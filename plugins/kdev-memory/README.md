@@ -19,9 +19,14 @@ claude plugin marketplace add KDevSec/kdev-agents
 claude plugin install kdev-memory@kdev-agents
 ```
 
-安装后自动启用 Stop hook —— 每次 Claude 要停下时检查：
-- 今天是否已有每日汇总
-- 执行日志里今天是否有记录
+安装后自动启用 Stop hook —— 每次 Claude 要停下时检查 `.kdev/` 状态，提醒 Claude 落盘：
+
+| 场景 | 提醒 |
+|-----|-----|
+| 项目未启用 `.kdev/` | 静默，不干扰其他项目 |
+| 今天还没生成每日汇总 | 提醒 Claude 调用 skill 从 `.kdev/` 聚合生成 |
+| 汇总存在 + 源文件有后续更新 | 提醒 Claude 追加新增条目（不覆盖已有内容） |
+| 执行日志里今天没条目 | 提醒 Claude 实时追加 Step 记录 |
 
 ## 更新
 ```bash
