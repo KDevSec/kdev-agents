@@ -10,10 +10,7 @@
       "name": "kdev-memory",
       "description": "工程记忆制度插件：实时落盘决策/踩坑/执行/评分记录，自动 hook 提醒每日汇总",
       "category": "development",
-      "source": {
-        "source": "path",
-        "path": "plugins/kdev-memory"
-      }
+      "source": "./plugins/kdev-memory"
     }
   ]
 }
