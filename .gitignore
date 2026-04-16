@@ -1,0 +1,32 @@
+# macOS
+.DS_Store
+
+# Linux
+*~
+.fuse_hidden*
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Editor / IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Environment
+.env
+.env.local
+
+# Claude Code 本地调试产物
+.kdev/
+.claude/settings.local.json

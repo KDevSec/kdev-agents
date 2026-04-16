@@ -12,12 +12,21 @@
 ## 安装
 
 ```bash
-claude plugin install /path/to/kdev-memory-plugin
+# 第一次使用者：注册 marketplace
+claude plugin marketplace add KDevSec/kdev-agents
+
+# 安装插件（自动带 hook）
+claude plugin install kdev-memory@kdev-agents
 ```
 
 安装后自动启用 Stop hook —— 每次 Claude 要停下时检查：
 - 今天是否已有每日汇总
 - 执行日志里今天是否有记录
+
+## 更新
+```bash
+claude plugin update kdev-memory@kdev-agents
+```
 
 ## 使用
 

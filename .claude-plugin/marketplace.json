@@ -1,7 +1,7 @@
 {
   "$schema": "https://anthropic.com/claude-code/marketplace.schema.json",
-  "name": "kdev-plugins",
-  "description": "KDev 工程记忆与流程辅助插件集",
+  "name": "kdev-agents",
+  "description": "KDev 系列 agent / 插件集合（工程记忆、流程辅助等）",
   "owner": {
     "name": "ly"
   },
