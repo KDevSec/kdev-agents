@@ -1,0 +1,17 @@
+{
+  "description": "kdev-memory: Stop 时提醒落盘 + 检查每日汇总",
+  "hooks": {
+    "Stop": [
+      {
+        "matcher": "*",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/stop-check.sh\"",
+            "timeout": 5
+          }
+        ]
+      }
+    ]
+  }
+}
