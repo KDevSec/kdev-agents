@@ -11,6 +11,12 @@
       "description": "工程记忆制度插件：实时落盘决策/踩坑/执行/评分记录，自动 hook 提醒每日汇总",
       "category": "development",
       "source": "./plugins/kdev-memory"
+    },
+    {
+      "name": "kdev-commit",
+      "description": "AI commit 身份强制隔离：hook 硬拦截未覆盖身份的智能体 commit，使人工/AI 提交在 git log 和 GitHub 页面一眼区分",
+      "category": "development",
+      "source": "./plugins/kdev-commit"
     }
   ]
 }

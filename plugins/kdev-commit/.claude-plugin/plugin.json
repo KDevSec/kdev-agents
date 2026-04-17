@@ -1,0 +1,10 @@
+{
+  "name": "kdev-commit",
+  "description": "AI commit 身份强制隔离：hook 硬拦截未覆盖身份的智能体 commit，使人工/AI 提交在 git log 和 GitHub 页面一眼区分",
+  "version": "0.1.0",
+  "author": {
+    "name": "ly"
+  },
+  "license": "MIT",
+  "keywords": ["commit", "attribution", "git", "hook", "ai-identity", "kdev"]
+}
