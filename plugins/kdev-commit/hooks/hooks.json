@@ -1,0 +1,17 @@
+{
+  "description": "kdev-commit: 拦截未覆盖 AI 身份的 git commit，动态派生 AI_EMAIL = <git-user.name>-AI@noreply.local",
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/block-unattributed-commit.sh\"",
+            "timeout": 3
+          }
+        ]
+      }
+    ]
+  }
+}

@@ -12,10 +12,8 @@ AI commit 身份强制隔离插件 —— 让智能体的 commit 和用户本人
 
 ## 核心机制
 
-安装时跑一次 skill，完成两件事：
-
-1. **PreToolUse Bash Hook**：智能体每次跑 `git commit` 时，hook 检查命令里是否带 `-c user.email=<AI_EMAIL>` 覆盖。没带就直接 block 并返回具体指令，Claude 立即重试。用户自己在终端敲的 commit 不受影响——hook 只在智能体会话里 fire。
-2. **运行时动态派生 AI 身份**：hook 不硬编码邮箱，每次触发时读 `git config user.name`（仓库级 > 全局级）加 `-AI` 后缀派生。团队成员换名字 / 不同项目用不同身份都自动适配。
+1. **PreToolUse Bash Hook**：智能体每次跑 `git commit` 时，hook 检查命令里是否带 `-c user.email=<AI_EMAIL>` 覆盖。没带就直接 block 并把期望邮箱写进 deny 消息——智能体照着重试即可，无需提前在 CLAUDE.md 里预埋规则。用户自己在终端敲的 commit 不受影响（hook 只在智能体会话里 fire）。
+2. **运行时动态派生 AI 身份**：hook 不硬编码邮箱，每次触发时读 `git config user.name`（仓库级 > 全局级）加 `-AI` 后缀派生。团队成员换名字 / 不同项目用不同身份都自动适配，无需重装。
 
 AI 邮箱固定用 `<name>-AI@noreply.local` 格式——不关联任何 GitHub 账号，页面显示灰色默认头像 + AI 名字，和本人头像**视觉一眼可区分**。
 
@@ -25,15 +23,13 @@ AI 邮箱固定用 `<name>-AI@noreply.local` 格式——不关联任何 GitHub 
 # 第一次使用者：注册 marketplace
 claude plugin marketplace add KDevSec/kdev-agents
 
-# 安装插件
+# 安装插件——hook 随插件自动注册，无需额外配置
 claude plugin install kdev-commit@kdev-agents
 ```
 
-装完在任意项目里说一句"帮我装 AI 提交隔离"即可，skill 会：
-- 检查 `git config --global user.name/user.email` 是否已配（没配提醒你先配）
-- 写 hook 到 `~/.claude/hooks/block-unattributed-commit.sh`
-- 注册到 `~/.claude/settings.json` 的 PreToolUse
-- 跑 3 个 hook 场景验证通过
+装完即生效，下一次智能体要 commit 时会被 hook 拦截并看到期望格式。
+
+**前置条件**：本机需配好 git 身份（`git config --global user.name "你的名字"`），hook 读这个值派生 AI 名字。
 
 ## 效果
 
