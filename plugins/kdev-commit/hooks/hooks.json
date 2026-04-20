@@ -1,5 +1,5 @@
 {
-  "description": "kdev-commit: 拦截未覆盖 AI 身份的 git commit，动态派生 AI_EMAIL = <git-user.name>-AI@noreply.local",
+  "description": "kdev-commit: (1) 拦截未覆盖 AI 身份的 git commit；(2) git push 弹权限框让用户确认。纯 Node 实现，零外部依赖。",
   "hooks": {
     "PreToolUse": [
       {
@@ -7,7 +7,12 @@
         "hooks": [
           {
             "type": "command",
-            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/block-unattributed-commit.sh\"",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/block-unattributed-commit.js\"",
+            "timeout": 3
+          },
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PLUGIN_ROOT}/hooks/confirm-push.js\"",
             "timeout": 3
           }
         ]

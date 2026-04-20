@@ -1,0 +1,120 @@
+---
+name: kdev-commit
+description: 用 AI 身份（本地 git user.name + -AI 后缀，email 沿用本地真实邮箱）完成 commit，并在 push 前让用户确认的标准流程。触发时机：用户说"帮我提交 / commit 一下 / 提交本次代码 / 提交并推送 / 推到 GitHub / ship 一下 / 收工 / 提交吧"时；或完成一段代码改动后用户表达"落盘 / 归档 / 入库"意图时。核心约束：AI 必须用 `git -c user.name=<NAME>-AI -c user.email=<真实邮箱> commit ...` 覆盖身份（kdev-commit hook 会硬校验，漏任一项就 deny）；push 由 confirm-push hook 弹权限框让用户点确认。
+---
+
+# kdev-commit skill
+
+## 这个 skill 负责什么
+
+**一件事**：把"用户说帮我提交"翻译成正确的 `git` 命令序列——读身份 → 派生 AI 身份 → 带覆盖参数 commit → 询问并 push。
+
+**这个 skill 不管**：
+- commit message 的具体模板（跟项目 commit 历史风格走）
+- commit 粒度（用户说怎么分就怎么分，不主动拆/合）
+- push 的权限弹窗（confirm-push.sh hook 处理）
+- 身份校验失败的兜底（block-unattributed-commit.sh hook 处理）
+
+## 身份策略（v0.2.0）
+
+- `AI_NAME = <git user.name>-AI`（ASCII 规范化：空格 → `-`，去掉非 ASCII 字符）
+- `AI_EMAIL = <git user.email>` —— **真实邮箱直接用，不拼 `@noreply.local`**
+- 效果：GitHub 头像仍是本人，但作者名后缀 `-AI` 清楚标记 AI 产出
+
+## 标准流程（AI 执行步骤）
+
+### 步骤 1：读本地 git 身份
+
+```bash
+git config user.name
+git config user.email
+```
+
+两个都非空才能继续。任一为空 → 告诉用户先配置（例：`git config --global user.email you@example.com`），不要自作主张写入 config。
+
+### 步骤 2：派生 AI_NAME
+
+- 规范化：把空格替换为 `-`，只保留 ASCII 字母数字/`_`/`-`
+- 加后缀：`AI_NAME = <safe_name>-AI`
+- 纯非 ASCII（如中文名） → 告诉用户先给 git 配一个 ASCII 别名
+
+### 步骤 3：看改动
+
+```bash
+git status
+git diff --staged   # 已暂存的改动
+git diff            # 未暂存（决定是否需要 git add）
+git log --oneline -5   # 参考项目 commit 风格
+```
+
+### 步骤 4：准备 commit message
+
+- 按项目最近几条 commit 的风格写（conventional commits / 自由式 / 带 scope / 中文 / 英文等，复制项目既有习惯）
+- 焦点放在 **为什么**，不要罗列 **改了什么**（diff 里已经有）
+- 单行标题 ≤ 72 字符
+
+### 步骤 5：执行 commit（带身份覆盖）
+
+```bash
+git -c user.name="$AI_NAME" -c user.email="$USER_EMAIL" commit -m "<msg>"
+```
+
+**硬约束**：`user.name` 和 `user.email` **两个都必须**用 `-c` 覆盖。block-unattributed-commit.sh hook 会校验。
+
+如果需要多行 message，用 HEREDOC 传：
+
+```bash
+git -c user.name="$AI_NAME" -c user.email="$USER_EMAIL" commit -m "$(cat <<'EOF'
+<title>
+
+<body>
+EOF
+)"
+```
+
+**注意**：不要带 `Co-Authored-By` 之类的 trailer ——作者名已经是 `-AI`，不需要再声明。
+
+### 步骤 6：询问用户是否 push
+
+commit 完成后，用自然语言问用户："要 push 到远端吗？"
+
+- 用户答"要 / yes / 推 / 是" → 继续步骤 7
+- 用户答"不要 / 先别 / 等等" → 停，报告 commit hash 和未推送状态
+
+### 步骤 7：执行 push
+
+```bash
+git push
+```
+
+如果报 `no upstream`，改用：
+
+```bash
+git push -u origin HEAD
+```
+
+**confirm-push hook 会弹 IDE 权限对话框**让用户再确认一次——用户点 allow 才真的推上去。这是第二道保险，正常现象，不要觉得是故障。
+
+**永远不要**：
+- 用 `--force`（除非用户明确说"强推"，且优先建议 `--force-with-lease`）
+- 在用户没说"push"的情况下擅自推
+
+### 步骤 8：报告
+
+- commit hash（`git log -1 --format=%H`）
+- push 到的 remote/branch
+- 如果还有未 push 的 commit，提醒用户
+
+## 异常处理
+
+- **commit hook deny**：按 deny reason 给的命令重试即可，不要改策略
+- **push 被拒（auth）**：原样报错给用户，不重试、不绕开
+- **push 被拒（non-fast-forward）**：提醒用户先 `git pull --rebase` 或手动决策，不要自己 rebase
+- **无 remote**：只完成 commit，告诉用户"没有配置 remote，跳过 push"
+
+## 不要做的事
+
+- **不要改 `git config`**：只读不写，永远
+- **不要用伪邮箱**：v0.1.0 用过 `@noreply.local`，v0.2.0 已废弃
+- **不要绕 hook**：hook deny 一定有原因，按提示重试
+- **不要主动 stage 所有文件**：用户让提交"这次改动"≠ `git add -A`。除非用户明确说"全部加进去"，否则只提交已暂存的改动；如果暂存区空而工作区有改动，问用户要不要 `git add` 哪些文件

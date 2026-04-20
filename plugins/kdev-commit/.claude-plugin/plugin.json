@@ -1,10 +1,10 @@
 {
   "name": "kdev-commit",
-  "description": "AI commit 身份强制隔离：hook 硬拦截未覆盖身份的智能体 commit，使人工/AI 提交在 git log 和 GitHub 页面一眼区分",
-  "version": "0.1.0",
+  "description": "AI commit + push 一体化：skill 引导 AI 用 <git user.name>-AI + 本地真实 email 完成 commit；hook 硬校验身份覆盖；push 前弹权限框让用户确认",
+  "version": "0.2.0",
   "author": {
     "name": "ly"
   },
   "license": "MIT",
-  "keywords": ["commit", "attribution", "git", "hook", "ai-identity", "kdev"]
+  "keywords": ["commit", "push", "attribution", "git", "hook", "skill", "ai-identity", "kdev"]
 }
