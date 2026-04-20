@@ -27,6 +27,11 @@ yarn-error.log*
 .env
 .env.local
 
-# Claude Code 本地调试产物
-.kdev/
+# Claude Code 本地调试产物（仅忽略仓库根目录的 .kdev/；
+# 允许子目录里的 .kdev 作为测试 fixture 被跟踪，靠下面的 negation 放行）
+/.kdev/
 .claude/settings.local.json
+
+# eval fixture：.kdev/ 测试数据，必须跟踪
+!plugins/kdev-memory/evals/fixtures/**/.kdev/
+!plugins/kdev-memory/evals/fixtures/**/.kdev/**
