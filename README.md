@@ -1,6 +1,6 @@
 # kdev-agents
 
-KDev 系列 Claude Code 插件集合 —— 工程记忆、流程辅助等。
+KDev 系列 Claude Code 插件集合 —— 工程记忆、流程辅助、代码提交等。
 
 ## 已有插件
 
