@@ -6,6 +6,7 @@
 
 - **实时落盘**：每步完成、每次踩坑、每个决策、每次评分，立刻写进 `.kdev/memory/` 对应文件
 - **快速汇总**：说"写今天的总结"时，从 `.kdev/memory/` 当天条目聚合拼装，不翻会话记录
+- **智能召回**：用户提到相关话题时，UserPromptSubmit hook 自动注入 `<kdev-memory-recall>` 指针让 Claude 按需 Read 细节——**已经踩过的坑不再重复、做过的决策能自然复用**
 - **双评分**：模型自评 + 用户评分，差值暴露方法论盲区
 - **经验外溢**：积累的改进建议喂给未来 skill 作者提炼新 skill
 - **跨会话续航**：SessionStart 注入摘要、PreCompact 写 checkpoint、SessionEnd 兜底 WARN，多管齐下保住记忆不丢
@@ -33,9 +34,9 @@ claude plugin install kdev-memory@kdev-agents
 
 本插件只管 `.kdev/memory/`，不碰同级其他目录。
 
-## Hook 行为（六层防线）
+## Hook 行为（七层防线）
 
-按会话时序由前到后六层 hook 协同工作：
+按会话时序由前到后七层 hook 协同工作：
 
 ### 1. SessionStart hook —— 开局注入 + 自动迁移
 
@@ -52,7 +53,28 @@ Claude 一开局就知道项目全景，不用等用户提"先看下昨天做到
 
 **额外职责**：检测 0.2.0 平铺结构（`.kdev/执行日志.md` 等），自动搬到 `.kdev/memory/` 子目录，留 `.kdev/MIGRATED-YYYY-MM-DD.md` 说明。从旧版升级完全无感。
 
-### 2. Stop hook —— 软提醒
+### 2. UserPromptSubmit hook —— 智能召回（triggers）
+
+用户每次发 prompt 时，扫 `.kdev/memory/` 里所有标了 `triggers:` 的条目，字面子串匹配命中就注入 `<kdev-memory-recall>` 指针给 Claude。**渐进式披露**——只给编号+标题+路径，Claude 判断相关再 Read 细节。
+
+扫描的四个数据源：
+
+| 数据源 | 召回范围 |
+|---|---|
+| `.kdev/memory/踩坑日志.md` 的 G-NNN | 全部（永久有效）|
+| `.kdev/memory/执行日志.md` 的 Step N | 今日/昨日（日期过滤，避免翻旧账） |
+| `.kdev/memory/方法论铁规.md` 的每条规则 | 全部 |
+| 项目级 spec 文件 7 个约定路径 | 全部（frontmatter / 行内两种格式） |
+
+约定的 spec 路径：`constitution.md` / `spec.md` / `principles.md` / `AGENTS.md` / `.specify/constitution.md` / `docs/constitution.md` / `docs/principles.md`。
+
+**防误触发**：Prompt sanitize 会 strip 代码块、XML 标签、URL、文件路径、git diff 块，避免用户在贴 README / 错误输出时字面量误触。
+
+**防刷屏**：每 session 同一条记忆只注入一次（60 分钟 TTL 去重，状态文件 `.kdev/memory/state/trigger-sessions.json`）；单次最多注入 3 条。
+
+**依赖 python3**。缺 python3 静默降级。
+
+### 3. Stop hook —— 软提醒
 
 每次 Claude 要停下时检查 `.kdev/memory/` 状态并 stdout 注入提醒：
 
@@ -65,7 +87,7 @@ Claude 一开局就知道项目全景，不用等用户提"先看下昨天做到
 
 软提醒的局限：会话自然 idle 时永远不会被下一轮读到。下面几层补上这个缝隙。
 
-### 3. Strict 模式（opt-in，条件阻塞）
+### 4. Strict 模式（opt-in，条件阻塞）
 
 `touch .kdev/memory/strict` 启用。执行日志今天空 + 工作区实质变更 ≥ 2 或命中里程碑白名单 → `exit 2` 阻塞 Stop，Claude 必须落盘才能结束。
 
@@ -73,17 +95,17 @@ Claude 一开局就知道项目全景，不用等用户提"先看下昨天做到
 
 阻塞带 `stop_hook_active` 保护不会无限循环。`rm .kdev/memory/strict` 关闭。
 
-### 4. PostToolUse hook —— 里程碑联动
+### 5. PostToolUse hook —— 里程碑联动
 
 Claude 用 `Write/Edit/MultiEdit/NotebookEdit` 命中里程碑白名单时立刻提醒追加 Step。日常源码编辑不打扰。
 
-### 5. PreCompact hook —— 压缩前写盘
+### 6. PreCompact hook —— 压缩前写盘
 
 会话即将被压缩时（`/compact` 或自动触发），写一个 `.kdev/memory/checkpoints/压缩前-YYYY-MM-DD-HHMMSS.md`，内容是今天所有 `.kdev/memory/` 核心文件的原文复制 + 工作区快照。**压缩后细节丢了也能回读原件。**
 
 7 天后自动清理。如需长期保留某个 checkpoint，手工 `mv` 出 `checkpoints/` 目录。
 
-### 6. SessionEnd hook —— 兜底警告
+### 7. SessionEnd hook —— 兜底警告
 
 会话真正结束时（客户端关闭、切项目），若执行日志今天空 + 工作区有变更 → 写 `.kdev/memory/WARN-未记录-YYYY-MM-DD.md`。下次进入项目时 SessionStart 的注入摘要会把它显眼列在顶部。
 
@@ -158,13 +180,20 @@ claude --debug
 └── memory/                    # kdev-memory 的全部产物
     ├── 当前状态.md             # 工作状态单一真相源（带 YAML frontmatter）
     ├── 决策日志.md             # Q-NNN
-    ├── 踩坑日志.md             # G-NNN
-    ├── 执行日志.md             # 每步记录 + 双评分
+    ├── 踩坑日志.md             # G-NNN（每条带 triggers: [...] 供智能召回）
+    ├── 执行日志.md             # 每步记录 + 双评分 + triggers
     ├── 每日汇总/               # YYYY-MM-DD.md
     ├── 改进建议.md             # R-NNN（喂给未来 skill 作者）
-    ├── 方法论铁规.md           # 可选，用户明确要求才建（择机迁到项目根 constitution.md/spec.md）
+    ├── 方法论铁规.md           # 可选，业务规则择机迁到项目根 constitution.md/spec.md
     ├── strict                  # 可选空文件，touch 后启用 Strict 阻塞
     ├── WARN-未记录-*.md        # SessionEnd hook 自动生成的兜底警告
+    ├── state/                  # hook 运行时状态
+    │   └── trigger-sessions.json  # UserPromptSubmit 去重（60min TTL）
     └── checkpoints/            # PreCompact hook 自动生成（7 天 retention）
         └── 压缩前-YYYY-MM-DD-HHMMSS.md
 ```
+
+项目级 spec 文件（UserPromptSubmit 自动扫描，存在即扫）：
+- `constitution.md` / `spec.md` / `principles.md` / `AGENTS.md`（项目根）
+- `.specify/constitution.md`（Spec Kit 新版）
+- `docs/constitution.md` / `docs/principles.md`

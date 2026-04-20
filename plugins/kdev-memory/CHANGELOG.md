@@ -1,5 +1,73 @@
 # kdev-memory CHANGELOG
 
+## 0.3.0 — 2026-04-20
+
+从 0.2.0 的"六层防线"升级到 **"七层防线 + 目录命名空间化 + 智能召回"**。
+核心目标：把记忆从"档案馆"升级为"会主动浮现"的闭环系统——已经踩过
+的坑不再重复，做过的决策能自然复用。
+
+### 新增
+
+- **UserPromptSubmit hook**（`hooks/user-prompt-trigger.sh` +
+  `hooks/lib/trigger-match.py`）：用户每次发 prompt 时扫
+  `.kdev/memory/` 里所有带 `triggers:` 的条目做 literal substring
+  匹配，命中就注入 `<kdev-memory-recall>` 指针给 Claude。**渐进式
+  披露**——只给编号+标题+路径，不塞全文，让 Claude 自己决定是否
+  Read 细节。
+  - 扫描 4 个数据源：G-NNN 全部 / Step 今日-昨日 / 方法论铁规 全部 /
+    项目级 spec 7 个约定路径
+  - Prompt sanitize：strip 代码块 / XML tag / URL / 文件路径 /
+    git diff（避免字面量误触发）
+  - Session 去重：`.kdev/memory/state/trigger-sessions.json`，
+    60 分钟 TTL，每 session 限额 3 条（借 OMC 经验 + 避开 issue #240
+    的同类坑）
+  - 借 OMC (oh-my-claudecode) 的成熟做法设计：literal 子串匹配、
+    toLowerCase、文件落盘去重；但放弃 OMC 直接塞全文的做法，改用
+    渐进式披露
+- **triggers 字段写法规范**（SKILL.md §8 新增章节）：
+  明确 G-NNN / Step / 铁规 / spec 四类条目的 triggers 标注方式、
+  三种合法格式（JSON 数组 / 逗号分隔 / YAML 多行）、关键词选择原则
+  （3-5 个、中英文、口语词、场景+特征）
+- **项目级 spec 约定路径扫描**：`constitution.md` / `spec.md` /
+  `principles.md` / `AGENTS.md` / `.specify/constitution.md` /
+  `docs/constitution.md` / `docs/principles.md`——存在即扫，支持
+  文件级 frontmatter 或行内 `## 规则 + triggers` 两种格式
+
+### 变更（破坏性 → 零感知迁移）
+
+- **`.kdev/` 重构成插件命名空间容器**：所有 kdev-memory 产物从
+  `.kdev/` 根目录平铺迁到 `.kdev/memory/` 子目录。未来其他 kdev
+  插件（kdev-commit、kdev-triggers 等）可以建兄弟子目录互不干扰。
+- **自动迁移**（`hooks/lib/migrate.sh`）：所有 hook 启动时调
+  `kdev_memory_migrate`，检测 0.2.0 平铺结构自动搬家到
+  `.kdev/memory/` 子目录，留 `.kdev/MIGRATED-YYYY-MM-DD.md`
+  清单给用户看。**从 0.2.0 升级完全无感**——第一次打开项目
+  就自动完成，用户不用手工做任何事。
+- 所有 hook 脚本 `KDEV_DIR` 从 `.kdev` 改到 `.kdev/memory`；软提
+  醒文本里的路径同步更新到 `.kdev/memory/*`
+- `hooks/lib/milestone.sh` / `hooks/lib/frontmatter.sh` 兼容新旧
+  两种路径（优先新路径，fallback 老路径）
+- SKILL.md 目录结构图重绘；描述增加 triggers / 召回相关触发词
+- README.md Hook 章节从"六层防线"改写为"七层防线"，加"命名
+  空间约定"和"UserPromptSubmit 智能召回"两个新章节
+
+### SKILL.md 里新增的触发规则段铁规（CLAUDE.md 贴段）
+
+- 🔴 每写一条新 G-NNN / Step / 铁规，紧跟标题下一行加
+  `triggers: [...]` 关键词列表（3-5 个用户会说的词，中英文都要）
+- 🔴 看到 `<kdev-memory-recall>` 注入时先判断相关性，字面子串
+  匹配有假阳性；相关再 Read，不相关忽略，不要为了"用起来"强行
+  靠拢
+
+### 兼容性
+
+- 0.2.0 → 0.3.0 完全向后兼容（自动迁移 + 双轨 fallback）
+- 没标 `triggers:` 的条目不影响现有功能，只是不会被自动召回
+  （退回到 0.2.0 的"档案馆"体验）
+- 缺 python3 → UserPromptSubmit 静默降级（其他 6 层 hook 继续工作）
+
+---
+
 ## 0.2.0 — 2026-04-19
 
 由一份用户反馈驱动的重大升级：Spec Kit 等长流程跑完后会话自然 idle，Stop hook
