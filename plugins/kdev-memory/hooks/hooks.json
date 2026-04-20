@@ -1,5 +1,5 @@
 {
-  "description": "kdev-memory: 六层防线 hook 系统 —— SessionStart 注入 + Stop 软提醒/Strict 阻塞 + PostToolUse 里程碑联动 + PreCompact 压缩前写盘 + SessionEnd 兜底警告",
+  "description": "kdev-memory: 七层防线 hook 系统 —— SessionStart 注入 + UserPromptSubmit 智能召回 + Stop 软提醒/Strict 阻塞 + PostToolUse 里程碑联动 + PreCompact 压缩前写盘 + SessionEnd 兜底警告",
   "hooks": {
     "SessionStart": [
       {
@@ -7,6 +7,17 @@
           {
             "type": "command",
             "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/session-start-brief.sh\"",
+            "timeout": 5
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/user-prompt-trigger.sh\"",
             "timeout": 5
           }
         ]
