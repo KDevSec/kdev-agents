@@ -1,7 +1,10 @@
 #!/usr/bin/env bash
 # kdev-memory SessionStart hook
-# 新会话启动时向 Claude 注入 .kdev/ 当前状态摘要，让 Claude 一开局就知道项目记忆在哪、
-# 有哪些待处理事项（WARN / checkpoint / 待决策等）。
+# 新会话启动时向 Claude 注入 .kdev/memory/ 当前状态摘要，让 Claude 一开局就知道
+# 项目记忆在哪、有哪些待处理事项（WARN / checkpoint / 待决策等）。
+#
+# 额外职责：这是所有 hook 里最早被触发的（按会话时序），承担"自动迁移 0.2.0 → 0.3.0
+# 目录结构"的主入口——旧结构的老项目升级到 0.3.0 后，第一次开会话就自动搬家。
 #
 # 输出格式：JSON，使用 hookSpecificOutput.additionalContext 结构化注入。
 # Claude Code 会把 additionalContext 作为 SessionStart 的初始上下文读到。
@@ -11,20 +14,25 @@
 #   - resume：精简到 2-3 行（Claude 已有上下文，不重复注入）
 #   - compact：提醒 checkpoint 在哪，不重复注入旧内容
 
-KDEV_DIR=".kdev"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=lib/migrate.sh
+# shellcheck disable=SC1091
+. "$SCRIPT_DIR/lib/migrate.sh"
+# shellcheck source=lib/frontmatter.sh
+# shellcheck disable=SC1091
+. "$SCRIPT_DIR/lib/frontmatter.sh"
+
+# 自动迁移（如果是 0.2.0 升级过来的老项目，这里完成搬家）
+kdev_memory_migrate
+
+KDEV_DIR=".kdev/memory"
 TODAY=$(date +%F)
 
-# 项目未启用 .kdev/ → 静默（输出 suppressOutput，不注入任何内容）
+# 项目未启用 .kdev/memory/ → 静默（输出 suppressOutput，不注入任何内容）
 if [ ! -d "$KDEV_DIR" ]; then
   echo '{"continue":true,"suppressOutput":true}'
   exit 0
 fi
-
-# 引入 frontmatter 解析
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-# shellcheck source=lib/frontmatter.sh
-# shellcheck disable=SC1091
-. "$SCRIPT_DIR/lib/frontmatter.sh"
 
 # 消费 stdin 拿 source（防 hang，1 秒超时）
 SOURCE="startup"
@@ -141,7 +149,7 @@ build_brief() {
         [ -n "$RECENT_G" ] && brief+="- $RECENT_G\n"
       fi
 
-      brief+="\n💡 **建议**：如需详细上下文，Read .kdev/当前状态.md 和最近的 .kdev/每日汇总/*.md。"
+      brief+="\n💡 **建议**：如需详细上下文，Read .kdev/memory/当前状态.md 和最近的 .kdev/memory/每日汇总/*.md。"
       ;;
   esac
 

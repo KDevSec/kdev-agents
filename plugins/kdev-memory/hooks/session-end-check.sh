@@ -1,15 +1,23 @@
 #!/usr/bin/env bash
 # kdev-memory SessionEnd hook
-# 会话真正结束时的兜底：若今天 .kdev/执行日志.md 无条目但工作区有变更
-# → 写一个显眼的 .kdev/WARN-未记录-YYYY-MM-DD.md 文件，列出当天被动过的文件
-# 下次打开项目时，CLAUDE.md 触发规则段会让 Claude 看到 WARN-* 并提醒用户补记
+# 会话真正结束时的兜底：若今天 .kdev/memory/执行日志.md 无条目但工作区有变更
+# → 写一个显眼的 .kdev/memory/WARN-未记录-YYYY-MM-DD.md 文件，列出当天被动过的文件
+# 下次打开项目时，SessionStart hook 会把 WARN 显眼列在 <kdev-memory-brief> 里
 
-KDEV_DIR=".kdev"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=lib/migrate.sh
+# shellcheck disable=SC1091
+. "$SCRIPT_DIR/lib/migrate.sh"
+
+# 防御性迁移：0.2.0 遗留结构自动搬到 .kdev/memory/
+kdev_memory_migrate
+
+KDEV_DIR=".kdev/memory"
 TODAY=$(date +%F)
 LOG_FILE="$KDEV_DIR/执行日志.md"
 WARN_FILE="$KDEV_DIR/WARN-未记录-$TODAY.md"
 
-# 项目未启用 .kdev/ → 静默
+# 项目未启用 .kdev/memory/ → 静默
 [ -d "$KDEV_DIR" ] || exit 0
 
 # 执行日志今天已有条目 → 无需警告

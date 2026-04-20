@@ -14,17 +14,22 @@
 #
 # 里程碑白名单：specs/**/*.md、specs/**/contracts/*.{yml,yaml}、.kdev/方法论铁规.md
 
-KDEV_DIR=".kdev"
-TODAY=$(date +%F)
-SUMMARY_FILE="$KDEV_DIR/每日汇总/$TODAY.md"
-
-# 引入里程碑白名单（单一真相源）
-# shellcheck source=lib/milestone.sh
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=lib/migrate.sh
+# shellcheck disable=SC1091
+. "$SCRIPT_DIR/lib/migrate.sh"
+# shellcheck source=lib/milestone.sh
 # shellcheck disable=SC1091
 . "$SCRIPT_DIR/lib/milestone.sh"
 
-# 1. 未启用 .kdev/ → 静默
+# 防御性迁移：0.2.0 遗留结构自动搬到 .kdev/memory/（幂等，热路径快返回）
+kdev_memory_migrate
+
+KDEV_DIR=".kdev/memory"
+TODAY=$(date +%F)
+SUMMARY_FILE="$KDEV_DIR/每日汇总/$TODAY.md"
+
+# 1. 未启用 .kdev/memory/ → 静默
 [ -d "$KDEV_DIR" ] || exit 0
 
 # 读 hook 输入的 JSON，拿 stop_hook_active（避免阻塞后无限循环）
@@ -41,7 +46,7 @@ REMINDERS=""
 
 # 2. 今天无汇总 → 提醒生成
 if [ ! -f "$SUMMARY_FILE" ]; then
-  REMINDERS="${REMINDERS}[kdev-memory] 今天（$TODAY）还没有生成每日汇总。如果本轮是当日最后一次工作，请调用 kdev-memory skill 从 .kdev/ 聚合当天记录生成汇总。\n"
+  REMINDERS="${REMINDERS}[kdev-memory] 今天（$TODAY）还没有生成每日汇总。如果本轮是当日最后一次工作，请调用 kdev-memory skill 从 .kdev/memory/ 聚合当天记录生成汇总。\n"
 else
   # 3. 汇总存在 → 检查源文件是否有后续更新未并入
   STALE_SOURCES=""
@@ -60,7 +65,7 @@ LOG_EMPTY_TODAY="false"
 if [ -f "$KDEV_DIR/执行日志.md" ]; then
   if ! grep -q "$TODAY" "$KDEV_DIR/执行日志.md" 2>/dev/null; then
     LOG_EMPTY_TODAY="true"
-    REMINDERS="${REMINDERS}[kdev-memory] 执行日志里今天没有任何条目。如果本轮完成了工作步骤，请实时追加 Step 记录到 .kdev/执行日志.md。\n"
+    REMINDERS="${REMINDERS}[kdev-memory] 执行日志里今天没有任何条目。如果本轮完成了工作步骤，请实时追加 Step 记录到 .kdev/memory/执行日志.md。\n"
   fi
 fi
 
@@ -105,9 +110,9 @@ if [ "$STOP_HOOK_ACTIVE" = "false" ] && [ -f "$KDEV_DIR/strict" ] && [ "$LOG_EMP
       if [ "$SUBSTANTIVE_COUNT" -ge 2 ] || [ "$MILESTONE_HIT" = "yes" ]; then
         CHANGE_COUNT="$SUBSTANTIVE_COUNT"
         {
-          echo "[kdev-memory/strict] 检测到 .kdev/执行日志.md 今天无任何条目，但工作区有 $CHANGE_COUNT 处未提交变更（命中里程碑=$MILESTONE_HIT）。"
-          echo "请先追加至少一条 Step 记录到 .kdev/执行日志.md（说明今天完成了哪些工作单元、产出物路径、模型自评），再结束本轮。"
-          echo "如需临时关闭严格模式：rm .kdev/strict"
+          echo "[kdev-memory/strict] 检测到 .kdev/memory/执行日志.md 今天无任何条目，但工作区有 $CHANGE_COUNT 处未提交变更（命中里程碑=$MILESTONE_HIT）。"
+          echo "请先追加至少一条 Step 记录到 .kdev/memory/执行日志.md（说明今天完成了哪些工作单元、产出物路径、模型自评），再结束本轮。"
+          echo "如需临时关闭严格模式：rm .kdev/memory/strict"
         } >&2
         exit 2
       fi

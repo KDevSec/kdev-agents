@@ -16,6 +16,8 @@ is_milestone_path() {
     specs/*/*.md|specs/*/contracts/*.yml|specs/*/contracts/*.yaml) return 0 ;;
 
     # --- 工程记忆自己的硬规 ---
+    .kdev/memory/方法论铁规.md) return 0 ;;
+    # 向后兼容：0.2.0 遗留位置（迁移失败场景的 fallback）
     .kdev/方法论铁规.md) return 0 ;;
 
     # --- 迭代 / Sprint / 冲刺 ---

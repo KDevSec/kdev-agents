@@ -1,14 +1,25 @@
 #!/usr/bin/env bash
 # kdev-memory PostToolUse hook
 # Claude 每次 Write/Edit/MultiEdit/NotebookEdit 命中里程碑白名单时注入一条软提醒：
-# "刚动了里程碑文件 X，请把对应 Step 追加到 .kdev/执行日志.md"
+# "刚动了里程碑文件 X，请把对应 Step 追加到 .kdev/memory/执行日志.md"
 #
 # 白名单在 hooks/lib/milestone.sh 中维护（覆盖 Spec Kit、ADR、迭代/Sprint、
 # 架构/PRD/设计、根目录关键文档、数据库 migration、OpenAPI/GraphQL/Proto 契约等）
 
-KDEV_DIR=".kdev"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=lib/migrate.sh
+# shellcheck disable=SC1091
+. "$SCRIPT_DIR/lib/migrate.sh"
+# shellcheck source=lib/milestone.sh
+# shellcheck disable=SC1091
+. "$SCRIPT_DIR/lib/milestone.sh"
 
-# 项目未启用 .kdev/ → 静默
+# 防御性迁移
+kdev_memory_migrate
+
+KDEV_DIR=".kdev/memory"
+
+# 项目未启用 .kdev/memory/ → 静默
 [ -d "$KDEV_DIR" ] || exit 0
 
 # 读 hook JSON，拿 tool_input.file_path
@@ -37,14 +48,8 @@ case "$FILE_PATH" in
   "$CWD"/*) REL_PATH="${FILE_PATH#$CWD/}" ;;
 esac
 
-# 引入里程碑白名单
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-# shellcheck source=lib/milestone.sh
-# shellcheck disable=SC1091
-. "$SCRIPT_DIR/lib/milestone.sh"
-
 if is_milestone_path "$REL_PATH"; then
-  echo "[kdev-memory] 刚动了里程碑文件 $REL_PATH —— 请把对应的 Step 追加到 .kdev/执行日志.md（说明这次变更的目的、产出、模型自评）。"
+  echo "[kdev-memory] 刚动了里程碑文件 $REL_PATH —— 请把对应的 Step 追加到 .kdev/memory/执行日志.md（说明这次变更的目的、产出、模型自评）。"
 fi
 
 exit 0

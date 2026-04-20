@@ -7,12 +7,14 @@
 #
 # 实现选择：优先 python3（稳）；降级到纯 bash 简单解析（不保证完整 YAML 合规）。
 
-# 读 .kdev/当前状态.md 的 frontmatter 字段
+# 读 .kdev/memory/当前状态.md 的 frontmatter 字段
 # 用法：read_state_field <field_name>
 # 若文件不存在 / 无 frontmatter / 字段缺失 → 返回空字符串
 read_state_field() {
   local field="$1"
-  local state_file=".kdev/当前状态.md"
+  local state_file=".kdev/memory/当前状态.md"
+  # 向后兼容：0.2.0 遗留位置的 fallback
+  [ -f "$state_file" ] || state_file=".kdev/当前状态.md"
 
   [ -f "$state_file" ] || { echo ""; return 0; }
 
@@ -64,9 +66,10 @@ PYEOF
   ' "$state_file"
 }
 
-# 判断 .kdev/当前状态.md 是否带 frontmatter
+# 判断 .kdev/memory/当前状态.md 是否带 frontmatter
 has_state_frontmatter() {
-  local state_file=".kdev/当前状态.md"
+  local state_file=".kdev/memory/当前状态.md"
+  [ -f "$state_file" ] || state_file=".kdev/当前状态.md"
   [ -f "$state_file" ] || return 1
   head -1 "$state_file" | grep -q '^---$'
 }

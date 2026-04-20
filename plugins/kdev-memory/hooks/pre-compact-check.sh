@@ -7,25 +7,30 @@
 # 不是"提醒 Claude"（压缩场景下 Claude 读提醒的概率低）。
 #
 # 行为：
-#   1. 总是写一个 .kdev/checkpoints/压缩前-YYYY-MM-DD-HHMMSS.md
+#   1. 总是写一个 .kdev/memory/checkpoints/压缩前-YYYY-MM-DD-HHMMSS.md
 #      内容 = 今日执行/决策/踩坑/改进当前状态的原文复制 + 工作区 porcelain
 #   2. 如果执行日志今天空 + 工作区有变更，checkpoint 里加"⚠️ 未落盘"显眼区块
 #   3. 顺手清理 7 天前的旧 checkpoint（retention）
 #   4. stdout 软提醒（bonus，不依赖 Claude 一定读到）
 
-KDEV_DIR=".kdev"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=lib/migrate.sh
+# shellcheck disable=SC1091
+. "$SCRIPT_DIR/lib/migrate.sh"
+# shellcheck source=lib/checkpoint.sh
+# shellcheck disable=SC1091
+. "$SCRIPT_DIR/lib/checkpoint.sh"
+
+# 防御性迁移
+kdev_memory_migrate
+
+KDEV_DIR=".kdev/memory"
 CHECKPOINT_DIR="$KDEV_DIR/checkpoints"
 TODAY=$(date +%F)
 TIMESTAMP=$(date +%F-%H%M%S)
 
-# 项目未启用 .kdev/ → 静默
+# 项目未启用 .kdev/memory/ → 静默
 [ -d "$KDEV_DIR" ] || exit 0
-
-# 引入公共库
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-# shellcheck source=lib/checkpoint.sh
-# shellcheck disable=SC1091
-. "$SCRIPT_DIR/lib/checkpoint.sh"
 
 # 消费 stdin（防止 hang）；PreCompact 的 trigger 字段可选用于日志
 # 最多读 100KB，1 秒超时
@@ -119,6 +124,6 @@ prune_old_checkpoints "$CHECKPOINT_DIR" 7
 
 # 软提醒（bonus）
 echo "[kdev-memory] 会话即将压缩。已写 checkpoint：$CHECKPOINT_FILE"
-echo "[kdev-memory] 压缩后若需回忆细节，可 Read 此文件。如本会话有 Step/决策/踩坑未落盘，请**现在就**追加到 .kdev/ 对应文件。"
+echo "[kdev-memory] 压缩后若需回忆细节，可 Read 此文件。如本会话有 Step/决策/踩坑未落盘，请**现在就**追加到 .kdev/memory/ 对应文件。"
 
 exit 0
