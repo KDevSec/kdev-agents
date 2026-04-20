@@ -1,0 +1,667 @@
+# kdev-memory 开发历程技术分享
+
+> 一个 Claude Code 插件从 0.1.0 到 0.3.0 的演进故事，以及背后关于"如何给 AI 智能体装一个靠谱的工程记忆"的思考。
+>
+> 日期：2026-04-20
+> 仓库：[KDevSec/kdev-agents](https://github.com/KDevSec/kdev-agents)
+> 插件：[plugins/kdev-memory/](../plugins/kdev-memory/)
+
+---
+
+## 1. 真实起源：从 token-statistics Sprint 0 狗粮项目长出来的
+
+kdev-memory **不是凭空设计出来的**。它是在开发另一个项目——[token-statistics](https://github.com/) Claude Code token 用量统计工具——的过程中，作为"顺手做的基础设施"起步的。
+
+### 1.1 当时真正的任务
+
+那时候的主目标是：
+
+- **狗粮 KDev-Agent v3.0.1 架构**：手动编排 BMAD / Gstack / Superpowers 三个插件，走完一个完整项目（IR → SR → AR → TDD 全流程，最终部署到 1C1G 公网）
+- **两件具体的附加任务**：
+  1. **流程顺畅度打分**——20+ 个节点每步结束都给用户打 1-5 分，采集"哪个 skill 好用、哪个不对"的原始信号
+  2. **为 kdev-agent 融合架构设计踩坑**——预设 6 个"可能是设计纰漏"的点（记忆系统碎片化、BMAD Helper Pattern、skill 流程冲突等），看真实跑起来是不是问题
+
+记忆制度本来不是目的——它只是为了**完成这两件附加任务**而被迫搭出来的最小脚手架。
+
+### 1.2 最早长什么样
+
+翻 `/home/lyadmin/Projects/token-statistics/.kdev/` 的历史，2026-04-10 的第一版目录是：
+
+```
+.kdev/
+├── state.md              # 流程状态
+├── questions-log.md      # 决策追溯
+├── gotchas.md            # 踩坑
+├── sprint0-journal.md    # 每步记录（含评分）
+├── sprint0-playbook.md   # Skill 编排操作手册
+└── daily-logs/           # 每日汇总
+```
+
+粒度和现在的 kdev-memory 已经非常接近——但**命名完全是英文 + 面向 Sprint 0 一次性**的。一看就是"为了这个项目造的临时工具"。
+
+到了 2026-04-13 前后，这套脚手架被证明足够稳，用户决定把它**中文化 + 通用化**：
+
+| 原名（英文、Sprint 0 专属） | 后来（kdev-memory 插件） |
+|---|---|
+| `state.md` | `当前状态.md` |
+| `questions-log.md` | `决策日志.md` |
+| `gotchas.md` | `踩坑日志.md` |
+| `sprint0-journal.md` | `执行日志.md` |
+| `daily-logs/` | `每日汇总/` |
+| `conventions.md §11 + R-NNN` | `改进建议.md` |
+
+这不是一次改名——是**从"项目私有的规范"抽象成"可复用的制度"**的关键转折。
+
+### 1.3 两件事的真实产出（证据）
+
+狗粮跑完，两件附加任务都出了硬产出：
+
+**流程顺畅度打分**（20+ 节点）：
+- 均值 4.0 / 5
+- 最低 3 分：**迭代 4 Step 2 brainstorm 偷跳摘要**——LLM 为了速度跳过了应有的决策核对点
+- 最高 5 分：gstack 的价值（但绑定着"整块调用导致流程失控"的问题）
+
+**6 个预设设计纰漏**的验证：
+- 4 个确认是真问题（记忆系统碎片化、外部 skill 流程失控、等等）
+- 2 个实践中没发生（边缘场景）
+- **3 个未预设**的新问题意外暴露出来
+
+所有这些，最后汇集成 [token-statistics/.kdev/改进建议.md](../token-statistics/.kdev/改进建议.md)——一份 **面向 KDev-Agent 项目的 meta 交付物**：不在 token-statistics 项目内执行，而是**反哺 kdev-agent v3.0.1 架构**。
+
+这份"改进建议.md"就是 kdev-memory 后来引以为核心卖点的 **"经验外溢给未来 skill 作者"** 的原型——**不是抽象设计，是真实发生过的用法**。
+
+### 1.4 什么时候决定"应该做成插件"
+
+触发点是一个具体瞬间：token-statistics 跑到迭代 3 左右，用户说了一句——
+
+> "这套 `.kdev/` 下次别的项目还用得上吧？能不能装一下就有？"
+
+这时候意识到两件事：
+
+1. **机制已经验证**过了，不是凭空设计——有 20+ 节点评分 + 6 个设计纰漏的真实数据在背书
+2. **手工搭建门槛太高**——每个项目都要写 CLAUDE.md 触发规则段 + 手动建目录 + 记住编号规则
+
+于是 2026-04-16 有了 kdev-memory 0.1.0：从 Sprint 0 专属的脚手架，抽象成**所有项目装了就有**的插件。
+
+### 1.5 为什么这个起源很重要
+
+搞清楚起源对判断这个插件的**边界**至关重要：
+
+- ✅ **擅长**：长周期项目、狗粮项目、方法论验证、跨项目经验归纳——**因为它就是为了这些场景做出来的**
+- ❌ **不适合**：一次性脚本、单会话任务、用 Jira/Linear 已经承接决策和缺陷的项目——**硬套就是过度工程**
+
+这也解释了为什么核心设计里那么多"反直觉但很强硬"的原则（实时落盘、不翻会话、原始胜于提炼）——**它们都是在 token-statistics 里被"靠印象补写的评分完全失真"这类具体教训逼出来的**，不是先验设计。
+
+---
+
+### 1.6 后来才意识到：这个痛点其实是普遍的
+
+把 kdev-memory 抽出来以后，才看清一件事：狗粮项目暴露的失忆问题，**其实是所有长周期项目都有**。
+
+> 周一，你开一个 Claude Code 会话做项目 A，花两小时讨论技术选型，最后选了 B 方案，理由是"团队下个月要接 C"。
+>
+> 周三，你开新会话继续做项目 A，随口问："这里用 A 还是 B？" Claude 礼貌地给你一份全新的对比清单，倾向 A。
+>
+> 周五，你跑同一个 `pnpm install` 命令，它花 15 分钟帮你 debug 出"workspace 根目录要加 `-r`"——和上周二它自己踩过的那个坑一模一样。
+
+这是多迭代、长周期项目里智能体的**结构性失忆**。问题不在模型聪不聪明——问题在于：
+
+- **会话压缩**一来，早期细节直接没；
+- **新会话**不会主动读昨天的记录；
+- 就算有 `CLAUDE.md`，它是"规则"，不是"项目现状"；
+- 官方 `memory` 机制更偏"用户偏好"，不是"工程日志"。
+
+token-statistics 的狗粮只是**把这个普遍问题在一个具体项目里压缩暴露**出来了——20+ 节点评分让"每次新会话都要重解释上下文"的代价变得可测量。
+
+---
+
+## 2. 产品定位：明确"不做什么"更重要
+
+很多记忆类插件做着做着就变成了"给 AI 上一套 CRM + 向量检索 + 摘要引擎"。我们一开始就给自己划了两道红线：
+
+### 2.1 定位的两件核心事
+
+| 核心任务 | 本质 | 起源证据 |
+|---|---|---|
+| **跨会话续航** | 让新会话 30 秒内接上昨天的工作 | token-statistics 跨会话恢复验证（Step 1 会话 2）——约 40k token 恢复完整上下文 |
+| **经验外溢给未来 skill 作者** | 把"智能体高速产出但用户觉得对不上"这类原始张力**无损保存**成一手原料 | token-statistics 的 [`改进建议.md`](../token-statistics/.kdev/改进建议.md) 反哺 kdev-agent v3.0.1 架构——这是实际发生的用法，不是抽象设想 |
+
+### 2.2 不做的事
+
+| 拒绝的路线 | 为什么拒绝 |
+|---|---|
+| SQLite / 向量库 / FTS5（如 claude-mem） | 核心定位背离——我们要"文件落盘 + 人可读"，不要工具才能解码的黑箱 |
+| 调用 LLM 做压缩摘要（如 claude-memory-compiler） | 引入 API key、成本、延迟；和"实时落盘"定位冲突 |
+| Continuous Learning 自动提取（如 ECC） | LLM 二次调用贵；原始证据比"提炼"更有价值 |
+| 三层 notepad + 6 类 JSON 状态（如 OMC） | 文件碎片化、心智负担大 |
+| 在项目内强制执行"改进建议" | **记录和执行是两件事**，强制执行等于滥用 |
+
+这些选择表面是技术选型，底层是产品定位——**我们卖的是"诚实的项目日志"，不是"AI 大脑"**。
+
+---
+
+## 3. 核心设计：实时落盘 + 汇总只读
+
+这是整个 skill 最重要的原则，任何使用者都必须理解：
+
+### 3.1 🔴 实时落盘，不是会话末尾回忆
+
+智能体每做完一步、踩一次坑、做一次决策、接到一次评分，**立刻**把当条记录写进 `.kdev/memory/` 对应文件。这是**持续进行的后台动作**——不是攒到会话最后一次写完，更不是等用户提醒才记。
+
+为什么死抠这条？因为不实时落盘会出三种严重后果：
+
+1. **会话被压缩或崩溃** → 当天信号全丢
+2. **记忆失真** → 靠回忆写的记录比实时写的**差一个量级**
+3. **用户评分过夜补录** → 第二天的分数严重失真（感受会褪色）
+
+### 3.2 🔴 每日汇总从文件聚合，不翻会话记录
+
+用户说"写今天的总结"时，智能体的动作路径**严格如下**：
+
+```
+读 .kdev/memory/执行日志.md  ──┐
+读 .kdev/memory/决策日志.md  ──┤
+读 .kdev/memory/踩坑日志.md  ──┼── 按今天日期筛选 → 拼装 → 写 每日汇总/YYYY-MM-DD.md
+读 .kdev/memory/改进建议.md  ──┤
+读 .kdev/memory/当前状态.md  ──┘
+```
+
+**严禁**：回翻会话上下文、让用户复述"今天做了什么"、凭印象总结。
+
+这看着像是强迫症式的规则，但它决定了 skill 是否成立：
+- 如果汇总靠回忆写，skill 就退化成"会话结束前写点总结"——毫无价值；
+- 如果汇总只是把 `.kdev/memory/` 里的数据按日筛选拼装，速度极快、信息准确、可审计。
+
+**文件是第一真相，会话是它的副本**——这是一句反直觉但极其重要的设计箴言。
+
+---
+
+## 4. 版本迭代故事（真实的成长线）
+
+从 git log 看，这个插件走了四版。每一版都是被具体痛点逼出来的，不是按"路线图"推进的。
+
+### 4.0（pre-plugin） — 在 token-statistics 里的原型期
+
+**时间**：2026-04-10 ~ 2026-04-15
+**形态**：没有插件、没有 hook，只有 `.kdev/` 目录 + 一份手写的 `CLAUDE.md` 触发规则段
+
+这个阶段验证了后来变成插件"核心原则"的几件事：
+
+- ✅ **实时落盘**（原则）：起初就要求"每步完成立刻写 sprint0-journal.md"——因为早期试过"会话末尾回忆补写"，当天的分数全部偏高（用户后来看到回忆补写的评分，形容"完全不是当时的感觉"）
+- ✅ **双评分**（雏形）：用户一开始只给一个顺畅度分，后来发现**用户评分和智能体自我感觉经常对不上**（"LLM 觉得顺、用户觉得返工"）——于是加了"模型自评 + 用户评分"的双轨
+- ✅ **改进建议不强制执行**（原则）：`conventions.md §11` 里的 R-NNN 明确写着"这些是反哺 KDev-Agent 的建议，**不改本项目**"——这条后来变成 kdev-memory 的核心哲学
+- ❌ **没有 hook、没有迁移、没有召回**：完全是"人工驱动"，智能体全靠 CLAUDE.md 自觉。实时落盘失灵了 N 次（Spec Kit 长流程跑完忘记记 Step），催生了后来的 hook 分层
+
+**关键观察**：这个原型期的**数据诚信度**反而是整个项目里最高的——因为用户**同时**是设计者、使用者、审计者，三个角色重叠时记录不可能作弊。后来做插件时的很多"反作弊"机制（时间戳锁定、强制扣分项、差值 ≥ 2 升 R-NNN）本质上是**在复制这个原型期的社会约束**——插件用户不会同时是审计者，所以结构必须顶上来。
+
+### 4.1 0.1.0 — 骨架 + Stop hook 四态软提醒
+
+**时间**：2026-04-16
+**commit**：[`8aa9191`](https://github.com/KDevSec/kdev-agents/commit/8aa9191)
+
+第一版只做了最基础的几件事：
+
+- `.kdev/` 目录结构：执行日志 / 决策日志 / 踩坑日志 / 改进建议 / 每日汇总 / 当前状态
+- Step / Q-NNN / G-NNN / R-NNN 编号规则
+- SKILL.md 定义触发词和记录 schema
+- **Stop hook 四态检查**：每次 Claude 要停下时做一次状态判断
+  - 项目未启用 `.kdev/` → 静默（不干扰其他项目）
+  - 今天无汇总 → 提醒 Claude 聚合生成
+  - 执行日志今天空 → 提醒实时追加 Step
+  - 其他 → 不打扰
+
+这一版的关键洞察：**hook 要能静默区分"启用 vs 未启用"的项目**。很多插件在安装后一股脑给所有项目注入提醒，用户 2 分钟内就想卸载。
+
+### 4.2 0.1.1 — 汇总过时检测
+
+**commit**：[`d3c8755`](https://github.com/KDevSec/kdev-agents/commit/d3c8755)
+
+生产里冒出一个新边缘场景：今天的每日汇总已经生成了，但之后执行日志又追加了 Step 25、Step 26。用户看汇总以为 Step 24 就是今天的终点——实际上还漏了两条。
+
+解决办法：Stop hook 增加第五态——**汇总存在 + 源文件 mtime 晚于汇总**时，提醒 Claude 追加增量到汇总而不是覆盖。
+
+这是个微调，但它说明一件事：**状态空间一旦有"过时"这种时态语义，你必须显式处理，不能只看"有没有"**。
+
+### 4.3 0.2.0 — 六层防线 + YAML frontmatter
+
+**时间**：2026-04-19
+**commit**：[`3930e9a`](https://github.com/KDevSec/kdev-agents/commit/3930e9a)
+**增量**：+950 行，-45 行
+
+用户反馈捅了个大洞：
+
+> "我跑 Spec Kit 跑了两小时，Stop hook 的提醒文本压根没被 Claude 读到过。"
+
+诊断下来原因是：**Stop hook 的 stdout 软提醒，只有在"Claude 还要再工作一轮"时才会被读进下一轮上下文**。如果用户看到任务完成就关会话，那段提醒永远没有读者。
+
+对 Spec Kit 这种"一个大 phase 跑两小时、最后自然 idle"的长流程，Stop hook 完全失灵。
+
+**解法**：不是加强 Stop hook，是**在会话时间轴上多铺几道闸**。于是有了六层防线：
+
+| 层 | Hook | 作用 | 触发时机 |
+|---|---|---|---|
+| 1 | **SessionStart** | 开局注入 `<kdev-memory-brief>` 摘要 | 新会话启动时 |
+| 2 | **Stop** | 软提醒（原有四态） | Claude 每次要停下 |
+| 3 | **Strict 模式**（opt-in） | 条件阻塞（执行日志今天空 + 工作区有变更 → exit 2） | Stop 时，需 `touch .kdev/strict` 启用 |
+| 4 | **PostToolUse** | 命中里程碑白名单时提醒 | Write/Edit/MultiEdit 后 |
+| 5 | **PreCompact** | 压缩前写 checkpoint 快照 | `/compact` 或自动压缩前 |
+| 6 | **SessionEnd** | 会话真正结束兜底写 WARN 文件 | 客户端关闭 / 切项目时 |
+
+**关键顿悟**：一层 hook 只能管一个时相，长流程需要**全时段覆盖**。软提醒在活跃会话有用，Strict 在有风险变更时有用，PreCompact 在压缩事件有用，SessionEnd 在关门时有用——**缺一层就漏一种场景**。
+
+同时这一版引入了 **`当前状态.md` 的 YAML frontmatter**：
+
+```markdown
+---
+phase: exec
+iteration: "Sprint 1"
+current_step: 23
+last_updated: 2026-04-19
+pending_decisions: [Q-007, Q-008]
+unresolved_gotchas: [G-014]
+---
+
+# 当前状态
+（自由文本 body）
+```
+
+为什么加 frontmatter？因为 SessionStart hook 要**秒报**项目状态给 Claude，解析自由文本既慢又容易 hallucinate。frontmatter 让**人能读、脚本能读、Claude 能读**三者兼得。
+
+### 4.4 0.3.0 — 七层防线 + 命名空间化 + 智能召回
+
+**时间**：2026-04-20
+**commits**：[`3c03672`](https://github.com/KDevSec/kdev-agents/commit/3c03672)（重构）+ [`dadf3e2`](https://github.com/KDevSec/kdev-agents/commit/dadf3e2)（召回）
+
+0.2.0 跑了一阵后暴露两个新问题：
+
+**问题 1：记忆是"档案馆"，不是"会主动浮现"**
+
+用户再次跑 `pnpm install` 报错时，`.kdev/memory/踩坑日志.md` 里明明有 G-012 记着一模一样的解法，但 Claude 不会主动读——它只在新会话开头看 SessionStart 注入一次。当时 G-012 不在注入里（它在历史条目），所以 Claude 从零开始 debug 了一遍。
+
+**问题 2：`.kdev/` 目录开始乱**
+
+kdev-commit 这个姊妹插件也想往 `.kdev/` 放点状态，但怕碰到 kdev-memory 的文件。命名冲突风险开始显现。
+
+**解法一：UserPromptSubmit hook 做智能召回（triggers）**
+
+```
+用户 prompt → sanitize（strip 代码块/URL/路径）
+           → 扫 .kdev/memory/ 里所有带 `triggers:` 的条目
+           → literal substring 匹配
+           → 命中则注入 <kdev-memory-recall> 指针（渐进式披露，只给编号+标题+路径）
+           → Claude 判断相关再 Read 全文
+```
+
+每条新增的踩坑/Step/铁规都要标 `triggers:` 字段：
+
+```markdown
+## G-012: pnpm install 在 workspace 根目录会漏装子包依赖
+triggers: ["pnpm install", "pnpm i", "workspace 依赖"]
+```
+
+下次用户一说"我跑 pnpm install 又报错了"，hook 立刻把 G-012 的指针注入给 Claude——**同一个坑不再重复踩**。
+
+**解法二：`.kdev/` 命名空间化 + 自动迁移**
+
+所有 kdev-memory 的产物搬到 `.kdev/memory/` 子目录：
+
+```
+.kdev/
+├── memory/     # kdev-memory 的地盘
+├── commit/     # 未来 kdev-commit 的地盘（如果它需要）
+└── <其他>/
+```
+
+**关键设计**：从 0.2.0 升级**完全无感**。SessionStart hook 启动时调 `migrate.sh`，检测旧结构就自动搬家，写一份 `.kdev/MIGRATED-YYYY-MM-DD.md` 清单给用户看。**用户不用手工做任何事**。
+
+---
+
+## 5. 横向调研：我们从六家框架学到什么、拒绝什么
+
+0.2.0 设计之前做了一次横向调研，覆盖 6 家主流 Claude Code 记忆框架。原始文档在 [docs/design-notes/2026-04-19-跨会话记忆与压缩保护-方案对比.md](design-notes/2026-04-19-跨会话记忆与压缩保护-方案对比.md)。
+
+### 5.1 对比总览
+
+| 方案 | Stars | PreCompact | SessionStart | 存储 |
+|---|---|---|---|---|
+| **claude-mem** | 45k | PostToolUse 持续采集 + Stop 摘要 | 从 SQLite + 向量库 Progressive Disclosure | SQLite + FTS5 + Chroma |
+| **claude-memory-compiler** | 125 | PreCompact/SessionEnd 调 Claude SDK 提取"有价值信息" | 注入编译后 `index.md` | 纯 Markdown |
+| **claude-reflect** | 881 | 无专门 PreCompact | 注入纠正历史 | CLAUDE.md 同步 |
+| **OMC (oh-my-claudecode)** | 25k | PreCompact checkpoint | 三层 notepad + 6 类 JSON | Markdown + JSON |
+| **ECC (everything-claude-code)** | 143k | 无专门 PreCompact | SQLite State Store 加载 | SQLite |
+| **kdev-memory** | — | **checkpoint 写纯 Markdown 快照 + source 分档注入** | **`additionalContext` 结构化注入分档摘要** | **纯 Markdown + YAML** |
+
+### 5.2 我们借鉴了什么
+
+- **OMC 的 Session 去重思路**：`state/trigger-sessions.json` + TTL，避免同会话重复注入
+- **OMC issue #240 的 stdin hang 保护**：所有读 stdin 的 hook 加 `timeout 1`
+- **claude-memory-compiler 的 PreCompact 写盘范式**：压缩前总是写 checkpoint
+- **各家一致的 `hookSpecificOutput.additionalContext`**：比裸 stdout 结构化得多
+
+### 5.3 我们明确拒绝的
+
+| 路线 | 拒绝理由 |
+|---|---|
+| SQLite / 向量库 | "文件落盘 + 人可读"是核心卖点 |
+| 调 LLM 做摘要 | 引入 API key、成本、延迟；违背实时落盘 |
+| 三层 notepad + 6 JSON | 碎片化、膨胀 |
+| regex 捕获纠正 | 属独立 concern，单独做 `kdev-correction` 更合适 |
+
+**一个更深层的原则**：调研不是为了"抄最全的"，是为了看清**每家的核心定位**，然后决定我们和它们的**差异化定位**在哪。差异化不是功能数量，是**产品哲学**。
+
+---
+
+## 6. 几个值得细讲的技术点
+
+### 6.1 双评分机制：防止智能体的讨好式满分
+
+每完成一个 Step，执行日志里要记两次评分：
+
+```markdown
+### 模型自评（在接触用户评分前写入并锁定）
+- 完成时间：2026-04-15 14:32    # 必须带分钟精度
+- 顺畅度自评：4/5
+- 本步最值得扣分的一点：G-012 的 pnpm 坑应该在初始化阶段就规避
+  （强制要求：必须填一条扣分项，不允许空）
+
+<!-- ---- 以下为锁定后的用户评分，模型不得回填修改上方自评段 ---- -->
+
+### 用户评分
+- 完成时间：2026-04-15 14:35    # 必须晚于模型自评段
+- 顺畅度：3/5
+- 用户评价：subagent 写得快但字段名对不上 PRD，又得我返工
+```
+
+**反模式**：如果不锁定时间戳，智能体会先看用户评分再"自评"一个差不多的分数——这就是"讨好式满分"。时间戳是**唯一硬证据**，结构上两段紧挨着，没时间戳没法事后审计。
+
+**反模式 2**：如果自评段不强制列扣分项，智能体会统统打 5/5。强制列一条扣分项，**让自我批评有个落点**。
+
+**差值的信号意义**：
+- 差值 = 0 或 1 且评价正面 → 健康
+- 差值 = 1 且评价含负面文本 → 弱信号，聚合到 R-NNN 相近主题下
+- **差值 ≥ 2 → 方法论盲区**。典型症状："agent 写得很快但写出的东西用户看着累"
+
+**关键原则**：差值只**记录**，不强制在项目内闭环。项目内强制执行是滥用——它的价值在未来某个 skill 作者跨项目 review 时，能从原始张力里提炼出新方法论。
+
+### 6.2 渐进式披露：只注入指针，不塞全文
+
+0.3.0 的 UserPromptSubmit hook 召回机制，**不**把踩坑日志的全文塞进上下文。它只注入：
+
+```
+<kdev-memory-recall>
+相关记忆（本 session 首次召回，如无关可忽略）：
+
+- G-012 "pnpm install 在 workspace 根目录会漏装子包依赖" → .kdev/memory/踩坑日志.md
+- Step 23 "实现采集器核心循环" → .kdev/memory/执行日志.md
+</kdev-memory-recall>
+```
+
+- 一条注入约 **30 token**，三条约 **100 token**
+- Claude 判断相关自己 Read 全文，不相关一眼扫过就忽略
+- **Read 的主动权在 Claude**——胜过强塞内容
+
+这和 OMC 直接塞全文的做法形成对比。塞全文的问题：Claude 即便觉得不相关，也要花推理成本"绕过"那段内容；塞多了污染整个会话。
+
+**设计箴言**：给智能体一个**指针**胜过给它一本**书**。
+
+### 6.3 triggers 字面匹配 + sanitize：deterministic 且防误触
+
+为什么用字面子串匹配（substring），不用 fuzzy / embedding？
+
+- **Deterministic**：用户能看懂为什么命中，能自己调 triggers
+- **零运行时成本**：grep 级别的速度
+- **可调试**：匹配失败能复现
+
+但字面匹配有个硬伤：**用户 prompt 里包含代码块或错误堆栈时，里面的字面量会误触发**。比如用户贴一段 README 给 Claude 看，里面恰好有"pnpm install"，hook 就把 G-012 注入了——但实际上用户根本没在讨论这个坑。
+
+解法：sanitize 管线
+
+```python
+# 在匹配之前先对用户 prompt 做清洗
+strip 代码块（``` ... ```）
+strip XML tag（<tag>...</tag>）
+strip URL（http://...、file://...）
+strip 文件路径（/abs/path、./rel/path）
+strip git diff 块（diff --git ...）
+```
+
+这些字面量**不应该**触发召回，因为它们往往是"被引用的内容"而不是"用户在谈论"。
+
+### 6.4 Session 去重：60 分钟 TTL 防刷屏
+
+同一个 session 里，同一条记忆**只注入一次**。实现：
+
+```
+.kdev/memory/state/trigger-sessions.json
+{
+  "session-abc123": {
+    "injected": ["G-012", "Step 23"],
+    "last_seen": "2026-04-20T14:00:00Z"
+  }
+}
+```
+
+TTL 60 分钟自动清理过期 session。单次限额 3 条（防刷屏）。
+
+### 6.5 零外部依赖：shell + Python fallback
+
+整个 hook 层**不引入任何 Node / npm / pip 包**：
+
+- Shell 脚本做大部分活（checkpoint、retention、milestone match、migrate）
+- Python 3 做 JSON 解析和结构化匹配（`trigger-match.py` 518 行）
+- **缺 python3** → UserPromptSubmit 静默降级；其他 6 层 hook 继续工作
+
+**设计哲学**：插件的外部依赖越少，被放弃的概率越低。shell + 系统 Python 是"装 Linux 就有"的东西，不需要任何额外安装。
+
+---
+
+## 7. 踩过的坑（真实发生的）
+
+### 7.1 stdin hang（OMC issue #240）
+
+早期 `stop-check.sh` 这样读输入：
+
+```bash
+[ ! -t 0 ] && INPUT=$(cat)
+```
+
+这在 Claude Code 的管道里会偶尔**永久 hang**——当 stdin 是管道但对方不 EOF 时 `cat` 阻塞不返回。
+
+解法：
+
+```bash
+[ ! -t 0 ] && INPUT=$(timeout 1 cat)
+```
+
+1 秒超时就放弃读输入，用空默认值继续。**原则**：hook 宁可信号不全也不能让用户的 Claude Code 卡死。
+
+### 7.2 里程碑白名单维护漂移
+
+Stop hook 和 PostToolUse hook 都需要判断"这次编辑是否命中里程碑文件"。早期两处各自维护一份模式列表，很快就漂移了。
+
+解法：抽 `hooks/lib/milestone.sh` 做单一真相源，两边共同 source。**这是工程项目里几乎每次都踩的坑——凡是需要在两处做同样判断的规则，必须抽出来**。
+
+当前白名单覆盖：Spec Kit / ADR / 迭代 / Sprint / PRD / 架构 / 设计 / 根目录关键文档 / DB migration / API 契约 / kdev 自己的方法论铁规。
+
+### 7.3 `.kdev/strict` 自己触发阻塞
+
+Strict 模式启用方式是 `touch .kdev/strict`。第一版上线后发现：**用户一 touch 完立刻触发阻塞**——因为 `touch` 动作本身被算进"工作区实质变更"。
+
+解法：Stop hook 计数逻辑排除 `.kdev/` 内部自维护文件（除 `方法论铁规.md`——它才是用户真正 care 的内容）。**边界要精确到子路径**。
+
+### 7.4 0.2.0 → 0.3.0 目录重构风险
+
+命名空间化需要把 `.kdev/执行日志.md` 搬到 `.kdev/memory/执行日志.md`。用户要是手工搬家错一个字就是数据丢失风险。
+
+解法：SessionStart hook 启动时调 `migrate.sh`：
+
+```bash
+# 检测旧结构
+if [[ -f .kdev/执行日志.md && ! -d .kdev/memory ]]; then
+  mkdir -p .kdev/memory
+  mv .kdev/执行日志.md .kdev/决策日志.md ... .kdev/memory/
+  write .kdev/MIGRATED-YYYY-MM-DD.md  # 迁移清单
+fi
+```
+
+**用户什么都不用做**——打开项目就自动完成。这叫**零感知迁移**。
+
+---
+
+## 8. 验证：为什么要有 evals/
+
+0.3.0 的 `evals/` 目录是 skill-creator 式的质量验证集。10 个测试 prompt，5 个 should-trigger、5 个 should-NOT-trigger：
+
+```
+✅ should-trigger 组：
+  - "我跑 pnpm install 又报错了" → 应召回 G-012
+  - "这个 aiohttp 的 proxy ClientDisconnected" → 应召回 G-014
+  - "还在做采集器的核心循环" → 应召回 Step 23
+  - "这个 API 怎么设计" → 应召回铁规
+  - "项目架构决策" → 应召回 constitution.md
+
+✅ should-NOT-trigger 组：
+  - 用户贴代码块里有 "pnpm install" 字面量 → 不召回（sanitize 生效）
+  - URL 里有 "workspace" 字样 → 不召回
+  - 文件路径里有 "pnpm" → 不召回
+  - 完全无关的话题 → 不召回
+  - 字面搜索（"帮我在代码里找 pnpm"） → 不召回
+```
+
+配一份 `fixtures/project-state/` 完整测试项目状态。evals 不是跑着玩的——它固化了**什么算"召回正确"** 的契约。以后重构 hook 内部实现时，这 10 条是回归测试的锚点。
+
+---
+
+## 9. 可借鉴的设计范式（对其他插件作者有用）
+
+### 9.1 记录 ≠ 执行
+
+`改进建议.md` 里写了 5 条"这里应该怎么改"，**不代表项目内要执行这些改进**。它是原料库，不是规则库。项目内要不要强制执行，取决于用户明确说"加进 `方法论铁规.md`"。
+
+**为什么重要**：混淆"记录"和"执行"的插件很快会变成"另一个 CLAUDE.md"——每个项目都被塞满死规则，但没人 care。
+
+### 9.2 软提醒 → 硬阻塞的分层
+
+别一上来就 `exit 2` 阻塞 Claude。分四档：
+
+```
+静默 < 软提醒(stdout) < 条件阻塞(opt-in) < 兜底落盘(脚本直接写文件)
+```
+
+大多数场景用软提醒就够。阻塞只留给"不写就丢数据"的场景，而且要 **opt-in**（`touch .kdev/strict` 启用）——这是对用户选择权的尊重。
+
+### 9.3 人机共读：Markdown + YAML frontmatter
+
+```markdown
+---
+phase: exec            # 脚本读
+current_step: 23       # 脚本读
+---
+
+# 当前状态            ← 人读
+（自由文本 body）      ← 人读
+```
+
+frontmatter 是脚本的结构化接口，body 是人的阅读接口。两者在同一个文件里，**一次编辑两处受益**。
+
+### 9.4 渐进式披露 > 塞全文
+
+给 Claude 一个指针 + 文件路径，让它**自己决定**读不读——胜过把 1000 行全文强塞进上下文。
+
+### 9.5 证据驱动的改进信号（原话优于总结）
+
+改进建议.md 里**保留用户原话**："subagent 写得快但字段名对不上 PRD"——这是比"需求对齐不足"有用 10 倍的信号。
+
+**原则**：在越靠近原始事件的层次保留越多细节。跨项目归纳时，原始细节是聚类的锚；总结丢了就找不回来了。
+
+---
+
+## 10. 对未来的留白
+
+### 10.1 R-NNN 改进建议的下游
+
+改进建议.md 不是死文件。它的终极价值在**未来某个智能体扫多个项目的 `改进建议.md`，跨项目聚类，产出新 skill**。
+
+比如"字段对齐"在 3 个项目都出现 2+ 次 → 值得做一个 `pre-commit-field-alignment-check` skill。这不在 kdev-memory 覆盖范围内——**本 skill 只负责把料备好**。
+
+### 10.2 `.kdev/` 命名空间的其他租客
+
+姊妹插件 `kdev-commit` 已经在 `plugins/kdev-commit/` 就位。未来如果它需要落盘状态（比如记录每次 AI commit 的元数据），就建 `.kdev/commit/` 子目录。kdev-memory 完全不碰它。
+
+### 10.3 不做的事情
+
+- LLM 辅助摘要 → 永不做
+- SQLite / 向量检索 → 永不做
+- 跨项目全局偏好（`~/.kdev/`）→ YAGNI，有明确信号再说
+- 语义搜索 → 过度工程，`grep` 够用
+
+---
+
+## 11. 总结：一个"简单"插件的复杂度从哪里来
+
+kdev-memory 看起来只是"往几个 md 文件里记点东西"。但代码量：
+
+```
+SKILL.md                    ~500 行（规范 + 触发规则）
+hooks/                      ~1400 行（7 个 hook + 5 个 lib）
+skills/                     ~500 行
+CHANGELOG / README           ~500 行
+─────────────────────────
+合计                         ~3000 行（不含 evals）
+```
+
+复杂度从哪儿来？
+
+1. **时序覆盖**：会话 idle / 压缩 / 结束 / 启动 / 每次 prompt 都是不同时相，各自要单独兜底
+2. **误触发的边界案例**：代码块字面量、session 重复、旧日期 Step、路径匹配子串
+3. **迁移兼容性**：0.2.0 → 0.3.0 必须无感，双轨 fallback
+4. **对失败优雅降级**：缺 python3、stdin hang、空状态、脏数据都要有 graceful path
+5. **用户心智模型的保护**：不刷屏、不打扰其他项目、不强制执行、授权一次长期有效
+
+**核心启示**：如果一个工具的**外观简单**是靠**内部足够复杂**撑起来的，那这份复杂度是值得投的——它换来了用户的"不用想"。反过来，如果外观复杂还让用户操心细节，那才是真的过度工程。
+
+---
+
+## 12. 一句话总结这次分享
+
+> kdev-memory 的核心不在"写了多少行代码"，而在一条极其朴素但反直觉的原则：
+>
+> **文件是第一真相，会话是它的副本。实时落盘，汇总只读；记录而不强制执行；给指针而不给全文。**
+>
+> 其余一切（七层防线、triggers 召回、双评分、sanitize、YAML frontmatter、命名空间、自动迁移）都是为了让这条原则在**真实长周期项目里**不被任何边界情况打破。
+
+---
+
+## 13. 最后想说的：先有真实问题，再有"插件"
+
+回看整条线，kdev-memory 的出生其实很"非典型"——
+
+**它不是先画 PRD 再开发的。** 它是在做 token-statistics 这个狗粮项目时，为了完成"流程顺畅度打分 + 设计纰漏捕获"两件附加任务，顺手搭出来的 `.kdev/` 脚手架。跑到迭代 3，用户说了一句"这套下次别的项目还用得上吧"，才有了"抽成插件"的念头。
+
+**这是一条有意思的产品方法论信号**：
+
+- 真正有用的基础设施，**往往先以"某个项目的私有规范"形式长出来**，被反复用过以后才抽成通用工具
+- 如果一开始就奔着"做个通用记忆插件"去设计，大概率会陷入"和 10 家上游对比功能表"的陷阱——功能堆得比 OMC 还多，但没人用
+- **先解决一个具体项目的具体问题，然后看这个解法是不是普遍**——这个路径比"先通用后特化"稳得多
+
+所以如果有人问"怎么想到做这个插件的"——真实答案是：**没想做，是先需要它，然后它就在那儿了**。
+
+后面那些看起来聪明的决策（拒绝 SQLite、渐进式披露、命名空间化），其实都只是**在"不破坏已经在 token-statistics 里跑通的东西"这个约束下**做的**最省力的延伸**。它们之所以看起来对，是因为**它们被真实项目过滤过**。
+
+---
+
+## 附录：相关资料
+
+- 仓库：[KDevSec/kdev-agents](https://github.com/KDevSec/kdev-agents)
+- 插件 README：[plugins/kdev-memory/README.md](../plugins/kdev-memory/README.md)
+- SKILL 定义：[plugins/kdev-memory/skills/kdev-memory/SKILL.md](../plugins/kdev-memory/skills/kdev-memory/SKILL.md)
+- CHANGELOG：[plugins/kdev-memory/CHANGELOG.md](../plugins/kdev-memory/CHANGELOG.md)
+- 六家框架调研：[docs/design-notes/2026-04-19-跨会话记忆与压缩保护-方案对比.md](design-notes/2026-04-19-跨会话记忆与压缩保护-方案对比.md)
+- evals：[plugins/kdev-memory/evals/README.md](../plugins/kdev-memory/evals/README.md)
+
+相关上游项目：
+- [claude-mem](https://github.com/thedotmack/claude-mem) — SQLite + 向量库范式
+- [oh-my-claudecode](https://github.com/Yeachan-Heo/oh-my-claudecode) — 三层 notepad + 6 类 JSON
+- [claude-memory-compiler](https://github.com/coleam00/claude-memory-compiler) — LLM 编译摘要
+- [claude-reflect](https://github.com/BayramAnnakov/claude-reflect) — 纠正捕获
+- [everything-claude-code](https://github.com/affaan-m/everything-claude-code) — SQLite State Store
