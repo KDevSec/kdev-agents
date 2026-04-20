@@ -6,7 +6,8 @@ KDev 系列 Claude Code 插件集合 —— 工程记忆、流程辅助等。
 
 | 插件 | 说明 |
 |-----|------|
-| [kdev-memory](plugins/kdev-memory) | 工程记忆制度：实时落盘决策/踩坑/执行/评分，自动 hook 提醒每日汇总 |
+| [kdev-memory](plugins/kdev-memory) | 工程记忆制度：实时落盘决策/踩坑/执行/评分，六层 hook 兜会话续航 |
+| [kdev-commit](plugins/kdev-commit) | AI commit + push 一体化：AI 用 `<name>-AI` 身份提交，push 前弹 IDE 权限框让用户确认 |
 
 ## 安装方式
 
@@ -16,6 +17,7 @@ claude plugin marketplace add KDevSec/kdev-agents
 
 # 2. 按需安装插件
 claude plugin install kdev-memory@kdev-agents
+claude plugin install kdev-commit@kdev-agents
 ```
 
 ## 更新
@@ -31,15 +33,23 @@ claude plugin update <plugin-name>@kdev-agents
 
 ```
 kdev-agents/
-├── .claude-plugin/
-│   └── marketplace.json       # marketplace 清单
+├── .claude-plugin/marketplace.json       # marketplace 清单
 └── plugins/
-    └── kdev-memory/           # 插件实体
+    ├── kdev-memory/                      # 工程记忆插件
+    │   ├── .claude-plugin/plugin.json
+    │   ├── skills/kdev-memory/SKILL.md
+    │   ├── hooks/                        # 六层 hook（Session/Stop/PreCompact/...）
+    │   │   ├── hooks.json
+    │   │   ├── lib/
+    │   │   └── *.sh
+    │   └── README.md
+    └── kdev-commit/                      # AI commit + push 插件
         ├── .claude-plugin/plugin.json
-        ├── skills/kdev-memory/SKILL.md
-        ├── hooks/
+        ├── skills/kdev-commit/SKILL.md
+        ├── hooks/                        # 纯 Node，零外部依赖
         │   ├── hooks.json
-        │   └── stop-check.sh
+        │   ├── block-unattributed-commit.js
+        │   └── confirm-push.js
         └── README.md
 ```
 
