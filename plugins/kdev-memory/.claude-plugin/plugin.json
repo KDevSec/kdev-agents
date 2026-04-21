@@ -1,7 +1,7 @@
 {
   "name": "kdev-memory",
   "description": "工程记忆制度插件：为多迭代项目建立实时落盘的决策/踩坑/执行/评分记忆 + 智能召回（triggers）。七层 hook（SessionStart 注入 + UserPromptSubmit 智能召回 + Stop 软提醒 + Strict 阻塞 + PostToolUse 里程碑联动 + PreCompact 压缩前写盘 + SessionEnd 兜底警告）+ 状态结构化（YAML frontmatter）+ .kdev/memory 命名空间化（插件隔离）",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "author": {
     "name": "ly"
   },

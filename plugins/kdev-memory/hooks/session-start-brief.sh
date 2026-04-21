@@ -21,6 +21,9 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # shellcheck source=lib/frontmatter.sh
 # shellcheck disable=SC1091
 . "$SCRIPT_DIR/lib/frontmatter.sh"
+# shellcheck source=lib/missing-summaries.sh
+# shellcheck disable=SC1091
+. "$SCRIPT_DIR/lib/missing-summaries.sh"
 
 # 自动迁移（如果是 0.2.0 升级过来的老项目，这里完成搬家）
 kdev_memory_migrate
@@ -71,6 +74,9 @@ fi
 SUMMARY_TODAY_STATUS="未生成"
 [ -f "$KDEV_DIR/每日汇总/$TODAY.md" ] && SUMMARY_TODAY_STATUS="已生成"
 
+# 过去日期有条目但缺每日汇总（跨天会话遗漏的兜底）
+MISSING_PAST_SUMMARIES=$(list_missing_past_summaries "$KDEV_DIR" "$TODAY")
+
 # ===== 读当前状态 frontmatter =====
 STATE_PHASE=$(read_state_field "phase")
 STATE_ITERATION=$(read_state_field "iteration")
@@ -101,10 +107,11 @@ build_brief() {
   case "$mode" in
     resume)
       brief+="项目有 .kdev/ 工程记忆。本次会话是 resume（Claude 已有前文上下文）。\n"
-      if [ -n "$WARN_FILES" ] || [ -n "$CHECKPOINT_FILES" ]; then
+      if [ -n "$WARN_FILES" ] || [ -n "$CHECKPOINT_FILES" ] || [ -n "$MISSING_PAST_SUMMARIES" ]; then
         brief+="⚠️ 待处理：\n"
         [ -n "$WARN_FILES" ] && brief+="- WARN 文件：\n$(echo "$WARN_FILES" | sed 's|^|  - |')\n"
         [ -n "$CHECKPOINT_FILES" ] && brief+="- Checkpoint 文件：\n$(echo "$CHECKPOINT_FILES" | sed 's|^|  - |')\n"
+        [ -n "$MISSING_PAST_SUMMARIES" ] && brief+="- 缺失的过去每日汇总（跨天会话遗漏）：$MISSING_PAST_SUMMARIES\n"
       fi
       ;;
 
@@ -115,16 +122,18 @@ build_brief() {
         brief+="$(echo "$CHECKPOINT_FILES" | sed 's|^|  - |')\n"
       fi
       [ -n "$WARN_FILES" ] && brief+="⚠️ 未处理的 WARN：\n$(echo "$WARN_FILES" | sed 's|^|  - |')\n"
+      [ -n "$MISSING_PAST_SUMMARIES" ] && brief+="⚠️ 缺失的过去每日汇总：$MISSING_PAST_SUMMARIES\n"
       ;;
 
     *)
       # startup / clear / 默认
       brief+="项目有 .kdev/ 工程记忆。当前状态（$TODAY）：\n\n"
 
-      if [ -n "$WARN_FILES" ] || [ -n "$CHECKPOINT_FILES" ]; then
+      if [ -n "$WARN_FILES" ] || [ -n "$CHECKPOINT_FILES" ] || [ -n "$MISSING_PAST_SUMMARIES" ]; then
         brief+="⚠️ **待处理（优先看）**：\n"
         [ -n "$WARN_FILES" ] && brief+="$(echo "$WARN_FILES" | sed 's|^|- |')\n"
         [ -n "$CHECKPOINT_FILES" ] && brief+="$(echo "$CHECKPOINT_FILES" | sed 's|^|- |')\n"
+        [ -n "$MISSING_PAST_SUMMARIES" ] && brief+="- 过去日期缺每日汇总（跨天会话遗漏）：$MISSING_PAST_SUMMARIES —— 请调用 kdev-memory skill 按日聚合源文件补写，严禁回翻会话上下文\n"
         brief+="\n"
       fi
 

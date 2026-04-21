@@ -2,11 +2,12 @@
 # kdev-memory Stop hook
 # 每次 Claude 要停下时检查 .kdev/ 状态并向 Claude 注入提醒文本
 #
-# 四条软提醒规则（stdout，exit 0）：
+# 五条软提醒规则（stdout，exit 0）：
 #   1. 项目无 .kdev/        → 静默退出
 #   2. 今天无汇总            → 提醒生成
 #   3. 汇总存在但源文件更新   → 提醒追加新增条目
 #   4. 执行日志今天空         → 提醒实时落盘
+#   5. 过去日期有条目但缺汇总 → 提醒补写（跨天会话遗漏的兜底）
 #
 # 阻塞规则（stderr，exit 2）—— 仅当 .kdev/strict 开关存在时启用：
 #   执行日志今天空 + 工作区有变更 + (变更文件 ≥ 2 OR 命中里程碑白名单)
@@ -21,6 +22,9 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # shellcheck source=lib/milestone.sh
 # shellcheck disable=SC1091
 . "$SCRIPT_DIR/lib/milestone.sh"
+# shellcheck source=lib/missing-summaries.sh
+# shellcheck disable=SC1091
+. "$SCRIPT_DIR/lib/missing-summaries.sh"
 
 # 防御性迁移：0.2.0 遗留结构自动搬到 .kdev/memory/（幂等，热路径快返回）
 kdev_memory_migrate
@@ -67,6 +71,12 @@ if [ -f "$KDEV_DIR/执行日志.md" ]; then
     LOG_EMPTY_TODAY="true"
     REMINDERS="${REMINDERS}[kdev-memory] 执行日志里今天没有任何条目。如果本轮完成了工作步骤，请实时追加 Step 记录到 .kdev/memory/执行日志.md。\n"
   fi
+fi
+
+# 5. 过去日期有条目但缺每日汇总 → 跨天会话遗漏的兜底提醒
+MISSING_PAST=$(list_missing_past_summaries "$KDEV_DIR" "$TODAY")
+if [ -n "$MISSING_PAST" ]; then
+  REMINDERS="${REMINDERS}[kdev-memory] ⚠️ 过去日期在 .kdev/memory/ 源文件里有条目，但 每日汇总/<日期>.md 不存在：$MISSING_PAST。典型原因是跨天会话未关，SessionEnd 没触发。请调用 kdev-memory skill 按这些日期聚合源文件生成汇总——严禁回翻会话上下文；若某日源文件信息不足请在汇总里坦白标注。\n"
 fi
 
 # -------- 严格模式：条件性阻塞（exit 2） --------

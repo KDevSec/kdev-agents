@@ -1,5 +1,46 @@
 # kdev-memory CHANGELOG
 
+## 0.3.1 — 2026-04-21
+
+**增强**：跨天会话场景的每日汇总兜底提醒。
+
+### 背景
+
+Claude Code 的 hook 体系是事件驱动（SessionEnd / Stop / PostToolUse / ...），
+没有"日期变更"事件。晚上 23:55 干到次日 01:30 不关会话的真实场景下：
+SessionEnd 不触发 → 昨天的每日汇总被静默遗漏 → 第二天新会话开局 Claude
+也不知道有缺口。0.3.0 的 Stop hook "今天无汇总"规则只看今日，无法覆盖
+这个 gap。
+
+### 新增
+
+- **`hooks/lib/missing-summaries.sh`**：共享库函数
+  `list_missing_past_summaries()`。扫 `.kdev/memory/{执行日志,决策日志,
+  踩坑日志,改进建议}.md` 里所有 `日期：YYYY-MM-DD` 行，返回"严格早于今日
+  且 `每日汇总/<date>.md` 缺失"的日期（最近 5 个，升序）。
+- **Stop hook 第 5 条软提醒**：发现过去日期缺汇总时注入提醒文本，显式说明
+  "典型原因是跨天会话未关"，指引 Claude 按日聚合源文件而不是回翻会话。
+- **SessionStart hook `<kdev-memory-brief>` ⚠️ 待处理段**：startup / resume /
+  compact 三种模式都会把缺失的过去汇总日期列出。这样即便用户忽略了 Stop
+  的提醒、新开会话时还能再看到一次。
+- **SKILL.md § "三层触发方式"**：Stop hook 描述从"三条提醒"扩到"四条提
+  醒"，明确说明跨天会话场景。
+
+### 设计原则
+
+- 软提醒、不阻塞：跨天遗漏一天不写汇总没到 strict 模式 `exit 2` 的严重
+  级别。strict 仍只管"今天执行日志空 + 工作区有变更"。
+- 不回翻会话：提醒文本显式禁止 Claude 凭印象补写，要求按日期从源文件聚合；
+  若某日源文件信息不足，在汇总里坦白标注。
+- 最近 5 条封顶：防止老项目启用 kdev-memory 时刷屏。
+
+### 自验证
+
+- 10/10 evals 通过（`run-hook-selftest.sh`），未破坏既有召回机制
+- 端到端 fixture 测试：2 个缺失日期在 Stop 和 SessionStart 都正确浮现
+
+---
+
 ## 0.3.0 — 2026-04-20
 
 从 0.2.0 的"六层防线"升级到 **"七层防线 + 目录命名空间化 + 智能召回"**。
