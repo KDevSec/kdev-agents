@@ -2,12 +2,13 @@
 # kdev-memory Stop hook
 # 每次 Claude 要停下时检查 .kdev/ 状态并向 Claude 注入提醒文本
 #
-# 五条软提醒规则（stdout，exit 0）：
+# 六条软提醒规则（stdout，exit 0）：
 #   1. 项目无 .kdev/        → 静默退出
 #   2. 今天无汇总            → 提醒生成
 #   3. 汇总存在但源文件更新   → 提醒追加新增条目
 #   4. 执行日志今天空         → 提醒实时落盘
 #   5. 过去日期有条目但缺汇总 → 提醒补写（跨天会话遗漏的兜底）
+#   6. 主文件跨月/跨季度       → 提醒归档切档
 #
 # 阻塞规则（stderr，exit 2）—— 仅当 .kdev/strict 开关存在时启用：
 #   执行日志今天空 + 工作区有变更 + (变更文件 ≥ 2 OR 命中里程碑白名单)
@@ -25,6 +26,9 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # shellcheck source=lib/missing-summaries.sh
 # shellcheck disable=SC1091
 . "$SCRIPT_DIR/lib/missing-summaries.sh"
+# shellcheck source=lib/archive-hint.sh
+# shellcheck disable=SC1091
+. "$SCRIPT_DIR/lib/archive-hint.sh"
 
 # 防御性迁移：0.2.0 遗留结构自动搬到 .kdev/memory/（幂等，热路径快返回）
 kdev_memory_migrate
@@ -77,6 +81,12 @@ fi
 MISSING_PAST=$(list_missing_past_summaries "$KDEV_DIR" "$TODAY")
 if [ -n "$MISSING_PAST" ]; then
   REMINDERS="${REMINDERS}[kdev-memory] ⚠️ 过去日期在 .kdev/memory/ 源文件里有条目，但 每日汇总/<日期>.md 不存在：$MISSING_PAST。典型原因是跨天会话未关，SessionEnd 没触发。请调用 kdev-memory skill 按这些日期聚合源文件生成汇总——严禁回翻会话上下文；若某日源文件信息不足请在汇总里坦白标注。\n"
+fi
+
+# 6. 主文件最早条目跨月/跨季度 → 提醒切档归档
+ARCHIVE_HINTS=$(collect_archive_hints "$KDEV_DIR")
+if [ -n "$ARCHIVE_HINTS" ]; then
+  REMINDERS="${REMINDERS}[kdev-memory] 📦 主文件已跨越归档边界，建议调用 kdev-memory skill 切档（将老条目迁到归档文件，主文件只留当前月/当前季）：\n${ARCHIVE_HINTS}\n切档步骤见 SKILL.md 的「文件切档与归档」章节。改进建议.md 不切档。\n"
 fi
 
 # -------- 严格模式：条件性阻塞（exit 2） --------

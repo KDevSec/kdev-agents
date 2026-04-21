@@ -2,6 +2,28 @@
 
 工程记忆制度插件 —— 为多迭代项目建立持久的跨会话记忆。
 
+## 这个插件和其他记忆方案的关系
+
+Claude Code 生态里还有两种常见的"记忆"概念，**它们和 kdev-memory 正交而不重叠，推荐同时使用**：
+
+| 解决的问题 | 典型方案 | 记什么 | 存哪里 |
+|---|---|---|---|
+| **用户个人化画像**（跨项目） | Claude Code 内置 `auto memory` | 用户偏好、协作习惯、外部系统指针 | `~/.claude/projects/<hash>/memory/`（用户机全局） |
+| **会话流回放**（让 Claude 记住昨天聊了啥） | 第三方会话压缩类插件 | 压缩后的会话 JSONL 摘要 | 项目内 gitignore 目录（本机私有） |
+| **工程过程档案**（本插件） | kdev-memory | 结构化决策/踩坑/Step/评分/改进信号 | `.kdev/memory/`（**跟代码 commit**） |
+
+kdev-memory 的差异化设计点：
+
+- **零外部 API 成本**：Claude 自己落盘，不调 Haiku/不调任何 API，不产生 token 以外的费用
+- **不依赖关闭 Auto-compact**：实时落盘不靠会话 JSONL，官方压缩吃掉也不丢信号
+- **可跟代码一起 commit**：项目内的工程决策/踩坑属于**项目资产**，应该进 git（不是只存在于个人机器）
+- **按需召回 + 渐进式披露**：triggers 字面匹配 → 只给编号/标题/路径指针 → Claude 按需 Read，**长项目更省 token 更精准**（vs 全量注入）
+- **双评分 + 下游原料库**：模型自评/用户评分/差值信号，沉淀成改进建议喂给未来 skill 作者，不是只服务当前会话
+
+什么时候装 kdev-memory：做**多迭代、多决策、长周期**的工程项目，希望踩过的坑不再重栽、做过的决策能复用、用户评分能沉淀成方法论改进。
+
+什么时候**不要只装** kdev-memory：如果你还需要"上次会话聊了什么"那种对话流回放，搭配一个会话压缩类插件一起用。三类工具组合起来才是完整的记忆栈。
+
 ## 核心机制
 
 - **实时落盘**：每步完成、每次踩坑、每个决策、每次评分，立刻写进 `.kdev/memory/` 对应文件
@@ -179,12 +201,16 @@ claude --debug
 ├── MIGRATED-YYYY-MM-DD.md     # 自动迁移记录（0.2.0 → 0.3.0，一次性）
 └── memory/                    # kdev-memory 的全部产物
     ├── 当前状态.md             # 工作状态单一真相源（带 YAML frontmatter）
-    ├── 决策日志.md             # Q-NNN
-    ├── 踩坑日志.md             # G-NNN（每条带 triggers: [...] 供智能召回）
-    ├── 执行日志.md             # 每步记录 + 双评分 + triggers
+    ├── 决策日志.md             # Q-NNN（当前季度；老条目切到 归档/）
+    ├── 踩坑日志.md             # G-NNN（当前季度；每条带 triggers: [...] 供智能召回）
+    ├── 执行日志.md             # 每步记录 + 双评分 + triggers（当前月；老条目切到 归档/）
     ├── 每日汇总/               # YYYY-MM-DD.md
-    ├── 改进建议.md             # R-NNN（喂给未来 skill 作者）
+    ├── 改进建议.md             # R-NNN（喂给未来 skill 作者；**不切档**，保完整）
     ├── 方法论铁规.md           # 可选，业务规则择机迁到项目根 constitution.md/spec.md
+    ├── 归档/                   # 长项目切档产物（0.4.0+）
+    │   ├── 执行日志-YYYY-MM.md       # 按月归档（如 执行日志-2026-03.md）
+    │   ├── 踩坑日志-YYYYQN.md        # 按季度归档（如 踩坑日志-2026Q1.md）
+    │   └── 决策日志-YYYYQN.md        # 按季度归档
     ├── strict                  # 可选空文件，touch 后启用 Strict 阻塞
     ├── WARN-未记录-*.md        # SessionEnd hook 自动生成的兜底警告
     ├── state/                  # hook 运行时状态
@@ -192,6 +218,8 @@ claude --debug
     └── checkpoints/            # PreCompact hook 自动生成（7 天 retention）
         └── 压缩前-YYYY-MM-DD-HHMMSS.md
 ```
+
+**归档机制**（0.4.0+）：长项目主文件会膨胀，Claude 在 Stop hook 看到主文件最早条目跨月（执行日志）或跨季度（踩坑/决策日志）时会 📦 提醒用户切档。详见 SKILL.md 的「文件切档与归档」章节。踩坑日志归档后仍参与 triggers 召回——老坑也要防重踩。
 
 项目级 spec 文件（UserPromptSubmit 自动扫描，存在即扫）：
 - `constitution.md` / `spec.md` / `principles.md` / `AGENTS.md`（项目根）

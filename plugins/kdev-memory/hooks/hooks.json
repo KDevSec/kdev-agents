@@ -1,5 +1,5 @@
 {
-  "description": "kdev-memory: 七层防线 hook 系统 —— SessionStart 注入 + UserPromptSubmit 智能召回 + Stop 软提醒/Strict 阻塞 + PostToolUse 里程碑联动 + PreCompact 压缩前写盘 + SessionEnd 兜底警告",
+  "description": "kdev-memory: 七层防线 hook 系统 —— SessionStart 注入 + UserPromptSubmit 智能召回（主文件 + 归档/ 子目录两路扫描）+ Stop 软提醒/归档提醒/Strict 阻塞 + PostToolUse 里程碑联动 + PreCompact 压缩前写盘 + SessionEnd 兜底警告",
   "hooks": {
     "SessionStart": [
       {

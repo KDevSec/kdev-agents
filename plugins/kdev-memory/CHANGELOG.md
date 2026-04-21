@@ -1,5 +1,92 @@
 # kdev-memory CHANGELOG
 
+## 0.4.0 — 2026-04-21
+
+**特性**：长项目的按期归档机制（执行日志按月、踩坑/决策按季度）+ 单元测试层
+（44 个 stdlib unittest，覆盖 trigger-match.py 的 7 类核心逻辑）+ README 差异
+化定位（与 Claude 官方 auto memory / claude-remember 等方案的关系说明）。
+
+### 背景
+
+0.3.0 引入 triggers 智能召回后，`.kdev/memory/` 主文件会随项目推进线性膨胀。
+半年下来执行日志 1000+ 行、踩坑日志 几十条 G-NNN，Claude Read 效率下降、
+UserPromptSubmit hook 全文扫描性能也吃力。SKILL.md 原本有"超 500 行按迭代切
+档"的人工建议，但无自动化提醒、无归档约定、无配套扫描支持。
+
+同时 Anthropic marketplace 上出现同类记忆方案（如 claude-remember），用户需要
+判断"什么时候装哪个 / 会不会重复造轮子"——README 需要给出差异化定位。
+
+### 新增
+
+- **`.kdev/memory/归档/` 子目录约定**：
+  - `执行日志.md` 按月切到 `归档/执行日志-YYYY-MM.md`
+  - `踩坑日志.md` 按季度切到 `归档/踩坑日志-YYYYQN.md`
+  - `决策日志.md` 按季度切到 `归档/决策日志-YYYYQN.md`
+  - `改进建议.md` **不切档**——它是喂给未来 skill 作者的原料库，完整性优先
+- **`hooks/lib/archive-hint.sh`**：新建共享库，日期→季度换算 + 跨期检测。
+  用最早条目日期而非行数阈值判断，避免"拍脑袋定多少行"。
+- **Stop hook 第 6 条软提醒**：主文件最早条目不在当月（执行日志）或当季（踩
+  坑/决策日志）时注入 📦 归档提醒文本，指向 `归档/` 子目录下的目标文件名。
+- **trigger-match.py 的 `_iter_memory_files()` 辅助**：所有归档扫描统一走
+  "主文件 + `归档/` 子目录"两路。踩坑日志归档后**仍参与召回**（老坑也要防重
+  踩），执行日志归档后被今日/昨日过滤剔除，实际等效只扫主文件。
+- **`tests/test_trigger_match.py`**：44 个 stdlib unittest（零外部依赖），覆盖
+  SanitizePrompt / ParseTriggersValue / ParseMultilineTriggers / MatchEntries /
+  DedupFilter / TTLPrune / GlobScan。包含"归档目录隔离"测试——防止
+  glob 误把同目录下其他前缀的归档文件（如 `执行日志-2026-03.md`）混入
+  踩坑扫描结果。
+- **SKILL.md §「文件切档与归档」**：整章新增，含切档规则一览 / 何时提醒 /
+  操作步骤 / 铁规（搬家而非删除、编号保留、主文件顶部留"历史归档"索引）/
+  召回逻辑变化说明。SKILL description frontmatter 加"切档 / 归档一下 / 归档
+  执行日志"触发词，让 Claude 能在用户说切档时自动召唤本 skill。
+- **`plugins/kdev-memory/README.md` §「这个插件和其他记忆方案的关系」**：顶
+  层章节，讲清楚三类记忆工具（官方 auto memory / 会话压缩类 / 本插件）正交
+  不重叠、五大差异化设计点、推荐同装。未点名任何第三方插件避免维护负担。
+- **`docs/design-notes/2026-04-21-三方记忆方案对比-官方auto-memory-vs-claude-remember-vs-kdev-memory.md`**：
+  三方机制对比、互补性矩阵、借鉴项决策的设计文档。
+
+### 向后兼容
+
+- 0.3.x 项目升级到 0.4.0 **零改动即可运行**：没有 `归档/` 子目录时，glob
+  扫描退化为单主文件，行为完全一致。
+- 归档是**人工触发 + Claude 提醒**，不自动执行——收到 📦 提醒后必须询问用
+  户同意才能切档，避免误迁老数据。
+- 现有 triggers 条目、编号体系（G-NNN / Step N / Q-NNN / R-NNN）跨档保持不
+  变，切档只是"搬家"不改结构。
+
+### 设计决策
+
+- **为什么按月/按季度而不是统一按季度**：执行日志粒度最细（每步一条）、膨
+  胀最快，按月切合理；踩坑/决策是慢积累，按月会造成过多小碎片，按季度刚好。
+- **为什么改进建议不切档**：消费者不是当前项目而是未来 skill 作者——跨项目
+  review 需要看全集，切档会损害聚类归纳的质量。
+- **为什么不用 Haiku 做压缩归档**（借鉴了 claude-remember 但没照抄）：
+  - 会违背 kdev-memory 的"零外部 API 成本"卖点
+  - Haiku 压缩会丢失 R-NNN 的"用户原话 / 事实段 / 评分差值"——这些恰恰
+    是下游 skill 作者最需要的原始证据
+  - 切档比压缩简单、可逆、无信息损失，是更合适的工具
+- **为什么归档放子目录不平铺**：几年后顶层会被几十个归档文件淹没，子目录让
+  `ls .kdev/memory/` 的输出始终整洁，glob 扫描也更精确。
+
+### 自验证
+
+- 44 个 unit tests 全通过（`python3 -m unittest discover tests`）
+- 端到端：构造主文件 + `归档/` 子目录的 fixture，UserPromptSubmit hook 正确
+  从归档文件召回老 G-NNN 条目，注入路径显示 `.kdev/memory/归档/踩坑日志-2026Q1.md`
+- Stop hook 跨期场景输出 📦 提醒，格式和路径（`归档/执行日志-YYYY-MM.md`）
+  正确；无跨期数据时静默不误报
+
+### 文档同步
+
+- `plugins/kdev-memory/README.md` 顶层差异化卖点 + 目录结构加归档子目录
+- `plugins/kdev-memory/skills/kdev-memory/SKILL.md` 切档章节 + 触发规则段 📦 + description 加触发词
+- `plugins/kdev-memory/hooks/hooks.json` description 补归档提醒/两路扫描
+- `plugins/kdev-memory/.claude-plugin/plugin.json` description 补归档切档；keywords 加 archive
+- `plugins/kdev-memory/evals/README.md` 加"纯单元测试"章节指向 tests/
+- `README.md`（仓库根）六层 → 七层（0.3.0 历史遗漏顺手修）+ 目录示例补 tests/ 和 evals/
+
+---
+
 ## 0.3.1 — 2026-04-21
 
 **增强**：跨天会话场景的每日汇总兜底提醒。

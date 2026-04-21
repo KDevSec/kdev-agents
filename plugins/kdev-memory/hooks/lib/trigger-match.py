@@ -211,39 +211,65 @@ def _extract_entries_with_triggers(
     return entries
 
 
+def _iter_memory_files(prefix: str) -> list[Path]:
+    """返回主文件 + 归档子目录下所有同前缀的归档文件。
+
+    扫描顺序：主文件 → 归档目录（按文件名排序）。
+    归档命名约定见 SKILL.md「文件切档与归档」章节。
+    """
+    paths = []
+    main = KDEV_DIR / f"{prefix}.md"
+    if main.is_file():
+        paths.append(main)
+    archive_dir = KDEV_DIR / "归档"
+    if archive_dir.is_dir():
+        paths.extend(sorted(archive_dir.glob(f"{prefix}-*.md")))
+    return paths
+
+
 def scan_g_entries() -> list[dict]:
-    """扫 .kdev/memory/踩坑日志.md 的 G-NNN 条目。"""
-    path = KDEV_DIR / "踩坑日志.md"
-    lines = _read_file(path)
-    if lines is None:
-        return []
+    """扫踩坑日志主文件 + 归档（含季度归档）。
+
+    踩坑召回要覆盖全部历史档——老坑也要防重踩。
+    """
+    entries = []
     heading_re = re.compile(r"^##\s+(G-\d+)[：:]\s*(.+?)\s*$")
-    return _extract_entries_with_triggers(
-        lines, heading_re,
-        lambda m, line: (m.group(1), m.group(2)),
-        "G",
-        str(path),
-    )
+    for path in _iter_memory_files("踩坑日志"):
+        lines = _read_file(path)
+        if lines is None:
+            continue
+        entries.extend(_extract_entries_with_triggers(
+            lines, heading_re,
+            lambda m, line: (m.group(1), m.group(2)),
+            "G",
+            str(path),
+        ))
+    return entries
 
 
 def scan_step_entries() -> list[dict]:
-    """扫 .kdev/memory/执行日志.md 的 Step，仅返回今日/昨日的。"""
-    path = KDEV_DIR / "执行日志.md"
-    lines = _read_file(path)
-    if lines is None:
-        return []
+    """扫执行日志主文件 + 归档，日期过滤只留今日/昨日。
+
+    月度归档里的 Step 都是老的，被 date_filter 剔除——扫到但不会召回。
+    """
     today = datetime.now().strftime("%Y-%m-%d")
     yesterday = (datetime.now() - timedelta(days=1)).strftime("%Y-%m-%d")
     date_ok = lambda d: d in (today, yesterday)
 
+    entries = []
     heading_re = re.compile(r"^##\s+(Step\s+[\w.-]+)[：:]\s*(.+?)\s*$")
-    return _extract_entries_with_triggers(
-        lines, heading_re,
-        lambda m, line: (m.group(1), m.group(2)),
-        "Step",
-        str(path),
-        date_filter=date_ok,
-    )
+    for path in _iter_memory_files("执行日志"):
+        lines = _read_file(path)
+        if lines is None:
+            continue
+        entries.extend(_extract_entries_with_triggers(
+            lines, heading_re,
+            lambda m, line: (m.group(1), m.group(2)),
+            "Step",
+            str(path),
+            date_filter=date_ok,
+        ))
+    return entries
 
 
 def scan_tiegui_entries() -> list[dict]:

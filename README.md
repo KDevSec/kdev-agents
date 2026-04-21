@@ -6,7 +6,7 @@ KDev 系列 Claude Code 插件集合 —— 工程记忆、流程辅助、代码
 
 | 插件 | 说明 |
 |-----|------|
-| [kdev-memory](plugins/kdev-memory) | 工程记忆制度：实时落盘决策/踩坑/执行/评分，六层 hook 兜会话续航 |
+| [kdev-memory](plugins/kdev-memory) | 工程记忆制度：实时落盘决策/踩坑/执行/评分，七层 hook 兜会话续航 + 按月/按季度归档 |
 | [kdev-commit](plugins/kdev-commit) | AI commit + push 一体化：AI 用 `<name>-AI` 身份提交，push 前弹 IDE 权限框让用户确认 |
 
 ## 安装方式
@@ -38,10 +38,13 @@ kdev-agents/
     ├── kdev-memory/                      # 工程记忆插件
     │   ├── .claude-plugin/plugin.json
     │   ├── skills/kdev-memory/SKILL.md
-    │   ├── hooks/                        # 六层 hook（Session/Stop/PreCompact/...）
+    │   ├── hooks/                        # 七层 hook（SessionStart/UserPromptSubmit/Stop/PostToolUse/PreCompact/SessionEnd/Strict）
     │   │   ├── hooks.json
-    │   │   ├── lib/
+    │   │   ├── lib/                      # trigger-match.py / archive-hint.sh / frontmatter.sh / ...
     │   │   └── *.sh
+    │   ├── tests/                        # stdlib unittest（trigger-match.py 单元测试）
+    │   ├── evals/                        # skill-creator 式 eval（端到端 hook 召回验证）
+    │   ├── CHANGELOG.md
     │   └── README.md
     └── kdev-commit/                      # AI commit + push 插件
         ├── .claude-plugin/plugin.json
