@@ -1,5 +1,18 @@
 # kdev-memory evals
 
+本目录下有**两条并列的 eval 线**，测不同层面：
+
+| eval 线 | 测什么 | 跑一次成本 | 什么时候跑 |
+|---|---|---|---|
+| [`evals.json`](evals.json) + [`run-hook-selftest.sh`](run-hook-selftest.sh) | `hooks/trigger-match.py` 的召回准确性（sanitize / triggers 解析 / 子串匹配 / 去重） | 秒级（纯 shell） | 每次改 trigger-match.py / sanitize 规则 / triggers 字段扫描 |
+| [`skill-quality/`](skill-quality/) | **SKILL.md + references/** 的行为质量（Claude 执行 skill 任务后产出是否合格） | 分钟级 × 每个 eval 2 subagent | 每次重写 SKILL.md / 新增 / 删除 reference / 改核心原则 |
+
+两条线互相独立——hook 改动只触发第一条，SKILL.md 文档改动只触发第二条。若同时改了就两条都跑。
+
+---
+
+## trigger-match 召回 eval（本文件以下章节）
+
 skill-creator 式的质量验证集：比对 0.2.0（无 triggers）vs 0.3.0（有 triggers）在相同 prompt 下的行为差异。
 
 ## 测试集（10 条）

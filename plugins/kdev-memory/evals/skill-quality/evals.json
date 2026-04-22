@@ -1,0 +1,151 @@
+{
+  "skill_name": "kdev-memory",
+  "notes": "测 SKILL.md + references/ 的行为质量。每个 eval 两个 config：with_skill = 当前 repo 的新版 skill；old_skill = 历史 snapshot 作为 baseline。assertions 在本文件顶层——是当前权威定义；历史 iteration 目录下的 eval_metadata.json 是当时跑测的冻结快照，不同步更新。",
+  "fixture_root": "../fixtures/skill-quality/",
+  "evals": [
+    {
+      "id": 0,
+      "name": "init",
+      "category": "core-flow",
+      "prompt": "我想给这个 FastAPI 项目建立 kdev-memory 工程记忆机制。项目目前无 CLAUDE.md、无 .kdev/ 目录。请按 skill 标准初始化流程完整执行：建骨架文件、在项目 CLAUDE.md 里加触发规则段、向我抛 Q-001 决策（Step 编号方式）。假设我回答'全局递增'。完成后在 outputs/ 目录里汇报：(a) 建了哪些文件，(b) CLAUDE.md 加了哪一段，(c) Q-001 的完整条目内容，(d) 当前状态.md 的 frontmatter 是什么样。",
+      "fixture": "eval-0-init/target-project/",
+      "assertions": [
+        {"text": "创建了 .kdev/memory/ 子目录（不是平铺在 .kdev/）"},
+        {"text": "建了 6 个核心骨架文件：决策日志.md / 踩坑日志.md / 执行日志.md / 每日汇总 目录 / 改进建议.md / 当前状态.md（方法论铁规.md 可选，不建也合格）"},
+        {"text": "当前状态.md 的 frontmatter 含全部 6 个规定字段：phase / iteration / current_step / last_updated / pending_decisions / unresolved_gotchas，且取值合理（不是占位符）"},
+        {"text": "phase 取值是 plan / exec / verify / done 四选一（不是自创值），current_step 是整数，last_updated 是 YYYY-MM-DD 格式"},
+        {"text": "CLAUDE.md 包含「智能体自动记录规则」章节，且这一段里包含至少 8 条 🔴 铁规（实时铁规 / 汇总不翻会话 / WARN-未记录 / kdev-memory-brief / checkpoint / 顺手改 frontmatter / 归档提醒 / 升级信号 / triggers / recall 判断——共 10-11 条，允许少 1-2 条）"},
+        {"text": "CLAUDE.md 的触发规则段包含结构化的触发规则表（markdown table），且表中至少覆盖 8 类触发时机"},
+        {"text": "CLAUDE.md 提到至少 2 个 hook 注入标签（WARN-未记录 / <kdev-memory-brief> / <kdev-memory-recall> / checkpoint 压缩前）"},
+        {"text": "Q-001 写入决策日志.md，含问题 + 日期 + 选项（含 A/B 两选）+ 用户选择 + 理由五项"},
+        {"text": "Q-001 的「理由」字段不是通用话术（如'简单好用'），而是结合项目特性写的具体理由"},
+        {"text": "CLAUDE.md 的「编号规则」段已按 Q-001 答案特化（明确写「全局递增」而不是模板里的占位表述）"}
+      ]
+    },
+    {
+      "id": 1,
+      "name": "daily-summary",
+      "category": "core-flow",
+      "prompt": "今天是 2026-04-22。请按 kdev-memory skill 的标准流程，为这个项目写今天的每日汇总。项目的 .kdev/memory/ 里已经有今天的 Step 12/13、G-005/G-006、Q-007/Q-008、R-001/R-002 条目。注意：skill 明确要求从文件聚合而不是翻会话记录。完成后把生成的 2026-04-22 汇总文件路径告诉我，并简要说明你的动作路径（读了哪些文件、按什么规则聚合）。",
+      "fixture": "eval-1-daily-summary/target-project/",
+      "assertions": [
+        {"text": "生成了 .kdev/memory/每日汇总/2026-04-22.md 文件"},
+        {"text": "汇总按 schema 含 5 段：完成的工作 / 未完成项 / 明日计划 / 本日新增 踩坑-决策-改进信号 / 负面评价观察"},
+        {"text": "正确引用了 Step 12 和 Step 13（不是抽象描述，而是引用具体编号）"},
+        {"text": "Step 13 的 -2 差值（模型 5 / 用户 3）被识别并关联到 R-002（即'文档太薄'）"},
+        {"text": "Step 12 的弱负面信号被识别：差值 +1 但用户评价含'磕磕绊绊'等负面词，应出现在「负面评价观察」段（弱信号留痕，不单独编号）"},
+        {"text": "本日新增段列出了全部 6 个新条目：G-005 / G-006 / Q-007 / Q-008 / R-001 / R-002"},
+        {"text": "REPORT.md 的动作路径描述明确说「从 .kdev/memory/ 读文件聚合」，不提及翻会话"},
+        {"text": "REPORT.md 列出的'读了哪些文件'至少包含 5 个核心文件：执行日志 / 决策日志 / 踩坑日志 / 改进建议 / 当前状态"},
+        {"text": "2026-04-22.md 的「未完成项」段识别出 Step 13 文档不完整（用户要求二次修订——这个信号在当前状态.md body 里）"},
+        {"text": "2026-04-22.md 的「明日计划」段指向 Step 14（二次修订）而非凭空发明新任务"}
+      ]
+    },
+    {
+      "id": 2,
+      "name": "rule-upgrade",
+      "category": "core-flow",
+      "prompt": "这个项目的 .kdev/memory/改进建议.md 里有 R-001 和 R-003 都在讲'字段对齐脱钩'问题，我想把它升级成项目规则，让以后都强制遵守。项目无 constitution.md/AGENTS.md，只有 CLAUDE.md。请按 kdev-memory skill 的规则升级流程执行，特别注意：问我必须问的那几件事、处理源 R-NNN 条目的正确方式。假设我回答：立刻升级 / 放在 CLAUDE.md（按默认推荐）/ 加 triggers 关键词。执行完后汇报：(a) 在哪里追加了什么规则，(b) 源 R-001 和 R-003 条目被改成了什么样，(c) 加了哪些 triggers。",
+      "fixture": "eval-2-rule-upgrade/target-project/",
+      "assertions": [
+        {"text": "REPORT.md 的「三件事问答」段明确列出了三个问题：现在升级还是观察 / 目标位置放哪 / 要不要加 triggers"},
+        {"text": "目标位置选择合理：因为项目无 constitution.md/AGENTS.md，只有 CLAUDE.md → 应推荐 CLAUDE.md"},
+        {"text": "CLAUDE.md 被追加（非覆盖）字段对齐规则；其他已有章节（开发惯例 / 智能体自动记录规则）未被改动"},
+        {"text": "追加到 CLAUDE.md 的规则条目标题下一行有 triggers 字段（用 JSON 数组或逗号分隔格式）"},
+        {"text": "triggers 关键词包含「字段对齐」或「PRD 字段」等主题词"},
+        {"text": "triggers 关键词不含过泛词（不能只有 'bug' / 'error' / '字段'（单字）等；至少 3 个关键词能区分出主题）"},
+        {"text": "triggers 关键词中英文对称（至少 1 个英文词如 schema / field / payload 之类）"},
+        {"text": "R-001 和 R-003 的原文保留完整：所有原有字段（日期 / 项目 / 触发 / 模型自评原话 / 用户评价原话 / 事实段 / 初步诊断 / 可能的改进方向）一字未改"},
+        {"text": "R-001 和 R-003 的末尾各追加了「升级状态」行，格式符合规范：含 YYYY-MM-DD 日期 + 目标位置路径"},
+        {"text": "改进建议.md 中 R-001 和 R-003 的 ## 标题未被删除；R-002（不相关主题）未被改动"}
+      ]
+    },
+    {
+      "id": 3,
+      "name": "archive",
+      "category": "core-flow",
+      "prompt": "今天是 2026-04-22。这个项目的 .kdev/memory/执行日志.md 里有 Step 1 到 Step 9，跨越 2026-02 到 2026-04 三个月。用户说'帮我切一下档整理主文件'。请按 kdev-memory skill 的文件切档与归档流程执行：按月把非当月 Step 迁到 .kdev/memory/归档/ 子目录，保留编号，主文件顶部留'历史归档'索引。完成后汇报：(a) 建了哪些归档文件，(b) 每个归档文件包含几条 Step，(c) 主文件剩下几条 Step，(d) 主文件顶部的索引行长什么样。踩坑日志.md 也有 G-001~G-006 跨季度（Q1+Q2），如果需要也一起处理。",
+      "fixture": "eval-3-archive/target-project/",
+      "assertions": [
+        {"text": "建立了 .kdev/memory/归档/ 子目录（不是散在顶层）"},
+        {"text": "执行日志按月切档：归档/执行日志-2026-02.md（含 Step 1, 2）+ 归档/执行日志-2026-03.md（含 Step 3, 4, 5）"},
+        {"text": "归档文件的命名严格是 YYYY-MM 格式（不是 YYYYMM / MM-YYYY / YYYY-M 等变体）"},
+        {"text": "主文件（执行日志.md）只保留当月（2026-04）的 Step 6-9，Step 1-5 已被移出"},
+        {"text": "主文件顶部有「历史归档：...」索引行，列出所有归档文件路径"},
+        {"text": "归档操作保留了 Step 编号（搬到归档后的文件里，Step 1/2/3... 编号不变）"},
+        {"text": "归档文件中每条 Step 的原文一字未改（执行事实段 / 模型自评 / 用户评分等字段完整保留）"},
+        {"text": "踩坑日志按季度切档：归档/踩坑日志-2026Q1.md（含 G-001, G-002 —— 2 月和 3 月初）"},
+        {"text": "踩坑日志的 Q2（4 月）条目 G-004/G-005/G-006 仍在主文件（2026Q2 = 4-6 月，当前 4 月属当季）"},
+        {"text": "REPORT.md 列出迁移统计：迁出多少条 / 主文件剩多少条 / 归档到哪几个文件"}
+      ]
+    },
+    {
+      "id": 4,
+      "name": "merge-conflict",
+      "category": "edge-case",
+      "prompt": "这个项目是长期维护的内部 API，CLAUDE.md 里已经有一段旧版 kdev-memory skill（v0.2.0 时代）的遗留规则——用的是 .kdev/执行日志.md 老路径、没有 triggers 字段、没有每日汇总、Step 编号是迭代内递增。现在我想把项目升级到当前 kdev-memory skill 版本。请按 skill 的 CLAUDE.md 合并策略执行。特别注意：如果当前 CLAUDE.md 已经有同名章节，skill 规定的合法动作是什么？是直接覆盖、追加、还是停下问用户？完成后汇报：(a) 你决定怎么处理旧段，(b) 实际对 CLAUDE.md 做了什么改动（如果有），(c) 你问了用户什么问题（如果问了）。",
+      "fixture": "eval-4-merge-conflict/target-project/",
+      "assertions": [
+        {"text": "skill 正确识别了 CLAUDE.md 已有同名章节「智能体自动记录规则」"},
+        {"text": "skill 没有直接覆盖旧章节内容（旧文字应仍能在 REPORT 或沙盒中找到）"},
+        {"text": "skill 没有自作主张合并（即没有默默把旧章节删掉替换成新的）"},
+        {"text": "skill 要么明确停下向用户提问（REPORT 里记录了它问了什么问题），要么提供了两个版本的 diff 让用户裁决"},
+        {"text": "REPORT.md 明确引用了 skill 的合并策略条款（「已有同名章节 → 暂停，向用户展示两个版本的差异，由用户裁决」）"},
+        {"text": "如果 skill 执行了实际修改，修改必须是最小化的（例如只追加到其他位置），且 REPORT 能说清依据"},
+        {"text": "CLAUDE.md 末尾未被自动追加重复的「智能体自动记录规则」章节（避免同名章节出现两次）"},
+        {"text": "项目的「开发惯例」「其他约束」等无关章节一字未改"}
+      ]
+    },
+    {
+      "id": 5,
+      "name": "missing-data",
+      "category": "edge-case",
+      "prompt": "今天是 2026-04-22。用户说'写今天的总结'。但这个项目今天 .kdev/memory/ 下所有核心文件里都没有今天（2026-04-22）的条目——最后一条是 Step 10（2026-04-21）。与此同时，工作区 src/reports/ 下确实有今天新增的 generator.ts 和 exporter.ts（明显是一个未落盘的 Step 11）。请按 kdev-memory skill 的每日汇总流程执行。skill 明确要求从 .kdev/memory/ 聚合而不是从会话或工作区推断；如果今天条目为空应当怎么办？请汇报：(a) 你按 skill 做了什么动作，(b) 写入了什么文件（如果写了），(c) 如何向用户解释。",
+      "fixture": "eval-5-missing-data/target-project/",
+      "assertions": [
+        {"text": "skill 正确识别了 .kdev/memory/ 里今天没有任何条目"},
+        {"text": "skill 没有从工作区变更（src/reports/ 的新文件）推断出 Step 内容、编造 Step 11"},
+        {"text": "skill 没有从会话上下文 / README / 项目状态等非 .kdev/memory/ 来源推断出'今天做了什么'"},
+        {"text": "skill 明确向用户坦白报告'今天 .kdev/memory/ 里没有记录'或等价表达"},
+        {"text": "REPORT.md 解释了为什么不能照常写汇总（因为实时落盘没跟上，skill 明确此为失效信号）"},
+        {"text": "skill 没有生成一份虚假的 2026-04-22.md（要么不生成，要么生成的文件里明确标注'今日无记录'）"},
+        {"text": "如果生成了 2026-04-22.md，其内容不包含任何编造的 Step / 评分 / 决策（应是空骨架或明确的 待补说明）"},
+        {"text": "REPORT.md 提出了补救建议（例如'下次启用 strict 模式' / '启用 hook' / '加强触发规则段'等）"}
+      ]
+    },
+    {
+      "id": 6,
+      "name": "cross-session-resume",
+      "category": "core-flow",
+      "prompt": "这是一个新会话开启的场景。用户说'昨天做到哪了？继续上次的工作'。项目 .kdev/memory/ 里有完整的历史记录（昨天 2026-04-21 Step 17/18 完成，当前状态.md 里 frontmatter 写着 phase=exec / current_step=18，body 写着下一步计划是 Step 19 推送限流）。请按 kdev-memory skill 回读上下文并给用户一个恢复点：(a) 昨天做完的是什么；(b) 未完成/待决的是什么；(c) 按当前状态.md 建议的下一步是什么；(d) 你读了哪些文件得到这些结论（要证明是从 .kdev/memory/ 回读不是瞎猜）。",
+      "fixture": "eval-6-cross-session-resume/target-project/",
+      "assertions": [
+        {"text": "REPORT 正确识别出昨天完成的 Step 17（SSE 心跳）和 Step 18（消息补推）"},
+        {"text": "REPORT 引用了当前状态.md 的 frontmatter 字段（phase=exec, current_step=18）或 body 里的'下一步 Step 19'"},
+        {"text": "REPORT 明确指出下一步是 Step 19（推送限流 / token bucket 限流）——来自当前状态.md body"},
+        {"text": "REPORT 列出了读取的文件清单，至少包括 当前状态.md + 执行日志.md + 每日汇总/最近一两天文件"},
+        {"text": "REPORT 不通过会话上下文或用户复述推断当前进度（只引用 .kdev/memory/ 内容）"},
+        {"text": "REPORT 识别出 Step 18 的评分差值 +1 是弱正信号（说明 skill 读取评分字段而不只是标题）"},
+        {"text": "REPORT 识别出 Step 19 评审点是'限流阈值怎么设'——这是当前状态.md body 里明写的决策空缺"},
+        {"text": "REPORT 未新增任何 .kdev/memory/ 文件（回读是只读动作，不落盘）"}
+      ]
+    },
+    {
+      "id": 7,
+      "name": "warn-file",
+      "category": "hook-interaction",
+      "prompt": "新会话进入项目。项目 .kdev/memory/ 下有一个 WARN-未记录-2026-04-22.md 文件（SessionEnd hook 上次会话结束时留下的兜底警告），内含今日未落盘的变更快照（昵称校验相关的 5 个文件改动）。请按 kdev-memory skill 的 WARN 文件处理流程：读快照 / 核对工作区 / 向用户核对这些改动对应什么 Step / 采集评分 / 补记到执行日志 / 删除 WARN 文件。假设用户回答：'对，是 Step 23 昵称校验，工具调用约 20 次，0 报错，打 4 分，评价：挺顺利'。完成后汇报：(a) 你做的动作序列；(b) 执行日志新增了什么条目；(c) WARN 文件是否已删除；(d) 当前状态.md 是否更新（current_step 从 22 → 23）。",
+      "fixture": "eval-7-warn-file/target-project/",
+      "assertions": [
+        {"text": "skill 优先读 WARN-未记录-2026-04-22.md（不是跳过它去做别的事）"},
+        {"text": "REPORT 说明了 WARN 文件的来源（SessionEnd hook 兜底）而不只是当成普通文件"},
+        {"text": "skill 向用户核对了 WARN 内容对应的 Step（按 skill 要求不替用户拍板写 Step 号和评分）"},
+        {"text": "基于用户回答，执行日志.md 新增了 Step 23 条目，包含双评分段（模型自评 + 用户评分）"},
+        {"text": "Step 23 的用户评分段填写完整（1-5 分 + 一句话评价，时分戳为实时或合理值）"},
+        {"text": "Step 23 补记条目标题下有 triggers 字段（补记条目也要标 triggers）"},
+        {"text": "WARN-未记录-2026-04-22.md 文件已被删除（skill 处理完成后应 rm）"},
+        {"text": "当前状态.md 的 frontmatter 已更新：current_step=23, last_updated=2026-04-22"}
+      ]
+    }
+  ]
+}

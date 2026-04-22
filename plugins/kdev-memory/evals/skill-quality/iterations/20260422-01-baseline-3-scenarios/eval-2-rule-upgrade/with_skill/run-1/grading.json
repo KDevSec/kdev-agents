@@ -1,0 +1,50 @@
+{
+  "run_id": "eval-2-with_skill",
+  "eval_id": 2,
+  "eval_name": "rule-upgrade",
+  "config": "with_skill",
+  "expectations": [
+    {
+      "text": "REPORT.md 的「三件事问答」段包含了三个问题：现在升级还是观察 / 目标位置放哪 / 要不要加 triggers",
+      "passed": true,
+      "evidence": "REPORT.md lines 10-16 has '## 三件事问答' table with all 3 questions: '现在升级还是先观察？', '目标位置放哪？', '要不要加 triggers 关键词？'"
+    },
+    {
+      "text": "CLAUDE.md 被追加（非覆盖）字段对齐规则",
+      "passed": true,
+      "evidence": "CLAUDE.md preserves original '## 开发惯例' and '## 智能体自动记录规则' sections (lines 5-15), appends new '## 项目硬规则' / '### 字段对齐优先（PRD ↔ 代码/接口）' at lines 17-35"
+    },
+    {
+      "text": "追加到 CLAUDE.md 的规则条目带 triggers 字段（包含「字段对齐」或「PRD 字段」关键词）",
+      "passed": true,
+      "evidence": "CLAUDE.md line 21: 'triggers: [\"字段对齐\", \"PRD 字段\", \"field alignment\", \"schema\", \"接口字段\", \"payload\"]' — both keywords present"
+    },
+    {
+      "text": "R-001 原文完整保留（日期 / 触发 / 原话 / 事实段 / 初步诊断 等字段至少保留 4 项）",
+      "passed": true,
+      "evidence": "改进建议.md lines 3-13 preserve R-001 with 日期、项目、触发、模型自评原话、用户评价原话、事实段、初步诊断、可能的改进方向 — all 8 fields preserved"
+    },
+    {
+      "text": "R-001 末尾有「升级状态」标记，含日期 + 目标位置",
+      "passed": true,
+      "evidence": "改进建议.md line 15: '> **升级状态**：2026-04-22 升级到 `CLAUDE.md §「字段对齐优先（PRD ↔ 代码/接口）」`...'"
+    },
+    {
+      "text": "R-003 原文完整保留 + 末尾有「升级状态」标记",
+      "passed": true,
+      "evidence": "改进建议.md lines 26-36 preserve R-003 fields; line 38: '> **升级状态**：2026-04-22 升级到 `CLAUDE.md §「字段对齐优先（PRD ↔ 代码/接口）」`...'"
+    },
+    {
+      "text": "改进建议.md 中 R-001 和 R-003 的源条目标题未被删除",
+      "passed": true,
+      "evidence": "改进建议.md line 3: '## R-001: 字段对齐脱钩（PRD vs 代码）' and line 26: '## R-003: 字段对齐脱钩再次出现（响应 payload）' — both titles intact"
+    }
+  ],
+  "overall_pass_rate": 1.0,
+  "summary": {
+    "pass_rate": 1.0,
+    "passed": 7,
+    "failed": 0,
+    "total": 7
+  }
+}

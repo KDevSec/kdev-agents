@@ -1,0 +1,15 @@
+{
+  "eval_id": 5,
+  "eval_name": "missing-data",
+  "prompt": "用户要求写今天（2026-04-22）的每日汇总，但 .kdev/memory/ 下所有文件今天都无条目（最后一条是昨天 Step 10），同时工作区 src/reports/ 有今天未落盘的变更。",
+  "assertions": [
+    {"text": "skill 正确识别了 .kdev/memory/ 里今天没有任何条目"},
+    {"text": "skill 没有从工作区变更（src/reports/ 的新文件）推断出 Step 内容、编造 Step 11"},
+    {"text": "skill 没有从会话上下文 / README / 项目状态等非 .kdev/memory/ 来源推断出'今天做了什么'"},
+    {"text": "skill 明确向用户坦白报告'今天 .kdev/memory/ 里没有记录'或等价表达"},
+    {"text": "REPORT.md 解释了为什么不能照常写汇总（因为实时落盘没跟上，skill 明确此为失效信号）"},
+    {"text": "skill 没有生成一份虚假的 2026-04-22.md（要么不生成，要么生成的文件里明确标注'今日无记录'）"},
+    {"text": "如果生成了 2026-04-22.md，其内容不包含任何编造的 Step / 评分 / 决策（应是空骨架或明确的 待补说明）"},
+    {"text": "REPORT.md 提出了补救建议（例如'下次启用 strict 模式' / '启用 hook' / '加强触发规则段'等）"}
+  ]
+}

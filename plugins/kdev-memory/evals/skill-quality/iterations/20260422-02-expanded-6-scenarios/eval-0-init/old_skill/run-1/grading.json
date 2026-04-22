@@ -1,0 +1,65 @@
+{
+  "run_id": "eval-0-old_skill",
+  "eval_id": 0,
+  "eval_name": "init",
+  "config": "old_skill",
+  "expectations": [
+    {
+      "text": "创建了 .kdev/memory/ 子目录（不是平铺在 .kdev/）",
+      "passed": true,
+      "evidence": "outputs/target-project/.kdev/memory/ contains 5 core files + 每日汇总/ dir"
+    },
+    {
+      "text": "建了 6 个核心骨架文件：决策日志.md / 踩坑日志.md / 执行日志.md / 每日汇总 目录 / 改进建议.md / 当前状态.md（方法论铁规.md 可选，不建也合格）",
+      "passed": true,
+      "evidence": "5 core files + 每日汇总/ directory present; 方法论铁规.md omitted (permitted per skill 可选 guidance)"
+    },
+    {
+      "text": "当前状态.md 的 frontmatter 含全部 6 个规定字段：phase / iteration / current_step / last_updated / pending_decisions / unresolved_gotchas，且取值合理（不是占位符）",
+      "passed": true,
+      "evidence": "当前状态.md frontmatter (lines 1-7): all 6 fields present; iteration: \"Sprint 0\"; current_step: 0"
+    },
+    {
+      "text": "phase 取值是 plan / exec / verify / done 四选一（不是自创值），current_step 是整数，last_updated 是 YYYY-MM-DD 格式",
+      "passed": true,
+      "evidence": "phase: plan (合法); current_step: 0 (int); last_updated: 2026-04-22 (YYYY-MM-DD)"
+    },
+    {
+      "text": "CLAUDE.md 包含「智能体自动记录规则」章节，且这一段里包含至少 8 条 🔴 铁规",
+      "passed": true,
+      "evidence": "CLAUDE.md lines 3-25 contain 10 🔴 铁规 identical in coverage to with_skill"
+    },
+    {
+      "text": "CLAUDE.md 的触发规则段包含结构化的触发规则表（markdown table），且表中至少覆盖 8 类触发时机",
+      "passed": true,
+      "evidence": "CLAUDE.md lines 27-46 markdown table with 17 rows covering 决策/踩坑/Step/评分/汇总/改进/铁规/状态/triggers/归档/升级/recall/WARN/brief/checkpoint"
+    },
+    {
+      "text": "CLAUDE.md 提到至少 2 个 hook 注入标签（WARN-未记录 / <kdev-memory-brief> / <kdev-memory-recall> / checkpoint 压缩前）",
+      "passed": true,
+      "evidence": "CLAUDE.md includes WARN-未记录-*.md, <kdev-memory-brief>, checkpoints/压缩前-*.md, <kdev-memory-recall>"
+    },
+    {
+      "text": "Q-001 写入决策日志.md，含问题 + 日期 + 选项（含 A/B 两选）+ 用户选择 + 理由五项",
+      "passed": true,
+      "evidence": "决策日志.md lines 5-11 has Q-001 title / 日期：2026-04-22 / 选项 (A) 全局递增 / (B) 迭代内递增 / 用户选择：A / 理由"
+    },
+    {
+      "text": "Q-001 的「理由」字段不是通用话术（如'简单好用'），而是结合项目特性写的具体理由",
+      "passed": true,
+      "evidence": "决策日志.md line 11: '项目为单人长期演进的 FastAPI 服务，跨迭代引用的场景多于迭代节奏感，全局递增更利于交叉检索与决策追溯' — 具体针对项目特性"
+    },
+    {
+      "text": "CLAUDE.md 的「编号规则」段已按 Q-001 答案特化（明确写「全局递增」而不是模板里的占位表述）",
+      "passed": true,
+      "evidence": "CLAUDE.md line 55: '**Step N 全局递增**（见 Q-001）：Step 1, 2, 3, ... 贯穿整个项目，不按迭代回归 1'"
+    }
+  ],
+  "summary": {
+    "pass_rate": 1.0,
+    "passed": 10,
+    "failed": 0,
+    "total": 10
+  },
+  "overall_pass_rate": 1.0
+}

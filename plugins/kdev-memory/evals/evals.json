@@ -1,8 +1,7 @@
 {
   "skill_name": "kdev-memory",
-  "version_under_test": "0.3.0",
-  "baseline_version": "0.2.0",
-  "notes": "Eval 集覆盖 triggers 智能召回的核心价值：已踩过的坑不再重复、做过的决策能复用。baseline (0.2.0) 没有 UserPromptSubmit hook，with-skill (0.3.0) 有。测试环境需要加载 fixtures/project-state/ 作为 .kdev/memory/ 的初始状态。",
+  "test_target": "hooks/user-prompt-trigger.sh + hooks/trigger-match.py",
+  "notes": "测 UserPromptSubmit hook 的 triggers 召回规则：字面子串匹配命中、sanitize 防误触、session 去重、主文件 + 归档目录两路扫描。这条 eval 线和 skill 文档层面无关——改 SKILL.md 不需要重跑；改 hook 脚本 / sanitize / triggers 字段扫描时才跑。跑法见 ../README.md 的「trigger-match 召回 eval」段。Fixture 在 fixtures/project-state/（共享静态数据，10 个 prompt 反复读）。对 skill 文档层面的行为质量测试见 skill-quality/evals.json。",
   "evals": [
     {
       "id": 1,

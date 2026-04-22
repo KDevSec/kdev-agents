@@ -1,0 +1,17 @@
+# skill-creator 运行产物：每次跑会变 + 体积大，不入库
+# 保留的产物见 iterations/<iteration-name>/ 下的 benchmark.json / benchmark.md / eval_metadata.json / grading.json / timing.json
+
+# 每次 subagent 生成的 sandbox，动辄几百 KB
+iterations/*/*/*/run-*/outputs/
+iterations/*/eval-*/*/run-*/outputs/
+
+# 临时 workspace（放在本目录外的也忽略）
+workspace/
+iteration-tmp-*/
+
+# skill snapshot：通过 git show HEAD:<path> 取历史版本，不必常驻
+skill-snapshot/
+
+# 静态 viewer HTML：可随时 regenerate
+iterations/*/review.html
+*.html

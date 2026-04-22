@@ -1,0 +1,65 @@
+{
+  "run_id": "eval-0-with_skill",
+  "eval_id": 0,
+  "eval_name": "init",
+  "config": "with_skill",
+  "expectations": [
+    {
+      "text": "创建了 .kdev/memory/ 子目录（不是平铺在 .kdev/）",
+      "passed": true,
+      "evidence": "outputs/target-project/.kdev/memory/ contains 决策日志.md / 执行日志.md / 踩坑日志.md / 改进建议.md / 当前状态.md / 每日汇总/.gitkeep"
+    },
+    {
+      "text": "建了 6 个核心骨架文件：决策日志.md / 踩坑日志.md / 执行日志.md / 每日汇总 目录 / 改进建议.md / 当前状态.md（方法论铁规.md 可选，不建也合格）",
+      "passed": true,
+      "evidence": "All 5 core files + 每日汇总/ dir present; 方法论铁规.md correctly omitted per skill guidance (REPORT notes '未建方法论铁规.md：按 SKILL.md 可选')"
+    },
+    {
+      "text": "当前状态.md 的 frontmatter 含全部 6 个规定字段：phase / iteration / current_step / last_updated / pending_decisions / unresolved_gotchas，且取值合理（不是占位符）",
+      "passed": true,
+      "evidence": "当前状态.md lines 1-7: phase: plan / iteration: \"Sprint 0\" / current_step: 0 / last_updated: 2026-04-22 / pending_decisions: [] / unresolved_gotchas: []"
+    },
+    {
+      "text": "phase 取值是 plan / exec / verify / done 四选一（不是自创值），current_step 是整数，last_updated 是 YYYY-MM-DD 格式",
+      "passed": true,
+      "evidence": "phase: plan (合法值); current_step: 0 (int); last_updated: 2026-04-22 (YYYY-MM-DD)"
+    },
+    {
+      "text": "CLAUDE.md 包含「智能体自动记录规则」章节，且这一段里包含至少 8 条 🔴 铁规",
+      "passed": true,
+      "evidence": "CLAUDE.md lines 5-27 contain ## 智能体自动记录规则 with 10 🔴 铁规（实时/每日汇总/WARN/kdev-memory-brief/checkpoint/frontmatter/归档/升级/triggers/recall）"
+    },
+    {
+      "text": "CLAUDE.md 的触发规则段包含结构化的触发规则表（markdown table），且表中至少覆盖 8 类触发时机",
+      "passed": true,
+      "evidence": "CLAUDE.md lines 29-48 contain markdown table with 17 rows: 决策/踩坑/Step/评分/汇总/改进/铁规/状态/frontmatter同步/triggers/归档/升级/recall/WARN/brief/checkpoint"
+    },
+    {
+      "text": "CLAUDE.md 提到至少 2 个 hook 注入标签（WARN-未记录 / <kdev-memory-brief> / <kdev-memory-recall> / checkpoint 压缩前）",
+      "passed": true,
+      "evidence": "CLAUDE.md mentions all four: WARN-未记录-*.md (line 13), <kdev-memory-brief> (line 15), checkpoints/压缩前-*.md (line 17), <kdev-memory-recall> (line 27)"
+    },
+    {
+      "text": "Q-001 写入决策日志.md，含问题 + 日期 + 选项（含 A/B 两选）+ 用户选择 + 理由五项",
+      "passed": true,
+      "evidence": "决策日志.md lines 8-14 has title/日期：2026-04-22/选项含 (A)(B)/用户选择：A/理由：...五项全到位"
+    },
+    {
+      "text": "Q-001 的「理由」字段不是通用话术（如'简单好用'），而是结合项目特性写的具体理由",
+      "passed": true,
+      "evidence": "决策日志.md line 14: '项目长期演进、单人开发，跨迭代引用 Step 编号的概率较高；全局递增更简单，编号稳定性优先于节奏感' — 结合项目生命周期特征"
+    },
+    {
+      "text": "CLAUDE.md 的「编号规则」段已按 Q-001 答案特化（明确写「全局递增」而不是模板里的占位表述）",
+      "passed": true,
+      "evidence": "CLAUDE.md line 57: 'Step N **全局递增**（贯穿整个项目，Step 1, 2, 3, ...，跨迭代不回零）——见 Q-001'"
+    }
+  ],
+  "summary": {
+    "pass_rate": 1.0,
+    "passed": 10,
+    "failed": 0,
+    "total": 10
+  },
+  "overall_pass_rate": 1.0
+}

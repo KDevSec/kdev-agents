@@ -1,0 +1,14 @@
+{
+  "eval_id": 0,
+  "eval_name": "init",
+  "prompt": "我想给这个 FastAPI 项目建立 kdev-memory 工程记忆机制。项目目前无 CLAUDE.md、无 .kdev/ 目录。请按 skill 标准初始化流程完整执行：建骨架文件、在项目 CLAUDE.md 里加触发规则段、向我抛 Q-001 决策（Step 编号方式）。假设我回答'全局递增'。完成后在 outputs/ 目录里汇报：(a) 建了哪些文件，(b) CLAUDE.md 加了哪一段，(c) Q-001 的完整条目内容，(d) 当前状态.md 的 frontmatter 是什么样。",
+  "assertions": [
+    {"text": "创建了 .kdev/memory/ 子目录（不是平铺在 .kdev/）"},
+    {"text": "建了 7 个核心骨架文件：决策日志.md / 踩坑日志.md / 执行日志.md / 每日汇总 目录 / 改进建议.md / 当前状态.md / 方法论铁规.md"},
+    {"text": "当前状态.md 含 YAML frontmatter 且至少有 phase / iteration / current_step / last_updated 字段"},
+    {"text": "CLAUDE.md 已被修改，包含「智能体自动记录规则」章节"},
+    {"text": "CLAUDE.md 规则段里提到 WARN-未记录 / kdev-memory-brief / kdev-memory-recall 三个 hook 行为中的至少两个"},
+    {"text": "Q-001 已写入决策日志.md，含选项 + 用户选择 + 理由三个字段"},
+    {"text": "CLAUDE.md 的编号规则与 Q-001 决策（全局递增）一致"}
+  ]
+}

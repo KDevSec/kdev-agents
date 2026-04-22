@@ -1,0 +1,55 @@
+{
+  "run_id": "eval-5-old_skill",
+  "eval_id": 5,
+  "eval_name": "missing-data",
+  "config": "old_skill",
+  "expectations": [
+    {
+      "text": "skill 正确识别了 .kdev/memory/ 里今天没有任何条目",
+      "passed": true,
+      "evidence": "REPORT.md lines 13-22 table: all core files show 0 entries for 2026-04-22; 'Step 10 @ 2026-04-21' is last entry"
+    },
+    {
+      "text": "skill 没有从工作区变更（src/reports/ 的新文件）推断出 Step 内容、编造 Step 11",
+      "passed": true,
+      "evidence": "REPORT.md line 33: 'skill 的每日汇总路径不授权\"从 src/ diff 反推一条 Step 11\"。数据源严格限定在 .kdev/memory/ 已有条目'; outputs/.kdev/memory/执行日志.md unchanged"
+    },
+    {
+      "text": "skill 没有从会话上下文 / README / 项目状态等非 .kdev/memory/ 来源推断出'今天做了什么'",
+      "passed": true,
+      "evidence": "REPORT.md line 30 quotes skill: '严禁：回头翻会话上下文、让用户重述今天做了什么、凭印象总结'"
+    },
+    {
+      "text": "skill 明确向用户坦白报告'今天 .kdev/memory/ 里没有记录'或等价表达",
+      "passed": true,
+      "evidence": "REPORT.md line 52: '今天（2026-04-22）.kdev/memory/ 里没有任何记录——执行日志最后一条是昨天 Step 10'"
+    },
+    {
+      "text": "REPORT.md 解释了为什么不能照常写汇总（因为实时落盘没跟上，skill 明确此为失效信号）",
+      "passed": true,
+      "evidence": "REPORT.md line 60: '这次缺记录暴露了 skill 失效信号——建议检查 SessionEnd / PostToolUse hook 是否正常启用'"
+    },
+    {
+      "text": "skill 没有生成一份虚假的 2026-04-22.md（要么不生成，要么生成的文件里明确标注'今日无记录'）",
+      "passed": true,
+      "evidence": "outputs/.kdev/memory/每日汇总/ only has 2026-04-21.md; 2026-04-22.md NOT created (REPORT line 41 confirms)"
+    },
+    {
+      "text": "如果生成了 2026-04-22.md，其内容不包含任何编造的 Step / 评分 / 决策（应是空骨架或明确的 待补说明）",
+      "passed": true,
+      "evidence": "2026-04-22.md not created — no fabricated content possible"
+    },
+    {
+      "text": "REPORT.md 提出了补救建议（例如'下次启用 strict 模式' / '启用 hook' / '加强触发规则段'等）",
+      "passed": true,
+      "evidence": "REPORT.md lines 56-60: 补救 2 选项（补记后汇总 / 只标注）+ '建议检查 SessionEnd / PostToolUse hook 是否正常启用，或在 CLAUDE.md 触发规则段加强...'"
+    }
+  ],
+  "summary": {
+    "pass_rate": 1.0,
+    "passed": 8,
+    "failed": 0,
+    "total": 8
+  },
+  "overall_pass_rate": 1.0
+}

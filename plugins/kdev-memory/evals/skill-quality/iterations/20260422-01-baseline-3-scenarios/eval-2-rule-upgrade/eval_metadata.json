@@ -1,0 +1,14 @@
+{
+  "eval_id": 2,
+  "eval_name": "rule-upgrade",
+  "prompt": "这个项目的 .kdev/memory/改进建议.md 里有 R-001 和 R-003 都在讲'字段对齐脱钩'问题，我想把它升级成项目规则，让以后都强制遵守。项目无 constitution.md/AGENTS.md，只有 CLAUDE.md。请按 kdev-memory skill 的规则升级流程执行，特别注意：问我必须问的那几件事、处理源 R-NNN 条目的正确方式。假设我回答：立刻升级 / 放在 CLAUDE.md（按默认推荐）/ 加 triggers 关键词。执行完后汇报：(a) 在哪里追加了什么规则，(b) 源 R-001 和 R-003 条目被改成了什么样，(c) 加了哪些 triggers。",
+  "assertions": [
+    {"text": "REPORT.md 的「三件事问答」段包含了三个问题：现在升级还是观察 / 目标位置放哪 / 要不要加 triggers"},
+    {"text": "CLAUDE.md 被追加（非覆盖）字段对齐规则"},
+    {"text": "追加到 CLAUDE.md 的规则条目带 triggers 字段（包含「字段对齐」或「PRD 字段」关键词）"},
+    {"text": "R-001 原文完整保留（日期 / 触发 / 原话 / 事实段 / 初步诊断 等字段至少保留 4 项）"},
+    {"text": "R-001 末尾有「升级状态」标记，含日期 + 目标位置"},
+    {"text": "R-003 原文完整保留 + 末尾有「升级状态」标记"},
+    {"text": "改进建议.md 中 R-001 和 R-003 的源条目标题未被删除"}
+  ]
+}

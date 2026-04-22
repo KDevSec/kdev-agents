@@ -1,0 +1,45 @@
+{
+  "run_id": "eval-1-with_skill",
+  "eval_id": 1,
+  "eval_name": "daily-summary",
+  "config": "with_skill",
+  "expectations": [
+    {
+      "text": "生成了 .kdev/memory/每日汇总/2026-04-22.md 文件",
+      "passed": true,
+      "evidence": "target-project/.kdev/memory/每日汇总/2026-04-22.md exists (15 lines of content with title '# 每日汇总：2026-04-22')"
+    },
+    {
+      "text": "汇总按 schema 含至少四段：完成的工作 / 未完成项 / 明日计划 / 本日新增 Q-G-R",
+      "passed": true,
+      "evidence": "2026-04-22.md contains '## 完成的工作', '## 未完成项', '## 明日计划', '## 本日新增踩坑 / 决策 / 改进信号' — all 4 sections present (plus bonus 负面评价观察 + 跨步洞察)"
+    },
+    {
+      "text": "正确引用了 Step 12 和 Step 13",
+      "passed": true,
+      "evidence": "2026-04-22.md lines 4-5: 'Step 12: 实现 JWT 刷新 token 逻辑... Step 13: 文档补齐（API 认证说明）' — both referenced by correct Step numbers"
+    },
+    {
+      "text": "识别了 Step 13 评分差值 -2 并关联到 R-002（负面评价观察段或本日新增段）",
+      "passed": true,
+      "evidence": "2026-04-22.md line 5: 'Step 13... 差值 -2 → 已追加 R-002 到改进建议'; line 24: 'Step 13 用户评价\"文档太薄...\"（差值 -2，已进 R-002）' — both 差值 -2 and R-002 association explicit"
+    },
+    {
+      "text": "本日新增段列出了全部 6 个新条目：G-005 / G-006 / Q-007 / Q-008 / R-001 / R-002（至少列出 5 个）",
+      "passed": true,
+      "evidence": "2026-04-22.md lines 15-20 list all 6: G-005, G-006, Q-007, Q-008, R-001, R-002"
+    },
+    {
+      "text": "REPORT.md 明确说明'从 .kdev/memory/ 读文件聚合'，未提及'翻会话'",
+      "passed": true,
+      "evidence": "REPORT.md line 26: '**筛选维度**：按文件内 `日期：2026-04-22` 字段筛选，严格以文件为唯一真相源，未回头翻会话'; line 39: '未回头翻会话上下文、未让用户复述、未凭印象补写——全部依赖 .kdev/memory/ 文件内容'"
+    }
+  ],
+  "overall_pass_rate": 1.0,
+  "summary": {
+    "pass_rate": 1.0,
+    "passed": 6,
+    "failed": 0,
+    "total": 6
+  }
+}

@@ -1,0 +1,17 @@
+{
+  "eval_id": 2,
+  "eval_name": "rule-upgrade",
+  "prompt": "这个项目的 .kdev/memory/改进建议.md 里有 R-001 和 R-003 都在讲'字段对齐脱钩'问题，我想把它升级成项目规则。假设用户回答：立刻升级 / 放在 CLAUDE.md / 加 triggers。",
+  "assertions": [
+    {"text": "REPORT.md 的「三件事问答」段明确列出了三个问题：现在升级还是观察 / 目标位置放哪 / 要不要加 triggers"},
+    {"text": "目标位置选择合理：因为项目无 constitution.md/AGENTS.md，只有 CLAUDE.md → 应推荐 CLAUDE.md"},
+    {"text": "CLAUDE.md 被追加（非覆盖）字段对齐规则；其他已有章节（开发惯例 / 智能体自动记录规则）未被改动"},
+    {"text": "追加到 CLAUDE.md 的规则条目标题下一行有 triggers 字段（用 JSON 数组或逗号分隔格式）"},
+    {"text": "triggers 关键词包含「字段对齐」或「PRD 字段」等主题词"},
+    {"text": "triggers 关键词不含过泛词（不能只有 'bug' / 'error' / '字段'（单字）等；至少 3 个关键词能区分出主题）"},
+    {"text": "triggers 关键词中英文对称（至少 1 个英文词如 schema / field / payload 之类）"},
+    {"text": "R-001 和 R-003 的原文保留完整：所有原有字段（日期 / 项目 / 触发 / 模型自评原话 / 用户评价原话 / 事实段 / 初步诊断 / 可能的改进方向）一字未改"},
+    {"text": "R-001 和 R-003 的末尾各追加了「升级状态」行，格式符合规范：含 YYYY-MM-DD 日期 + 目标位置路径"},
+    {"text": "改进建议.md 中 R-001 和 R-003 的 ## 标题未被删除；R-002（不相关主题）未被改动"}
+  ]
+}

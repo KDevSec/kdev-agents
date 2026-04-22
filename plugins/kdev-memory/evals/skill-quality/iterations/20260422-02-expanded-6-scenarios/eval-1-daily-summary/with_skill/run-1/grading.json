@@ -1,0 +1,65 @@
+{
+  "run_id": "eval-1-with_skill",
+  "eval_id": 1,
+  "eval_name": "daily-summary",
+  "config": "with_skill",
+  "expectations": [
+    {
+      "text": "生成了 .kdev/memory/每日汇总/2026-04-22.md 文件",
+      "passed": true,
+      "evidence": "outputs/.kdev/memory/每日汇总/2026-04-22.md exists"
+    },
+    {
+      "text": "汇总按 schema 含 5 段：完成的工作 / 未完成项 / 明日计划 / 本日新增 踩坑-决策-改进信号 / 负面评价观察",
+      "passed": true,
+      "evidence": "2026-04-22.md has ## 完成的工作 (line 3) / ## 未完成项 (line 7) / ## 明日计划 (line 10) / ## 本日新增踩坑/决策/改进信号 (line 13) / ## 负面评价观察 (line 21) — all 5 sections plus bonus 跨步洞察"
+    },
+    {
+      "text": "正确引用了 Step 12 和 Step 13（不是抽象描述，而是引用具体编号）",
+      "passed": true,
+      "evidence": "Line 4-5: 'Step 12: 实现 JWT 刷新 token 逻辑' and 'Step 13: 文档补齐' — explicit Step numbers"
+    },
+    {
+      "text": "Step 13 的 -2 差值（模型 5 / 用户 3）被识别并关联到 R-002（即'文档太薄'）",
+      "passed": true,
+      "evidence": "Line 5: 'Step 13: 文档补齐...🚨（模型 5 / 用户 3，差值 -2 → 已追加 R-002 到改进建议）'"
+    },
+    {
+      "text": "Step 12 的弱负面信号被识别：差值 +1 但用户评价含'磕磕绊绊'等负面词，应出现在「负面评价观察」段（弱信号留痕，不单独编号）",
+      "passed": true,
+      "evidence": "Line 22: 'Step 12: 用户评价\"最终效果好，但过程磕磕绊绊\"（差值 +1，已记入执行日志；因换库绕路触发 R-001）'"
+    },
+    {
+      "text": "本日新增段列出了全部 6 个新条目：G-005 / G-006 / Q-007 / Q-008 / R-001 / R-002",
+      "passed": true,
+      "evidence": "Lines 14-19 list all: G-005, G-006, Q-007, Q-008, R-001, R-002"
+    },
+    {
+      "text": "REPORT.md 的动作路径描述明确说「从 .kdev/memory/ 读文件聚合」，不提及翻会话",
+      "passed": true,
+      "evidence": "REPORT.md line 13: 'Step 1 读 .kdev/memory/ 下所有核心文件，按 2026-04-22 筛选 — 严禁翻会话记录'"
+    },
+    {
+      "text": "REPORT.md 列出的'读了哪些文件'至少包含 5 个核心文件：执行日志 / 决策日志 / 踩坑日志 / 改进建议 / 当前状态",
+      "passed": true,
+      "evidence": "REPORT.md lines 15-21 table lists 执行日志.md/决策日志.md/踩坑日志.md/改进建议.md/当前状态.md/每日汇总 — 5+ core files"
+    },
+    {
+      "text": "2026-04-22.md 的「未完成项」段识别出 Step 13 文档不完整（用户要求二次修订——这个信号在当前状态.md body 里）",
+      "passed": true,
+      "evidence": "Line 8: 'Step 13 文档需二次修订：按用户反馈补齐错误码列表 + 过期/撤销处理说明（当前版本被判\"太薄\"）'"
+    },
+    {
+      "text": "2026-04-22.md 的「明日计划」段指向 Step 14（二次修订）而非凭空发明新任务",
+      "passed": true,
+      "evidence": "Line 11: 'Step 14: 按 R-002 反馈重写 docs/api-auth.md，补齐错误码 + 过期/撤销边界路径'"
+    }
+  ],
+  "summary": {
+    "pass_rate": 1.0,
+    "passed": 10,
+    "failed": 0,
+    "total": 10
+  },
+  "overall_pass_rate": 1.0
+}

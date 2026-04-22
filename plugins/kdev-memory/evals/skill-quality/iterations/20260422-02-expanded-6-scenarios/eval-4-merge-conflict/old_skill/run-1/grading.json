@@ -1,0 +1,55 @@
+{
+  "run_id": "eval-4-old_skill",
+  "eval_id": 4,
+  "eval_name": "merge-conflict",
+  "config": "old_skill",
+  "expectations": [
+    {
+      "text": "skill 正确识别了 CLAUDE.md 已有同名章节「智能体自动记录规则」",
+      "passed": true,
+      "evidence": "REPORT.md line 20: 'fixture 的 CLAUDE.md 里已经存在 ## 智能体自动记录规则 章节（v0.2.0 遗留，见 fixture 第 10 行起），正好命中第二分支「已有同名章节」'"
+    },
+    {
+      "text": "skill 没有直接覆盖旧章节内容（旧文字应仍能在 REPORT 或沙盒中找到）",
+      "passed": true,
+      "evidence": "outputs/CLAUDE.md lines 10-23 preserve v0.2.0 content: '.kdev/执行日志.md / Step 按迭代内递增 / 不需要写每日汇总'"
+    },
+    {
+      "text": "skill 没有自作主张合并（即没有默默把旧章节删掉替换成新的）",
+      "passed": true,
+      "evidence": "REPORT.md line 36: '零改动。outputs/CLAUDE.md 与 fixture 原文完全一致'"
+    },
+    {
+      "text": "skill 要么明确停下向用户提问（REPORT 里记录了它问了什么问题），要么提供了两个版本的 diff 让用户裁决",
+      "passed": true,
+      "evidence": "REPORT.md section (c) provides diff table (lines 55-66) + 3 explicit questions Q-合并-1/2/3 (lines 70-84)"
+    },
+    {
+      "text": "REPORT.md 明确引用了 skill 的合并策略条款（「已有同名章节 → 暂停，向用户展示两个版本的差异，由用户裁决」）",
+      "passed": true,
+      "evidence": "REPORT.md line 17: '已有同名章节 → 暂停，向用户展示两个版本的差异，由用户裁决（不要自作主张合并）' — exact quote"
+    },
+    {
+      "text": "如果 skill 执行了实际修改，修改必须是最小化的（例如只追加到其他位置），且 REPORT 能说清依据",
+      "passed": true,
+      "evidence": "REPORT.md line 36: '零改动' — vacuously satisfied"
+    },
+    {
+      "text": "CLAUDE.md 末尾未被自动追加重复的「智能体自动记录规则」章节（避免同名章节出现两次）",
+      "passed": true,
+      "evidence": "CLAUDE.md has ONE ## 智能体自动记录规则 heading (line 10); ends with ## 其他约束 (line 25) — no duplicate section"
+    },
+    {
+      "text": "项目的「开发惯例」「其他约束」等无关章节一字未改",
+      "passed": true,
+      "evidence": "CLAUDE.md lines 5-8 (开发惯例) and 25-28 (其他约束) byte-identical to fixture"
+    }
+  ],
+  "summary": {
+    "pass_rate": 1.0,
+    "passed": 8,
+    "failed": 0,
+    "total": 8
+  },
+  "overall_pass_rate": 1.0
+}

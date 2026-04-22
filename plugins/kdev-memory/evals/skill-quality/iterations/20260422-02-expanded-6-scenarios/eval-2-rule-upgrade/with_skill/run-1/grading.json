@@ -1,0 +1,65 @@
+{
+  "run_id": "eval-2-with_skill",
+  "eval_id": 2,
+  "eval_name": "rule-upgrade",
+  "config": "with_skill",
+  "expectations": [
+    {
+      "text": "REPORT.md 的「三件事问答」段明确列出了三个问题：现在升级还是观察 / 目标位置放哪 / 要不要加 triggers",
+      "passed": true,
+      "evidence": "REPORT.md lines 5-11: '问 1 — 现在升级还是先观察' / '问 2 — 目标位置放哪' / '问 3 — 要不要加 triggers' — all three asked"
+    },
+    {
+      "text": "目标位置选择合理：因为项目无 constitution.md/AGENTS.md，只有 CLAUDE.md → 应推荐 CLAUDE.md",
+      "passed": true,
+      "evidence": "REPORT.md line 9: '目标位置放哪？ 答：CLAUDE.md。项目无 constitution.md/AGENTS.md/.specify/等 7 个约定路径，只有 CLAUDE.md → 按默认推荐'"
+    },
+    {
+      "text": "CLAUDE.md 被追加（非覆盖）字段对齐规则；其他已有章节（开发惯例 / 智能体自动记录规则）未被改动",
+      "passed": true,
+      "evidence": "CLAUDE.md preserves lines 1-10 (## 开发惯例) and lines 23-27 (## 智能体自动记录规则); new ## 项目硬规则 added at lines 11-21 between them"
+    },
+    {
+      "text": "追加到 CLAUDE.md 的规则条目标题下一行有 triggers 字段（用 JSON 数组或逗号分隔格式）",
+      "passed": true,
+      "evidence": "CLAUDE.md line 15: 'triggers: [\"字段对齐\", \"PRD 字段\", \"schema 对齐\", \"field alignment\", \"响应字段\", \"接口字段\"]' — directly below rule title"
+    },
+    {
+      "text": "triggers 关键词包含「字段对齐」或「PRD 字段」等主题词",
+      "passed": true,
+      "evidence": "triggers array contains both '字段对齐' and 'PRD 字段'"
+    },
+    {
+      "text": "triggers 关键词不含过泛词（不能只有 'bug' / 'error' / '字段'（单字）等；至少 3 个关键词能区分出主题）",
+      "passed": true,
+      "evidence": "All 6 triggers are theme-specific: 字段对齐/PRD 字段/schema 对齐/field alignment/响应字段/接口字段 — no single generic '字段' or 'bug'/'error'"
+    },
+    {
+      "text": "triggers 关键词中英文对称（至少 1 个英文词如 schema / field / payload 之类）",
+      "passed": true,
+      "evidence": "'schema 对齐' and 'field alignment' are English tokens — 2 English entries"
+    },
+    {
+      "text": "R-001 和 R-003 的原文保留完整：所有原有字段（日期 / 项目 / 触发 / 模型自评原话 / 用户评价原话 / 事实段 / 初步诊断 / 可能的改进方向）一字未改",
+      "passed": true,
+      "evidence": "改进建议.md R-001 lines 3-13 and R-003 lines 26-36 preserve all original fields verbatim; only '> **升级状态**：...' lines appended"
+    },
+    {
+      "text": "R-001 和 R-003 的末尾各追加了「升级状态」行，格式符合规范：含 YYYY-MM-DD 日期 + 目标位置路径",
+      "passed": true,
+      "evidence": "改进建议.md line 15: '> **升级状态**：2026-04-22 升级到 CLAUDE.md §「项目硬规则」→「字段对齐（PRD ↔ 代码）」'; line 38 same format for R-003"
+    },
+    {
+      "text": "改进建议.md 中 R-001 和 R-003 的 ## 标题未被删除；R-002（不相关主题）未被改动",
+      "passed": true,
+      "evidence": "改进建议.md line 3 '## R-001: 字段对齐脱钩' and line 26 '## R-003: 字段对齐脱钩再次出现' preserved; R-002 lines 17-24 unchanged (no 升级状态 appended)"
+    }
+  ],
+  "summary": {
+    "pass_rate": 1.0,
+    "passed": 10,
+    "failed": 0,
+    "total": 10
+  },
+  "overall_pass_rate": 1.0
+}

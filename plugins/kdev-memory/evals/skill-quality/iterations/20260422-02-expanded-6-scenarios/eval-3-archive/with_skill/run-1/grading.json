@@ -1,0 +1,65 @@
+{
+  "run_id": "eval-3-with_skill",
+  "eval_id": 3,
+  "eval_name": "archive",
+  "config": "with_skill",
+  "expectations": [
+    {
+      "text": "建立了 .kdev/memory/归档/ 子目录（不是散在顶层）",
+      "passed": true,
+      "evidence": "outputs/.kdev/memory/归档/ exists containing 执行日志-2026-02.md / 执行日志-2026-03.md / 踩坑日志-2026Q1.md"
+    },
+    {
+      "text": "执行日志按月切档：归档/执行日志-2026-02.md（含 Step 1, 2）+ 归档/执行日志-2026-03.md（含 Step 3, 4, 5）",
+      "passed": true,
+      "evidence": "执行日志-2026-02.md contains Step 1 (line 3) and Step 2 (line 26); REPORT confirms 执行日志-2026-03.md has Step 3/4/5 (3 条)"
+    },
+    {
+      "text": "归档文件的命名严格是 YYYY-MM 格式（不是 YYYYMM / MM-YYYY / YYYY-M 等变体）",
+      "passed": true,
+      "evidence": "Filenames 执行日志-2026-02.md, 执行日志-2026-03.md — YYYY-MM format confirmed"
+    },
+    {
+      "text": "主文件（执行日志.md）只保留当月（2026-04）的 Step 6-9，Step 1-5 已被移出",
+      "passed": true,
+      "evidence": "执行日志.md contains only Step 6/7/8/9 (lines 5,27,49,71) all dated 2026-04-*; no Step 1-5"
+    },
+    {
+      "text": "主文件顶部有「历史归档：...」索引行，列出所有归档文件路径",
+      "passed": true,
+      "evidence": "执行日志.md line 3: '> 历史归档：归档/执行日志-2026-03.md、归档/执行日志-2026-02.md'; 踩坑日志.md line 3: '> 历史归档：归档/踩坑日志-2026Q1.md'"
+    },
+    {
+      "text": "归档操作保留了 Step 编号（搬到归档后的文件里，Step 1/2/3... 编号不变）",
+      "passed": true,
+      "evidence": "执行日志-2026-02.md preserves 'Step 1: 初始化仓库...' and 'Step 2: 登录模块(OAuth)' — numbering unchanged"
+    },
+    {
+      "text": "归档文件中每条 Step 的原文一字未改（执行事实段 / 模型自评 / 用户评分等字段完整保留）",
+      "passed": true,
+      "evidence": "执行日志-2026-02.md Step 1 preserves 执行事实 (工具调用20/报错1) / 模型自评 / 用户评分 verbatim"
+    },
+    {
+      "text": "踩坑日志按季度切档：归档/踩坑日志-2026Q1.md（含 G-001, G-002 —— 2 月和 3 月初）",
+      "passed": true,
+      "evidence": "踩坑日志-2026Q1.md contains G-001 (2026-02-06), G-002 (2026-02-19), G-003 (2026-03-03) — all Q1 entries included"
+    },
+    {
+      "text": "踩坑日志的 Q2（4 月）条目 G-004/G-005/G-006 仍在主文件（2026Q2 = 4-6 月，当前 4 月属当季）",
+      "passed": true,
+      "evidence": "踩坑日志.md retains G-004 (04-08), G-005 (04-15), G-006 (04-21) all in 2026Q2"
+    },
+    {
+      "text": "REPORT.md 列出迁移统计：迁出多少条 / 主文件剩多少条 / 归档到哪几个文件",
+      "passed": true,
+      "evidence": "REPORT.md section (b) table: 执行日志-2026-02.md 2条 / 执行日志-2026-03.md 3条 / 踩坑日志-2026Q1.md 3条; section (c): 主文件剩 4 Step + 3 G — explicit stats"
+    }
+  ],
+  "summary": {
+    "pass_rate": 1.0,
+    "passed": 10,
+    "failed": 0,
+    "total": 10
+  },
+  "overall_pass_rate": 1.0
+}

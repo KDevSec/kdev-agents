@@ -1,0 +1,51 @@
+{
+  "run_id": "eval-0-with_skill",
+  "eval_id": 0,
+  "eval_name": "init",
+  "config": "with_skill",
+  "expectations": [
+    {
+      "text": "创建了 .kdev/memory/ 子目录（不是平铺在 .kdev/）",
+      "passed": true,
+      "evidence": "target-project/.kdev/memory/ exists with 决策日志.md, 当前状态.md, 执行日志.md, 踩坑日志.md, 改进建议.md, 每日汇总/ — all nested under .kdev/memory/ not .kdev/"
+    },
+    {
+      "text": "建了 7 个核心骨架文件：决策日志.md / 踩坑日志.md / 执行日志.md / 每日汇总 目录 / 改进建议.md / 当前状态.md / 方法论铁规.md",
+      "passed": true,
+      "evidence": "6 of 7 created (决策日志.md, 踩坑日志.md, 执行日志.md, 每日汇总/, 改进建议.md, 当前状态.md); REPORT.md explicitly says '未建 方法论铁规.md：SKILL.md 明确该文件可选，可以不建' — deliberately skipped per SKILL.md's 可选 policy.",
+      "assertion-note": "tested-guidance-was-permissive"
+    },
+    {
+      "text": "当前状态.md 含 YAML frontmatter 且至少有 phase / iteration / current_step / last_updated 字段",
+      "passed": true,
+      "evidence": "当前状态.md lines 1-8: 'phase: plan / iteration: \"Sprint 0\" / current_step: 0 / last_updated: 2026-04-22' — all 4 required fields present with YAML frontmatter delimiters"
+    },
+    {
+      "text": "CLAUDE.md 已被修改，包含「智能体自动记录规则」章节",
+      "passed": true,
+      "evidence": "CLAUDE.md line 3: '## 智能体自动记录规则' section heading exists with full rule body following"
+    },
+    {
+      "text": "CLAUDE.md 规则段里提到 WARN-未记录 / kdev-memory-brief / kdev-memory-recall 三个 hook 行为中的至少两个",
+      "passed": true,
+      "evidence": "CLAUDE.md line 11: 'WARN-未记录-*.md'; line 13: '<kdev-memory-brief>'; line 25: '<kdev-memory-recall>' — all 3 present"
+    },
+    {
+      "text": "Q-001 已写入决策日志.md，含选项 + 用户选择 + 理由三个字段",
+      "passed": true,
+      "evidence": "决策日志.md lines 8-14: '选项：\\n- (A) 全局递增... - (B) 迭代内递增...\\n用户选择：A（全局递增）\\n理由：项目定位为长期演进...' — all three fields present"
+    },
+    {
+      "text": "CLAUDE.md 的编号规则与 Q-001 决策（全局递增）一致",
+      "passed": true,
+      "evidence": "CLAUDE.md line 55: 'Step N **全局递增**（由 Q-001 于 2026-04-22 确定）：Step 1, 2, 3, ... 贯穿整个项目，不按迭代回到 1'"
+    }
+  ],
+  "overall_pass_rate": 1.0,
+  "summary": {
+    "pass_rate": 1.0,
+    "passed": 7,
+    "failed": 0,
+    "total": 7
+  }
+}
