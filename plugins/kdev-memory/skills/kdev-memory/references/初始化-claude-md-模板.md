@@ -134,3 +134,57 @@ CLAUDE.md 规则段扮演的是 skill 的**对外接口**——只列出 Claude 
 - 新增 references/ 文件
 
 **append-only 原则**：接口变更尽量只加不改——新增 hook 标签 OK，改名或废弃要走 deprecation 周期。这样老项目的 CLAUDE.md 永远不会被现有 skill 破坏。
+
+---
+
+## 修 CLAUDE.md 漂移流程（用户召唤时读）
+
+### 触发时机
+
+用户说：
+- "修 CLAUDE.md 漂移 / 接口漂移 / CLAUDE.md 升级 / claude.md 对齐 skill"
+- SessionStart hook 的 `<kdev-memory-brief>` 里出现 ⚠️ "CLAUDE.md 接口漂移：..." 提示，用户让处理
+
+### 动作路径
+
+1. **读本文件顶部 `claude_md_contract` frontmatter**
+   取得当前 skill 版本的 3 个字段：`cross_session_rules` / `hook_injection_tags` / `hook_file_patterns`
+
+2. **读项目 CLAUDE.md**
+   抽出 `## 智能体自动记录规则` 章节（其他章节完全不动）
+
+3. **逐项比对 → 生成精确 diff patch**
+   - `hook_injection_tags` 里的每一项：CLAUDE.md 规则段里是否字面包含？没有 → 加到"优先处理 hook 产出"段的列表
+   - `hook_file_patterns` 同上
+   - `cross_session_rules` 的每个主题：CLAUDE.md 是否有主题关键词命中？没有 → 加一条新的 🔴 铁规（内容措辞用 contract 里的 description，保持简洁）
+
+4. **展示 diff 给用户审**
+   用 `diff -u` 或手工组织的"before/after"展示缺失行的插入位置。**不要一次性重写整段**。
+
+5. **用户批准后执行 Edit**
+   用 `Edit` tool 做最小化插入。只改 `## 智能体自动记录规则` 章节内部，**严禁**触及其他章节或用户自定义加入规则段的行。
+
+6. **验证**
+   再次调用 `hooks/lib/claude_md_lint.py`（或跑 SessionStart hook）确认 `status: ok`。
+
+### 铁规
+
+- **只管辖 `## 智能体自动记录规则` 章节**——其他章节（开发惯例 / 项目约束等）一字不动
+- **用户手动加入规则段的自定义行不覆盖**——比如用户额外加了第 4 条贯穿铁规"commit 前必须跑 lint"，这行不在 contract 里，保留
+- **展示 + 批准 + 执行是三个分离步骤**——不要 silent patch
+- **失败安全**：任何歧义场景（用户大幅改写了规则段 / diff 难以精确定位）→ 降级为"我只能指出缺什么，请你手工加"，不强行 patch
+
+### 典型 diff 样例
+
+用户 CLAUDE.md 缺一条 hook 标签：
+
+```diff
+ 🔴 **优先处理 hook 产出**：看到下列 hook 留下的信号时，**优先处理**：
+ - `.kdev/memory/WARN-未记录-*.md` —— SessionEnd hook 兜底文件
+ - `<kdev-memory-brief>` 注入 —— SessionStart hook 的会话全景提示
+ - `<kdev-memory-recall>` 注入 —— UserPromptSubmit hook 的召回指针
++- `<kdev-memory-step-incomplete>` 注入 —— Stop hook 检测 Step 缺段 → 补齐或 R-NNN
+ - `.kdev/memory/checkpoints/压缩前-*.md` —— PreCompact hook 的压缩快照
+```
+
+精确、最小化、可审计。

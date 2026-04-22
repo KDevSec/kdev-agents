@@ -1,0 +1,55 @@
+{
+  "run_id": "eval-8-with_skill",
+  "eval_id": 8,
+  "eval_name": "claude-md-drift-fix",
+  "config": "with_skill",
+  "expectations": [
+    {
+      "text": "skill 正确识别 CLAUDE.md 缺少两个 hook 文件模式的响应",
+      "evidence": "REPORT (a) 明确列出 missing_hook_files: ['.kdev/memory/WARN-未记录-*.md', '.kdev/memory/checkpoints/压缩前-*.md']，并说明 missing_hook_tags / missing_rule_themes 均为空，命中范围与 lint before-patch JSON 一致",
+      "passed": true
+    },
+    {
+      "text": "skill 读取了 skill 的 claude_md_contract frontmatter（REPORT 引用了 contract 内容）",
+      "evidence": "REPORT 明言『依据 claude_md_contract frontmatter（位于 references/初始化-claude-md-模板.md 顶部）』，并在 (d) 的自检里逐字引用了 hook_injection_tags / hook_file_patterns / cross_session_rules 三个字段名",
+      "passed": true
+    },
+    {
+      "text": "CLAUDE.md 的「开发惯例」章节一字未改（严禁触及非本 skill 管辖的内容）",
+      "evidence": "diff 后 target-project/CLAUDE.md 第 6–9 行 '## 开发惯例 / Node.js 22 + TypeScript / 提交前 npm test' 与输入完全一致，REPORT (d) 也点名『第 6–9 行一字未改』",
+      "passed": true
+    },
+    {
+      "text": "CLAUDE.md 的「智能体自动记录规则」章节内，已有的 3 条铁规结构保留、措辞不被整段重写",
+      "evidence": "既有两条 🔴（实时落盘 / 文件聚合）措辞逐字保留，在其下新增第 3 条 🔴 『优先处理 hook 产出』+ 两条文件模式明细；未重写章节标题、未改动首句『本项目启用 kdev-memory 工程记忆制度』、未动段尾『（缺…）』括注。Edit 是纯追加而非整段重写。",
+      "passed": true
+    },
+    {
+      "text": "CLAUDE.md 的「优先处理 hook 产出」段新增了 WARN 文件和 checkpoint 文件的响应行（或新增了完整的第 3 条铁规含这两个引用）",
+      "evidence": "target-project/CLAUDE.md 第 19–21 行新增：🔴 『优先处理 hook 产出』+ `.kdev/memory/WARN-未记录-*.md` 响应 + `.kdev/memory/checkpoints/压缩前-*.md` 响应，措辞沿用模板标准行",
+      "passed": true
+    },
+    {
+      "text": "修改后的 CLAUDE.md 用 claude_md_lint.py 复验 status=ok（或 missing 列表为空）",
+      "evidence": "复跑 claude_md_lint.py 验证：{\"status\": \"ok\", \"drift\": false, \"missing_hook_tags\": [], \"missing_hook_files\": [], \"missing_rule_themes\": [], \"summary\": \"CLAUDE.md 接口契约齐全\"}",
+      "passed": true
+    },
+    {
+      "text": "REPORT 列出了完整的 diff（或等价的 before/after 对比），展示了最小化修改",
+      "evidence": "REPORT (a) 给了 ```diff``` 代码块（3 行新增 + 上下文）；(b) 给了并排 Before / After 代码块 + 净变化清单（『新增 3 行』），双形式齐备",
+      "passed": true
+    },
+    {
+      "text": "skill 没有一次性整段重写规则段（Edit 的 before/after 应仅含新增行 + 附近上下文）",
+      "evidence": "CLAUDE.md 文件从 759 字节增至 1150 字节，净增约 390 字节对应新增 3 行；原两条 🔴 + 段尾括注字字未动，符合『最小化插入』语义",
+      "passed": true
+    }
+  ],
+  "summary": {
+    "pass_rate": 1.0,
+    "passed": 8,
+    "failed": 0,
+    "total": 8
+  },
+  "overall_pass_rate": 1.0
+}

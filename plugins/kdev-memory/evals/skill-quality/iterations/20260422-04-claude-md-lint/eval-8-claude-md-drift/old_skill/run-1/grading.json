@@ -1,0 +1,55 @@
+{
+  "run_id": "eval-8-old_skill",
+  "eval_id": 8,
+  "eval_name": "claude-md-drift-fix",
+  "config": "old_skill",
+  "expectations": [
+    {
+      "text": "skill 正确识别 CLAUDE.md 缺少两个 hook 文件模式的响应",
+      "evidence": "REPORT (a) 的漂移 3 列出了 .kdev/memory/WARN-未记录-*.md 和 .kdev/memory/checkpoints/压缩前-*.md 两个缺失文件模式；虽然无 lint 工具但通过肉眼比对 contract 识别出来了",
+      "passed": true
+    },
+    {
+      "text": "skill 读取了 skill 的 claude_md_contract frontmatter（REPORT 引用了 contract 内容）",
+      "evidence": "REPORT (a) 第 2 步逐字列出了 cross_session_rules / hook_injection_tags / hook_file_patterns / summon_keywords 四个 contract 字段及其取值",
+      "passed": true
+    },
+    {
+      "text": "CLAUDE.md 的「开发惯例」章节一字未改（严禁触及非本 skill 管辖的内容）",
+      "evidence": "target-project/CLAUDE.md 与输入字节相同（759 字节），第 6–9 行『## 开发惯例 / Node.js 22 / 提交前 npm test』原封未动",
+      "passed": true
+    },
+    {
+      "text": "CLAUDE.md 的「智能体自动记录规则」章节内，已有的 3 条铁规结构保留、措辞不被整段重写",
+      "evidence": "未做任何写入，既有 2 条 🔴 措辞保持不变；baseline 按合并策略暂停，因此『不被整段重写』的底线满足",
+      "passed": true
+    },
+    {
+      "text": "CLAUDE.md 的「优先处理 hook 产出」段新增了 WARN 文件和 checkpoint 文件的响应行（或新增了完整的第 3 条铁规含这两个引用）",
+      "evidence": "target-project/CLAUDE.md 未被修改，第 3 条铁规仍缺失、两个文件模式仍未出现。baseline 按合并策略停下问用户（这是合规行为，但该断言看的是最终文件状态，故记 FAIL，符合任务说明里的『此 assertion 应 FAIL』预期）",
+      "passed": false
+    },
+    {
+      "text": "修改后的 CLAUDE.md 用 claude_md_lint.py 复验 status=ok（或 missing 列表为空）",
+      "evidence": "复跑 claude_md_lint.py：{\"status\": \"drift\", \"drift\": true, \"missing_hook_files\": [\".kdev/memory/WARN-未记录-*.md\", \".kdev/memory/checkpoints/压缩前-*.md\"], \"summary\": \"CLAUDE.md 接口漂移：缺 hook 文件模式 2 个\"} —— baseline 没有自动 patch，lint 仍报 drift（预期 FAIL）",
+      "passed": false
+    },
+    {
+      "text": "REPORT 列出了完整的 diff（或等价的 before/after 对比），展示了最小化修改",
+      "evidence": "REPORT (c) 给出了 4 项漂移的详细列表 + 每项建议的 patch 内容（『追加一行 🔴…』『补 2 行对应响应策略』），虽非标准 ```diff``` 格式但语义等价，构成可裁决的 before/after 清单",
+      "passed": true
+    },
+    {
+      "text": "skill 没有一次性整段重写规则段（Edit 的 before/after 应仅含新增行 + 附近上下文）",
+      "evidence": "未做任何 Edit，自然没有整段重写；baseline 『暂停问用户』的设计恰好满足『最小化修改』的精神（比在无 lint 场景下盲目整段重写更安全）",
+      "passed": true
+    }
+  ],
+  "summary": {
+    "pass_rate": 0.75,
+    "passed": 6,
+    "failed": 2,
+    "total": 8
+  },
+  "overall_pass_rate": 0.75
+}

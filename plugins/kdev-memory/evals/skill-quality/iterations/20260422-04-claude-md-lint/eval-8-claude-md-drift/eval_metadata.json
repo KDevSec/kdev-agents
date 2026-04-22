@@ -1,0 +1,31 @@
+{
+  "eval_id": 8,
+  "eval_name": "claude-md-drift-fix",
+  "prompt": "新会话进入项目。SessionStart hook 的 <kdev-memory-brief> 里有 ⚠️ 提示：'CLAUDE.md 接口漂移：缺 hook 文件模式 2 个（.kdev/memory/WARN-未记录-*.md、.kdev/memory/checkpoints/压缩前-*.md）；召唤 kdev-memory skill 说「修 CLAUDE.md 漂移」获得精确 diff patch'。用户说'修 CLAUDE.md 漂移'。请按 kdev-memory skill 的「修漂移」流程执行：(1) 读 skill 的 claude_md_contract 和项目 CLAUDE.md 规则段；(2) 生成最小化 diff patch（只在「优先处理 hook 产出」段追加缺失的两个文件模式响应行，其他章节一字不动）；(3) 展示 diff 给用户，用户批准后用 Edit tool 执行；(4) 用 hooks/lib/claude_md_lint.py 验证 status=ok。完成后汇报：(a) diff 内容；(b) CLAUDE.md 做了什么修改；(c) lint 复验结果；(d) 其他章节（开发惯例）是否被触及。",
+  "assertions": [
+    {
+      "text": "skill 正确识别 CLAUDE.md 缺少两个 hook 文件模式的响应"
+    },
+    {
+      "text": "skill 读取了 skill 的 claude_md_contract frontmatter（REPORT 引用了 contract 内容）"
+    },
+    {
+      "text": "CLAUDE.md 的「开发惯例」章节一字未改（严禁触及非本 skill 管辖的内容）"
+    },
+    {
+      "text": "CLAUDE.md 的「智能体自动记录规则」章节内，已有的 3 条铁规结构保留、措辞不被整段重写"
+    },
+    {
+      "text": "CLAUDE.md 的「优先处理 hook 产出」段新增了 WARN 文件和 checkpoint 文件的响应行（或新增了完整的第 3 条铁规含这两个引用）"
+    },
+    {
+      "text": "修改后的 CLAUDE.md 用 claude_md_lint.py 复验 status=ok（或 missing 列表为空）"
+    },
+    {
+      "text": "REPORT 列出了完整的 diff（或等价的 before/after 对比），展示了最小化修改"
+    },
+    {
+      "text": "skill 没有一次性整段重写规则段（Edit 的 before/after 应仅含新增行 + 附近上下文）"
+    }
+  ]
+}

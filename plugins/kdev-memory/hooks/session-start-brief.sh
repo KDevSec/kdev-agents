@@ -77,6 +77,29 @@ SUMMARY_TODAY_STATUS="未生成"
 # 过去日期有条目但缺每日汇总（跨天会话遗漏的兜底）
 MISSING_PAST_SUMMARIES=$(list_missing_past_summaries "$KDEV_DIR" "$TODAY")
 
+# CLAUDE.md 接口契约 lint —— 检测 skill 升级后项目 CLAUDE.md 是否缺少新接口
+# 只在项目根存在 CLAUDE.md 且 skill 带 contract 文件时才跑（纯只读，失败静默）
+DRIFT_HINT=""
+CONTRACT_FILE="$SCRIPT_DIR/../skills/kdev-memory/references/初始化-claude-md-模板.md"
+LINT_LIB="$SCRIPT_DIR/lib/claude_md_lint.py"
+if [ -f "CLAUDE.md" ] && [ -f "$CONTRACT_FILE" ] && [ -f "$LINT_LIB" ] && command -v python3 >/dev/null 2>&1; then
+  DRIFT_HINT=$(KDEV_LINT_LIB="$LINT_LIB" python3 - "$CONTRACT_FILE" "CLAUDE.md" <<'PYEOF' 2>/dev/null || true
+import sys, os, importlib.util
+from pathlib import Path
+
+lint_file = Path(os.environ["KDEV_LINT_LIB"])
+spec = importlib.util.spec_from_file_location("claude_md_lint", lint_file)
+mod = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(mod)
+
+result = mod.run_lint(Path(sys.argv[1]), Path(sys.argv[2]))
+hint = mod.format_hint_for_brief(result)
+if hint:
+    print(hint)
+PYEOF
+)
+fi
+
 # ===== 读当前状态 frontmatter =====
 STATE_PHASE=$(read_state_field "phase")
 STATE_ITERATION=$(read_state_field "iteration")
@@ -107,11 +130,12 @@ build_brief() {
   case "$mode" in
     resume)
       brief+="项目有 .kdev/ 工程记忆。本次会话是 resume（Claude 已有前文上下文）。\n"
-      if [ -n "$WARN_FILES" ] || [ -n "$CHECKPOINT_FILES" ] || [ -n "$MISSING_PAST_SUMMARIES" ]; then
+      if [ -n "$WARN_FILES" ] || [ -n "$CHECKPOINT_FILES" ] || [ -n "$MISSING_PAST_SUMMARIES" ] || [ -n "$DRIFT_HINT" ]; then
         brief+="⚠️ 待处理：\n"
         [ -n "$WARN_FILES" ] && brief+="- WARN 文件：\n$(echo "$WARN_FILES" | sed 's|^|  - |')\n"
         [ -n "$CHECKPOINT_FILES" ] && brief+="- Checkpoint 文件：\n$(echo "$CHECKPOINT_FILES" | sed 's|^|  - |')\n"
         [ -n "$MISSING_PAST_SUMMARIES" ] && brief+="- 缺失的过去每日汇总（跨天会话遗漏）：$MISSING_PAST_SUMMARIES\n"
+        [ -n "$DRIFT_HINT" ] && brief+="$DRIFT_HINT\n"
       fi
       ;;
 
@@ -129,11 +153,12 @@ build_brief() {
       # startup / clear / 默认
       brief+="项目有 .kdev/ 工程记忆。当前状态（$TODAY）：\n\n"
 
-      if [ -n "$WARN_FILES" ] || [ -n "$CHECKPOINT_FILES" ] || [ -n "$MISSING_PAST_SUMMARIES" ]; then
+      if [ -n "$WARN_FILES" ] || [ -n "$CHECKPOINT_FILES" ] || [ -n "$MISSING_PAST_SUMMARIES" ] || [ -n "$DRIFT_HINT" ]; then
         brief+="⚠️ **待处理（优先看）**：\n"
         [ -n "$WARN_FILES" ] && brief+="$(echo "$WARN_FILES" | sed 's|^|- |')\n"
         [ -n "$CHECKPOINT_FILES" ] && brief+="$(echo "$CHECKPOINT_FILES" | sed 's|^|- |')\n"
         [ -n "$MISSING_PAST_SUMMARIES" ] && brief+="- 过去日期缺每日汇总（跨天会话遗漏）：$MISSING_PAST_SUMMARIES —— 请调用 kdev-memory skill 按日聚合源文件补写，严禁回翻会话上下文\n"
+        [ -n "$DRIFT_HINT" ] && brief+="$DRIFT_HINT\n"
         brief+="\n"
       fi
 

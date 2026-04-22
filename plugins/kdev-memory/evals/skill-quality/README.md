@@ -148,14 +148,14 @@ rm -rf $WS
 
 ## 当前基线
 
-[`iterations/20260422-03-decoupled-claude-md/`](iterations/20260422-03-decoupled-claude-md/) 是**当前权威基线**：
+[`iterations/20260422-04-claude-md-lint/`](iterations/20260422-04-claude-md-lint/) 是**当前权威基线**：
 
-- 对比：解耦前的 SKILL.md（Phase 1 重构版）↔ 解耦后的 SKILL.md（CLAUDE.md 规则段只放接口，不放实现细节）
-- 4 个关键场景 × 2 configs = 8 runs，用接口级 assertions
+- 对比：iter-3 解耦但无 lint ↔ 新增 `claude_md_lint.py` + SessionStart 集成 + "修漂移"召唤流程
+- eval-8 drift-fix 场景 × 2 configs = 2 runs
 - 关键结论：
-  - eval-0 init 的 CLAUDE.md 从 57 行精简到 38 行（-33%），100% 过接口级 assertion
-  - 边缘场景（eval-4 合并冲突 / eval-5 数据缺失 / eval-7 WARN 处理）全部 0 regression
-  - 验证了"CLAUDE.md 规则段只放接口（贯穿铁规 + hook 标签 + 召唤时机），实现细节留 skill"的架构可行
+  - 新版 100% pass vs baseline 75% pass —— lint 工具带来自动化闭环
+  - 多花 ~20% tokens（跑 lint + Edit + 复验），换"发现 → 诊断 → patch → 验证"一次完成
+  - Baseline 已识别漂移并给建议（证明 iter-3 架构的 self-documenting），但需用户多轮裁决；新版省去这个
 
 完整说明见该 iteration 目录下的 `notes.md`。
 
@@ -163,9 +163,10 @@ rm -rf $WS
 
 | iteration | 测什么 | 结论 |
 |---|---|---|
-| **[20260422-03-decoupled-claude-md](iterations/20260422-03-decoupled-claude-md/)** ← 当前基线 | 解耦改造：CLAUDE.md 规则段只放接口 | 解耦成功 + 边缘场景 0 regression |
-| [20260422-02-expanded-6-scenarios](iterations/20260422-02-expanded-6-scenarios/) | Phase 1 重构（SKILL.md 734 → 254 行）的 6 场景全面验证 | 行为等价 + tokens -19.6% |
-| [20260422-01-baseline-3-scenarios](iterations/20260422-01-baseline-3-scenarios/) | Phase 1 重构的首轮 3 场景探索（基础 assertions） | 演进记录保留 |
+| **[20260422-04-claude-md-lint](iterations/20260422-04-claude-md-lint/)** ← 当前基线 | lint 工具 + 修漂移自动化流程 | 审计 P1-7 正式落地；自动化闭环 vs 手工裁决 |
+| [20260422-03-decoupled-claude-md](iterations/20260422-03-decoupled-claude-md/) | 解耦改造：CLAUDE.md 规则段只放接口 | 解耦成功 + 边缘场景 0 regression |
+| [20260422-02-expanded-6-scenarios](iterations/20260422-02-expanded-6-scenarios/) | Phase 1 重构的 6 场景全面验证 | 行为等价 + tokens -19.6% |
+| [20260422-01-baseline-3-scenarios](iterations/20260422-01-baseline-3-scenarios/) | Phase 1 重构的首轮 3 场景探索 | 演进记录保留 |
 
 ## 和 skill-creator 的关系
 
