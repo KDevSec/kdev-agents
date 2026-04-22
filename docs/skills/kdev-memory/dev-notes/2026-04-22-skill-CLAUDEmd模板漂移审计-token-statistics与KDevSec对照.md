@@ -263,7 +263,7 @@ Stop hook 现有检测项：
 **P1 · 本周**
 
 1. CLAUDE.md "评分机制要点"段加 Step 完成闸门硬表达（对齐 5.1 第 1 条）
-2. Step 1 污染样本事件追加 R-001 到 [改进建议.md](../../../KDevSec/.kdev/memory/改进建议.md)：记"模型自评段完成 ≠ Step 完成"的行为惯性
+2. Step 1 污染样本事件追加 R-001 到 [改进建议.md](../../../../../KDevSec/.kdev/memory/改进建议.md)：记"模型自评段完成 ≠ Step 完成"的行为惯性
 3. 本会话按 skill 流程补一次 Step 1 延迟采集评分（区别于零采集）
 
 ---
@@ -347,21 +347,21 @@ Stop hook 现有检测项：
 ## 8. 证据链索引
 
 ### token-statistics 侧
-- 执行日志 Step 7 / Step 8 + "顺畅度：待补"：[执行日志.md](../../../token-statistics/.kdev/memory/执行日志.md)
-- Q-053~Q-062 决策全是用户参与节点但无 Step：[决策日志.md](../../../token-statistics/.kdev/memory/决策日志.md)
-- §9.4 豁免条款：[conventions.md:259-274](../../../token-statistics/.kdev/conventions.md#L259-L274)
-- 简化版 Step schema：[CLAUDE.md:65-87](../../../token-statistics/CLAUDE.md#L65-L87)
-- Sprint 0 状态机绑定：[CLAUDE.md:125-135](../../../token-statistics/CLAUDE.md#L125-L135)
-- 老位置 state.md：[.kdev/state.md](../../../token-statistics/.kdev/state.md)
-- 零 triggers 踩坑日志：[踩坑日志.md](../../../token-statistics/.kdev/memory/踩坑日志.md)
-- 4 天漏汇总 + 本次补登：[每日汇总 04-18/19/20/21/22](../../../token-statistics/.kdev/memory/每日汇总)
-- G-020 编号双义 + R-008 闸门：[踩坑日志.md G-026](../../../token-statistics/.kdev/memory/踩坑日志.md)
+- 执行日志 Step 7 / Step 8 + "顺畅度：待补"：[执行日志.md](../../../../../token-statistics/.kdev/memory/执行日志.md)
+- Q-053~Q-062 决策全是用户参与节点但无 Step：[决策日志.md](../../../../../token-statistics/.kdev/memory/决策日志.md)
+- §9.4 豁免条款：[conventions.md:259-274](../../../../../token-statistics/.kdev/conventions.md#L259-L274)
+- 简化版 Step schema：[CLAUDE.md:65-87](../../../../../token-statistics/CLAUDE.md#L65-L87)
+- Sprint 0 状态机绑定：[CLAUDE.md:125-135](../../../../../token-statistics/CLAUDE.md#L125-L135)
+- 老位置 state.md：[.kdev/state.md](../../../../../token-statistics/.kdev/state.md)
+- 零 triggers 踩坑日志：[踩坑日志.md](../../../../../token-statistics/.kdev/memory/踩坑日志.md)
+- 4 天漏汇总 + 本次补登：[每日汇总 04-18/19/20/21/22](../../../../../token-statistics/.kdev/memory/每日汇总)
+- G-020 编号双义 + R-008 闸门：[踩坑日志.md G-026](../../../../../token-statistics/.kdev/memory/踩坑日志.md)
 
 ### KDevSec 侧
-- Step 1 污染样本事件：[执行日志.md](../../../KDevSec/.kdev/memory/执行日志.md)
-- v0.4.0 对齐 CLAUDE.md：[CLAUDE.md](../../../KDevSec/CLAUDE.md)
-- 正确 frontmatter：[当前状态.md](../../../KDevSec/.kdev/memory/当前状态.md)
-- 空改进建议（待补 R-001）：[改进建议.md](../../../KDevSec/.kdev/memory/改进建议.md)
+- Step 1 污染样本事件：[执行日志.md](../../../../../KDevSec/.kdev/memory/执行日志.md)
+- v0.4.0 对齐 CLAUDE.md：[CLAUDE.md](../../../../../KDevSec/CLAUDE.md)
+- 正确 frontmatter：[当前状态.md](../../../../../KDevSec/.kdev/memory/当前状态.md)
+- 空改进建议（待补 R-001）：[改进建议.md](../../../../../KDevSec/.kdev/memory/改进建议.md)
 
 ### skill 侧
 - 当前版本 SKILL.md：`/home/lyadmin/.claude/plugins/cache/kdev-agents/kdev-memory/0.4.0/skills/kdev-memory/SKILL.md`

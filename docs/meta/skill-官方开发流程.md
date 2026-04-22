@@ -4,7 +4,7 @@
 >
 > 作者基于 kdev-memory 的实战补充见姐妹文档 [skill-开发通用流程.md](skill-开发通用流程.md)。
 >
-> 配套案例文档：[kdev-memory-开发历程技术分享.md](kdev-memory-开发历程技术分享.md)
+> 配套案例文档：[kdev-memory-开发历程技术分享.md](../skills/kdev-memory/开发历程.md)
 
 ---
 
@@ -755,4 +755,4 @@ python -m scripts.package_skill <path/to/skill-folder>
 
 - **本仓库内姐妹文档**：
   - [skill-开发通用流程.md](skill-开发通用流程.md) —— 作者基于 kdev-memory 的实战补充（含 hook 分层 / 严格度 opt-in / 依赖最小化等官方没讲的工程经验）
-  - [kdev-memory-开发历程技术分享.md](kdev-memory-开发历程技术分享.md) —— 一个真实 skill 项目的 10 天迭代故事
+  - [kdev-memory-开发历程技术分享.md](../skills/kdev-memory/开发历程.md) —— 一个真实 skill 项目的 10 天迭代故事
