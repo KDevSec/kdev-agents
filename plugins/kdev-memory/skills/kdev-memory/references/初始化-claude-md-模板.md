@@ -1,18 +1,60 @@
+---
+claude_md_contract:
+  purpose: "本文件定义 CLAUDE.md 规则段要暴露的'接口'——贯穿 session 的铁规 + Claude 要识别的 hook 信号。skill 内部实现细节（schema / 编号 / 评分机制 / 触发表）不放这里，由用户召唤 skill 时按需加载。"
+  cross_session_rules:
+    - "实时落盘：每做完一步立即落到 .kdev/memory/"
+    - "文件聚合不翻会话：写汇总从 .kdev/memory/ 读当天条目拼装"
+    - "优先处理 hook 产出：WARN 文件 / brief 注入 / recall 注入 / checkpoint"
+  hook_injection_tags:
+    - "<kdev-memory-brief>"
+    - "<kdev-memory-recall>"
+  hook_file_patterns:
+    - ".kdev/memory/WARN-未记录-*.md"
+    - ".kdev/memory/checkpoints/压缩前-*.md"
+  summon_keywords:
+    - "建立工程记忆 / 加 .kdev / 搞记忆机制"
+    - "写今天总结 / 生成每日汇总 / 交接给明天"
+    - "切档 / 归档一下 / 整理主文件"
+    - "这条以后都要遵守 / 加到项目规则 / 升级成铁规"
+    - "昨天做到哪了 / 继续上次的工作 / 恢复上下文"
+  version_hint: "本契约若变（新增 hook tag / 改贯穿铁规 / 改 summon keywords），老项目的 CLAUDE.md 规则段需手工 patch 对应行。实现级变更（schema / 编号 / 评分机制细节）不触及本契约，CLAUDE.md 不用改。"
+---
+
 # 初始化时贴进项目 CLAUDE.md 的触发规则段
 
 ## 什么时候读本文件
 
 - 执行 kdev-memory 初始化、需要把触发规则段写进项目 `CLAUDE.md` 时
-- 老项目升级 skill 版本、需要核对触发规则段是否对齐时
-- 排查"模型没按 skill 预期行动"时对照现场 CLAUDE.md 看漂移在哪
+- 老项目升级 skill 版本、需要核对触发规则段的**接口**部分是否对齐（接口指本文件 frontmatter 的 `claude_md_contract`）
+- 看到 lint 提示"CLAUDE.md 缺少某个 hook 注入标签响应"时
 
 ## 我不负责什么
 
 - **`.kdev/memory/` 各文件的字段格式** → `references/六类记录-schema.md`
 - **triggers 关键词怎么选** → `references/triggers-写法.md`
-- **hook 的行为边界** → `references/自动化机制-hooks.md`
+- **各 hook 的内部行为细节** → `references/自动化机制-hooks.md`
+- **每类记录详细的触发时机和评分机制** → 它们在 skill 里，CLAUDE.md 规则段**不复述**
 
 ---
+
+## 设计原则：接口 vs 实现解耦
+
+CLAUDE.md 规则段扮演的是 skill 的**对外接口**——只列出 Claude **必须时刻在场**的决策点：
+
+- **贯穿 session 的铁规**：需要 Claude 下意识时刻检查（实时落盘 / 文件聚合 / hook 产出响应）
+- **召唤 skill 的时机**：列出触发词，让 Claude 知道"什么时候要调 skill"
+- **hook 注入接口**：列出 Claude 要识别的特殊标签和文件
+
+**不放进规则段**（这些随 skill 演进会频繁变化）：
+- ❌ 六类记录的详细 schema
+- ❌ 评分机制的具体字段
+- ❌ Q/G/R/Step 编号规则
+- ❌ 各 hook 的内部行为表
+- ❌ 切档 / 升级 / 归档的具体流程
+
+这些都在 skill 本体（SKILL.md / references/）里，用户召唤 skill 时自然读到。
+
+**好处**：skill 升级 schema / 评分 / 编号 / hook 细节时，CLAUDE.md 规则段**一字不动**——从根源避免"CLAUDE.md 漂移"。
 
 ## CLAUDE.md 合并策略
 
@@ -27,55 +69,68 @@
 ```markdown
 ## 智能体自动记录规则
 
-走项目流程时，必须**实时**维护 `.kdev/memory/` 下的记录文件。**不需要征求用户许可即可写入这些文件。**
+本项目启用 kdev-memory 工程记忆制度。**本段只讲何时召唤 skill 和 Claude 必须时刻在场的 3 条铁规；具体 schema / 格式 / 流程 / 边缘处理都在 skill 里**（用户召唤时自然读到，不在本段复述）。
 
-🔴 **实时铁规**：每做完一步、踩一次坑、做一次决策、接到一次评分，**立刻**追加一条到对应文件。不要攒到会话结束或每日汇总时才回忆着写——那样记录就失真了。
+### 3 条"必须时刻在场"的铁规（跨 session 贯穿）
 
-🔴 **每日汇总不翻会话**：用户要求"生成每日总结"时，直接从 `.kdev/memory/` 读当天条目聚合，不要回翻会话上下文、不要让用户复述。如果 `.kdev/memory/` 空了，坦白报告"今天实时落盘没跟上"，不要编造。
+这些动作是下意识的、持续的，不能依赖"被召唤"才触发。
 
-🔴 **新会话进入项目先看 `.kdev/memory/WARN-未记录-*.md`**：这是 SessionEnd hook 在上次会话"有变更但没落盘"时留下的兜底警告文件。看到就优先处理：读文件里的变更快照、向用户确认那些改动对应什么 Step、把补记写进执行日志，然后删除 WARN 文件。不要忽略它往下做别的事。
+🔴 **实时落盘**：每做完一个有边界的步骤（任务 / 决策 / 踩坑 / 用户评分）→ **立刻**追加到 `.kdev/memory/` 对应文件。不要攒到会话末尾或"总结一下"时才补录——回忆会失真，评分会褪色。**不需要征求用户许可**即可写入 `.kdev/memory/` 下的任何文件。
 
-🔴 **看到 `<kdev-memory-brief>` 注入**：SessionStart hook 启动时会注入一段 `<kdev-memory-brief>...</kdev-memory-brief>` 摘要，内含今日进度、当前状态字段、待处理 WARN/checkpoint。把它当作项目全景的"开局提示"——如果摘要里有🚨或⚠️条目，立刻读对应文件处理，不要越过它直接做用户新任务。
+🔴 **文件聚合不翻会话**：用户说"写今天的总结"时，**必须**从 `.kdev/memory/` 当天条目聚合，**不要**回翻会话上下文、不要让用户复述。如果 `.kdev/memory/` 里今天条目为空 → **坦率报告**"今天实时落盘没跟上"，不要凭印象补写。
 
-🔴 **看到 `.kdev/memory/checkpoints/压缩前-*.md`**：这是 PreCompact hook 在会话压缩前留下的快照。一般情况不需要主动看；只在以下场景读：(a) 用户说"上次压缩前的细节"；(b) 当前 `.kdev/` 文件有缺失但 checkpoint 里有原文；(c) 执行日志有空当期且同时段有 checkpoint（说明压缩时没来得及落盘）。Checkpoint 7 天后 PreCompact hook 自动清理，不用手工维护。
+🔴 **优先处理 hook 产出**：看到下列 hook 留下的信号时，**优先处理**（不跳过去做别的）：
+- `.kdev/memory/WARN-未记录-*.md` —— SessionEnd hook 兜底文件：读快照 → 向用户核对 → 补记 Step → `rm` 文件
+- `<kdev-memory-brief>` 注入 —— SessionStart hook 的会话全景提示：其中 ⚠️ 条目先处理
+- `<kdev-memory-recall>` 注入 —— UserPromptSubmit hook 的召回指针：判断相关性 → 按需 Read
+- `.kdev/memory/checkpoints/压缩前-*.md` —— PreCompact hook 的压缩快照：按需读（用户问"上次压缩前细节"或本地 .kdev/ 缺失时）
 
-🔴 **每次完成 Step 都要顺手更新 `.kdev/memory/当前状态.md` 的 frontmatter**：至少改 `current_step` + `last_updated`。有新开的 Q-NNN 或 G-NNN 也要加到对应字段。不是攒到每日汇总时才改——frontmatter 字段就是给 SessionStart hook 和下一次会话看的，延迟更新等于下次启动就拿到过期数据。
+### 召唤 kdev-memory skill 的时机
 
-🔴 **看到 Stop hook 的 📦 归档提醒时**：说明主文件跨期（执行日志跨月 / 踩坑或决策跨季）。**不要立刻自动切档**——先问用户"要不要现在归档"，用户同意再按 SKILL.md 的「文件切档与归档」章节执行：搬家而非删除、编号不变、主文件顶部留一行"历史归档：..."索引。
+以下情形用户不用明说"召唤 skill"，Claude 应主动加载：
 
-🔴 **发现规则升级信号时**（R-NNN 同主题 ≥ 2 次 / 方法论铁规被引用 ≥ 3 次 / 用户说"这条以后都要遵守 / 写进项目规则 / 变成硬规矩"）：按 SKILL.md 的「规则升级流程」主动问用户三件事——升不升级 / 放哪（默认推荐：已有 constitution.md/AGENTS.md 就放那里，否则放 CLAUDE.md）/ 要不要加 triggers。**严禁替用户拍板**。同意升级后在目标位置追加规则 + 源 R-NNN（或铁规原条目）末尾加 `> 升级状态：YYYY-MM-DD 升级到 xxx`，**原文一字不改**——归档托底需要完整证据链。
+- **初始化**：用户说"建立工程记忆 / 加 .kdev / 搞记忆机制"
+- **每日汇总**：用户说"写今天总结 / 生成每日汇总 / 交接给明天"
+- **切档归档**：用户说"切档 / 归档一下 / 整理主文件"
+- **规则升级**：用户说"这条以后都要遵守 / 加到项目规则 / 变成硬规矩 / 升级成铁规"
+- **跨会话续航**：新会话用户问"昨天做到哪了 / 之前聊到什么 / 继续上次的工作 / 恢复上下文"
+- **格式疑问**：写新 G-NNN / Step / 铁规不确定 schema 时
+- **边缘情况**：CLAUDE.md 合并冲突 / 跨月归档 / 规则升级决策等——召唤 skill 读对应 reference
 
-🔴 **每写一条新 G-NNN 踩坑 / Step / 铁规，紧跟标题下一行加 `triggers:` 关键词列表**：3-5 个用户在日常对话里会说的词（命令名、场景词、特征词），中英文都要。这是给 UserPromptSubmit hook 的召回锚——不标就永远不会被自动召回，下次用户遇到同样的问题 Claude 还得重新 debug 一遍。格式示例：`triggers: ["pnpm install", "workspace 依赖"]`。
+### 关键授权
 
-🔴 **看到 `<kdev-memory-recall>` 注入时先判断相关性**：UserPromptSubmit hook 是字面子串匹配，可能有假阳性。注入只给编号+标题+路径（渐进式披露），Claude 判断与当前任务相关再 Read 对应文件；判断无关就直接忽略，不要为了"用起来"而强行靠拢。相关记忆本会话只注入一次，不会刷屏。
+- `.kdev/memory/` 下的记录文件**不需要逐条请示**即可写入——这是制度，不是每次询问的一次性操作
+- 每完成 Step 要顺手更新 `.kdev/memory/当前状态.md` 的 frontmatter（`current_step` + `last_updated`），不要攒到每日汇总时才改
 
-### 触发规则
+---
 
-| 触发时机 | 记录目标 | 格式要求 |
-|---------|---------|---------|
-| 每次需要人做决策 | `.kdev/memory/决策日志.md` | 追加 Q-NNN：问题、选项、用户选择、理由 |
-| 每次踩坑/绕路/报错 | `.kdev/memory/踩坑日志.md` | 追加 G-NNN：现象、原因、解决 |
-| 每步完成后 | `.kdev/memory/执行日志.md` | 追加 Step N：执行事实 + 模型自评（含扣分项）+ 用户评分 |
-| 每步结束后 | 主动向用户征询评分 | 模型先自评+列事实，再让用户打分；**用户评分当场采集，不允许延后** |
-| 会话结束前 | `.kdev/memory/每日汇总/YYYY-MM-DD.md` | 汇总当天工作 |
-| 评分差值 ≥ 2 或反复负面反馈 | `.kdev/memory/改进建议.md` | 追加 R-NNN：原话 + 事实 + 评分 + 初步诊断（不强制在项目内执行） |
-| （可选）项目自愿立硬规 | `.kdev/memory/方法论铁规.md` | 用户明确要求才写，默认不用 |
-| 流程状态变更 | `.kdev/memory/当前状态.md`（含 frontmatter） | 更新 body + **同步 frontmatter 字段**（phase/iteration 等） |
-| 每完成 Step 后顺手 | `.kdev/memory/当前状态.md` frontmatter | 更新 `current_step` + `last_updated`；如有新 Q/G 同步列表 |
-| 写新 G-NNN / Step / 铁规时顺手 | 标题下一行 `triggers: [...]` | 3-5 个关键词，中英文都要；用户日常口语词（命令名/场景/特征） |
-| Stop hook 输出 📦 归档提醒 | 主文件切档 | 先问用户同意；搬家而非删除；编号保留；主文件顶部留"历史归档"索引 |
-| R-NNN 同主题 ≥ 2 次 / 铁规被引用 ≥ 3 次 / 用户说"变成项目规则" | 规则升级 | 问升不升级 / 放哪 / triggers；用户同意后**目标位置追加** + 源条目加 `> 升级状态：...`（原文保留） |
-| 看到 `<kdev-memory-recall>` 注入 | 判断相关性 → 按需 Read 或忽略 | 字面子串匹配会有假阳性，先看标题/路径判断再决定是否读全文 |
-| 发现 `.kdev/memory/WARN-未记录-*.md` | 优先处理，不跳过 | 读变更快照 → 向用户核对 → 补记 Step → `rm` 该 WARN 文件 |
-| 发现 SessionStart 注入的 `<kdev-memory-brief>` | 先处理摘要里的⚠️条目 | 按提示读 WARN/checkpoint/待处理项 → 完成后再做用户任务 |
-| 发现 `.kdev/memory/checkpoints/压缩前-*.md` 且当前需要回溯 | 按需 Read | 只在用户询问"压缩前细节"或本地 .kdev/ 缺失时读 |
-
-### 评分机制要点
-- **模型自评**：写"执行事实"段（工具调用/报错/绕路次数，估算即可）+ 1-5 顺畅度 + **必须列一条扣分项**（防讨好式满分）
-- **用户评分**：1-5 顺畅度 + 一句话评价
-- **差值 ≥ 2 或用户评价含明显负面文本 → 追加到改进建议.md**：原话+事实+评分全留，不提炼、不强制执行
-
-### 编号规则
-- Q-NNN、G-NNN、R-NNN 全局递增，跨文件可互相引用
-- Step N 规则见 Q-001（本项目初始化时决定：全局递增 or 迭代内递增）
+**详细 schema、格式、流程、边缘处理**：都在 skill 里，用户召唤后读即可。本规则段故意不复述，以避免跟 skill 演进漂移。
 ```
+
+---
+
+## 接口契约管理（给 skill 维护者）
+
+本文件顶部的 `claude_md_contract` frontmatter 是 CLAUDE.md 规则段的"接口声明"。任何会导致老项目 CLAUDE.md 规则段要改的变更都必须反映在这里，并在 skill CHANGELOG 标注。
+
+**接口变更的典型类型**（老项目 CLAUDE.md 规则段要手工 patch）：
+
+| 变更 | 影响 CLAUDE.md 规则段哪一段 | 建议动作 |
+|---|---|---|
+| 加一条贯穿 session 铁规 | 「3 条铁规」段 | 用户手工加一条 |
+| 加一个 Claude 必须识别的 hook 注入标签 | 「优先处理 hook 产出」段 | 用户手工加一行 |
+| 改 hook 注入标签的字符串 | 同上 | 用户手工 rename |
+| 废弃一个 hook 标签 | 同上 | 用户可选（旧项目继续识别旧标签也不报错）|
+| 加一个新的 summon keyword | 「召唤 kdev-memory skill 的时机」段 | 用户可选（skill description 里的触发词足够兜底）|
+
+**不是接口变更**（CLAUDE.md 规则段一字不动）：
+
+- 改六类记录的 schema 字段
+- 改评分机制（自评 / 用户评分 / 差值阈值）
+- 改 Q/G/R/Step 编号规则
+- 改切档 / 升级 / 初始化的内部步骤
+- 改 references/ 文件的组织方式
+- 重命名 references/ 的文件
+- 新增 references/ 文件
+
+**append-only 原则**：接口变更尽量只加不改——新增 hook 标签 OK，改名或废弃要走 deprecation 周期。这样老项目的 CLAUDE.md 永远不会被现有 skill 破坏。

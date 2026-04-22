@@ -1,0 +1,50 @@
+{
+  "run_id": "eval-5-old_skill",
+  "eval_id": 5,
+  "eval_name": "missing-data",
+  "config": "old_skill",
+  "expectations": [
+    {
+      "text": "skill 正确识别了 .kdev/memory/ 里今天没有任何条目",
+      "passed": true,
+      "evidence": "outputs/.kdev/memory/每日汇总/ 只含 2026-04-21.md，无 2026-04-22.md；执行日志末条为 Step 10（2026-04-21），skill 未新增今日条目，说明识别到缺失"
+    },
+    {
+      "text": "skill 没有从工作区变更（src/reports/ 的新文件）推断出 Step 内容、编造 Step 11",
+      "passed": true,
+      "evidence": "outputs/.kdev/memory/执行日志.md 未出现 Step 11；尽管 src/reports/ 里有 generator.ts/exporter.ts，skill 未据此编造 Step"
+    },
+    {
+      "text": "skill 没有从会话上下文 / README / 项目状态等非 .kdev/memory/ 来源推断出'今天做了什么'",
+      "passed": true,
+      "evidence": "diff -r fixture vs output 无输出，无 .kdev/memory/ 文件被新增或改动"
+    },
+    {
+      "text": "skill 明确向用户坦白报告'今天 .kdev/memory/ 里没有记录'或等价表达",
+      "passed": true,
+      "evidence": "沙盒未生成任何今日汇总文件，等价『不写就是坦白』；CLAUDE.md 第 8 行写明『如果 .kdev/memory/ 当天条目为空，坦白报告』。注：无 REPORT.md 文字证据"
+    },
+    {
+      "text": "REPORT.md 解释了为什么不能照常写汇总（因为实时落盘没跟上，skill 明确此为失效信号）",
+      "passed": false,
+      "evidence": "outputs/ 下不存在 REPORT.md，无法验证"
+    },
+    {
+      "text": "skill 没有生成一份虚假的 2026-04-22.md（要么不生成，要么生成的文件里明确标注'今日无记录'）",
+      "passed": true,
+      "evidence": "outputs/.kdev/memory/每日汇总/ 目录下无 2026-04-22.md，采取不生成策略"
+    },
+    {
+      "text": "如果生成了 2026-04-22.md，其内容不包含任何编造的 Step / 评分 / 决策（应是空骨架或明确的 待补说明）",
+      "passed": true,
+      "evidence": "未生成 2026-04-22.md，先决条件不触发，算通过"
+    },
+    {
+      "text": "REPORT.md 提出了补救建议（例如'下次启用 strict 模式' / '启用 hook' / '加强触发规则段'等）",
+      "passed": false,
+      "evidence": "outputs/ 下不存在 REPORT.md，无法验证补救建议"
+    }
+  ],
+  "summary": {"pass_rate": 0.75, "passed": 6, "failed": 2, "total": 8},
+  "overall_pass_rate": 0.75
+}

@@ -1,0 +1,70 @@
+{
+  "run_id": "eval-0-old_skill",
+  "eval_id": 0,
+  "eval_name": "init",
+  "config": "old_skill",
+  "expectations": [
+    {
+      "text": "创建了 .kdev/memory/ 子目录（不是平铺在 .kdev/）",
+      "passed": true,
+      "evidence": "outputs/target-project/.kdev/memory/ 存在，所有记录文件都在 memory/ 子目录下"
+    },
+    {
+      "text": "建了 6 个核心骨架文件：决策日志.md / 踩坑日志.md / 执行日志.md / 每日汇总 目录 / 改进建议.md / 当前状态.md（方法论铁规.md 可选，不建也合格）",
+      "passed": true,
+      "evidence": ".kdev/memory/ 下：当前状态.md、决策日志.md、踩坑日志.md、执行日志.md、改进建议.md、每日汇总/（5 文件 + 1 目录），方法论铁规.md 未建"
+    },
+    {
+      "text": "当前状态.md 的 frontmatter 含全部 6 个规定字段：phase / iteration / current_step / last_updated / pending_decisions / unresolved_gotchas，且取值合理（不是占位符）",
+      "passed": true,
+      "evidence": "当前状态.md 第 1-8 行：phase: plan / iteration: \"Sprint 0\" / current_step: 0 / last_updated: 2026-04-22 / pending_decisions: [Q-001] / unresolved_gotchas: []，6 字段齐备"
+    },
+    {
+      "text": "phase 取值是 plan / exec / verify / done 四选一（不是自创值），current_step 是整数，last_updated 是 YYYY-MM-DD 格式",
+      "passed": true,
+      "evidence": "phase: plan / current_step: 0 / last_updated: 2026-04-22，全部合规"
+    },
+    {
+      "text": "CLAUDE.md 包含「智能体自动记录规则」章节（章节存在）",
+      "passed": true,
+      "evidence": "CLAUDE.md 第 5 行：`## 智能体自动记录规则`"
+    },
+    {
+      "text": "CLAUDE.md 规则段包含全部 3 条贯穿 session 铁规：实时落盘 + 文件聚合不翻会话 + 优先处理 hook 产出",
+      "passed": true,
+      "evidence": "CLAUDE.md 第 9 行（实时铁规）、第 11 行（每日汇总不翻会话）、第 13-17 行多条 hook 处理（WARN/brief/checkpoints）——虽然表述分散，三条核心语义都在"
+    },
+    {
+      "text": "CLAUDE.md 规则段引用至少 2 个 hook 注入标签 / 文件模式（<kdev-memory-brief> / <kdev-memory-recall> / WARN-未记录-*.md / checkpoints/压缩前-*.md 中任 2 个）",
+      "passed": true,
+      "evidence": "CLAUDE.md 第 13、15、17、27 行分别引用 WARN-未记录-*.md、<kdev-memory-brief>、checkpoints/压缩前-*.md、<kdev-memory-recall>，4 个全部命中"
+    },
+    {
+      "text": "CLAUDE.md 规则段包含「召唤 skill 的时机」段，至少列出 4 个典型触发场景（初始化 / 每日汇总 / 切档 / 规则升级 / 跨会话续航 / 等）",
+      "passed": false,
+      "evidence": "CLAUDE.md 无独立的『召唤 kdev-memory skill 的时机』章节；虽然触发规则表里有类似触发时机列（决策/踩坑/Step/归档/规则升级等），但那是实现级规则表，不是『何时召唤 skill』的解耦接口描述。旧模板设计不包含该段"
+    },
+    {
+      "text": "CLAUDE.md 规则段不复述 skill 实现细节：不含 8 行以上的触发规则 markdown 表格（那属于 skill 内部应由用户召唤时读到），不含具体的 Q/G/R/Step schema 字段定义",
+      "passed": false,
+      "evidence": "CLAUDE.md 第 31-48 行存在 17 行触发规则 markdown 表格（表头+分隔符+15 数据行），明显违反 `≤ 8 行` 上限。且表内含 `Q-NNN：问题、选项、用户选择、理由` 等 schema 字段定义。第 55-57 行还有『编号规则』小节复述 Q/G/R/Step 编号 schema"
+    },
+    {
+      "text": "CLAUDE.md 规则段总长度 ≤ 60 行（精简解耦目标；如超过说明又塞进了实现细节）",
+      "passed": true,
+      "evidence": "CLAUDE.md 全文 57 行（wc -l），恰好 ≤ 60，但接近上限——因为旧模板本身就是 57 行的满配"
+    },
+    {
+      "text": "Q-001 写入决策日志.md，含问题 + 日期 + 选项（含 A/B 两选）+ 用户选择 + 理由五项",
+      "passed": true,
+      "evidence": "决策日志.md 第 7-13 行：Q-001 标题 + 日期 2026-04-22 + (A)(B) 选项 + 用户选择：A（全局递增）+ 理由"
+    },
+    {
+      "text": "Q-001 的「理由」字段不是通用话术（如'简单好用'），而是结合项目特性写的具体理由",
+      "passed": true,
+      "evidence": "决策日志.md 第 13 行：『项目为单人长周期演进，跨迭代引用 Step 的需求更常见；编号简单、不用在每个迭代开头重置心智；未来回看执行日志直接 Step N 就能定位，不需要同时记住迭代号』——结合项目单人长周期特性"
+    }
+  ],
+  "summary": {"pass_rate": 0.833, "passed": 10, "failed": 2, "total": 12},
+  "overall_pass_rate": 0.833
+}

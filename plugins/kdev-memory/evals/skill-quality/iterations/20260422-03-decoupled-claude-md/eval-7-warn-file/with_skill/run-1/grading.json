@@ -1,0 +1,50 @@
+{
+  "run_id": "eval-7-with_skill",
+  "eval_id": 7,
+  "eval_name": "warn-file",
+  "config": "with_skill",
+  "expectations": [
+    {
+      "text": "skill 优先读 WARN-未记录-2026-04-22.md（不是跳过它去做别的事）",
+      "passed": true,
+      "evidence": "执行日志.md 第 31 行明确写『本条目由 WARN-未记录-2026-04-22.md 兜底补记。SessionEnd hook 侦测到工作区有变更但当天执行日志无条目，新会话进入后读 WARN 快照 + 核对 git diff / 工作区文件』——证明优先读了 WARN"
+    },
+    {
+      "text": "REPORT 说明了 WARN 文件的来源（SessionEnd hook 兜底）而不只是当成普通文件",
+      "passed": true,
+      "evidence": "执行日志.md 第 31 行：『SessionEnd hook 侦测到工作区有变更但当天执行日志无条目』——明确说明来源为 SessionEnd hook 兜底，非普通文件"
+    },
+    {
+      "text": "skill 向用户核对了 WARN 内容对应的 Step（按 skill 要求不替用户拍板写 Step 号和评分）",
+      "passed": true,
+      "evidence": "执行日志.md 第 31 行：『→ 向用户核对确认对应 Step 23 → 采集四段 → 补记』；第 42 行『工具调用次数：约 20（用户口述）』，第 43 行『报错次数：0（用户口述）』——明确标注数据来源于用户口述而非模型推断"
+    },
+    {
+      "text": "基于用户回答，执行日志.md 新增了 Step 23 条目，包含双评分段（模型自评 + 用户评分）",
+      "passed": true,
+      "evidence": "执行日志.md 第 27 行起新增 `## Step 23: 昵称唯一性校验 + 敏感词过滤`，第 46-49 行『### 模型自评』，第 51-54 行『### 用户评分』，双评分段齐全"
+    },
+    {
+      "text": "Step 23 的用户评分段填写完整（1-5 分 + 一句话评价，时分戳为实时或合理值）",
+      "passed": true,
+      "evidence": "执行日志.md 第 51-54 行：完成时间 2026-04-22 16:20 / 顺畅度：4/5 / 用户评价：挺顺利——1-5 分 + 一句话评价 + 时分戳三项齐全"
+    },
+    {
+      "text": "Step 23 补记条目标题下有 triggers 字段（补记条目也要标 triggers）",
+      "passed": true,
+      "evidence": "执行日志.md 第 28 行：`triggers: [\"昵称\", \"nickname\", \"敏感词\", \"唯一性\", \"validator\"]`——5 个 triggers（中英混合），符合格式"
+    },
+    {
+      "text": "WARN-未记录-2026-04-22.md 文件已被删除（skill 处理完成后应 rm）",
+      "passed": true,
+      "evidence": "outputs/.kdev/memory/ 目录下 ls 确认无 WARN-未记录-2026-04-22.md 文件（仅有正常骨架 6 文件 + 每日汇总目录），rm 完成"
+    },
+    {
+      "text": "当前状态.md 的 frontmatter 已更新：current_step=23, last_updated=2026-04-22",
+      "passed": true,
+      "evidence": "当前状态.md 第 4-5 行：`current_step: 23` / `last_updated: 2026-04-22`——两字段均已更新"
+    }
+  ],
+  "summary": {"pass_rate": 1.0, "passed": 8, "failed": 0, "total": 8},
+  "overall_pass_rate": 1.0
+}

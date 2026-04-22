@@ -1,0 +1,31 @@
+{
+  "eval_id": 7,
+  "eval_name": "warn-file",
+  "prompt": "新会话进入项目。项目 .kdev/memory/ 下有一个 WARN-未记录-2026-04-22.md 文件（SessionEnd hook 上次会话结束时留下的兜底警告），内含今日未落盘的变更快照（昵称校验相关的 5 个文件改动）。请按 kdev-memory skill 的 WARN 文件处理流程：读快照 / 核对工作区 / 向用户核对这些改动对应什么 Step / 采集评分 / 补记到执行日志 / 删除 WARN 文件。假设用户回答：'对，是 Step 23 昵称校验，工具调用约 20 次，0 报错，打 4 分，评价：挺顺利'。完成后汇报：(a) 你做的动作序列；(b) 执行日志新增了什么条目；(c) WARN 文件是否已删除；(d) 当前状态.md 是否更新（current_step 从 22 → 23）。",
+  "assertions": [
+    {
+      "text": "skill 优先读 WARN-未记录-2026-04-22.md（不是跳过它去做别的事）"
+    },
+    {
+      "text": "REPORT 说明了 WARN 文件的来源（SessionEnd hook 兜底）而不只是当成普通文件"
+    },
+    {
+      "text": "skill 向用户核对了 WARN 内容对应的 Step（按 skill 要求不替用户拍板写 Step 号和评分）"
+    },
+    {
+      "text": "基于用户回答，执行日志.md 新增了 Step 23 条目，包含双评分段（模型自评 + 用户评分）"
+    },
+    {
+      "text": "Step 23 的用户评分段填写完整（1-5 分 + 一句话评价，时分戳为实时或合理值）"
+    },
+    {
+      "text": "Step 23 补记条目标题下有 triggers 字段（补记条目也要标 triggers）"
+    },
+    {
+      "text": "WARN-未记录-2026-04-22.md 文件已被删除（skill 处理完成后应 rm）"
+    },
+    {
+      "text": "当前状态.md 的 frontmatter 已更新：current_step=23, last_updated=2026-04-22"
+    }
+  ]
+}

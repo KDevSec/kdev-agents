@@ -1,0 +1,50 @@
+{
+  "run_id": "eval-7-old_skill",
+  "eval_id": 7,
+  "eval_name": "warn-file",
+  "config": "old_skill",
+  "expectations": [
+    {
+      "text": "skill 优先读 WARN-未记录-2026-04-22.md（不是跳过它去做别的事）",
+      "passed": true,
+      "evidence": "执行日志.md 第 30 行明确写『本条由 WARN-未记录-2026-04-22.md 兜底补记 —— 上次会话未实时落盘，依据 SessionEnd 快照 + 工作区核对 + 用户确认补齐』——证明优先读了 WARN"
+    },
+    {
+      "text": "REPORT 说明了 WARN 文件的来源（SessionEnd hook 兜底）而不只是当成普通文件",
+      "passed": true,
+      "evidence": "执行日志.md 第 30 行说明『上次会话未实时落盘，依据 SessionEnd 快照』——明确来源为 SessionEnd hook 兜底"
+    },
+    {
+      "text": "skill 向用户核对了 WARN 内容对应的 Step（按 skill 要求不替用户拍板写 Step 号和评分）",
+      "passed": true,
+      "evidence": "执行日志.md 第 30 行：『+ 用户确认补齐』，第 40 行『工具调用次数：约 20（用户确认）』、第 41 行『报错次数：0（用户确认）』——数据明确标注来自用户确认"
+    },
+    {
+      "text": "基于用户回答，执行日志.md 新增了 Step 23 条目，包含双评分段（模型自评 + 用户评分）",
+      "passed": true,
+      "evidence": "执行日志.md 第 27 行起新增 Step 23，第 44-47 行『### 模型自评』，第 49-52 行『### 用户评分』，双段齐全。注：模型自评的顺畅度自评填为『待补』（第 46 行）是故意为之——old_skill 采取了保守姿态避免污染用户评分"
+    },
+    {
+      "text": "Step 23 的用户评分段填写完整（1-5 分 + 一句话评价，时分戳为实时或合理值）",
+      "passed": true,
+      "evidence": "执行日志.md 第 49-52 行：完成时间 2026-04-22（补记，用户当场答复）/ 顺畅度：4/5 / 用户评价：挺顺利——3 项齐全"
+    },
+    {
+      "text": "Step 23 补记条目标题下有 triggers 字段（补记条目也要标 triggers）",
+      "passed": true,
+      "evidence": "执行日志.md 第 28 行：`triggers: [\"昵称校验\", \"nickname\", \"敏感词\", \"sensitive-words\", \"唯一性\"]`——5 个 triggers（中英混合）"
+    },
+    {
+      "text": "WARN-未记录-2026-04-22.md 文件已被删除（skill 处理完成后应 rm）",
+      "passed": true,
+      "evidence": "outputs/.kdev/memory/ 目录下 ls 确认无 WARN 文件，rm 完成"
+    },
+    {
+      "text": "当前状态.md 的 frontmatter 已更新：current_step=23, last_updated=2026-04-22",
+      "passed": true,
+      "evidence": "当前状态.md 第 4-5 行：`current_step: 23` / `last_updated: 2026-04-22`"
+    }
+  ],
+  "summary": {"pass_rate": 1.0, "passed": 8, "failed": 0, "total": 8},
+  "overall_pass_rate": 1.0
+}

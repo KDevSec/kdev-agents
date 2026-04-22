@@ -148,15 +148,24 @@ rm -rf $WS
 
 ## 当前基线
 
-[`iterations/20260422-02-expanded-6-scenarios/`](iterations/20260422-02-expanded-6-scenarios/) 是当前权威基线：
+[`iterations/20260422-03-decoupled-claude-md/`](iterations/20260422-03-decoupled-claude-md/) 是**当前权威基线**：
 
-- 对比：v0.4.0 单文件 734 行 SKILL.md ↔ 重构后 SKILL.md 254 行 + 6 references
-- 6 个场景 × 2 configs = 12 runs，升级后的严格 assertions
-- 关键结论：pass rate 100% / 100%（结构重构语义零损失），新版省 **-19.6%** tokens
+- 对比：解耦前的 SKILL.md（Phase 1 重构版）↔ 解耦后的 SKILL.md（CLAUDE.md 规则段只放接口，不放实现细节）
+- 4 个关键场景 × 2 configs = 8 runs，用接口级 assertions
+- 关键结论：
+  - eval-0 init 的 CLAUDE.md 从 57 行精简到 38 行（-33%），100% 过接口级 assertion
+  - 边缘场景（eval-4 合并冲突 / eval-5 数据缺失 / eval-7 WARN 处理）全部 0 regression
+  - 验证了"CLAUDE.md 规则段只放接口（贯穿铁规 + hook 标签 + 召唤时机），实现细节留 skill"的架构可行
 
 完整说明见该 iteration 目录下的 `notes.md`。
 
-另有早期 iteration：[`iterations/20260422-01-baseline-3-scenarios/`](iterations/20260422-01-baseline-3-scenarios/)——首轮 3 场景 + 基础 assertions，作为演进记录保留，**不是当前基线**。
+## 演进历史（按时间倒序）
+
+| iteration | 测什么 | 结论 |
+|---|---|---|
+| **[20260422-03-decoupled-claude-md](iterations/20260422-03-decoupled-claude-md/)** ← 当前基线 | 解耦改造：CLAUDE.md 规则段只放接口 | 解耦成功 + 边缘场景 0 regression |
+| [20260422-02-expanded-6-scenarios](iterations/20260422-02-expanded-6-scenarios/) | Phase 1 重构（SKILL.md 734 → 254 行）的 6 场景全面验证 | 行为等价 + tokens -19.6% |
+| [20260422-01-baseline-3-scenarios](iterations/20260422-01-baseline-3-scenarios/) | Phase 1 重构的首轮 3 场景探索（基础 assertions） | 演进记录保留 |
 
 ## 和 skill-creator 的关系
 

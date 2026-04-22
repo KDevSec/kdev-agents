@@ -1,0 +1,43 @@
+{
+  "eval_id": 0,
+  "eval_name": "init",
+  "prompt": "我想给这个 FastAPI 项目建立 kdev-memory 工程记忆机制。项目目前无 CLAUDE.md、无 .kdev/ 目录。请按 skill 标准初始化流程完整执行：建骨架文件、在项目 CLAUDE.md 里加触发规则段、向我抛 Q-001 决策（Step 编号方式）。假设我回答'全局递增'。完成后在 outputs/ 目录里汇报：(a) 建了哪些文件，(b) CLAUDE.md 加了哪一段，(c) Q-001 的完整条目内容，(d) 当前状态.md 的 frontmatter 是什么样。",
+  "assertions": [
+    {
+      "text": "创建了 .kdev/memory/ 子目录（不是平铺在 .kdev/）"
+    },
+    {
+      "text": "建了 6 个核心骨架文件：决策日志.md / 踩坑日志.md / 执行日志.md / 每日汇总 目录 / 改进建议.md / 当前状态.md（方法论铁规.md 可选，不建也合格）"
+    },
+    {
+      "text": "当前状态.md 的 frontmatter 含全部 6 个规定字段：phase / iteration / current_step / last_updated / pending_decisions / unresolved_gotchas，且取值合理（不是占位符）"
+    },
+    {
+      "text": "phase 取值是 plan / exec / verify / done 四选一（不是自创值），current_step 是整数，last_updated 是 YYYY-MM-DD 格式"
+    },
+    {
+      "text": "CLAUDE.md 包含「智能体自动记录规则」章节（章节存在）"
+    },
+    {
+      "text": "CLAUDE.md 规则段包含全部 3 条贯穿 session 铁规：实时落盘 + 文件聚合不翻会话 + 优先处理 hook 产出"
+    },
+    {
+      "text": "CLAUDE.md 规则段引用至少 2 个 hook 注入标签 / 文件模式（<kdev-memory-brief> / <kdev-memory-recall> / WARN-未记录-*.md / checkpoints/压缩前-*.md 中任 2 个）"
+    },
+    {
+      "text": "CLAUDE.md 规则段包含「召唤 skill 的时机」段，至少列出 4 个典型触发场景（初始化 / 每日汇总 / 切档 / 规则升级 / 跨会话续航 / 等）"
+    },
+    {
+      "text": "CLAUDE.md 规则段不复述 skill 实现细节：不含 8 行以上的触发规则 markdown 表格（那属于 skill 内部应由用户召唤时读到），不含具体的 Q/G/R/Step schema 字段定义"
+    },
+    {
+      "text": "CLAUDE.md 规则段总长度 ≤ 60 行（精简解耦目标；如超过说明又塞进了实现细节）"
+    },
+    {
+      "text": "Q-001 写入决策日志.md，含问题 + 日期 + 选项（含 A/B 两选）+ 用户选择 + 理由五项"
+    },
+    {
+      "text": "Q-001 的「理由」字段不是通用话术（如'简单好用'），而是结合项目特性写的具体理由"
+    }
+  ]
+}

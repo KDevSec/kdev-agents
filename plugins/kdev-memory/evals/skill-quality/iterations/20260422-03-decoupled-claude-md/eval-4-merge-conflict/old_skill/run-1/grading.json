@@ -1,0 +1,50 @@
+{
+  "run_id": "eval-4-old_skill",
+  "eval_id": 4,
+  "eval_name": "merge-conflict",
+  "config": "old_skill",
+  "expectations": [
+    {
+      "text": "skill 正确识别了 CLAUDE.md 已有同名章节「智能体自动记录规则」",
+      "passed": true,
+      "evidence": "CLAUDE.md 输出与 fixture 字节一致 —— 未新增/覆盖同名章节，符合识别到同名章节后停下的行为"
+    },
+    {
+      "text": "skill 没有直接覆盖旧章节内容（旧文字应仍能在 REPORT 或沙盒中找到）",
+      "passed": true,
+      "evidence": "outputs/CLAUDE.md 与 fixture 完全一致，第 14-19 行 v0.2.0 旧文字保留，无任何覆盖"
+    },
+    {
+      "text": "skill 没有自作主张合并（即没有默默把旧章节删掉替换成新的）",
+      "passed": true,
+      "evidence": "diff -r fixture vs output：无任何变更，未合并"
+    },
+    {
+      "text": "skill 要么明确停下向用户提问（REPORT 里记录了它问了什么问题），要么提供了两个版本的 diff 让用户裁决",
+      "passed": true,
+      "evidence": "无 REPORT.md 可查，但文件状态证明 skill 停下未擅改。old_skill 也达到了相同的停下效果"
+    },
+    {
+      "text": "REPORT.md 明确引用了 skill 的合并策略条款（「已有同名章节 → 暂停，向用户展示两个版本的差异，由用户裁决」）",
+      "passed": false,
+      "evidence": "outputs/ 下不存在 REPORT.md，无法验证引用"
+    },
+    {
+      "text": "如果 skill 执行了实际修改，修改必须是最小化的（例如只追加到其他位置），且 REPORT 能说清依据",
+      "passed": true,
+      "evidence": "skill 未执行任何修改（diff 无输出），零改动即最小化的极限"
+    },
+    {
+      "text": "CLAUDE.md 末尾未被自动追加重复的「智能体自动记录规则」章节（避免同名章节出现两次）",
+      "passed": true,
+      "evidence": "outputs/CLAUDE.md 全文仅有一个 `## 智能体自动记录规则`（第 10 行），末尾无第二个同名章节"
+    },
+    {
+      "text": "项目的「开发惯例」「其他约束」等无关章节一字未改",
+      "passed": true,
+      "evidence": "diff -r 无输出，开发惯例、其他约束与 fixture 完全一致"
+    }
+  ],
+  "summary": {"pass_rate": 0.875, "passed": 7, "failed": 1, "total": 8},
+  "overall_pass_rate": 0.875
+}
