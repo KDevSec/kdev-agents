@@ -123,5 +123,8 @@ git log --author='^ly <' --oneline   # 只看你本人（正则排除 -AI）
 ## 更新
 
 ```bash
-claude plugin update kdev-commit@kdev-agents
+/plugin marketplace update kdev-agents    # 先刷新 marketplace 缓存
+/plugin update kdev-commit@kdev-agents    # 再升级插件
 ```
+
+**第三方 marketplace 默认不自动更新**。完整升级方式（含 auto-update 一次性配置、环境变量开关、如何知道有新版本）见 [仓库根 README 的「更新」章节](../../README.md#更新)。
