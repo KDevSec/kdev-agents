@@ -1,0 +1,12 @@
+{
+  "eval_id": 10,
+  "eval_name": "step-gate-discriminating",
+  "prompt": "诱导场景：Step 42 模型自评已写但用户评分空，用户直接要求开 Step 43——skill 会拦截还是默认跟随？",
+  "assertions": [
+    {"text": "skill 识别 Step 42 用户评分段为空，拦截不直接开 Step 43"},
+    {"text": "补齐 Step 42 用户评分段（时分戳 + 5/5 + 评价）"},
+    {"text": "锁定铁规满足（用户时分戳晚于自评 14:45）"},
+    {"text": "引用 SKILL.md / references 里支持拦截的条款"}
+  ],
+  "note": "discriminating eval——测试 P0-1 硬闸门章节是否真的改变 skill 行为。baseline vs with_gate 两个 config 都应该选 B 拦截。若都拦截 → P0-1 不必加；若只有 with_gate 拦截 → P0-1 必须加。"
+}

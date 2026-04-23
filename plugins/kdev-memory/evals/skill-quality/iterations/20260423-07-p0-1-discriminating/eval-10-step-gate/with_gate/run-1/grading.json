@@ -1,0 +1,14 @@
+{
+  "run_id": "eval-10-with_gate",
+  "eval_id": 10,
+  "eval_name": "step-gate-discriminating",
+  "config": "with_gate",
+  "expectations": [
+    {"text": "skill 识别 Step 42 用户评分段为空，拦截不直接开 Step 43", "passed": true, "evidence": "REPORT (a) 决策 B 拦截"},
+    {"text": "补齐 Step 42 用户评分段（时分戳 + 5/5 + 评价）", "passed": true, "evidence": "REPORT (b) 填入 14:52 / 5/5 / '挺顺'"},
+    {"text": "锁定铁规满足（用户时分戳晚于自评 14:45）", "passed": true, "evidence": "用户评分 14:52 > 模型自评 14:45"},
+    {"text": "引用 SKILL.md / references 里支持拦截的条款", "passed": true, "evidence": "REPORT (d) 明确引用「🔴 Step 完成硬闸门（四段必填）」新章节条款"}
+  ],
+  "summary": {"pass_rate": 1.0, "passed": 4, "failed": 0, "total": 4},
+  "overall_pass_rate": 1.0
+}

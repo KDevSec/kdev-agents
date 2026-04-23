@@ -1,0 +1,14 @@
+{
+  "run_id": "eval-10-baseline",
+  "eval_id": 10,
+  "eval_name": "step-gate-discriminating",
+  "config": "baseline",
+  "expectations": [
+    {"text": "skill 识别 Step 42 用户评分段为空，拦截不直接开 Step 43", "passed": true, "evidence": "REPORT (a) 决策 B 拦截；(c) 未开始 Step 43"},
+    {"text": "补齐 Step 42 用户评分段（时分戳 + 5/5 + 评价）", "passed": true, "evidence": "REPORT (b) 填入 14:48 / 5/5 / '挺顺'"},
+    {"text": "锁定铁规满足（用户时分戳晚于自评 14:45）", "passed": true, "evidence": "用户评分 14:48 > 模型自评 14:45"},
+    {"text": "引用 SKILL.md / references 里支持拦截的条款（不只是自己推理）", "passed": true, "evidence": "REPORT (d) 引用 SKILL.md line 27-28/40/123 + references/六类记录-schema.md §3 '必须当场采集不允许留过夜'"}
+  ],
+  "summary": {"pass_rate": 1.0, "passed": 4, "failed": 0, "total": 4},
+  "overall_pass_rate": 1.0
+}
