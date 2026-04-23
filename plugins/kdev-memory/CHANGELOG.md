@@ -1,5 +1,89 @@
 # kdev-memory CHANGELOG
 
+## 0.5.1 — 2026-04-23
+
+**特性**：SKILL.md 新增「🔴 Step 完成硬闸门（四段必填）」章节 + Step 完整度
+lint（P1-5/6 落地）+ iter-5/6/7 三轮 eval 数据归档。
+
+### 背景
+
+0.5.0 发布后做了两件事：一是 iter-5 补齐跨会话续航场景覆盖（skill description
+承诺的 5 个核心触发场景至此全部 eval 过）；二是 iter-6 落地审计 P1-5/6（Step
+完整度 lint，覆盖 SessionStart brief 欠评告警 + Stop hook check-step-completeness
+阻塞）；三是 iter-7 用 discriminating eval 回答"审计 P0-1 Step 完成闸门章节是否
+应当加"。
+
+iter-7 初步结论"不加"，但 user 反问"如果 baseline 换成 with_gate，是不是效果
+一样的情况下，还减少了 md 的内容"——这个反问点出经济性估算的 bug：
+- SKILL.md +22 行是**一次性**成本（约 +500 tokens/加载）
+- skill 推理 + 搜索引用是**每次**成本（with_gate 比 baseline 省 -12,143 tokens）
+- 净收益：**每次触发净省 ~11.6k tokens**（扣除加载成本后）
+
+按 kdev-memory 活跃项目每天触发 20+ 次算，每天净省 ~230k tokens。+22 行文档是
+值得的。**决策反转：合入闸门章节**。
+
+### 新增
+
+- **SKILL.md 新增「🔴 Step 完成硬闸门（四段必填）」章节**（约 26 行，替换
+  v0.5.0 留下的 placeholder 注释）：
+  - 四段必填硬判定（执行事实 / 模型自评 / 用户评分 / 评分差异分析 任一缺 = 未完成）
+  - 动作链（模型写自评 → 公布 → 主动追问 → 锁定时分戳 → 才能开下一步）
+  - 反模式声明（"模型写完自评就认为 Step 完成"）
+  - 用户明确跳过评分时走 R-NNN 销账（不走默认路径）
+  - iter-7 数据注记（-21% tokens / -35% tool uses）
+- **`hooks/lib/step_completeness.py`**（203 行，纯 Python 无外部依赖）：
+  扫执行日志最近 N 条 Step，检测用户评分段时分戳空 / 扣分项空 / 完全无用户评分段
+- **`tests/test_step_completeness.py`**（33 tests）：项目累计 **98 tests pass**
+- **SessionStart hook 集成 Step 完整度 lint**：brief ⚠️ 段加欠评 Step 告警
+- **Stop hook 集成 Step 完整度 lint**：今日新增半残 → 软提醒；strict 模式下 exit 2 阻塞
+- **`evals/skill-quality/evals.json` 新增 eval-9 (step-half-complete-fix) + eval-10
+  (step-gate-discriminating)**，共 **10 个场景** + **7 轮 iteration**
+
+### iter 数据累积
+
+| iter | 场景 | pass rate | 发现 |
+|---|---|---|---|
+| iter-5 | eval-6 跨会话续航 | 8/8 | skill 严格只读回读，语义理解到位 |
+| iter-6 | eval-9 Step 半残修复 | 8/8 | skill"坦诚反思"路线补齐（超预期） |
+| iter-7 | eval-10 Step 闸门 discriminating | 2 configs 行为一致 | P0-1 应当加（经济性驱动）|
+
+### 审计 §5.1 落地最终状态：7/8
+
+| 审计项 | 状态 | iter |
+|---|---|---|
+| P0-1 Step 完成闸门 | ✅ 合入 SKILL.md | iter-7 + 0.5.1 |
+| P0-2 动词链 | ✅ 已隐含（P0-1 章节带动作链）| iter-7 + 0.5.1 |
+| P0-3 豁免动作化 | 🟡 v0.6.0 候选 | — |
+| P0-4 Step 脱离状态机 | ✅ 已隐含 | Phase 1 |
+| P1-5 brief 欠评告警 | ✅ | iter-6 + 0.5.1 |
+| P1-6 Stop check-step-completeness | ✅ | iter-6 + 0.5.1 |
+| P1-7 CLAUDE.md 漂移检测 | ✅ | iter-4 |
+
+### 向后兼容
+
+- 0.5.x 内部升级完全兼容：SKILL.md 增量字段、新 lib、hook 非阻塞集成
+- 老项目 CLAUDE.md 零改动——闸门章节在 skill 本体不需要出现在 CLAUDE.md
+- Strict 模式仍需 opt-in（`touch .kdev/memory/strict`）
+
+### 设计决策
+
+- **为什么是 patch 而不是 minor**：
+  - SKILL.md 闸门章节是"显式化已有隐含规则"——baseline 数据已证明行为一致
+  - Step 完整度 lint / hook 改动是 hook 层内部扩展，对外接口不变
+  - 不新增召唤触发词、不改 `claude_md_contract`
+- **为什么 iter-7 结论会反转**：
+  - 初次分析把 SKILL.md +22 行当"代价"、-21% tokens 当"收益"
+  - 但两者不同量纲：+22 行是一次性写入，-12k tokens 是每次触发
+  - user 反问点破这个误判，基于"长期 × 频率"的经济性修正了决策
+
+### 相关 commit
+
+- commit `c7e125c` feat: Step 完整度 lint（P1-5/6）+ iter-6 eval-9
+- commit `f695370` test: iter-7 P0-1 discriminating（初版 "不加" 结论）
+- commit `<本 commit>` chore: 0.5.1 + 合入闸门章节 + iter-7 决策反转
+
+---
+
 ## 0.5.0 — 2026-04-22
 
 **特性**：SKILL.md 拆分为 references/ 渐进式披露（-65% 行数，-19.6% 触发

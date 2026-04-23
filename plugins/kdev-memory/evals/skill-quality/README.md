@@ -166,7 +166,7 @@ rm -rf $WS
 
 | iteration | 测什么 | 结论 |
 |---|---|---|
-| **[20260423-07-p0-1-discriminating](iterations/20260423-07-p0-1-discriminating/)** ← 最新 | P0-1 Step 完成闸门是否必要？discriminating eval | **结论：不必加**——baseline 已有等效语义，加闸门只省 21% tokens 不改变行为 |
+| **[20260423-07-p0-1-discriminating](iterations/20260423-07-p0-1-discriminating/)** ← 最新 | P0-1 Step 完成闸门是否必要？discriminating eval | **结论反转：应当加**——虽然行为一致，但每次省 ~11.6k tokens，+22 行文档的一次性成本 ≤ 每次触发的长期收益；已合入 SKILL.md |
 | [20260423-06-step-completeness-lint](iterations/20260423-06-step-completeness-lint/) | Step 完整度 lint（P1-5 brief 告警 + P1-6 Stop 阻塞）| 8/8 pass，skill"坦诚反思"路线补齐半残 Step |
 | [20260422-05-eval6-coverage](iterations/20260422-05-eval6-coverage/) | 补跑 eval-6 跨会话续航（场景覆盖）| 8/8 pass，skill 严格只读回读，语义理解到位 |
 | [20260422-04-claude-md-lint](iterations/20260422-04-claude-md-lint/) ← 对照基线 | lint 工具 + 修漂移自动化流程 | 审计 P1-7 正式落地；自动化闭环 vs 手工裁决 |

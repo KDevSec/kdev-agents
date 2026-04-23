@@ -1,7 +1,7 @@
 {
   "name": "kdev-memory",
   "description": "工程记忆制度插件：为多迭代项目建立实时落盘的决策/踩坑/执行/评分记忆 + 智能召回（triggers）。七层 hook（SessionStart 注入 + UserPromptSubmit 智能召回 + Stop 软提醒/归档提醒 + Strict 阻塞 + PostToolUse 里程碑联动 + PreCompact 压缩前写盘 + SessionEnd 兜底警告）+ 状态结构化（YAML frontmatter）+ .kdev/memory 命名空间化（插件隔离）+ 按月/按季度归档切档（执行日志按月、踩坑/决策按季度进 归档/ 子目录，改进建议不切档）+ CLAUDE.md 接口 / 实现解耦（规则段只放 claude_md_contract 接口契约，实现细节留 skill 本体，避免 skill 升级与项目 CLAUDE.md 漂移）+ 接口漂移 lint（SessionStart 自动检测缺少的 hook 标签 / 文件模式 / 贯穿铁规，召唤 skill 说「修 CLAUDE.md 漂移」即一键精确 diff patch）",
-  "version": "0.5.0",
+  "version": "0.5.1",
   "author": {
     "name": "ly"
   },
