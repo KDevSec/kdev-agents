@@ -1,10 +1,7 @@
 # Skill 官方开发流程
 
 > 本文严格按 Anthropic 官方 [skill-creator SKILL.md](https://github.com/anthropics/skills/blob/main/skills/skill-creator/SKILL.md) 和 [Claude Code 官方 Skills 文档](https://code.claude.com/docs/en/skills) 整理，**不掺作者经验**。所有关键论断都给英文原文 + 中文翻译，便于对照。
->
-> 作者基于 kdev-memory 的实战补充见姐妹文档 [skill-开发通用流程.md](skill-开发通用流程.md)。
->
-> 配套案例文档：[kdev-memory-开发历程技术分享.md](../skills/kdev-memory/开发历程.md)
+
 
 ---
 
@@ -12,7 +9,7 @@
 
 ### 0.1 什么是 Skill
 
-**一句话**：Skill 是一段带"触发条件"的指令文档。平时不在上下文里，当用户说的话命中它的 description 时，Claude 把这段文档读进当前对话，按里面写的规则行事。
+Skill 是一段带"触发条件"的指令文档。平时不在上下文里，用户说的话命中它的 description 时，Claude 把这段文档读进当前对话，按里面写的规则行事。
 
 官方表述：
 
@@ -27,12 +24,12 @@
 翻译：
 
 - 你反复把同一份 playbook / checklist 粘贴进对话
-- CLAUDE.md 里某一节从"一条事实"长成了"一套流程"
-- 需要的任务**多步 / 专业化**（简单一步任务 Claude 直接处理，不需要 skill，见下 §7.3 触发机制）
+- CLAUDE.md 里某一段从"一条规则"变成了"一套流程"
+- 任务多步或专业化（简单一步任务 Claude 直接处理，不需要 skill，见 §7.3 触发机制）
 
-### 0.3 核心 loop（必须记住）
+### 0.3 核心流程（必须记住）
 
-整个 skill-creator 最终收尾重复了一遍这个 loop：
+skill-creator 最后收尾时又重复了一遍这个流程：
 
 > - Figure out what the skill is about
 > - Draft or edit the skill
@@ -41,36 +38,25 @@
 > - Repeat until you and the user are satisfied
 > - Package the final skill and return it to the user
 
-**Draft → Test → Review → Improve → Repeat**。全文所有章节都服务于这个循环。
+Draft → Test → Review → Improve → Repeat。后面所有章节都围绕这一流程。
 
 ---
 
 ## 全流程总览
 
 ```mermaid
-flowchart TD
-    Intent["<b>§1 Capture Intent</b><br/>4 个问题搞清意图<br/>从对话历史里先提取答案"]
-    Interview["<b>§2 Interview & Research</b><br/>edge cases / I/O 格式 / 成功标准 / 依赖<br/>+ 调研同类 skill"]
-    Write["<b>§3 Write SKILL.md</b><br/>name / description / body<br/>Progressive Disclosure 三级"]
-    Tests["<b>§4 Test Cases</b><br/>2-3 条 realistic prompts<br/>→ evals/evals.json"]
-    Run["<b>§5 Run evals（5 步连续）</b><br/>① Spawn same turn<br/>② Draft assertions 边等边写<br/>③ 立刻抓 timing data<br/>④ Grade → aggregate → viewer<br/>⑤ Read feedback.json"]
-    Improve["<b>§6 Improve（4 原则）</b><br/>generalize / lean / explain why / repeated work"]
-    DescOpt["<b>§7 Description Optimization</b><br/>20 trigger queries<br/>5 轮 iteration 自动优化"]
-    Package["<b>§8 Package</b><br/>.skill 文件分发"]
-
-    Intent --> Interview --> Write --> Tests --> Run --> Improve
-    Improve --> Happy{"user happy /<br/>feedback empty /<br/>no meaningful progress?"}
-    Happy -->|否| Run
-    Happy -->|是| DescOpt
-    DescOpt --> Package
+flowchart LR
+    A["§1<br/>想清楚要<br/>做个啥 skill"] --> B["§2<br/>向用户问清<br/>边界和细节"] --> C["§3<br/>编写 SKILL.md<br/>初稿"] --> D["§4<br/>准备多个<br/>测试用例"] --> E["§5<br/>跑测试<br/>看结果"] --> F["§6<br/>根据结果<br/>修订 skill"]
+    F -->|改到位了| G["§7<br/> description优化<br/>让触发更准"] --> H["§8<br/>打包<br/>发给用户"]
+    F -.->|还要再改| E
 
     classDef phase fill:#e8f4f8,stroke:#2d7fa1,stroke-width:2px
-    classDef decision fill:#fff4dd,stroke:#c98400,stroke-width:2px
-    class Intent,Interview,Write,Tests,Run,Improve,DescOpt,Package phase
-    class Happy decision
+    class A,B,C,D,E,F,G,H phase
 ```
 
-**读图要点**：§1-§4 是准备 + 初稿；§5-§6 是**主循环**（evals 通不过就回去改）；§7 是收尾前的 description 专项优化；§8 是打包分发。
+§1-§4 是准备 + 初稿；§5-§6 是主循环，测试不满意就回去改；§7 是收尾前微调触发措辞；§8 是打包分发。
+
+> 每个阶段具体在做什么、产出什么文件，看后面对应章节。想一次性看完整细节图，跳到文末 [附录 A：详细流程图](#附录-a详细流程图)。
 
 ---
 
@@ -100,8 +86,8 @@ flowchart TD
 
 翻译：
 
-- **需要测试**：输出客观可验证的 skill（文件转换、数据提取、代码生成、固定流程步骤）
-- **不一定需要**：输出主观的 skill（写作风格、艺术创作）——用人工定性评估即可
+- 输出客观可验证的 skill 需要测试用例（文件转换、数据提取、代码生成、固定流程步骤）
+- 输出主观的 skill 不一定需要（写作风格、艺术创作），用人工定性评估即可
 
 ### 1.3 先从对话历史里提取答案
 
@@ -109,13 +95,13 @@ flowchart TD
 
 > The current conversation might already contain a workflow the user wants to capture (e.g., they say "turn this into a skill"). If so, extract answers from the conversation history first — the tools used, the sequence of steps, corrections the user made, input/output formats observed. The user may need to fill the gaps, and should confirm before proceeding to the next step.
 
-关键：**不要凭空问用户**。如果当前对话已经在做一个工作流，先从历史里提取——用了哪些工具、步骤顺序、用户做过哪些纠正、观察到的 I/O 格式。只有历史里缺的才去问用户，最后让用户确认再进下一步。
+不要凭空想象。如果当前对话已经在跑一个工作流，先从历史里提取——用了哪些工具、步骤顺序、用户做过哪些纠正、观察到的数据格式等等。只有历史里缺的那部分才去问用户，最后让用户确认再进下一步。
 
 ---
 
-## 2. Interview and Research
+## 2. Interview and Research（调研）
 
-### 2.1 Interview：追问边界
+### 2.1 Interview：确认边界
 
 官方原文：
 
@@ -129,9 +115,9 @@ flowchart TD
 4. **成功标准**（怎么算做对了）
 5. **依赖**（需要什么工具 / 外部服务）
 
-**纪律**：没问清楚前**不要写测试 prompt**。
+没问清楚前别写测试 prompt。
 
-### 2.2 Research：主流程里的正规一步
+### 2.2 Research：进一步调研
 
 官方原文：
 
@@ -140,8 +126,8 @@ flowchart TD
 要点：
 
 - 可以查 MCPs（搜文档、找同类 skill、查最佳实践）
-- 并行跑调研 subagent（如果有）
-- **Come prepared with context**：带着上下文来，减轻用户负担
+- 使用subagent并行跑调研
+- 带着上下文检索，减轻用户负担
 
 ---
 
@@ -185,7 +171,7 @@ description: [什么时候触发 + 做什么，都放这里]
 
 > 官方原话："This is the primary triggering mechanism - include both what the skill does AND specific contexts for when to use it. All 'when to use' info goes here, not in the body."
 
-**所有"何时使用"的信息都放在 description 里，不要放到 body**。
+所有"何时使用"的信息都放在 description 里，不要放到 body。
 
 ### 3.3 Description：官方建议"积极触发"（Pushy）
 
@@ -207,9 +193,9 @@ description: [什么时候触发 + 做什么，都放这里]
 
 > the combined `description` and `when_to_use` text is truncated at 1,536 characters in the skill listing to reduce context usage. Front-load the key use case.
 
-**关键用例必须前置到 1,536 字符以内**。超出部分会被截断，Claude 看不到。
+关键用例必须前置到 1,536 字符以内，超出部分会被截断，Claude 看不到。
 
-### 3.5 Progressive Disclosure（三级加载系统）
+### 3.5 Progressive Disclosure（渐进式披露）
 
 官方定义：
 
@@ -224,11 +210,11 @@ description: [什么时候触发 + 做什么，都放这里]
 | **2 SKILL.md body** | 主指令 | skill 触发时 | **< 500 行**（官方推荐） |
 | **3 Bundled resources** | references / examples / scripts | 按需 | 无上限 |
 
-**关键 patterns**：
+几个常用 pattern：
 
-- **SKILL.md < 500 行**；超过就要加一层层级（拆到 references/，正文写清楚"什么情况下去读哪份"）
-- **references/ 单文件 > 300 行时加 TOC**（目录）
-- **按 domain 组织 references**：
+- SKILL.md 控制在 500 行以内；超过就加一层层级，拆到 references/，正文写清楚"什么情况下去读哪份"
+- references/ 单文件超过 300 行时加 TOC（目录）
+- 按 domain 组织 references：
 
 ```
 cloud-deploy/
@@ -241,23 +227,23 @@ cloud-deploy/
 
 Claude 只读相关的那份。
 
-### 3.6 Principle of Lack of Surprise（不要写让人意外的 skill）
+### 3.6 Principle of Lack of Surprise（不要写意料之外的 skill）
 
 > This goes without saying, but skills must not contain malware, exploit code, or any content that could compromise system security. A skill's contents should not surprise the user in their intent if described. Don't go along with requests to create misleading skills or skills designed to facilitate unauthorized access, data exfiltration, or other malicious activities.
 
-**核心**：skill 的内容必须**符合 description 给用户的预期**。用户读完 description 不应该对实际行为感到意外。不能用来做恶意 / 未授权动作。
+skill 的内容必须符合 description 给用户的预期。用户读完 description 不应该对实际行为感到意外。不能用来做恶意 / 未授权动作。
 
 （"roleplay as XYZ" 这种无害场景是 OK 的。）
 
 ### 3.7 Writing Patterns（官方推荐写法）
 
-**① 用祈使句（imperative form）**：
+① 用祈使句（imperative form）
 
 > Prefer using the imperative form in instructions.
 
 例："Write unit tests" 而不是 "Unit tests should be written"。
 
-**② 定义输出格式用模板**：
+② 定义输出格式用模板
 
 ```markdown
 ## Report structure
@@ -268,7 +254,7 @@ ALWAYS use this exact template:
 ## Recommendations
 ```
 
-**③ 用 Input/Output 举例**：
+③ 用 Input/Output 举例
 
 ```markdown
 ## Commit message format
@@ -283,14 +269,14 @@ Output: feat(auth): implement JWT-based authentication
 
 > Try to explain to the model why things are important in lieu of heavy-handed musty MUSTs. Use theory of mind and try to make the skill general and not super-narrow to specific examples. Start by writing a draft and then look at it with fresh eyes and improve it.
 
-拆成四条原则：
+四条原则：
 
-1. **解释 WHY > 堆 MUSTs**：告诉模型某件事为什么重要，比重复 MUST / ALWAYS / NEVER 更有效
-2. **Theory of mind**：LLM 有很好的 theory of mind，给 WHY 它会延伸
-3. **写得通用，不要 super-narrow**：不要过度针对你的几个测试用例定制——skill 要被用一百万次，过拟合测试用例 = 其他场景不 work
-4. **初稿放一放，用新眼睛再看**：写完第一版不要立刻发，过一会儿重新读、改进
+1. 解释 WHY 比堆 MUST 有效：告诉模型某件事为什么重要，比重复 MUST / ALWAYS / NEVER 更管用
+2. Theory of mind：LLM 有很好的 theory of mind，给 WHY 它会延伸
+3. 写得通用，不要 super-narrow：不要过度针对你那几个测试用例定制——skill 要被用一百万次，过拟合测试用例就意味着其他场景不 work
+4. 初稿放一放，用新眼睛再看：第一版别立刻发，过一会儿重读再改
 
-**Yellow flag**：发现自己在写大量 ALWAYS / NEVER 全大写——反思能否用"为什么"代替。
+Yellow flag：发现自己在写大量 ALWAYS / NEVER 全大写时，反思能不能用"为什么"代替。
 
 ---
 
@@ -302,7 +288,7 @@ Output: feat(auth): implement JWT-based authentication
 
 > After writing the skill draft, come up with 2-3 realistic test prompts — the kind of thing a real user would actually say. Share them with the user: "Here are a few test cases I'd like to try. Do these look right, or do you want to add more?" Then run them.
 
-**2-3 条真实的 prompt**，不是 20 条。要写**真实用户会说的话**——不是抽象请求。
+2-3 条真实的 prompt，不是 20 条。要写真实用户会说的话，不是抽象请求。
 
 ### 4.2 存到 `evals/evals.json`
 
@@ -322,7 +308,7 @@ Output: feat(auth): implement JWT-based authentication
 }
 ```
 
-**不要先写 assertions**——留到 §5 Step 2 里边跑边起草。
+不要先写 assertions，留到 §5 Step 2 边跑边起草。
 
 ---
 
@@ -343,7 +329,7 @@ Output: feat(auth): implement JWT-based authentication
         └── grading.json
 ```
 
-**不要事先创建全部目录**——边走边建。
+不要事先把所有目录都建好，边走边建。
 
 ### Step 1：同一轮里一起 spawn 所有 runs（with-skill + baseline）
 
@@ -378,7 +364,7 @@ Execute this task:
 }
 ```
 
-**官方纪律**：eval 取**描述性名字**——不要用 `eval-0`，要用能在 benchmark viewer 里一眼看清"这测的是什么"的名字。
+官方硬要求：eval 取描述性名字。不要用 `eval-0`，要用能在 benchmark viewer 里一眼看清"这测的是什么"的名字。
 
 ### Step 2：runs 跑着的同时起草 assertions
 
@@ -386,13 +372,13 @@ Execute this task:
 
 好 assertion 的三条标准：
 
-1. **Objectively verifiable**（客观可验证）
-2. **有描述性的名字**（benchmark viewer 里一眼看清）
-3. **Subjective skills**（写作风格、设计质量）不要硬上 assertion——用定性评估
+1. Objectively verifiable（客观可验证）
+2. 有描述性的名字（benchmark viewer 里一眼看清）
+3. Subjective skills（写作风格、设计质量）不要硬上 assertion，用定性评估
 
 写完 assertions 更新回 `eval_metadata.json` 和 `evals/evals.json`。
 
-### Step 3：run 完成时**立刻**抓 timing data
+### Step 3：run 完成时立刻抓 timing data
 
 官方原话（重要）：
 
@@ -406,7 +392,7 @@ Execute this task:
 }
 ```
 
-**错过通知 = 数据永远拿不到**。每个通知单独处理，不要攒着。
+错过通知就再也拿不到。每个通知单独处理，不要攒着。
 
 ### Step 4：Grade → Aggregate → 启动 Viewer
 
@@ -414,9 +400,9 @@ Execute this task:
 
 Spawn grader subagent（读 `agents/grader.md`）评估每条 assertion。存到每个 run 目录下的 `grading.json`。
 
-官方硬性要求：**`grading.json` 的 `expectations` 数组必须用字段 `text` / `passed` / `evidence`**——不是 `name` / `met` / `details` 或其他变体。viewer 依赖这些字段名。
+官方硬性要求：`grading.json` 的 `expectations` 数组必须用字段 `text` / `passed` / `evidence`，不能换成 `name` / `met` / `details` 或其他变体——viewer 依赖这些字段名。
 
-**能程序化检查的 assertion 写脚本跑**——不要肉眼看。更快、更可靠、可跨 iteration 复用。
+能程序化检查的 assertion 写脚本跑，不要肉眼看：更快、更可靠，能跨 iteration 复用。
 
 #### 4.2 Aggregate
 
@@ -424,11 +410,11 @@ Spawn grader subagent（读 `agents/grader.md`）评估每条 assertion。存到
 python -m scripts.aggregate_benchmark <workspace>/iteration-N --skill-name <name>
 ```
 
-生成 `benchmark.json` + `benchmark.md`——pass_rate / time / tokens per configuration，含 mean ± stddev + delta。**with_skill 排在 baseline 前面**。
+生成 `benchmark.json` + `benchmark.md`——pass_rate / time / tokens per configuration，含 mean ± stddev + delta。with_skill 排在 baseline 前面。
 
 #### 4.3 Analyst pass
 
-读 benchmark 数据，挖**聚合统计可能藏住的模式**：
+读 benchmark 数据，挖那些聚合统计可能藏住的模式：
 
 - 不管用不用 skill 都通过的 assertion（non-discriminating）
 - 高方差的 eval（可能 flaky）
@@ -447,15 +433,15 @@ nohup python <skill-creator-path>/eval-viewer/generate_review.py \
 VIEWER_PID=$!
 ```
 
-**Iteration 2+** 加 `--previous-workspace <workspace>/iteration-<N-1>` 让用户看到历次对比。
+Iteration 2 之后加 `--previous-workspace <workspace>/iteration-<N-1>`，让用户看到历次对比。
 
-**无显示环境**（Cowork 等）用 `--static <output_path>` 生成独立 HTML。
+无显示环境（如 Cowork）用 `--static <output_path>` 生成独立 HTML。
 
-**官方强调**（全大写原话）：
+官方在这里全大写强调：
 
 > GENERATE THE EVAL VIEWER *BEFORE* evaluating inputs yourself. You want to get them in front of the human ASAP!
 
-**先生成 viewer 给人看，再自己开始改 skill**。
+先生成 viewer 给人看，再自己开始改 skill。
 
 ### Step 5：读 `feedback.json`
 
@@ -472,7 +458,7 @@ VIEWER_PID=$!
 }
 ```
 
-**空 feedback = 用户觉得没问题**。集中精力改有具体 complaint 的那几条。
+空 feedback 表示用户觉得没问题。把精力集中到有具体 complaint 的那几条上。
 
 完事后关 viewer：
 
@@ -482,9 +468,9 @@ kill $VIEWER_PID 2>/dev/null
 
 ---
 
-## 6. Improving the skill（4 条核心改进原则）
+## 6. Improving the skill（改进原则）
 
-这是官方"the heart of the loop"——最重要的一节。4 条原则逐条展开：
+官方把这一节叫做 "the heart of the loop"，整套流程里最值得反复看。下面 4 条原则逐条展开。
 
 ### 6.1 Generalize from feedback（不要过拟合测试用例）
 
@@ -492,18 +478,18 @@ kill $VIEWER_PID 2>/dev/null
 
 > ...we're trying to create skills that can be used a million times... across many different prompts. Here you and the user are iterating on only a few examples over and over again because it helps move faster... But if the skill you and the user are codeveloping works only for those examples, it's useless.
 
-**关键**：你只在 3 个测试用例上迭代**是为了加快速度**，但 skill 要能用在**一百万次不同的 prompt** 上。如果改进只对这 3 个例子有效，skill 就没用。
+你只在 3 个测试用例上迭代是为了加快速度，但 skill 要能用在一百万次不同的 prompt 上。如果改进只对这 3 个例子有效，skill 就没用。
 
-**反模式**：
+反模式：
 
 - Fiddly overfitty changes（针对某个测试用例的精修）
 - Oppressively constrictive MUSTs（针对某个失败硬加 MUST）
 
-**正模式**：
+正模式：
 
 > If there's some stubborn issue, you might try branching out and using different metaphors, or recommending different patterns of working. It's relatively cheap to try and maybe you'll land on something great.
 
-遇到顽固问题，试试**换个比喻 / 换个推荐的工作模式**——相对便宜，可能撞出好东西。
+遇到顽固问题，试试换个比喻、换个推荐的工作模式。成本不高，说不定撞出好东西。
 
 ### 6.2 Keep the prompt lean（保持精简）
 
@@ -511,10 +497,10 @@ kill $VIEWER_PID 2>/dev/null
 
 > Remove things that aren't pulling their weight. Make sure to read the transcripts, not just the final outputs — if it looks like the skill is making the model waste a bunch of time doing things that are unproductive, you can try getting rid of the parts of the skill that are making it do that and seeing what happens.
 
-**关键**：
+几个要点：
 
-- **不要只看最终输出，读 transcripts（完整过程）**
-- 看到 model 浪费时间做无用功 → 删掉导致这个的 skill 片段试试
+- 不要只看最终输出，要读 transcripts（完整过程）
+- 看到 model 在浪费时间做无用功，删掉导致这个的 skill 片段试试
 - 删掉没贡献的内容
 
 ### 6.3 Explain the WHY（解释原因）
@@ -523,11 +509,11 @@ kill $VIEWER_PID 2>/dev/null
 
 > Try hard to explain the **why** behind everything you're asking the model to do. Today's LLMs are *smart*. They have good theory of mind and when given a good harness can go beyond rote instructions and really make things happen.
 
-**具体判据（yellow flag）**：
+具体判据（yellow flag）：
 
 > If you find yourself writing ALWAYS or NEVER in all caps, or using super rigid structures, that's a yellow flag — if possible, reframe and explain the reasoning so that the model understands why the thing you're asking for is important.
 
-全大写 ALWAYS / NEVER 或过度刚性结构 = yellow flag，反思能不能改成解释原因。
+全大写 ALWAYS / NEVER、过度刚性的结构都是 yellow flag——反思能不能改成解释原因。
 
 ### 6.4 Look for repeated work across test cases（打包成脚本）
 
@@ -535,11 +521,11 @@ kill $VIEWER_PID 2>/dev/null
 
 > Read the transcripts from the test runs and notice if the subagents all independently wrote similar helper scripts or took the same multi-step approach to something. If all 3 test cases resulted in the subagent writing a `create_docx.py` or a `build_chart.py`, that's a strong signal the skill should bundle that script.
 
-**做法**：
+做法：
 
 - 读所有 test run 的 transcripts
 - 看 subagent 们是不是独立写了相似的 helper script
-- 如果是 → 把脚本**一次性写好放 `scripts/`**，skill 里让 subagent 直接用
+- 如果是，把脚本一次性写好放 `scripts/`，skill 里让 subagent 直接用
 - 省掉每次 invocation 都 reinventing the wheel
 
 ### 6.5 迭代 loop
@@ -557,33 +543,33 @@ kill $VIEWER_PID 2>/dev/null
 
 ## 7. Description Optimization（独立流程，skill 完成后做）
 
-Description 是**唯一**决定 Claude 是否 invoke skill 的机制。skill-creator 为此做了专门的自动化优化流程。
+Description 是 Claude 决定要不要 invoke skill 的唯一依据。skill-creator 为此专门做了一套自动化优化流程。
 
 ### 7.1 Step 1：生成 20 条 trigger eval queries
 
-**数量**：8-10 条 should-trigger + 8-10 条 should-NOT-trigger，总计 20 条。
+数量：8-10 条 should-trigger + 8-10 条 should-NOT-trigger，总共 20 条。
 
-**质量要求**：
+质量要求：
 
 > The queries must be realistic and something a Claude Code or Claude.ai user would actually type. Not abstract requests, but requests that are concrete and specific and have a good amount of detail. For instance, file paths, personal context about the user's job or situation, column names and values, company names, URLs. A little bit of backstory. Some might be in lowercase or contain abbreviations or typos or casual speech.
 
-**好的 query vs 坏的 query**：
+好的 query vs 坏的 query：
 
 坏 ❌：`"Format this data"`, `"Extract text from PDF"`, `"Create a chart"`
 
 好 ✅：`"ok so my boss just sent me this xlsx file (its in my downloads, called something like 'Q4 sales final FINAL v2.xlsx') and she wants me to add a column that shows the profit margin as a percentage. The revenue is in column C and costs are in column D i think"`
 
-**should-trigger 的覆盖策略**：
+should-trigger 的覆盖策略：
 
 > You want different phrasings of the same intent — some formal, some casual. Include cases where the user doesn't explicitly name the skill or file type but clearly needs it. Throw in some uncommon use cases and cases where this skill competes with another but should win.
 
-**should-NOT-trigger 的关键**（易错）：
+should-NOT-trigger 的部分最容易写错：
 
 > The most valuable ones are the near-misses — queries that share keywords or concepts with the skill but actually need something different. Think adjacent domains, ambiguous phrasing where a naive keyword match would trigger but shouldn't, and cases where the query touches on something the skill does but in a context where another tool is more appropriate.
 >
 > The key thing to avoid: don't make should-not-trigger queries obviously irrelevant. "Write a fibonacci function" as a negative test for a PDF skill is too easy — it doesn't test anything. **The negative cases should be genuinely tricky.**
 
-**核心**：should-NOT 要用**近似难辨（near-miss）** 的 query——共享关键词但实际需要别的工具。"写斐波那契函数"当 PDF skill 的负例太蠢，什么都没测到。
+should-NOT 必须用近似难辨（near-miss）的 query：共享关键词但实际需要别的工具。拿"写斐波那契函数"测一个 PDF skill 太蠢，什么都没测到。
 
 存为 JSON：
 
@@ -623,11 +609,11 @@ python -m scripts.run_loop \
 
 关键设计：
 
-- **60/40 train/test split**
-- **每条 query 重复跑 3 次**（控制方差，得到稳定 trigger rate）
-- **Claude with extended thinking** 提改进方案
+- 60/40 train/test split
+- 每条 query 重复跑 3 次（控制方差，得到稳定 trigger rate）
+- Claude with extended thinking 来提改进方案
 - 最多 5 轮
-- **best_description 按 test score（held-out）选，不是 train score**——防 overfitting
+- best_description 按 test score（held-out）选，不是 train score——防 overfitting
 
 ### 7.4 重要认知：How Skill Triggering Works
 
@@ -635,16 +621,16 @@ python -m scripts.run_loop \
 
 > Skills appear in Claude's `available_skills` list with their name + description, and Claude decides whether to consult a skill based on that description. The important thing to know is that **Claude only consults skills for tasks it can't easily handle on its own — simple, one-step queries like "read this PDF" may not trigger a skill even if the description matches perfectly**, because Claude can handle them directly with basic tools. Complex, multi-step, or specialized queries reliably trigger skills when the description matches.
 
-**关键认知**：
+这里有两条经常被忽略：
 
-- **简单一步任务即使 description 完美匹配也不会触发 skill**（Claude 直接处理）
-- **只有多步 / 专业化任务**在 description 匹配时会稳定触发
+- 简单一步的任务即使 description 完美匹配也不会触发 skill（Claude 直接处理）
+- 只有多步、专业化任务在 description 匹配时才会稳定触发
 
-**推论**：
+由此推出：
 
 > This means your eval queries should be substantive enough that Claude would actually benefit from consulting a skill. Simple queries like "read file X" are poor test cases — they won't trigger skills regardless of description quality.
 
-写 eval query 时要让任务**足够 substantive**——"读文件 X" 这类简单 query 无论 description 多好都不会触发，测不出任何东西。
+写 eval query 时要让任务足够 substantive。"读文件 X" 这类简单 query 无论 description 多好都不会触发，测不出任何东西。
 
 ### 7.5 Step 4：应用结果
 
@@ -652,7 +638,7 @@ python -m scripts.run_loop \
 
 ---
 
-## 8. Package（可选收尾）
+## 8. Package（可选）
 
 如果有 `present_files` 工具，打包成 `.skill` 文件给用户安装：
 
@@ -670,7 +656,7 @@ python -m scripts.package_skill <path/to/skill-folder>
 
 > The basic idea is: give two outputs to an independent agent without telling it which is which, and let it judge quality. Then analyze why the winner won.
 
-**可选、需要 subagent、大多数用户不需要**。人工 review loop 通常够用。详情读 `agents/comparator.md` 和 `agents/analyzer.md`。
+可选、需要 subagent，大多数用户用不到。人工 review loop 通常够用。详情读 `agents/comparator.md` 和 `agents/analyzer.md`。
 
 ---
 
@@ -678,23 +664,23 @@ python -m scripts.package_skill <path/to/skill-folder>
 
 ### 10.1 Claude.ai
 
-- **无 subagent** → 测试用例**串行跑**，不能并行
+- 没有 subagent，测试用例只能串行跑，不能并行
 - 每条 test case：自己读 SKILL.md → 按指令执行 test prompt → 一条条做
 - 跳过 baseline runs（不带 skill 那组）
-- **无 browser** → 跳过 viewer，在对话里直接展示结果，文件存到 fs 让用户下载检查
-- **跳过 benchmarking**（没 baseline 对比意义不大）→ 只做定性反馈
-- **跳过 Description Optimization**（要 `claude` CLI，Claude.ai 没有）
-- **跳过 Blind Comparison**（要 subagent）
-- **Packaging 照常**（只要 Python + filesystem）
+- 没有 browser，跳过 viewer，在对话里直接展示结果，文件存到 fs 让用户下载检查
+- 跳过 benchmarking（没 baseline 对比意义不大），只做定性反馈
+- 跳过 Description Optimization（要 `claude` CLI，Claude.ai 没有）
+- 跳过 Blind Comparison（要 subagent）
+- Packaging 照常（只要 Python + filesystem）
 
 ### 10.2 Cowork
 
-- **有 subagent**，主流程照 Claude Code 跑
+- 有 subagent，主流程照 Claude Code 跑
 - 遇超时问题可以串行跑测试
-- **无 display** → viewer 用 `--static <output_path>` 生成独立 HTML，给用户点击链接
-- 官方全大写强调：**GENERATE THE EVAL VIEWER *BEFORE* 自己评估输出**
+- 没有 display，viewer 用 `--static <output_path>` 生成独立 HTML，给用户点击链接
+- 官方全大写强调：GENERATE THE EVAL VIEWER *BEFORE* 自己评估输出
 - Feedback 靠 "Submit All Reviews" 下载 `feedback.json` 文件
-- Description Optimization 能跑（用 `claude -p` 子进程），但**等 skill 完全定型 + 用户同意再做**
+- Description Optimization 能跑（用 `claude -p` 子进程），但等 skill 完全定型、用户同意之后再做
 
 ---
 
@@ -702,22 +688,22 @@ python -m scripts.package_skill <path/to/skill-folder>
 
 摘自 Claude Code 官方 Skills 文档：
 
-### 11.1 Skill **该触发却没触发**
+### 11.1 Skill 该触发却没触发
 
 1. 检查 description 是否包含用户会自然说的关键词
 2. 让 Claude 回答 "What skills are available?" 验证是否被加载
 3. 换种说法重新请求，让它更贴近 description
 4. 如果 user-invocable，直接用 `/skill-name` 调用
 
-### 11.2 Skill **过度触发**
+### 11.2 Skill 过度触发
 
-1. description 写得**更具体**（缩窄触发条件）
+1. description 写得更具体（缩窄触发条件）
 2. 加 `disable-model-invocation: true`（只允许手动触发）
 
-### 11.3 Description **被截断**
+### 11.3 Description 被截断
 
 1. 设 `SLASH_COMMAND_TOOL_CHAR_BUDGET` 环境变量放大预算
-2. 或**关键用例前置**到 1,536 字符以内（description + when_to_use 合计上限）
+2. 或把关键用例前置到 1,536 字符以内（description + when_to_use 合计上限）
 
 ---
 
@@ -741,7 +727,7 @@ python -m scripts.package_skill <path/to/skill-folder>
 
 ## 13. 一句话记住
 
-> **Skill 不是写出来就完的。skill-creator 的核心是 `Draft → Test → Review → Improve → Repeat` 的循环——evals 是循环的燃料，description optimization 是收尾的校准。缺任何一环都是半成品。**
+> Skill 写完只是开始。`Draft → Test → Review → Improve → Repeat` 这个循环才是 skill-creator 的真正主线——evals 推动循环往前走，description optimization 在收尾时校准触发。少了任一环都还是半成品。
 
 ---
 
@@ -753,6 +739,39 @@ python -m scripts.package_skill <path/to/skill-folder>
   - [skill-creator SKILL.md](https://github.com/anthropics/skills/blob/main/skills/skill-creator/SKILL.md) —— 本文的主要依据
   - [Agent Skills 开放标准](https://agentskills.io)
 
-- **本仓库内姐妹文档**：
-  - [skill-开发通用流程.md](skill-开发通用流程.md) —— 作者基于 kdev-memory 的实战补充（含 hook 分层 / 严格度 opt-in / 依赖最小化等官方没讲的工程经验）
-  - [kdev-memory-开发历程技术分享.md](../skills/kdev-memory/开发历程.md) —— 一个真实 skill 项目的 10 天迭代故事
+
+---
+
+## 附录 A：详细流程图
+
+把每个阶段在做什么、产出什么、要追问什么都画在一张图里。信息密度高，平时不用看；有人想一眼摸清全貌时再翻这里。
+
+```mermaid
+flowchart TD
+    subgraph IntentBlock["<b>§1 想清楚要做个啥 skill</b>　先翻对话历史找线索，缺什么再问用户"]
+        direction LR
+        Q1["① 这个 skill 让 Claude<br/>具体能做什么？<br/>（用动词开头，具体可测）"] ~~~ Q2["② 用户说什么话<br/>该让这个 skill 上场？<br/>（短语 / 上下文）"] ~~~ Q3["③ 期望输出长什么样？<br/>（文件 / 数据 / 解释性文字）"] ~~~ Q4["④ 要不要搭测试用例？<br/>（客观可验证才需要）"]
+    end
+
+    Interview["<b>§2 向用户问清细节</b><br/>问 5 件事：边界情况 / 输入输出格式 /<br/>能给个示例吗 / 怎么算做对了 / 依赖什么工具<br/>顺手查一下有没有同类 skill 可参考"]
+    Write["<b>§3 写 SKILL.md 初稿</b><br/>三件套：name / description / 正文<br/>按 Progressive Disclosure 三级渐进加载组织"]
+    Tests["<b>§4 准备测试用例</b><br/>2-3 条真实用户会说的 prompt<br/>存到 evals/evals.json"]
+    Run["<b>§5 跑测试看结果（5 步连续，中途别停）</b><br/>① 同一轮里 spawn 所有 run（含 baseline）<br/>② 等结果时同步起草 assertion<br/>③ 收到完成通知立刻存 timing.json<br/>④ 评分 → 聚合 → 启动 viewer<br/>⑤ 读用户提交的 feedback.json"]
+    Improve["<b>§6 按结果改 skill（4 条原则）</b><br/>从反馈里泛化 / 保持精简 /<br/>解释为什么 / 把重复工作打包成脚本"]
+    DescOpt["<b>§7 调 description 让触发更准</b><br/>生成 20 条 trigger query<br/>跑最多 5 轮自动 iteration<br/>按 held-out test score 选最优"]
+    Package["<b>§8 打包发给用户</b><br/>生成 .skill 文件分发"]
+
+    IntentBlock --> Interview --> Write --> Tests --> Run --> Improve
+    Improve --> Happy{"用户说满意 / feedback 都没意见 /<br/>改来改去也没明显进步？"}
+    Happy -->|否| Run
+    Happy -->|是| DescOpt
+    DescOpt --> Package
+
+    classDef phase fill:#e8f4f8,stroke:#2d7fa1,stroke-width:2px
+    classDef decision fill:#fff4dd,stroke:#c98400,stroke-width:2px
+    classDef question fill:#fdf6e3,stroke:#a07a3a,stroke-width:1px
+    class Interview,Write,Tests,Run,Improve,DescOpt,Package phase
+    class Happy decision
+    class Q1,Q2,Q3,Q4 question
+    style IntentBlock fill:#fffaf0,stroke:#a07a3a,stroke-width:2px
+```
