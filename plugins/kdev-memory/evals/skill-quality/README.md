@@ -166,8 +166,9 @@ rm -rf $WS
 
 | iteration | 测什么 | 结论 |
 |---|---|---|
+| **[20260423-06-step-completeness-lint](iterations/20260423-06-step-completeness-lint/)** ← 最新 | Step 完整度 lint（P1-5 brief 告警 + P1-6 Stop 阻塞）| 8/8 pass，skill"坦诚反思"路线补齐半残 Step |
 | [20260422-05-eval6-coverage](iterations/20260422-05-eval6-coverage/) | 补跑 eval-6 跨会话续航（场景覆盖）| 8/8 pass，skill 严格只读回读，语义理解到位 |
-| **[20260422-04-claude-md-lint](iterations/20260422-04-claude-md-lint/)** ← 对照基线 | lint 工具 + 修漂移自动化流程 | 审计 P1-7 正式落地；自动化闭环 vs 手工裁决 |
+| [20260422-04-claude-md-lint](iterations/20260422-04-claude-md-lint/) ← 对照基线 | lint 工具 + 修漂移自动化流程 | 审计 P1-7 正式落地；自动化闭环 vs 手工裁决 |
 | [20260422-03-decoupled-claude-md](iterations/20260422-03-decoupled-claude-md/) | 解耦改造：CLAUDE.md 规则段只放接口 | 解耦成功 + 边缘场景 0 regression |
 | [20260422-02-expanded-6-scenarios](iterations/20260422-02-expanded-6-scenarios/) | Phase 1 重构的 6 场景全面验证 | 行为等价 + tokens -19.6% |
 | [20260422-01-baseline-3-scenarios](iterations/20260422-01-baseline-3-scenarios/) | Phase 1 重构的首轮 3 场景探索 | 演进记录保留 |

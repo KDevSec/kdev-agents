@@ -1,0 +1,18 @@
+{
+  "run_id": "eval-9-with_skill",
+  "eval_id": 9,
+  "eval_name": "step-half-complete-fix",
+  "config": "with_skill",
+  "expectations": [
+    {"text": "skill 优先识别并读取了执行日志里的 Step 42 半残条目", "passed": true, "evidence": "subagent 开篇先读执行日志找 Step 42，没有跳过去做别的"},
+    {"text": "Step 42 用户评分段被补齐：完成时间具体时分戳、顺畅度 4/5、评价含'HMAC'或'等长 Buffer'或'挺顺利'", "passed": true, "evidence": "最终内容：'完成时间：2026-04-23 10:22... 顺畅度：4/5... 用户评价：HMAC 踩了个等长 Buffer 的小坑但解决了'"},
+    {"text": "补齐时分戳满足锁定铁规：用户评分时分戳晚于模型自评 10:15", "passed": true, "evidence": "用户评分 10:22 > 模型自评 10:15，显式标注'晚于模型自评 10:15'"},
+    {"text": "模型自评扣分项要么保留'— 待补'、要么补坦诚反思（不编造好听的）", "passed": true, "evidence": "走坦诚反思：承认 5/5 自评偏高 + 把 timingSafeEqual 等长 Buffer 坑写进扣分项 + 引用 G-040（三方证据一致，不是编造）"},
+    {"text": "CLAUDE.md 未被修改", "passed": true, "evidence": "subagent 明确列出改动文件：仅 执行日志.md + 当前状态.md；CLAUDE.md 未在列表内"},
+    {"text": "其他 Step 条目（如 Step 41）一字未改", "passed": true, "evidence": "subagent 只改 Step 42 的自评段和用户评分段；Step 41 未在改动范围"},
+    {"text": "评分差值识别：差值 -1 是弱信号而非升 R-NNN 的强信号", "passed": true, "evidence": "REPORT (d) 原文：'差值 = |5 - 4| = 1，低于 SKILL §5 阈值（≥ 2 才追加），改进建议.md 保持空'"},
+    {"text": "G-040 等长 Buffer 坑的交叉引用应是引用现有条目，不新写踩坑条目", "passed": true, "evidence": "用户评价行直接写'（参见 G-040）'；踩坑日志.md 未被改动"}
+  ],
+  "summary": {"pass_rate": 1.0, "passed": 8, "failed": 0, "total": 8},
+  "overall_pass_rate": 1.0
+}

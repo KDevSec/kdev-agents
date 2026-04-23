@@ -89,6 +89,34 @@ if [ -n "$ARCHIVE_HINTS" ]; then
   REMINDERS="${REMINDERS}[kdev-memory] 📦 主文件已跨越归档边界，建议调用 kdev-memory skill 切档（将老条目迁到归档文件，主文件只留当前月/当前季）：\n${ARCHIVE_HINTS}\n切档步骤见 SKILL.md 的「文件切档与归档」章节。改进建议.md 不切档。\n"
 fi
 
+# 7. Step 完整度扫描（P1-6 落地）—— 今日新增 Step 但字段半残 → 软提醒
+# 占位变量：strict 模式阻塞段会用
+STEP_TODAY_HALF_COMPLETE=0
+STEP_LINT_LIB="$SCRIPT_DIR/lib/step_completeness.py"
+if [ -f "$KDEV_DIR/执行日志.md" ] && [ -f "$STEP_LINT_LIB" ] && command -v python3 >/dev/null 2>&1; then
+  STEP_RESULT=$(KDEV_STEP_LIB="$STEP_LINT_LIB" python3 - "$KDEV_DIR/执行日志.md" "$TODAY" 2>/dev/null <<'PYEOF'
+import sys, os, importlib.util
+from pathlib import Path
+lib = Path(os.environ["KDEV_STEP_LIB"])
+spec = importlib.util.spec_from_file_location("step_completeness", lib)
+mod = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(mod)
+result = mod.run_check(Path(sys.argv[1]), sys.argv[2])
+result["_today_iso"] = sys.argv[2]
+hint = mod.format_hint_for_stop(result)
+# 双输出：count + hint text（用 "|SEP|" 分隔避免 newline 冲突）
+print(f"{result.get('today_half_complete', 0)}|SEP|{hint or ''}")
+PYEOF
+)
+  if [ -n "$STEP_RESULT" ] && echo "$STEP_RESULT" | grep -q "|SEP|"; then
+    STEP_TODAY_HALF_COMPLETE="${STEP_RESULT%%|SEP|*}"
+    STEP_HINT_TEXT="${STEP_RESULT#*|SEP|}"
+    if [ -n "$STEP_HINT_TEXT" ]; then
+      REMINDERS="${REMINDERS}${STEP_HINT_TEXT}\n"
+    fi
+  fi
+fi
+
 # -------- 严格模式：条件性阻塞（exit 2） --------
 # 仅当项目显式 touch .kdev/strict 才启用；已在 stop_hook_active 下就跳过，避免无限循环
 if [ "$STOP_HOOK_ACTIVE" = "false" ] && [ -f "$KDEV_DIR/strict" ] && [ "$LOG_EMPTY_TODAY" = "true" ]; then
@@ -138,6 +166,18 @@ if [ "$STOP_HOOK_ACTIVE" = "false" ] && [ -f "$KDEV_DIR/strict" ] && [ "$LOG_EMP
       fi
     fi
   fi
+fi
+
+# -------- 严格模式（Step 完整度）：今日半残 Step 阻塞 --------
+# 单独判定：即使执行日志今天有条目（上一段不 block），但如果那些条目半残
+# （用户评分空 / 扣分项空），strict 模式下也要 exit 2——补齐字段后才能结束
+if [ "$STOP_HOOK_ACTIVE" = "false" ] && [ -f "$KDEV_DIR/strict" ] && [ "$STEP_TODAY_HALF_COMPLETE" -gt 0 ] 2>/dev/null; then
+  {
+    echo "[kdev-memory/strict] 今日新增 $STEP_TODAY_HALF_COMPLETE 条 Step 但字段半残（用户评分段时分戳空 / 扣分项空 等）。"
+    echo "请当场采集用户评分 + 补扣分项，再结束本轮。长期漂移用 R-NNN 改进建议记录。"
+    echo "如需临时关闭严格模式：rm .kdev/memory/strict"
+  } >&2
+  exit 2
 fi
 
 # 有提醒则输出，无则静默

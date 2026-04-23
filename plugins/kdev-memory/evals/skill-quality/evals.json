@@ -150,6 +150,23 @@
       ]
     },
     {
+      "id": 9,
+      "name": "step-half-complete-fix",
+      "category": "hook-interaction",
+      "prompt": "新会话进入项目。SessionStart hook 的 <kdev-memory-brief> 里有 ⚠️ 提示：'发现 1 条欠评 / 半残 Step（最近 2 条中）：Step 42（2026-04-23）: 用户评分段「完成时间」为 '—'；用户评分段「顺畅度」为 '—/5'。新会话第一件事：向用户核对评分后补齐，或明确销账'。用户说'对的，那个 Step 42 的评分我现在补上，Webhook 签名验证挺顺利的，打 4 分，一句话评价：HMAC 踩了个等长 Buffer 的小坑但解决了'。请按 kdev-memory skill 流程：(1) 读 brief 指出的半残 Step 42 条目；(2) 把用户评分段的时分戳、顺畅度、一句话评价补齐；(3) 顺便检查模型自评段的「扣分项：— 待补」是否也应该补（模型自评不是用户回答范围，如果模型回忆不出真实扣分项应保持'待补'或补一个坦诚的反思）；(4) 保留 G-040（踩坑日志里的等长 Buffer 坑）的交叉引用。完成后汇报：(a) Step 42 用户评分段的最终内容；(b) 模型自评段扣分项是否补了、如何处理；(c) 执行日志之外的文件是否被改（如当前状态.md）；(d) 是否生成了 R-NNN（评分差值分析）。",
+      "fixture": "eval-9-step-half-complete/target-project/",
+      "assertions": [
+        {"text": "skill 优先识别并读取了执行日志里的 Step 42 半残条目（不是跳过去做别的事）"},
+        {"text": "Step 42 用户评分段被补齐：完成时间填了具体时分戳（不再是 —）、顺畅度填 4/5、用户评价含 'HMAC' 或 '等长 Buffer' 或 '挺顺利'"},
+        {"text": "补齐时分戳时满足「锁定铁规」：用户评分时分戳晚于模型自评时分戳（即晚于 10:15）"},
+        {"text": "模型自评段的扣分项要么保留 '— 待补' 并解释、要么补一条坦诚反思（不编造好听的）"},
+        {"text": "CLAUDE.md 未被修改（skill 只动 .kdev/memory/ 下文件）"},
+        {"text": "其他 Step 条目（如 Step 41）一字未改"},
+        {"text": "评分差值分析：差值 ≤ 1（模型 5 / 用户 4，差值 -1，弱信号），REPORT 应识别这是弱信号而非升 R-NNN 的强信号"},
+        {"text": "如果 REPORT 提 G-040 / 等长 Buffer 坑的交叉引用，应是'之前已记录于 G-040'的引用，不新写一份踩坑条目"}
+      ]
+    },
+    {
       "id": 8,
       "name": "claude-md-drift-fix",
       "category": "hook-interaction",

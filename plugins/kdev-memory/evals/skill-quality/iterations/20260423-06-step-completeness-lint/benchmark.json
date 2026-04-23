@@ -1,0 +1,101 @@
+{
+  "metadata": {
+    "skill_name": "kdev-memory",
+    "skill_path": "<path/to/skill>",
+    "executor_model": "<model-name>",
+    "analyzer_model": "<model-name>",
+    "timestamp": "2026-04-23T01:31:55Z",
+    "evals_run": [
+      9
+    ],
+    "runs_per_configuration": 3
+  },
+  "runs": [
+    {
+      "eval_id": 9,
+      "configuration": "with_skill",
+      "run_number": 1,
+      "result": {
+        "pass_rate": 1.0,
+        "passed": 8,
+        "failed": 0,
+        "total": 8,
+        "time_seconds": 143.3,
+        "tokens": 44591,
+        "tool_calls": 0,
+        "errors": 0
+      },
+      "expectations": [
+        {
+          "text": "skill \u4f18\u5148\u8bc6\u522b\u5e76\u8bfb\u53d6\u4e86\u6267\u884c\u65e5\u5fd7\u91cc\u7684 Step 42 \u534a\u6b8b\u6761\u76ee",
+          "passed": true,
+          "evidence": "subagent \u5f00\u7bc7\u5148\u8bfb\u6267\u884c\u65e5\u5fd7\u627e Step 42\uff0c\u6ca1\u6709\u8df3\u8fc7\u53bb\u505a\u522b\u7684"
+        },
+        {
+          "text": "Step 42 \u7528\u6237\u8bc4\u5206\u6bb5\u88ab\u8865\u9f50\uff1a\u5b8c\u6210\u65f6\u95f4\u5177\u4f53\u65f6\u5206\u6233\u3001\u987a\u7545\u5ea6 4/5\u3001\u8bc4\u4ef7\u542b'HMAC'\u6216'\u7b49\u957f Buffer'\u6216'\u633a\u987a\u5229'",
+          "passed": true,
+          "evidence": "\u6700\u7ec8\u5185\u5bb9\uff1a'\u5b8c\u6210\u65f6\u95f4\uff1a2026-04-23 10:22... \u987a\u7545\u5ea6\uff1a4/5... \u7528\u6237\u8bc4\u4ef7\uff1aHMAC \u8e29\u4e86\u4e2a\u7b49\u957f Buffer \u7684\u5c0f\u5751\u4f46\u89e3\u51b3\u4e86'"
+        },
+        {
+          "text": "\u8865\u9f50\u65f6\u5206\u6233\u6ee1\u8db3\u9501\u5b9a\u94c1\u89c4\uff1a\u7528\u6237\u8bc4\u5206\u65f6\u5206\u6233\u665a\u4e8e\u6a21\u578b\u81ea\u8bc4 10:15",
+          "passed": true,
+          "evidence": "\u7528\u6237\u8bc4\u5206 10:22 > \u6a21\u578b\u81ea\u8bc4 10:15\uff0c\u663e\u5f0f\u6807\u6ce8'\u665a\u4e8e\u6a21\u578b\u81ea\u8bc4 10:15'"
+        },
+        {
+          "text": "\u6a21\u578b\u81ea\u8bc4\u6263\u5206\u9879\u8981\u4e48\u4fdd\u7559'\u2014 \u5f85\u8865'\u3001\u8981\u4e48\u8865\u5766\u8bda\u53cd\u601d\uff08\u4e0d\u7f16\u9020\u597d\u542c\u7684\uff09",
+          "passed": true,
+          "evidence": "\u8d70\u5766\u8bda\u53cd\u601d\uff1a\u627f\u8ba4 5/5 \u81ea\u8bc4\u504f\u9ad8 + \u628a timingSafeEqual \u7b49\u957f Buffer \u5751\u5199\u8fdb\u6263\u5206\u9879 + \u5f15\u7528 G-040\uff08\u4e09\u65b9\u8bc1\u636e\u4e00\u81f4\uff0c\u4e0d\u662f\u7f16\u9020\uff09"
+        },
+        {
+          "text": "CLAUDE.md \u672a\u88ab\u4fee\u6539",
+          "passed": true,
+          "evidence": "subagent \u660e\u786e\u5217\u51fa\u6539\u52a8\u6587\u4ef6\uff1a\u4ec5 \u6267\u884c\u65e5\u5fd7.md + \u5f53\u524d\u72b6\u6001.md\uff1bCLAUDE.md \u672a\u5728\u5217\u8868\u5185"
+        },
+        {
+          "text": "\u5176\u4ed6 Step \u6761\u76ee\uff08\u5982 Step 41\uff09\u4e00\u5b57\u672a\u6539",
+          "passed": true,
+          "evidence": "subagent \u53ea\u6539 Step 42 \u7684\u81ea\u8bc4\u6bb5\u548c\u7528\u6237\u8bc4\u5206\u6bb5\uff1bStep 41 \u672a\u5728\u6539\u52a8\u8303\u56f4"
+        },
+        {
+          "text": "\u8bc4\u5206\u5dee\u503c\u8bc6\u522b\uff1a\u5dee\u503c -1 \u662f\u5f31\u4fe1\u53f7\u800c\u975e\u5347 R-NNN \u7684\u5f3a\u4fe1\u53f7",
+          "passed": true,
+          "evidence": "REPORT (d) \u539f\u6587\uff1a'\u5dee\u503c = |5 - 4| = 1\uff0c\u4f4e\u4e8e SKILL \u00a75 \u9608\u503c\uff08\u2265 2 \u624d\u8ffd\u52a0\uff09\uff0c\u6539\u8fdb\u5efa\u8bae.md \u4fdd\u6301\u7a7a'"
+        },
+        {
+          "text": "G-040 \u7b49\u957f Buffer \u5751\u7684\u4ea4\u53c9\u5f15\u7528\u5e94\u662f\u5f15\u7528\u73b0\u6709\u6761\u76ee\uff0c\u4e0d\u65b0\u5199\u8e29\u5751\u6761\u76ee",
+          "passed": true,
+          "evidence": "\u7528\u6237\u8bc4\u4ef7\u884c\u76f4\u63a5\u5199'\uff08\u53c2\u89c1 G-040\uff09'\uff1b\u8e29\u5751\u65e5\u5fd7.md \u672a\u88ab\u6539\u52a8"
+        }
+      ],
+      "notes": []
+    }
+  ],
+  "run_summary": {
+    "with_skill": {
+      "pass_rate": {
+        "mean": 1.0,
+        "stddev": 0.0,
+        "min": 1.0,
+        "max": 1.0
+      },
+      "time_seconds": {
+        "mean": 143.3,
+        "stddev": 0.0,
+        "min": 143.3,
+        "max": 143.3
+      },
+      "tokens": {
+        "mean": 44591.0,
+        "stddev": 0.0,
+        "min": 44591,
+        "max": 44591
+      }
+    },
+    "delta": {
+      "pass_rate": "+1.00",
+      "time_seconds": "+143.3",
+      "tokens": "+44591"
+    }
+  },
+  "notes": []
+}
