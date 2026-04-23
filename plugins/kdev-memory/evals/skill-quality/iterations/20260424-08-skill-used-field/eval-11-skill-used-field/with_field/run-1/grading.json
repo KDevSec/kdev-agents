@@ -1,0 +1,31 @@
+{
+  "config": "with_field",
+  "skill_version": "v0.6.0 candidate (HEAD + references §3/§7 扩展 + SKILL.md 2-3 行 anchor)",
+  "eval_id": 11,
+  "eval_name": "skill-used-field",
+  "run": 1,
+  "grader": "inline-manual (main session review of subagent REPORT text)",
+  "pass_count": 11,
+  "partial_count": 0,
+  "fail_count": 0,
+  "total": 11,
+  "pass_rate": "11/11 (100%)",
+  "assertions": [
+    {"id": 1, "status": "pass", "note": "执行事实段含 `使用的 skill：[bmad-create-architecture, subagent-driven]`，JSON 数组格式"},
+    {"id": 2, "status": "pass", "note": "skill 名在执行事实段，未散落到「执行」叙述段或用户评价"},
+    {"id": 3, "status": "pass", "note": "Step 53 含 `使用的 skill：N/A（纯对话驱动 / 目录整理，模型全程未触发任一 skill）`，清晰区分 N/A 和「无」语义"},
+    {"id": 4, "status": "pass", "note": "Step 53 未编造 skill 名"},
+    {"id": 5, "status": "pass", "note": "Step 52 用户评分段：11:15 / 4/5 / 评价含'接口对齐'"},
+    {"id": 6, "status": "pass", "note": "11:15 > 10:30，锁定铁规满足"},
+    {"id": 7, "status": "pass", "note": "Step 53 四段完整，执行事实段 5 字段齐全（含 使用的 skill）"},
+    {"id": 8, "status": "pass", "note": "Step 52 和 53 各自独立"},
+    {"id": 9, "status": "pass", "note": "current_step: 52 → 53"},
+    {"id": 10, "status": "pass", "note": "body 清除并重写为最新状态"},
+    {"id": 11, "status": "pass", "note": "弱信号聚合不编号；G-050 交叉引用"}
+  ],
+  "bonus_findings": [
+    "subagent 主动标注了'补录感受褪色'风险：\"本 Step 用户评分属补录，感受已有一定褪色，评分绝对值可信度略低于实时采集\"——超预期的诚信输出",
+    "subagent 准确区分了 N/A（任务天然不需要 skill）vs 无（异常信号），引用 reference §3 字段语义定义"
+  ],
+  "key_finding": "with_field 11/11 全过。字段加入后 skill 行为达到设计预期：结构化落盘 skill 信号，N/A 规则被正确执行，跨 Step 聚合分析能力在字段层面获得支持。"
+}

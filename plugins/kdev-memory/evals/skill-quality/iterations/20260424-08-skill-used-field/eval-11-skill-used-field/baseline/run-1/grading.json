@@ -1,0 +1,27 @@
+{
+  "config": "baseline",
+  "skill_version": "v0.5.1 (HEAD pre-bump)",
+  "eval_id": 11,
+  "eval_name": "skill-used-field",
+  "run": 1,
+  "grader": "inline-manual (main session review of subagent REPORT text)",
+  "pass_count": 7,
+  "partial_count": 1,
+  "fail_count": 3,
+  "total": 11,
+  "pass_rate": "7/11 (≈64%)",
+  "assertions": [
+    {"id": 1, "status": "fail", "note": "baseline schema 无「使用的 skill」字段 → skill 名被塞进「执行」自由文本段（'用 bmad-create-architecture 出架构草案 + 用 subagent-driven 起了 3 个并行 subagent 实现'）。结构化查询视角不可见。"},
+    {"id": 2, "status": "fail", "note": "skill 名散落到叙述段（'执行'段），执行事实段没有独立字段——subagent 自己也承认这是局限：'想聚合分析哪些 Step 没用 skill / 哪些 skill 最高频时只能全文扫描'"},
+    {"id": 3, "status": "fail", "note": "Step 53 执行事实段仅 4 字段；N/A 信息表达为「执行」段的自由文本『纯对话驱动，全程未触发任何 skill』，无结构化字段"},
+    {"id": 4, "status": "pass", "note": "忠实记录'未触发任何 skill'，未编造 skill 名"},
+    {"id": 5, "status": "pass", "note": "Step 52 用户评分段：10:45 / 4/5 / 评价含'接口对齐'"},
+    {"id": 6, "status": "pass", "note": "10:45 > 10:30，锁定铁规满足"},
+    {"id": 7, "status": "partial", "note": "Step 53 四段完整但执行事实段仅 4 字段（baseline schema 本就 4 字段，非 subagent 失误——是 schema 层面的缺口）"},
+    {"id": 8, "status": "pass", "note": "Step 52 和 53 各自独立，未拆分也未合并"},
+    {"id": 9, "status": "pass", "note": "current_step: 52 → 53"},
+    {"id": 10, "status": "pass", "note": "body 清除'用户评分字段半残'表述"},
+    {"id": 11, "status": "pass", "note": "弱信号聚合到改进建议.md，未编号；G-050 交叉引用，未新写踩坑条目"}
+  ],
+  "key_finding": "baseline schema 层面就缺少「使用的 skill」字段 → skill 行为没问题（忠实遵循它看到的 schema），但信息降级为自由文本 → 跨 Step 聚合分析能力丧失。subagent 自评出这个局限。"
+}

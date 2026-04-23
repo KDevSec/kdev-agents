@@ -1,0 +1,23 @@
+{
+  "id": 11,
+  "name": "skill-used-field",
+  "category": "hook-interaction",
+  "iteration": "20260424-08-skill-used-field",
+  "frozen_at": "2026-04-24",
+  "note": "冻结快照——本轮跑测时的 assertions，对应 evals.json 顶层 id=11。未来 assertions 演进后 evals.json 会更新，此文件保持不变便于追溯。",
+  "prompt_hash_summary": "新会话补齐 Step 52（含 bmad-create-architecture + subagent-driven skill 使用）+ 新建 Step 53（纯对话驱动 / skill N/A）",
+  "fixture": "eval-11-skill-used-field/target-project/",
+  "assertions": [
+    {"text": "Step 52 执行事实段含「使用的 skill」字段，取值为列表含 bmad-create-architecture 和 subagent-driven 两项（不管是 JSON 数组 [x, y] 还是 YAML 多行格式都算）"},
+    {"text": "Step 52 的 skill 名没有被塞进「执行」段或「用户评价」自由文本里而遗漏结构化字段——执行事实段必须有独立字段"},
+    {"text": "Step 53 执行事实段含「使用的 skill」字段，取值为 N/A（对话驱动） 或 无 或 N/A（skill 识别出此 Step 未触发任何 skill）"},
+    {"text": "Step 53 没有编造 skill 名（不能填 bmad-* 或 subagent-*——用户明确说没触发 skill）"},
+    {"text": "Step 52 用户评分段被补齐：完成时间填了具体时分戳（不再是 —）、顺畅度填 4/5、用户评价含「架构」或「subagent」或「接口对齐」"},
+    {"text": "Step 52 补齐时分戳满足锁定铁规：用户评分时分戳晚于模型自评时分戳 10:30"},
+    {"text": "Step 53 作为独立 Step 条目加入执行日志.md（triggers + 四段完整：执行事实含全部 5 个字段 / 模型自评 / 用户评分 / 评分差异分析）"},
+    {"text": "Step 52 和 Step 53 都被视为一个完整 Step 单元（不被拆成更细或合并成一条）——验证粒度判断符合「自然停顿点」原则"},
+    {"text": "当前状态.md frontmatter current_step 更新为 53"},
+    {"text": "当前状态.md body 的「字段半残」表述被清空或改写为最新状态"},
+    {"text": "没有编造新的 G-NNN / Q-NNN / R-NNN（只建 Step 52 补齐 + Step 53 新建；G-050 交叉引用是 OK 的，新写踩坑条目不行）"}
+  ]
+}

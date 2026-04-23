@@ -1,0 +1,8 @@
+{
+  "config": "baseline",
+  "total_tokens": 50116,
+  "tool_uses": 18,
+  "duration_ms": 133368,
+  "duration_human": "~2m 13s",
+  "note": "subagent 无法直接写 REPORT.md（工具策略拦截），以 text 返回完整报告内容"
+}

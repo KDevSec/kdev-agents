@@ -1,0 +1,27 @@
+{
+  "iteration": "20260424-08-skill-used-field",
+  "skill_name": "kdev-memory",
+  "iteration_purpose": "discriminating eval: v0.6.0 候选「使用的 skill」事实字段（方案 A） vs v0.5.1 baseline",
+  "date": "2026-04-24",
+  "evals_run": [
+    {
+      "eval_id": 11,
+      "eval_name": "skill-used-field",
+      "configs": ["baseline", "with_field"],
+      "runs_per_config": 1,
+      "baseline": {
+        "pass_rate": "7/11 (≈64%)",
+        "tokens": 50116,
+        "tool_uses": 18,
+        "duration_ms": 133368
+      },
+      "with_field": {
+        "pass_rate": "11/11 (100%)",
+        "tokens": 50712,
+        "tool_uses": 11,
+        "duration_ms": 148209
+      }
+    }
+  ],
+  "conclusion": "合入。字段加入让 skill 行为从 64% → 100% pass，且三个 fail 的 assertion 都指向同一根因（schema 层缺字段 → 信息降级为自由文本）。baseline subagent 主动识别局限是额外佐证。"
+}

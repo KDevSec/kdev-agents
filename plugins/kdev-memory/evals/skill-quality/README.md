@@ -18,7 +18,7 @@
 | 改 hook 脚本（trigger-match / sanitize 等） | **不用跑这条线**，用 `../evals.json` 那条 |
 | 改 .kdev/memory/ 文件格式 | 跑（会影响 Claude 写入的产物） |
 
-## 当前场景覆盖（8 个）
+## 当前场景覆盖（10 个）
 
 | # | 名字 | 场景类型 | 覆盖的 skill description 触发词 |
 |---|---|---|---|
@@ -30,6 +30,9 @@
 | 5 | missing-data | edge-case | 当天 .kdev/memory/ 无条目时的坦白报告 |
 | 6 | cross-session-resume | core-flow | "昨天做到哪了 / 继续上次的工作 / 恢复上下文" |
 | 7 | warn-file | hook-interaction | 处理 SessionEnd hook 留下的 WARN-未记录-*.md |
+| 8 | claude-md-drift-fix | hook-interaction | "修 CLAUDE.md 漂移 / 接口漂移 / claude.md 对齐 skill" |
+| 9 | step-half-complete-fix | hook-interaction | SessionStart brief ⚠️ 欠评 Step 的补齐流程 |
+| 11 | skill-used-field | hook-interaction | Step 执行事实段「使用的 skill」字段 + N/A 语义（v0.6.0）|
 
 **未覆盖**（skill description 里提到但暂不测的）：
 - `<kdev-memory-recall>` / `<kdev-memory-brief>` 注入的处理 —— 需要模拟 hook 注入的上下文，subagent harness 做不到
@@ -166,7 +169,8 @@ rm -rf $WS
 
 | iteration | 测什么 | 结论 |
 |---|---|---|
-| **[20260423-07-p0-1-discriminating](iterations/20260423-07-p0-1-discriminating/)** ← 最新 | P0-1 Step 完成闸门是否必要？discriminating eval | **结论反转：应当加**——虽然行为一致，但每次省 ~11.6k tokens，+22 行文档的一次性成本 ≤ 每次触发的长期收益；已合入 SKILL.md |
+| **[20260424-08-skill-used-field](iterations/20260424-08-skill-used-field/)** ← 最新 | v0.6.0 候选：Step 事实层加「使用的 skill」+ 粒度指引 discriminating | **合入**——with_field 11/11 vs baseline 7/11；behavior 质量提升（非成本下降），一次性 SKILL.md +1 行 / references +44 行 换字段结构化 + 跨 Step 聚合能力 |
+| [20260423-07-p0-1-discriminating](iterations/20260423-07-p0-1-discriminating/) | P0-1 Step 完成闸门是否必要？discriminating eval | **结论反转：应当加**——虽然行为一致，但每次省 ~11.6k tokens，+22 行文档的一次性成本 ≤ 每次触发的长期收益；已合入 SKILL.md |
 | [20260423-06-step-completeness-lint](iterations/20260423-06-step-completeness-lint/) | Step 完整度 lint（P1-5 brief 告警 + P1-6 Stop 阻塞）| 8/8 pass，skill"坦诚反思"路线补齐半残 Step |
 | [20260422-05-eval6-coverage](iterations/20260422-05-eval6-coverage/) | 补跑 eval-6 跨会话续航（场景覆盖）| 8/8 pass，skill 严格只读回读，语义理解到位 |
 | [20260422-04-claude-md-lint](iterations/20260422-04-claude-md-lint/) ← 对照基线 | lint 工具 + 修漂移自动化流程 | 审计 P1-7 正式落地；自动化闭环 vs 手工裁决 |

@@ -182,6 +182,26 @@
         {"text": "REPORT 列出了完整的 diff（或等价的 before/after 对比），展示了最小化修改"},
         {"text": "skill 没有一次性整段重写规则段（Edit 的 before/after 应仅含新增行 + 附近上下文）"}
       ]
+    },
+    {
+      "id": 11,
+      "name": "skill-used-field",
+      "category": "hook-interaction",
+      "prompt": "新会话。SessionStart brief ⚠️ 提示 Step 52 用户评分段半残。用户说：'Step 52 我补一下评分：用了 bmad-create-architecture 出架构草案 + subagent-driven 起了 3 个并行子代理跑实现。整个 phase 约 45 分钟，顺畅度 4，评价：架构拆得干净但 subagent 串联时接口对齐花了点时间（坑已记 G-050）。另外顺手把刚才做的整理也补一条：Step 53——我手动整理了 .kdev/memory/ 目录层级（只是 ls/mv，纯对话驱动，全程没触发任何 skill），约 10 分钟，工具调用 8 次，0 报错，顺畅度 5，评价：纯体力活但必要。' 请按 kdev-memory skill 流程：(1) 补齐 Step 52 用户评分段；(2) 在 Step 52 执行事实段补「使用的 skill」字段；(3) 新建 Step 53 完整四段（含「使用的 skill」字段）；(4) 更新当前状态.md 的 current_step=53 + 清空 body 里的「半残」表述；(5) 做评分差异分析。完成后汇报：(a) Step 52 执行事实段和用户评分段的最终内容；(b) Step 53 执行事实段的「使用的 skill」字段填了什么；(c) 当前状态.md 的变化。",
+      "fixture": "eval-11-skill-used-field/target-project/",
+      "assertions": [
+        {"text": "Step 52 执行事实段含「使用的 skill」字段，取值为列表含 bmad-create-architecture 和 subagent-driven 两项（不管是 JSON 数组 [x, y] 还是 YAML 多行格式都算）"},
+        {"text": "Step 52 的 skill 名没有被塞进「执行」段或「用户评价」自由文本里而遗漏结构化字段——执行事实段必须有独立字段"},
+        {"text": "Step 53 执行事实段含「使用的 skill」字段，取值为 N/A（对话驱动） 或 无 或 N/A（skill 识别出此 Step 未触发任何 skill）"},
+        {"text": "Step 53 没有编造 skill 名（不能填 bmad-* 或 subagent-*——用户明确说没触发 skill）"},
+        {"text": "Step 52 用户评分段被补齐：完成时间填了具体时分戳（不再是 —）、顺畅度填 4/5、用户评价含「架构」或「subagent」或「接口对齐」"},
+        {"text": "Step 52 补齐时分戳满足锁定铁规：用户评分时分戳晚于模型自评时分戳 10:30"},
+        {"text": "Step 53 作为独立 Step 条目加入执行日志.md（triggers + 四段完整：执行事实含全部 5 个字段 / 模型自评 / 用户评分 / 评分差异分析）"},
+        {"text": "Step 52 和 Step 53 都被视为一个完整 Step 单元（不被拆成更细或合并成一条）——验证粒度判断符合「自然停顿点」原则"},
+        {"text": "当前状态.md frontmatter current_step 更新为 53"},
+        {"text": "当前状态.md body 的「字段半残」表述被清空或改写为最新状态"},
+        {"text": "没有编造新的 G-NNN / Q-NNN / R-NNN（只建 Step 52 补齐 + Step 53 新建；G-050 交叉引用是 OK 的，新写踩坑条目不行）"}
+      ]
     }
   ]
 }

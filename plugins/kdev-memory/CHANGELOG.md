@@ -1,5 +1,96 @@
 # kdev-memory CHANGELOG
 
+## 0.6.0 — 2026-04-24
+
+**特性**：Step 执行事实段新增「使用的 skill」结构化字段（方案 A 落地）+ Step 粒度指引（自然停顿点三信号 + 三映射 + 反模式）+ 当前状态.md body 的 TodoWrite 跟随记约定 + iter-8 discriminating eval 验证（eval-11 with_field 11/11 vs baseline 7/11）。
+
+### 背景
+
+0.5.1 之后回头看 2026-04-22 dev-note「skill 使用记录与体验评分维度缺口」——token-statistics Step 11 评分时用户反馈"没用到 skill 感受不明显"暴露出两件事：
+
+1. **事实层缺 skill 追踪**：skill 使用情况散落在自由文本里，不是结构化字段 → 跨 Step 按 skill 聚合分析无锚点
+2. **Step 粒度定义模糊**：SKILL.md 说"粒度比 commit 粗、比迭代细"——没说清"phase 级"还是"todo 级"，导致 skill 面对大需求拆 20 todos 4 phases 的场景无判断依据
+
+session 决策采**方案 A**（事实层加字段，评分维度不动），不走方案 B（分两个评分维度）。方案 A 的理由：skill 正/负贡献能融进顺畅度 + 一句话评价；分两个数是过度设计。
+
+粒度信号则从对话迭代中明确为**自然停顿点**（时长 / 干预 / 验收）三信号，不机械按 phase 或 todo 切。
+
+### 新增
+
+- **references/六类记录-schema.md §3「使用的 skill」字段**：
+  - 事实段 schema 加 `- 使用的 skill：[bmad-create-architecture, subagent-driven]` 行
+  - 字段语义块：列表 / 「无」/「N/A（对话驱动）」三态；硬规"触发过就必须列名"
+  - N/A vs 无区分：N/A = 任务天然不需 skill；无 = 本该触发但没触发（异常信号）
+  - 用途：跨 Step 按 skill 聚合做"skill 体感"分析的字段锚点
+
+- **references/六类记录-schema.md §3「Step 粒度：自然停顿点」**：
+  - 三停顿信号：时长（≥ 约 30min-1h / 工具调用约 30 次以上）/ 干预（需决策 Q-NNN）/ 验收（有可 review 产出）
+  - 三种 phase 映射合法：1 phase → 1 Step（默认）/ 2 phase → 1 Step（都短 + 无干预）/ 1 phase → N Steps（有决策点切开）
+  - 反模式：每 todo 一 Step（评分疲劳）/ 整需求一 Step（信号失真）/ 机械按 phase（phase 可能只是思维组织）
+  - 闸门触发时机段：看三个停顿信号，不是看 todos 状态
+
+- **references/六类记录-schema.md §7「进行中 Step 的 todos 分解」body 段**：
+  - 当前状态.md body 示例加 todos 段
+  - 更新时机列表加一条：TodoWrite 首次 emit 3+ todos 落段；状态变化顺手同步；Step 完成清空
+  - 目的：跨 session 接力回读"当前 Step 做到哪了"；单个 todo completed 不触发 Step 闸门
+
+- **SKILL.md 主文微扩**（+1 行净）：
+  - L68 闸门字段枚举加「使用的 skill」（+0 行，同行扩）
+  - L149 速览段 §3 括号里加粒度 anchor + 使用的 skill 字段（+1 行）
+  - **主文净增 +1 行（287 → 286，功能表达反而更清晰）**
+
+- **evals/fixtures/skill-quality/eval-11-skill-used-field/**：webhook-platform 项目
+  - 半残 Step 52（Webhook 重试机制）：用了 bmad-create-architecture + subagent-driven，用户评分段空
+  - 新建 Step 53 场景：纯对话驱动目录整理（skill N/A 用例）
+
+- **evals/skill-quality/evals.json 新增 eval-11**（id=11）：
+  - prompt 同时测"有 skill 使用场景"和"N/A 对话驱动场景"
+  - 11 条 assertions，核心测字段是否被结构化落盘 + N/A 是否正确识别 + 粒度判断 + 锁定铁规
+
+- **iter-8 discriminating eval**（`evals/skill-quality/iterations/20260424-08-skill-used-field/`）：
+  - baseline（v0.5.1）：**7/11 (≈64%)** — fail #1/#2/#3，partial #7，全指向 schema 层缺字段
+  - with_field（v0.6.0 候选）：**11/11 (100%)**
+  - 关键：baseline subagent 主动识别局限"想聚合分析哪些 Step 没用 skill / 哪些 skill 最高频时只能全文扫描"
+  - 额外：with_field subagent 自发补"补录感受褪色"备注（超预期诚信）+ 准确区分 N/A vs 无语义
+
+### iter 数据累积
+
+| iter | 场景 | 结果 | 决策 |
+|---|---|---|---|
+| iter-8 | eval-11 使用的 skill 字段 + Step 粒度 discriminating | 7/11 → 11/11 | **合入**（behavior 质量提升，非成本下降）|
+
+### 向后兼容
+
+- **老 Step 条目不追溯**：v0.6.0 前的 Step 没有「使用的 skill」字段是正常的，skill 不会倒着改老条目
+- `claude_md_contract` 未变：字段属 skill 实现细节，不是接口契约（dev-note 明确排除）
+- CLAUDE.md 模板零改动：规则段不复述 schema 字段
+- 0.5.x 老项目升级 0.6.0 后，下次触发新 Step 时自动按新 schema 写（老条目保持不变）
+
+### 设计决策
+
+- **为什么是 minor（0.6.0）不是 patch**：schema 字段扩展是隐式接口变化——未来 hook（如 check-step-completeness）会看到字段；评判为 minor bump 是精确表达
+- **为什么不加 skill 体验感评分维度（方案 B）**：
+  - skill 正/负贡献判断和顺畅度是同一把尺（"这 skill 帮到我没"）——分两个数字是过度设计
+  - 两个数让用户每步做两次判断，采集负担 +1，ROI 不划算
+  - 单一顺畅度 + 事实层 skill 名单：跨 Step 聚合分析靠"skill 名单 + 顺畅度"已经够
+  - dev-note §决策源原文明确排除方案 B
+- **为什么 Step 粒度是"自然停顿点"而不是"phase = Step"**：
+  - 硬规则 phase = Step 有反例：两个短 phase 中间无干预就应合；一个长 phase 有决策点就应切
+  - 真正的判断依据是"人-模型协作节奏"—— 30min-1h 连续独立执行 / 需决策 / 有可 review 产出
+  - 这把决策权还给 skill 的判断，给出三信号作 anchor
+- **为什么 SKILL.md 主文只加 1 行**：每次 skill 触发都要加载主文，行数直接等于 token 成本；iter-7 教训是一次性 vs 每次成本分开算——细则全放 references（按需读），主文只留 anchor
+- **为什么跑 discriminating eval 而不是"直接合"**：iter-7 启示是不要预判经济性——跑一轮数据验证字段加入是否真让 skill 行为变好。本次结果确认 64% → 100%，behavior 质量信号清晰
+
+### 不纳入 v0.6.0 的候选（留 v0.7.x）
+
+- **PostToolUse matcher=TodoWrite hook**：自动在 phase 末端提醒 Step 闸门——先让手动约定跑 2 周观察痛点频率
+- **跨 Step "skill 体感"聚合分析召唤词**（"分析 skill 体感 / skill 质量盘点"）：留 v0.7.x 的新能力扩展
+- **多会话同项目编号冲突检测**：暂靠文档约定（git 原生分支处理）+ 后续加 Stop hook 检测 warn；不做 assignment 代码
+
+### 相关 commit
+
+- commit `<本 commit>` feat(kdev-memory): 0.6.0 — Step 事实层加「使用的 skill」+ Step 粒度指引 + todos 跟随记 + iter-8 验证
+
 ## 0.5.1 — 2026-04-23
 
 **特性**：SKILL.md 新增「🔴 Step 完成硬闸门（四段必填）」章节 + Step 完整度

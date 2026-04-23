@@ -1,0 +1,8 @@
+{
+  "config": "with_field",
+  "total_tokens": 50712,
+  "tool_uses": 11,
+  "duration_ms": 148209,
+  "duration_human": "~2m 28s",
+  "note": "比 baseline 多 ~600 tokens 多 15s，少 7 次 tool use。tool_use -7 表明 schema 清晰后 subagent 少反复查找（一次定位到 references §3 就够）"
+}
