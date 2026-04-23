@@ -148,7 +148,10 @@ rm -rf $WS
 
 ## 当前基线
 
-[`iterations/20260422-04-claude-md-lint/`](iterations/20260422-04-claude-md-lint/) 是**当前权威基线**：
+[`iterations/20260422-04-claude-md-lint/`](iterations/20260422-04-claude-md-lint/) 是**当前对照权威基线**（版本 vs 版本对比）；
+[`iterations/20260422-05-eval6-coverage/`](iterations/20260422-05-eval6-coverage/) 补齐了跨会话续航场景覆盖（单配置）。
+
+
 
 - 对比：iter-3 解耦但无 lint ↔ 新增 `claude_md_lint.py` + SessionStart 集成 + "修漂移"召唤流程
 - eval-8 drift-fix 场景 × 2 configs = 2 runs
@@ -163,7 +166,8 @@ rm -rf $WS
 
 | iteration | 测什么 | 结论 |
 |---|---|---|
-| **[20260422-04-claude-md-lint](iterations/20260422-04-claude-md-lint/)** ← 当前基线 | lint 工具 + 修漂移自动化流程 | 审计 P1-7 正式落地；自动化闭环 vs 手工裁决 |
+| [20260422-05-eval6-coverage](iterations/20260422-05-eval6-coverage/) | 补跑 eval-6 跨会话续航（场景覆盖）| 8/8 pass，skill 严格只读回读，语义理解到位 |
+| **[20260422-04-claude-md-lint](iterations/20260422-04-claude-md-lint/)** ← 对照基线 | lint 工具 + 修漂移自动化流程 | 审计 P1-7 正式落地；自动化闭环 vs 手工裁决 |
 | [20260422-03-decoupled-claude-md](iterations/20260422-03-decoupled-claude-md/) | 解耦改造：CLAUDE.md 规则段只放接口 | 解耦成功 + 边缘场景 0 regression |
 | [20260422-02-expanded-6-scenarios](iterations/20260422-02-expanded-6-scenarios/) | Phase 1 重构的 6 场景全面验证 | 行为等价 + tokens -19.6% |
 | [20260422-01-baseline-3-scenarios](iterations/20260422-01-baseline-3-scenarios/) | Phase 1 重构的首轮 3 场景探索 | 演进记录保留 |

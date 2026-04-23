@@ -1,0 +1,23 @@
+{
+  "run_id": "eval-6-with_skill",
+  "eval_id": 6,
+  "eval_name": "cross-session-resume",
+  "config": "with_skill",
+  "expectations": [
+    {"text": "REPORT 正确识别出昨天完成的 Step 17（SSE 心跳）和 Step 18（消息补推）", "passed": true, "evidence": "REPORT (a) 明确列 Step 18 细节 + 末尾背景段交代 Step 17 是 Step 18 的上游；两个 Step 号都引用具体"},
+    {"text": "REPORT 引用了当前状态.md 的 frontmatter 字段（phase=exec, current_step=18）或 body 里的'下一步 Step 19'", "passed": true, "evidence": "REPORT (b) 原文 'phase: exec、current_step: 18、last_updated: 2026-04-21'；(c) 引用 body 的 Step 19 token bucket"},
+    {"text": "REPORT 明确指出下一步是 Step 19（推送限流 / token bucket 限流）——来自当前状态.md body", "passed": true, "evidence": "REPORT (c) 原文 'Step 19：推送限流（防恶意订阅刷 SSE 连接）/ token bucket 按订阅者 IP 限流'"},
+    {"text": "REPORT 列出了读取的文件清单，至少包括 当前状态.md + 执行日志.md + 每日汇总/最近一两天文件", "passed": true, "evidence": "subagent 返回 'Files read from .kdev/memory/: 当前状态.md / 每日汇总/2026-04-21.md / 每日汇总/2026-04-20.md / 执行日志.md / 决策日志.md / 踩坑日志.md / 改进建议.md'——共 7 个文件超出最低要求"},
+    {"text": "REPORT 不通过会话上下文或用户复述推断当前进度（只引用 .kdev/memory/ 内容）", "passed": true, "evidence": "REPORT 开篇铁规声明 + subagent 返回 'no session-transcript access, no user restate'"},
+    {"text": "REPORT 识别出 Step 18 的评分差值 +1 是弱正信号（说明 skill 读取评分字段而不只是标题）", "passed": true, "evidence": "REPORT (a) 原文 '模型自评 3/5... 用户评分 4/5... 差值 +1，弱正信号，未触发 R-NNN 强制'"},
+    {"text": "REPORT 识别出 Step 19 评审点是'限流阈值怎么设'——这是当前状态.md body 里明写的决策空缺", "passed": true, "evidence": "REPORT (c) 原文 '需要用户拍板的评审点：限流阈值怎么设（这是一个 Q-012 候选——智能体不应替用户拍板）'"},
+    {"text": "REPORT 未新增任何 .kdev/memory/ 文件（回读是只读动作，不落盘）", "passed": true, "evidence": "subagent 返回 'no memory-file mutation'，沙盒只有 fixture 原样拷贝 + outputs/REPORT.md（位于 outputs 根，不在 target-project 内）"}
+  ],
+  "summary": {
+    "pass_rate": 1.0,
+    "passed": 8,
+    "failed": 0,
+    "total": 8
+  },
+  "overall_pass_rate": 1.0
+}
