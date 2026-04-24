@@ -25,6 +25,10 @@ cd "$FIXTURE_DIR"
 # 清一下可能的历史 state（避免 session 去重影响本次）
 rm -rf .kdev/memory/state
 
+# v0.7+: 把 trigger-match 的"今日"基准固定到 fixture 里最新 Step 日期（2026-04-20），
+# 让 should-trigger-Step-今日 不因现实日期推进而失效（fixture date drift 修复）
+export KDEV_TRIGGER_TODAY="2026-04-20"
+
 PLUGIN="$PLUGIN_DIR" python3 <<'PYEOF'
 import json, subprocess, pathlib, os, re
 

@@ -252,8 +252,18 @@ def scan_step_entries() -> list[dict]:
 
     月度归档里的 Step 都是老的，被 date_filter 剔除——扫到但不会召回。
     """
-    today = datetime.now().strftime("%Y-%m-%d")
-    yesterday = (datetime.now() - timedelta(days=1)).strftime("%Y-%m-%d")
+    # v0.7+: 允许测试/eval 通过 KDEV_TRIGGER_TODAY=YYYY-MM-DD 固定"今日"基准，
+    # 避免 fixture 硬编码日期随真实时间漂移导致 eval 失败
+    override = os.environ.get("KDEV_TRIGGER_TODAY", "").strip()
+    if override:
+        try:
+            base = datetime.fromisoformat(override)
+        except ValueError:
+            base = datetime.now()
+    else:
+        base = datetime.now()
+    today = base.strftime("%Y-%m-%d")
+    yesterday = (base - timedelta(days=1)).strftime("%Y-%m-%d")
     date_ok = lambda d: d in (today, yesterday)
 
     entries = []
