@@ -22,7 +22,7 @@ def _write_log(tmp_path: Path, content: str) -> Path:
 
 def test_faded_backfill_step_is_not_half_complete(tmp_path):
     """褪色补录 Step（含 **褪色补录** / 保留占位 / 非原生当场采集 任一标记）应被跳过。"""
-    log = _write_log(tmp_path, """## Step M-5（回补 meta）: iter-5 主控零评分兜底
+    log = _write_log(tmp_path, """## Step M-5: iter-5 主控零评分兜底（回补 meta）
 
 日期：2026-04-15
 
@@ -92,7 +92,7 @@ def test_genuine_open_step_still_reported(tmp_path):
 
 def test_status_voided_faded_frontmatter_skipped(tmp_path):
     """Step body 里的 YAML frontmatter status: voided-faded 应直接跳过（不依赖启发式）。"""
-    log = _write_log(tmp_path, """## Step M-6（回补 meta）: iter-6
+    log = _write_log(tmp_path, """## Step M-6: iter-6（回补 meta）
 
 ---
 status: voided-faded
