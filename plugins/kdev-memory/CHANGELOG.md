@@ -1,5 +1,51 @@
 # kdev-memory CHANGELOG
 
+## [0.7.0] — 2026-04-24
+
+### 🔄 立场反转（breaking change in philosophy, not API）
+- `.kdev/` 从"项目资产、跟代码 commit"改为"**本地过程目录，默认 gitignore**"
+- init 时自动 append `.kdev/` 到项目 `.gitignore`（`KDEV_GIT_TRACK=1` 可跳过）
+- 团队共享产物改走 `/kdev-memory-promote` + `docs/` 通道
+
+### ✨ 新增
+- **`/kdev-memory-promote`** 命令：列出 pending 沉淀候选 + 推荐去向，用户确认后写入 docs/ 并更新 promote_status
+- **`/kdev-memory-weekly`** 命令：滚动 7 天周总结（默认 today-6 ~ today，可用 --from/--to 覆盖），输出按**汇报四段骨架**组织：
+  - 📦 **过程资产**（机械盘点：Step/Q/G/R 条数、每日汇总覆盖率、条目索引）
+  - 💡 **经验总结**（正向信号：4.5+ 高分 Step、踩坑升规则、稳扎稳打条目）
+  - ⚠️ **问题教训**（负向信号：差值 ≥ 1.5 的 Step、低评分、未升规则的高频踩坑）
+  - 🚀 **开发进展**（业务视角：主线叙事、里程碑、下期展望）
+- **Schema 扩展**：Step / R / Q / G frontmatter 新增 `status: open | scored | voided-faded | voided-r-nnn`，R / Q / G / 改进建议新增 `promote_status: pending | done | skipped` + `promote_target` + `promote_date`
+- **Brief 三层分层**：P0 硬阻塞（WARN / 今日欠评）/ P1 需核对（跨天汇总缺失 / 接口漂移 / 沉淀提醒）/ P2 参考（checkpoint / growth backlog）
+- **销账识别**：Brief 欠评扫描优先读 `status` frontmatter，fallback 启发式 grep（`褪色补录` / `保留占位` / `非原生当场采集` / `## Step M-`）—— 解决 iter 5~8 meta 回补条目被反复报"待处理"问题
+- `hooks/lib/init-gitignore.sh`：helper，初始化自动配 gitignore
+- `hooks/lib/promote-scan.sh`：Brief P1 集成的沉淀候选扫描器
+- `hooks/lib/promote-list.sh`：`/kdev-memory-promote` 命令聚合脚本
+- `hooks/lib/weekly.sh`：`/kdev-memory-weekly` 命令聚合脚本
+- `hooks/lib/migrate-v0.7.sh`：v0.6 → v0.7 软迁移（保留历史 commit）
+
+### 🐛 修复
+- SessionEnd WARN 不再依赖 git（立场反转后 `.kdev/` 默认 gitignore，git status 拿不到变化）—— 改为 `.last-flush` mtime 比对
+- `post-write-check.sh` 写入 `.kdev/memory/*` 时自动 `touch .last-flush`（与 SessionEnd 的 mtime 机制联动）
+
+### 📚 文档
+- README：对比表第三行最后一列、差异化设计点第 3 条全部重写；新增「为什么 .kdev/ 默认 gitignore」小节；新增「从 v0.6 升级到 v0.7」章节
+- SKILL.md：新增"条目状态与沉淀字段"章节、"v0.7+ 自动加 .kdev/ 到 .gitignore"段
+- references/六类记录-schema.md：Q / G / Step / R 各段同步 status / promote_* 字段
+- 开发历程.md：新增 v0.7 立场反转章节
+
+### ⚠️ 迁移指引
+已装 v0.6 且 `.kdev/` 已 git tracked 的项目：
+
+```bash
+bash "${CLAUDE_PLUGIN_ROOT}/hooks/lib/migrate-v0.7.sh"
+git diff --cached  # 核对
+git commit -m "chore: .kdev/ 转为本地过程目录（kdev-memory v0.7 立场反转）"
+```
+
+历史 commit 保留（dog-fooding 证据）；未来 `.kdev/` 变更不再进 git。
+
+**已知副作用**：`evals/run-hook-selftest.sh` 的 `should-trigger-Step-今日` 测试因 fixture 里硬编码 `2026-04-19/2026-04-20` 日期会在 2026-04-26+ 之后变"不再是今日/昨日"而失败——这是 fixture date drift 问题，与 v0.7 改动无关，留待后续 release 修复。
+
 ## 0.6.0 — 2026-04-24
 
 **特性**：Step 执行事实段新增「使用的 skill」结构化字段（方案 A 落地）+ Step 粒度指引（自然停顿点三信号 + 三映射 + 反模式）+ 当前状态.md body 的 TodoWrite 跟随记约定 + iter-8 discriminating eval 验证（eval-11 with_field 11/11 vs baseline 7/11）。
