@@ -22,6 +22,10 @@
 ```markdown
 ## Q-007: 是否在 MVP 阶段引入 Docker？
 日期：2026-04-15
+status: open | scored | voided-faded | voided-r-nnn
+promote_status: pending | done | skipped
+promote_target: docs/XX                    # 若已沉淀则填写
+promote_date: 2026-04-24                   # 若已沉淀则填写
 选项：
 - (A) 引入 —— 部署一致性好，但增加学习/构建成本
 - (B) 不引入，裸机 Node.js —— 简单，但后续换机器要重装
@@ -30,6 +34,23 @@
 ```
 
 **为什么有效**：带选项和理由的决策能被未来的智能体"理解并延伸"，而不是死记结论。下次遇到类似选择时，能看出之前的取舍逻辑是否仍然成立。
+
+### 条目状态与沉淀字段（v0.7+）
+
+Q-NNN 条目的 frontmatter 可加以下字段（缺失等价于默认值，历史条目无需手工迁移）：
+
+**status**（销账）：决策是否已完整评分
+- `open` —— 进行中 / 待评分（默认）
+- `scored` —— 评分完整已闭环
+- `voided-faded` —— 褪色补录占位，不强求补
+- `voided-r-nnn` —— 显式 R-NNN 销账
+
+**promote_\* 字段**（沉淀）：决策是否沉淀到团队文档
+- `promote_status: pending | done | skipped` —— 默认 pending
+- `promote_target` —— 沉淀后填写目标路径（如 `docs/04-架构/ADR-XXX.md`）；skip 时填理由（如 "个人偏好，无团队价值"）
+- `promote_date` —— 沉淀完成日期（YYYY-MM-DD）
+
+> 字段语义详见 SKILL.md「条目状态与沉淀字段（v0.7+）」节。
 
 ---
 
@@ -42,6 +63,10 @@
 ## G-012: pnpm install 在 workspace 根目录会漏装子包依赖
 triggers: ["pnpm install", "pnpm i", "workspace 依赖"]
 日期：2026-04-15
+status: open | scored | voided-faded | voided-r-nnn
+promote_status: pending | done | skipped
+promote_target: docs/XX                    # 若已沉淀则填写
+promote_date: 2026-04-24                   # 若已沉淀则填写
 现象：子包 import 报错 "Cannot find module 'xxx'"，package.json 里明明写了
 原因：pnpm 默认只装 root，需要 --recursive 或在子包目录单独跑
 解决：统一在子包里跑 `pnpm install`，或 root 跑 `pnpm -r install`
@@ -50,6 +75,23 @@ triggers: ["pnpm install", "pnpm i", "workspace 依赖"]
 **`triggers:` 必须有**：下次用户再说"跑 pnpm install 报错了"时，UserPromptSubmit hook 就能自动召回 G-012 的指针给 Claude。标 triggers 的规范见 `references/triggers-写法.md`。
 
 **为什么按编号不按日期**：G-NNN 可以被其他文件（执行日志、每日汇总）直接引用，形成超链网络。这是"可检索的记忆"的基础。
+
+### 条目状态与沉淀字段（v0.7+）
+
+G-NNN 条目的 frontmatter 可加以下字段（缺失等价于默认值，历史条目无需手工迁移）：
+
+**status**（销账）：踩坑是否已完整评分
+- `open` —— 进行中 / 待评分（默认）
+- `scored` —— 评分完整已闭环
+- `voided-faded` —— 褪色补录占位，不强求补
+- `voided-r-nnn` —— 显式 R-NNN 销账
+
+**promote_\* 字段**（沉淀）：踩坑是否沉淀到团队文档/wiki
+- `promote_status: pending | done | skipped` —— 默认 pending
+- `promote_target` —— 沉淀后填写目标路径（如 `docs/05-常见问题/pnpm-workspace.md`）；skip 时填理由（如 "只影响本项目"）
+- `promote_date` —— 沉淀完成日期（YYYY-MM-DD）
+
+> 字段语义详见 SKILL.md「条目状态与沉淀字段（v0.7+）」节。
 
 ---
 
@@ -62,6 +104,7 @@ triggers: ["pnpm install", "pnpm i", "workspace 依赖"]
 ## Step 7: 实现 token 采集器核心循环
 triggers: ["采集器", "核心循环", "token 收集"]
 日期：2026-04-15
+status: open | scored | voided-faded | voided-r-nnn
 
 ### 执行
 - 写了 collector/core/collect.js
@@ -119,6 +162,19 @@ triggers: ["采集器", "核心循环", "token 收集"]
 ### 发现
 - pnpm -r test 在 monorepo 下比单包 test 慢 3 倍，值得后续优化
 ```
+
+### Step 状态字段（v0.7+）
+
+Step 条目的 frontmatter 可加以下字段（缺失等价于默认值，历史条目无需手工迁移）：
+
+**status**（销账）：Step 是否已完整评分
+- `open` —— 进行中 / 待评分（默认）
+- `scored` —— 评分完整已闭环
+- `voided-faded` —— 褪色补录占位，不强求补
+- `voided-r-nnn` —— 显式 R-NNN 销账
+
+> 注：Step 条目不走团队沉淀（过程记录留在本地），故**不涉及** `promote_*` 字段。
+> 字段语义详见 SKILL.md「条目状态与沉淀字段（v0.7+）」节。
 
 **双评分机制的设计意图**：
 - **模型陈列事实 + 自评顺畅度**：事实段是无偏数据，自评是模型的主观感受。**强制"必须写一条扣分项"**防止讨好式打满分。
@@ -205,6 +261,9 @@ triggers: ["采集器", "核心循环", "token 收集"]
 ## R-001: 智能体高速产出与细节对齐脱钩
 日期：2026-04-15
 项目：token-statistics
+promote_status: pending | done | skipped
+promote_target: docs/XX                    # 若已沉淀则填写
+promote_date: 2026-04-24                   # 若已沉淀则填写
 触发：执行日志 Step 8 评分差值 -2（模型自评 5/5，用户 3/5）
 模型自评原话："代码一次跑通，token 消耗低，顺畅"
 用户评价原话："subagent 写得快但字段名对不上 PRD，又得我返工"
@@ -217,6 +276,9 @@ triggers: ["采集器", "核心循环", "token 收集"]
 ## R-002: commit 粒度混乱
 日期：2026-04-12
 项目：token-statistics
+promote_status: pending | done | skipped
+promote_target: 
+promote_date: 
 触发：用户反馈"这个 commit 混进了三件事"
 用户评价原话："commit 8a3e0f0 把 PRD 扩展 + 基线计划 + brainstorm 三件事打包了"
 初步诊断：智能体为了"进度快"把无强耦合的变更合并提交
@@ -229,6 +291,18 @@ triggers: ["采集器", "核心循环", "token 收集"]
 - 诊断是可选的——写出来辅助未来 review，但不要强行拔高成"铁律"
 - "改进方向"用疑问/假设语气，不要断言"必须怎么做"
 - 同一项目的 R 编号递增，跨项目不共享（靠"项目"字段识别）
+
+### 沉淀字段（v0.7+）
+
+改进建议.md 的 R-NNN 条目可加以下字段（缺失等价于默认值，历史条目无需手工迁移）：
+
+**promote_\* 字段**（沉淀）：改进建议是否沉淀到团队文档或新 skill
+- `promote_status: pending | done | skipped` —— 默认 pending
+- `promote_target` —— 沉淀后填写目标路径（如 `docs/06-方法论/字段对齐检查.md` 或 skill 名）；skip 时填理由（如 "项目特异性，无通用价值"）
+- `promote_date` —— 沉淀完成日期（YYYY-MM-DD）
+
+> 注：改进建议本身**不走销账**（无 `status` 字段），因为它的生命周期是"记录 → 沉淀 / 跳过"，不涉及评分锁定。
+> 字段语义详见 SKILL.md「条目状态与沉淀字段（v0.7+）」节。
 
 ---
 
