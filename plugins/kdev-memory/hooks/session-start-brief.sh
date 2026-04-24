@@ -122,6 +122,16 @@ PYEOF
 )
 fi
 
+# ===== 沉淀候选扫描（v0.7 新增，实际聚合由 Task 14 的 hooks/lib/promote-scan.sh 提供） =====
+PROMOTE_HINT=""
+PROMOTE_SCAN_LIB="$SCRIPT_DIR/lib/promote-scan.sh"
+if [ -f "$PROMOTE_SCAN_LIB" ]; then
+  # shellcheck source=lib/promote-scan.sh
+  # shellcheck disable=SC1091
+  . "$PROMOTE_SCAN_LIB"
+  PROMOTE_HINT=$(scan_promote_candidates "$KDEV_DIR" "$TODAY" 2>/dev/null || true)
+fi
+
 # ===== 读当前状态 frontmatter =====
 STATE_PHASE=$(read_state_field "phase")
 STATE_ITERATION=$(read_state_field "iteration")
@@ -149,16 +159,45 @@ build_brief() {
   local mode="$1"
   local brief=""
 
+  # ===== v0.7 三层分层：共享计算（startup/resume 都用） =====
+  local P0_HINTS=""
+  local P1_HINTS=""
+  local P2_HINTS=""
+
+  # P0 硬阻塞: WARN files, today's half-complete Step
+  if [ -n "$WARN_FILES" ]; then
+    P0_HINTS+="$(echo "$WARN_FILES" | sed 's|^|  - |')\n"
+  fi
+  if [ -n "$STEP_HINT" ] && echo "$STEP_HINT" | grep -q "今日"; then
+    P0_HINTS+="$STEP_HINT\n"
+  fi
+
+  # P1 需核对: past-days missing summaries, CLAUDE.md drift, historical half-complete Steps, promote reminder
+  if [ -n "$MISSING_PAST_SUMMARIES" ]; then
+    P1_HINTS+="  - 过去日期缺每日汇总（跨天会话遗漏）：$MISSING_PAST_SUMMARIES —— 调用 kdev-memory skill 按日聚合源文件补写，严禁回翻会话上下文\n"
+  fi
+  if [ -n "$DRIFT_HINT" ]; then
+    P1_HINTS+="$DRIFT_HINT\n"
+  fi
+  if [ -n "$STEP_HINT" ] && ! echo "$STEP_HINT" | grep -q "今日"; then
+    P1_HINTS+="$STEP_HINT\n"
+  fi
+  if [ -n "$PROMOTE_HINT" ]; then
+    P1_HINTS+="$PROMOTE_HINT\n"
+  fi
+
+  # P2 仅报告: checkpoint references (historical context, not urgent)
+  if [ -n "$CHECKPOINT_FILES" ]; then
+    P2_HINTS+="$(echo "$CHECKPOINT_FILES" | sed 's|^|  - |')\n"
+  fi
+
   case "$mode" in
     resume)
       brief+="项目有 .kdev/ 工程记忆。本次会话是 resume（Claude 已有前文上下文）。\n"
-      if [ -n "$WARN_FILES" ] || [ -n "$CHECKPOINT_FILES" ] || [ -n "$MISSING_PAST_SUMMARIES" ] || [ -n "$DRIFT_HINT" ] || [ -n "$STEP_HINT" ]; then
+      if [ -n "$P0_HINTS" ] || [ -n "$P1_HINTS" ]; then
         brief+="⚠️ 待处理：\n"
-        [ -n "$WARN_FILES" ] && brief+="- WARN 文件：\n$(echo "$WARN_FILES" | sed 's|^|  - |')\n"
-        [ -n "$CHECKPOINT_FILES" ] && brief+="- Checkpoint 文件：\n$(echo "$CHECKPOINT_FILES" | sed 's|^|  - |')\n"
-        [ -n "$MISSING_PAST_SUMMARIES" ] && brief+="- 缺失的过去每日汇总（跨天会话遗漏）：$MISSING_PAST_SUMMARIES\n"
-        [ -n "$DRIFT_HINT" ] && brief+="$DRIFT_HINT\n"
-        [ -n "$STEP_HINT" ] && brief+="$STEP_HINT\n"
+        [ -n "$P0_HINTS" ] && brief+="🔴 $P0_HINTS"
+        [ -n "$P1_HINTS" ] && brief+="🟡 $P1_HINTS"
       fi
       ;;
 
@@ -168,22 +207,26 @@ build_brief() {
         brief+="📦 压缩前 checkpoint（可回读细节）：\n"
         brief+="$(echo "$CHECKPOINT_FILES" | sed 's|^|  - |')\n"
       fi
-      [ -n "$WARN_FILES" ] && brief+="⚠️ 未处理的 WARN：\n$(echo "$WARN_FILES" | sed 's|^|  - |')\n"
-      [ -n "$MISSING_PAST_SUMMARIES" ] && brief+="⚠️ 缺失的过去每日汇总：$MISSING_PAST_SUMMARIES\n"
+      if [ -n "$P0_HINTS" ]; then
+        brief+="🔴 未处理的 P0 阻塞：\n$P0_HINTS"
+      fi
+      if [ -n "$P1_HINTS" ]; then
+        brief+="🟡 需核对：\n$P1_HINTS"
+      fi
       ;;
 
     *)
       # startup / clear / 默认
       brief+="项目有 .kdev/ 工程记忆。当前状态（$TODAY）：\n\n"
 
-      if [ -n "$WARN_FILES" ] || [ -n "$CHECKPOINT_FILES" ] || [ -n "$MISSING_PAST_SUMMARIES" ] || [ -n "$DRIFT_HINT" ] || [ -n "$STEP_HINT" ]; then
-        brief+="⚠️ **待处理（优先看）**：\n"
-        [ -n "$WARN_FILES" ] && brief+="$(echo "$WARN_FILES" | sed 's|^|- |')\n"
-        [ -n "$CHECKPOINT_FILES" ] && brief+="$(echo "$CHECKPOINT_FILES" | sed 's|^|- |')\n"
-        [ -n "$MISSING_PAST_SUMMARIES" ] && brief+="- 过去日期缺每日汇总（跨天会话遗漏）：$MISSING_PAST_SUMMARIES —— 请调用 kdev-memory skill 按日聚合源文件补写，严禁回翻会话上下文\n"
-        [ -n "$DRIFT_HINT" ] && brief+="$DRIFT_HINT\n"
-        [ -n "$STEP_HINT" ] && brief+="$STEP_HINT\n"
-        brief+="\n"
+      if [ -n "$P0_HINTS" ]; then
+        brief+="🔴 **P0 硬阻塞（立刻处理）**：\n$P0_HINTS\n"
+      fi
+      if [ -n "$P1_HINTS" ]; then
+        brief+="🟡 **P1 需核对**：\n$P1_HINTS\n"
+      fi
+      if [ -n "$P2_HINTS" ]; then
+        brief+="⚪ **P2 参考**：\n$P2_HINTS\n"
       fi
 
       brief+="📊 **今日进度**：\n"
