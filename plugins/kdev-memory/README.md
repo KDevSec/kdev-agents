@@ -240,3 +240,22 @@ claude --debug
 - `constitution.md` / `spec.md` / `principles.md` / `AGENTS.md`（项目根）
 - `.specify/constitution.md`（Spec Kit 新版）
 - `docs/constitution.md` / `docs/principles.md`
+
+## 从 v0.6 升级到 v0.7
+
+v0.7 把 `.kdev/` 从"跟代码 commit"改为"**本地过程目录默认 gitignore**"（立场反转）。已有项目升级步骤：
+
+```bash
+# 在项目根目录执行
+bash "${CLAUDE_PLUGIN_ROOT}/hooks/lib/migrate-v0.7.sh"
+
+# 核对后 commit
+git diff --cached
+git commit -m "chore: .kdev/ 转为本地过程目录（kdev-memory v0.7 立场反转）"
+```
+
+历史 commit 保留（`.kdev/` 过往版本仍在 git log 里，便于追溯 dog-fooding 证据）；未来 `.kdev/` 变更不再进 git。
+
+**不想迁移**：`export KDEV_GIT_TRACK=1`，跳过 .gitignore 修改（单人项目可用，多会话/多成员强烈不推荐，会撞 merge 冲突）。
+
+详细立场反转推理见**开发历程 v0.7 立场反转**章节。
