@@ -53,6 +53,19 @@ PLACEHOLDER_VALUES = {"—", "-", "", "待补", "污染样本", "TBD", "TODO", "
 # 默认扫描最近 N 天
 DEFAULT_LOOKBACK_DAYS = 14
 
+# v0.7+ 销账信号
+VOIDED_HEURISTIC_PATTERNS = (
+    "**褪色补录**",      # Brief 模板语（最强信号）
+    "褪色补录",           # 不带 ** 的纯文字
+    "保留占位不强求补",
+    "保留占位",
+    "非原生当场采集",
+    "无原生评分",
+    "不计入差值",
+)
+
+VOIDED_STATUSES = {"voided-faded", "voided-r-nnn"}
+
 
 def parse_steps(log_text: str) -> list[dict[str, Any]]:
     """把执行日志切成 Step 条目列表。
@@ -78,11 +91,26 @@ def parse_steps(log_text: str) -> list[dict[str, Any]]:
         # 提取日期字段
         date_m = re.search(r"^日期[:：]\s*(\d{4}-\d{2}-\d{2})", body, re.MULTILINE)
         entry_date = date_m.group(1) if date_m else None
+
+        # v0.7+: extract Step body's embedded YAML frontmatter status, if any
+        status_m = re.search(
+            r"^---\s*$\n(.*?)^---\s*$",
+            body,
+            re.MULTILINE | re.DOTALL,
+        )
+        entry_status = None
+        if status_m:
+            fm_text = status_m.group(1)
+            sf = re.search(r"^\s*status\s*:\s*(\S+)", fm_text, re.MULTILINE)
+            if sf:
+                entry_status = sf.group(1).strip()
+
         steps.append({
             "label": label,
             "title": title,
             "date": entry_date,
             "body": body,
+            "status": entry_status,  # v0.7+
         })
     return steps
 
@@ -90,6 +118,20 @@ def parse_steps(log_text: str) -> list[dict[str, Any]]:
 def check_step(step: dict[str, Any]) -> list[str]:
     """返回该 Step 的 issues 列表（空表示无半残）。"""
     body = step["body"]
+
+    # v0.7+: status field priority (schema layer)
+    if step.get("status") in VOIDED_STATUSES:
+        return []
+
+    # v0.7+: heuristic voided markers (text layer — compat for historical entries)
+    for pat in VOIDED_HEURISTIC_PATTERNS:
+        if pat in body:
+            return []
+
+    # v0.7+: Step title starts with "Step M-" → treat as meta-回补 placeholder
+    if re.match(r"^Step\s+M-", step["label"]):
+        return []
+
     issues: list[str] = []
 
     # 1. 用户评分段：找"### 用户评分" → 提取时分戳和顺畅度
