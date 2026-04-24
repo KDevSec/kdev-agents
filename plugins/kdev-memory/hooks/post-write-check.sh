@@ -48,6 +48,11 @@ case "$FILE_PATH" in
   "$CWD"/*) REL_PATH="${FILE_PATH#$CWD/}" ;;
 esac
 
+# v0.7: refresh .last-flush when Claude writes into .kdev/memory/
+if [[ "$REL_PATH" == *".kdev/memory/"* ]] || [[ "$FILE_PATH" == *".kdev/memory/"* ]]; then
+  touch ".kdev/memory/.last-flush" 2>/dev/null || true
+fi
+
 if is_milestone_path "$REL_PATH"; then
   echo "[kdev-memory] 刚动了里程碑文件 $REL_PATH —— 请把对应的 Step 追加到 .kdev/memory/执行日志.md（说明这次变更的目的、产出、模型自评）。"
 fi
