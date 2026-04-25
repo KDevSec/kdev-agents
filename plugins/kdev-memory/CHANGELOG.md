@@ -1,5 +1,22 @@
 # kdev-memory CHANGELOG
 
+## [0.7.1] — 2026-04-25
+
+### ✨ 新增
+- **Worktree 自动共享记忆**：secondary worktree（`.git/worktrees/<name>`）启动时 SessionStart hook 自动检测并建 symlink/junction `.kdev → 主 worktree/.kdev`，让多 worktree 共享同一份记忆（Step 编号、评分、决策实时同步）。`hooks/lib/worktree-link.sh` 新增
+  - Linux / macOS：`ln -s`
+  - Windows (Git-Bash / MSYS)：`cmd /c mklink /J`（NTFS junction，**无需管理员权限**）
+- **Brief 增加「当前分支」一行**：让 Claude 在切分支后立刻知道分支语境
+
+### 🐛 修复
+- 测试 `test_promote_scan.py::test_time_trigger_over_7_days` / `test_escalate_to_p0_over_30_days`：把 flush 文件 mtime 锚定到测试硬编码的 `today=2026-04-24` 而不是真实时间，避免随真实日期推进出现 7 天边界漂移导致的测试不稳定（同 v0.7 trigger-match fixture date drift 同类问题）
+
+### 📚 文档
+- README 新增「Worktree 与多分支」章节：Linux/macOS/Windows 三平台 symlink/junction 行为、主 worktree 切分支不做特殊处理的理由、Windows 手动 fallback
+
+### 🔧 兼容性
+- 跨平台审计：`stat -c` / `date -d` 已有 BSD fallback（macOS）；`find -newer` / `grep -qxF` 跨平台 OK；新加的 worktree-link 在 MINGW/MSYS/CYGWIN 三种 Windows shell 环境下走 `mklink /J` 路径
+
 ## [0.7.0] — 2026-04-24
 
 ### 🔄 立场反转（breaking change in philosophy, not API）
