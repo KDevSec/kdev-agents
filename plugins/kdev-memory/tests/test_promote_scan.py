@@ -21,7 +21,8 @@ def _call(project: Path) -> str:
         f"out = scan_promote_candidates({kdev_path!r}, '2026-04-24')\n"
         "sys.stdout.write(out)\n"
     )
-    env = {**os.environ, "LANG": "en_US.UTF-8", "LC_ALL": "en_US.UTF-8"}
+    # Windows 兼容：强制 Python subprocess stdout 使用 UTF-8（避免 GBK 无法编码 emoji）
+    env = {**os.environ, "LANG": "en_US.UTF-8", "LC_ALL": "en_US.UTF-8", "PYTHONIOENCODING": "utf-8"}
     r = subprocess.run([sys.executable, "-c", code], capture_output=True, env=env)
     return r.stdout.decode("utf-8", errors="replace")
 

@@ -22,7 +22,8 @@ def _call(project: Path, date_from: str = "", date_to: str = "") -> subprocess.C
         args.extend(["--from", date_from])
     if date_to:
         args.extend(["--to", date_to])
-    env = {**os.environ, "LANG": "en_US.UTF-8", "LC_ALL": "en_US.UTF-8"}
+    # Windows 兼容：强制 Python subprocess stdout 使用 UTF-8（避免 GBK 无法编码 emoji）
+    env = {**os.environ, "LANG": "en_US.UTF-8", "LC_ALL": "en_US.UTF-8", "PYTHONIOENCODING": "utf-8"}
     # 二进制捕获 + UTF-8 解码（防 Windows 中文 GBK）
     result = subprocess.run(args, cwd=str(project), capture_output=True, env=env)
     result.stdout = result.stdout.decode("utf-8", errors="replace")
