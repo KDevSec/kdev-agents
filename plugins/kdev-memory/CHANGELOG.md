@@ -1,5 +1,15 @@
 # kdev-memory CHANGELOG
 
+## [0.7.2] — 2026-04-25
+
+### 🔧 跨平台一致性
+- **`weekly.sh` 重构**：把内嵌 `python3 - <<EOF` heredoc 拆到独立的 `hooks/lib/weekly.py`。weekly.sh 缩为薄 wrapper（参数解析 + 默认日期 + 调 `python3 weekly.py`），逻辑一行不少，可维护性更好
+- **修 Windows Git-Bash subprocess 兼容**：原 heredoc 在 Windows Git-Bash 通过 Python subprocess 调用时 stdin 失败（returncode 49），重构后该限制消除
+- **`test_weekly_aggregate.py` 移除 `@skip_on_windows`**：v0.7.1 的 7 个 weekly 跳过测试现在在 Linux/macOS/Windows 三平台都跑（v0.7.1 Windows 跑 117/13 → v0.7.2 应 124/6）
+
+### 📚 文档
+- 报告：[`docs/WINDOWS-COMPAT-REPORT.md`](../../docs/WINDOWS-COMPAT-REPORT.md) 已记录 v0.7.1 修复路径，本版本补齐其中"建议后续工作 #1"
+
 ## [0.7.1] — 2026-04-25
 
 ### ✨ 新增
