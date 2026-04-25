@@ -40,7 +40,7 @@ fail_count = 0
 for ev in evals:
     payload = json.dumps({"prompt": ev["prompt"], "session_id": f"eval-{ev['id']}"})
     result = subprocess.run(
-        ["bash", f"{plugin}/hooks/user-prompt-trigger.sh"],
+        ["python3", f"{plugin}/hooks/user-prompt-trigger.py"],
         input=payload, capture_output=True, text=True, timeout=15,
     )
     try:

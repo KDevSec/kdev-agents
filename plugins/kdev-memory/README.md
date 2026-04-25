@@ -124,7 +124,7 @@ Claude 一开局就知道项目全景，不用等用户提"先看下昨天做到
 
 `touch .kdev/memory/strict` 启用。执行日志今天空 + 工作区实质变更 ≥ 2 或命中里程碑白名单 → `exit 2` 阻塞 Stop，Claude 必须落盘才能结束。
 
-里程碑白名单由 `hooks/lib/milestone.sh` 统一维护，覆盖 Spec Kit、ADR、迭代/Sprint、PRD/架构/设计、根目录关键文档、数据库 migration、API/协议契约等。
+里程碑白名单由 `hooks/lib/milestone.py` 统一维护，覆盖 Spec Kit、ADR、迭代/Sprint、PRD/架构/设计、根目录关键文档、数据库 migration、API/协议契约等。
 
 阻塞带 `stop_hook_active` 保护不会无限循环。`rm .kdev/memory/strict` 关闭。
 
@@ -200,10 +200,10 @@ touch .kdev/memory/strict
 grep -A3 enabledPlugins ~/.claude/settings.json
 
 # 2. 手动跑 SessionStart 看注入
-bash ~/.claude/plugins/marketplaces/kdev-agents/plugins/kdev-memory/hooks/session-start-brief.sh < /dev/null
+python3 ~/.claude/plugins/marketplaces/kdev-agents/plugins/kdev-memory/hooks/session-start-brief.py < /dev/null
 
 # 3. 手动跑 Stop hook 看输出
-bash ~/.claude/plugins/marketplaces/kdev-agents/plugins/kdev-memory/hooks/stop-check.sh < /dev/null
+python3 ~/.claude/plugins/marketplaces/kdev-agents/plugins/kdev-memory/hooks/stop-check.py < /dev/null
 
 # 4. 开调试模式跑一轮，观察所有 hook 触发日志
 claude --debug

@@ -66,7 +66,7 @@ for i in $(seq 1 10); do
   prompt=$(python3 -c "import json; e=json.load(open('../../evals.json'))['evals']; print(e[$i-1]['prompt'])")
   echo "=== Test $i: $name ==="
   echo "{\"prompt\":$(python3 -c "import json; print(json.dumps('$prompt'))"),\"session_id\":\"eval-$i\"}" \
-    | bash ../../../hooks/user-prompt-trigger.sh \
+    | python3 ../../../hooks/user-prompt-trigger.py \
     | python3 -c 'import sys,json; d=json.load(sys.stdin); ctx=d.get("hookSpecificOutput",{}).get("additionalContext",""); print(ctx if ctx else "<suppress>")'
   echo
 done

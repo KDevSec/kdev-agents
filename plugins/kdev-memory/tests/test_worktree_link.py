@@ -1,8 +1,10 @@
-"""test worktree-link.sh: secondary worktree 自动 symlink .kdev → 主 worktree（v0.7.1）
+"""test worktree_link.py: secondary worktree 自动 symlink .kdev → 主 worktree（v0.7.1 / v0.8 转 Python）
 
-平台覆盖：Linux / macOS。Windows (junction via mklink /J) 因为 CI 环境难以可靠模拟，跳过——
+平台覆盖：Linux / macOS。Windows (junction via cmd /c mklink /J) 因为 CI 环境难以可靠模拟，跳过——
 通过 README + 人工验证保证。
 """
+
+from __future__ import annotations
 
 import os
 import subprocess
@@ -11,14 +13,8 @@ from pathlib import Path
 
 import pytest
 
-LIB = Path(__file__).parent.parent / "hooks" / "lib" / "worktree-link.sh"
+LIB_DIR = Path(__file__).parent.parent / "hooks" / "lib"
 
-# Windows: Python subprocess 默认 'bash' 指向 WSL，需显式用 Git Bash
-BASH = (
-    "C:/Program Files/Git/usr/bin/bash.exe"
-    if sys.platform == "win32"
-    else "bash"
-)
 
 skip_on_windows = pytest.mark.skipif(
     sys.platform == "win32",
@@ -26,22 +22,24 @@ skip_on_windows = pytest.mark.skipif(
 )
 
 
+def _utf8_env() -> dict:
+    return {**os.environ, "LANG": "en_US.UTF-8", "LC_ALL": "en_US.UTF-8"}
+
+
 def _run_in(project: Path) -> subprocess.CompletedProcess:
-    """source 进来再调 worktree_link_kdev"""
-    import os
-    # Windows Path 用反斜杠，bash 需要正斜杠 -> 用 as_posix()
-    lib_path = LIB.as_posix()
-    project_path = project.as_posix()
-    script = f'''
-source "{lib_path}"
-worktree_link_kdev
-'''
-    env = {**os.environ, "LANG": "en_US.UTF-8", "LC_ALL": "en_US.UTF-8"}
-    # Windows: Python text=True 用系统编码(GBK)，但 Git Bash 输出 UTF-8
-    # 解决方案：二进制捕获后手动 UTF-8 解码
-    result = subprocess.run([BASH, "-c", script], cwd=project_path, capture_output=True, env=env)
-    result.stdout = result.stdout.decode("utf-8", errors="replace")
-    result.stderr = result.stderr.decode("utf-8", errors="replace")
+    """子进程调 worktree_link.py 的 worktree_link_kdev()，cwd=project。"""
+    code = (
+        "import sys\n"
+        f"sys.path.insert(0, {str(LIB_DIR)!r})\n"
+        "from worktree_link import worktree_link_kdev\n"
+        "worktree_link_kdev()\n"
+    )
+    result = subprocess.run(
+        [sys.executable, "-c", code],
+        cwd=str(project), capture_output=True, env=_utf8_env(),
+    )
+    result.stdout = result.stdout.decode("utf-8", errors="replace") if isinstance(result.stdout, bytes) else result.stdout
+    result.stderr = result.stderr.decode("utf-8", errors="replace") if isinstance(result.stderr, bytes) else result.stderr
     return result
 
 

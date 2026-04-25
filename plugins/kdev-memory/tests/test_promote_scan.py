@@ -1,4 +1,6 @@
-"""test promote-scan.sh: 扫描 .kdev/memory/ 的沉淀候选"""
+"""test promote_scan.py: 扫描 .kdev/memory/ 的沉淀候选（v0.8 转 Python）"""
+
+from __future__ import annotations
 
 import os
 import subprocess
@@ -6,30 +8,21 @@ import sys
 import time
 from pathlib import Path
 
-LIB = Path(__file__).parent.parent / "hooks" / "lib" / "promote-scan.sh"
-
-# Windows: Python subprocess 默认 'bash' 指向 WSL，需显式用 Git Bash
-BASH = (
-    "C:/Program Files/Git/usr/bin/bash.exe"
-    if sys.platform == "win32"
-    else "bash"
-)
+LIB_DIR = Path(__file__).parent.parent / "hooks" / "lib"
 
 
 def _call(project: Path) -> str:
-    """source 进来再调 scan_promote_candidates"""
-    import os
-    # Windows Path 用反斜杠，bash 需要正斜杠 -> 用 as_posix()
-    lib_path = LIB.as_posix()
-    kdev_path = Path(project, ".kdev", "memory").as_posix()
-    script = f'''
-source "{lib_path}"
-scan_promote_candidates "{kdev_path}" "2026-04-24"
-'''
+    """子进程调 promote_scan.scan_promote_candidates，cwd=project，today 锚定 2026-04-24。"""
+    kdev_path = (project / ".kdev" / "memory").as_posix()
+    code = (
+        "import sys\n"
+        f"sys.path.insert(0, {str(LIB_DIR)!r})\n"
+        "from promote_scan import scan_promote_candidates\n"
+        f"out = scan_promote_candidates({kdev_path!r}, '2026-04-24')\n"
+        "sys.stdout.write(out)\n"
+    )
     env = {**os.environ, "LANG": "en_US.UTF-8", "LC_ALL": "en_US.UTF-8"}
-    # Windows: Python text=True 用系统编码(GBK)，但 Git Bash 输出 UTF-8
-    # 解决方案：二进制捕获后手动 UTF-8 解码
-    r = subprocess.run([BASH, "-c", script], capture_output=True, env=env)
+    r = subprocess.run([sys.executable, "-c", code], capture_output=True, env=env)
     return r.stdout.decode("utf-8", errors="replace")
 
 

@@ -1,32 +1,27 @@
-"""test SessionEnd hook 的 mtime-based WARN 生成逻辑（v0.7）
+"""test SessionEnd hook 的 mtime-based WARN 生成逻辑（v0.7 / v0.8 转 Python）
 
 v0.6: git status --porcelain 检测 .kdev/ dirty → 生成 WARN
 v0.7: .last-flush mtime 比对 → 生成 WARN（立场反转后 .kdev/ 不 git tracked 也能工作）
+v0.8: hook 从 session-end-check.sh 转为 session-end-check.py，三平台一致
 """
+
+from __future__ import annotations
 
 import os
 import subprocess
 import sys
 import time
+from datetime import date
 from pathlib import Path
 
-HOOK = Path(__file__).parent.parent / "hooks" / "session-end-check.sh"
-
-# Windows: Python subprocess 默认 'bash' 指向 WSL，需显式用 Git Bash
-BASH = (
-    "C:/Program Files/Git/usr/bin/bash.exe"
-    if sys.platform == "win32"
-    else "bash"
-)
+HOOK = Path(__file__).parent.parent / "hooks" / "session-end-check.py"
 
 
 def _setup_kdev(tmp_path: Path) -> Path:
     """造一个最小 .kdev/memory/ 结构，返回 project root。"""
-    import os
     project = tmp_path / "project"
     (project / ".kdev" / "memory").mkdir(parents=True)
     (project / ".kdev" / "memory" / "执行日志.md").write_text("# 执行日志\n", encoding="utf-8")
-    # init git so git-based fallback also usable if needed
     subprocess.run(["git", "init", "-q"], cwd=project, check=True)
     subprocess.run(["git", "add", "."], cwd=project, check=True)
     subprocess.run(
@@ -36,15 +31,16 @@ def _setup_kdev(tmp_path: Path) -> Path:
     )
     return project
 
-# 强制 Git Bash 使用 UTF-8 编码（Windows 中文环境默认 GBK）
-_UTF8_ENV = None
 
-def _get_utf8_env():
-    import os
-    global _UTF8_ENV
-    if _UTF8_ENV is None:
-        _UTF8_ENV = {**os.environ, "LANG": "en_US.UTF-8", "LC_ALL": "en_US.UTF-8"}
-    return _UTF8_ENV
+def _utf8_env() -> dict:
+    return {**os.environ, "LANG": "en_US.UTF-8", "LC_ALL": "en_US.UTF-8"}
+
+
+def _run_hook(project: Path) -> subprocess.CompletedProcess:
+    return subprocess.run(
+        [sys.executable, str(HOOK)],
+        cwd=str(project), capture_output=True, env=_utf8_env(),
+    )
 
 
 def test_warn_generated_when_kdev_modified_after_last_flush(tmp_path):
@@ -52,18 +48,13 @@ def test_warn_generated_when_kdev_modified_after_last_flush(tmp_path):
     project = _setup_kdev(tmp_path)
     flush = project / ".kdev" / "memory" / ".last-flush"
     flush.touch()
-    # 让 .last-flush mtime 比 执行日志 更旧
     old_time = time.time() - 3600
     os.utime(flush, (old_time, old_time))
-    # 碰一下执行日志模拟新修改（mtime 默认是当前时间）
     (project / ".kdev" / "memory" / "执行日志.md").write_text(
         "# 执行日志\n\n## Step 1\n", encoding="utf-8"
     )
-    # Windows Path 用反斜杠，bash 需要正斜杠 -> 用 as_posix()
-    hook_path = HOOK.as_posix()
-    project_path = project.as_posix()
-    subprocess.run([BASH, hook_path], cwd=project_path, check=True, env=_get_utf8_env())
-    from datetime import date
+    r = _run_hook(project)
+    assert r.returncode == 0, f"hook failed: {r.stderr.decode('utf-8', errors='replace')}"
     warn = project / ".kdev" / "memory" / f"WARN-未记录-{date.today().isoformat()}.md"
     assert warn.exists(), "SessionEnd 应生成 WARN（mtime 机制），但 WARN 文件不存在"
 
@@ -74,14 +65,10 @@ def test_no_warn_when_last_flush_newer(tmp_path):
     (project / ".kdev" / "memory" / "执行日志.md").write_text(
         "# 执行日志\n\n## Step 1\n", encoding="utf-8"
     )
-    # last-flush 在执行日志之后 touch
     time.sleep(0.5)
     (project / ".kdev" / "memory" / ".last-flush").touch()
-    # Windows Path 用反斜杠，bash 需要正斜杠 -> 用 as_posix()
-    hook_path = HOOK.as_posix()
-    project_path = project.as_posix()
-    subprocess.run([BASH, hook_path], cwd=project_path, check=True, env=_get_utf8_env())
-    from datetime import date
+    r = _run_hook(project)
+    assert r.returncode == 0
     warn = project / ".kdev" / "memory" / f"WARN-未记录-{date.today().isoformat()}.md"
     assert not warn.exists(), "last-flush 比 .kdev/ 都新 → 不应有 WARN"
 
@@ -89,11 +76,8 @@ def test_no_warn_when_last_flush_newer(tmp_path):
 def test_no_warn_when_no_last_flush_and_no_changes(tmp_path):
     """无 .last-flush 且 .kdev/memory/ 基本无变化（init 后刚 commit）→ 无 WARN。"""
     project = _setup_kdev(tmp_path)
-    # Windows Path 用反斜杠，bash 需要正斜杠 -> 用 as_posix()
-    hook_path = HOOK.as_posix()
-    project_path = project.as_posix()
-    subprocess.run([BASH, hook_path], cwd=project_path, check=True, env=_get_utf8_env())
-    from datetime import date
+    r = _run_hook(project)
+    assert r.returncode == 0
     warn = project / ".kdev" / "memory" / f"WARN-未记录-{date.today().isoformat()}.md"
     assert not warn.exists(), "初始化空项目不应有 WARN"
 
@@ -105,13 +89,5 @@ def test_works_without_git_repo(tmp_path):
     (project / ".kdev" / "memory" / "执行日志.md").write_text(
         "# 执行日志\n\n## Step 1\n", encoding="utf-8"
     )
-    # 无 git init
-    # Windows Path 用反斜杠，bash 需要正斜杠 -> 用 as_posix()
-    hook_path = HOOK.as_posix()
-    project_path = project.as_posix()
-    result = subprocess.run(
-        [BASH, hook_path], cwd=project_path, capture_output=True, env=_get_utf8_env()
-    )
-    stdout = result.stdout.decode("utf-8", errors="replace")
-    stderr = result.stderr.decode("utf-8", errors="replace")
-    assert result.returncode == 0, f"hook 异常退出: {stderr}"
+    r = _run_hook(project)
+    assert r.returncode == 0, f"hook 异常退出: {r.stderr.decode('utf-8', errors='replace')}"

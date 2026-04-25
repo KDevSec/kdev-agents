@@ -1,6 +1,6 @@
 {
   "skill_name": "kdev-memory",
-  "test_target": "hooks/user-prompt-trigger.sh + hooks/trigger-match.py",
+  "test_target": "hooks/user-prompt-trigger.py + hooks/lib/trigger-match.py",
   "notes": "测 UserPromptSubmit hook 的 triggers 召回规则：字面子串匹配命中、sanitize 防误触、session 去重、主文件 + 归档目录两路扫描。这条 eval 线和 skill 文档层面无关——改 SKILL.md 不需要重跑；改 hook 脚本 / sanitize / triggers 字段扫描时才跑。跑法见 ../README.md 的「trigger-match 召回 eval」段。Fixture 在 fixtures/project-state/（共享静态数据，10 个 prompt 反复读）。对 skill 文档层面的行为质量测试见 skill-quality/evals.json。",
   "evals": [
     {
