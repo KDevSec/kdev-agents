@@ -2,20 +2,35 @@
 
 import os
 import subprocess
+import sys
 import time
 from pathlib import Path
 
 LIB = Path(__file__).parent.parent / "hooks" / "lib" / "promote-scan.sh"
 
+# Windows: Python subprocess 默认 'bash' 指向 WSL，需显式用 Git Bash
+BASH = (
+    "C:/Program Files/Git/usr/bin/bash.exe"
+    if sys.platform == "win32"
+    else "bash"
+)
+
 
 def _call(project: Path) -> str:
     """source 进来再调 scan_promote_candidates"""
+    import os
+    # Windows Path 用反斜杠，bash 需要正斜杠 -> 用 as_posix()
+    lib_path = LIB.as_posix()
+    kdev_path = Path(project, ".kdev", "memory").as_posix()
     script = f'''
-source {LIB}
-scan_promote_candidates "{project}/.kdev/memory" "2026-04-24"
+source "{lib_path}"
+scan_promote_candidates "{kdev_path}" "2026-04-24"
 '''
-    r = subprocess.run(["bash", "-c", script], capture_output=True, text=True)
-    return r.stdout
+    env = {**os.environ, "LANG": "en_US.UTF-8", "LC_ALL": "en_US.UTF-8"}
+    # Windows: Python text=True 用系统编码(GBK)，但 Git Bash 输出 UTF-8
+    # 解决方案：二进制捕获后手动 UTF-8 解码
+    r = subprocess.run([BASH, "-c", script], capture_output=True, env=env)
+    return r.stdout.decode("utf-8", errors="replace")
 
 
 def _mkkdev(tmp_path: Path) -> Path:

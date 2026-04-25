@@ -13,6 +13,13 @@ import pytest
 
 LIB = Path(__file__).parent.parent / "hooks" / "lib" / "worktree-link.sh"
 
+# Windows: Python subprocess 默认 'bash' 指向 WSL，需显式用 Git Bash
+BASH = (
+    "C:/Program Files/Git/usr/bin/bash.exe"
+    if sys.platform == "win32"
+    else "bash"
+)
+
 skip_on_windows = pytest.mark.skipif(
     sys.platform == "win32",
     reason="Windows junction 通过 cmd /c mklink /J 实现，需手动验证（README 说明手动方案）",
@@ -21,11 +28,21 @@ skip_on_windows = pytest.mark.skipif(
 
 def _run_in(project: Path) -> subprocess.CompletedProcess:
     """source 进来再调 worktree_link_kdev"""
+    import os
+    # Windows Path 用反斜杠，bash 需要正斜杠 -> 用 as_posix()
+    lib_path = LIB.as_posix()
+    project_path = project.as_posix()
     script = f'''
-source "{LIB}"
+source "{lib_path}"
 worktree_link_kdev
 '''
-    return subprocess.run(["bash", "-c", script], cwd=project, capture_output=True, text=True)
+    env = {**os.environ, "LANG": "en_US.UTF-8", "LC_ALL": "en_US.UTF-8"}
+    # Windows: Python text=True 用系统编码(GBK)，但 Git Bash 输出 UTF-8
+    # 解决方案：二进制捕获后手动 UTF-8 解码
+    result = subprocess.run([BASH, "-c", script], cwd=project_path, capture_output=True, env=env)
+    result.stdout = result.stdout.decode("utf-8", errors="replace")
+    result.stderr = result.stderr.decode("utf-8", errors="replace")
+    return result
 
 
 def _init_main(tmp_path: Path) -> Path:
