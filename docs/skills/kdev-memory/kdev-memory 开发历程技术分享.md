@@ -286,6 +286,46 @@ evals/
 3. **成本/收益的衡量要明确"**——对成本 / 收益是一次性的，还是每次都付 / 每次都收？
 
 
+### 3.6 0.6.0 ~ 0.7.1（2026-04-23 ~ 04-25）— 立场反转 + 跨平台 worktree 共享
+
+这三个版本是一条完整的因果链：**实战踩坑 → 反转核心假设 → 补齐多 worktree 场景**。
+
+**0.6.0**（04-23）：Step 执行事实段加「使用的 skill」字段（iter-8 discriminating eval 验证 11/11 vs baseline 7/11），Step 粒度指引（自然停顿点三信号），iter-7 reason-not-reasons 风格在 eval 上证明"列出错误模式"比"讲对的理由"省 -21% token、-35% tool uses。这是 eval 驱动迭代的稳定期，证明 iter-5~7 的方法论已经收敛。
+
+**0.7.0**（04-24）—— 立场反转：`.kdev/` 从"跟代码 commit"改为"**本地过程目录默认 gitignore**"。触发链条：
+
+1. G-028（多会话并发 Step 编号撞车）→ R-014 代码 worktree 隔离（补丁 1）
+2. R-015 记忆 worktree 模型（补丁 2，退化为同 worktree 分 commit）
+3. iter-9 合 master 时 `.kdev/` 4 个文件同时 merge 冲突——R-015 预测的"基线分叉"真实发生
+4. 用户反思："如果 `.kdev/` 不 git 托管，是不是就不需要考虑这些问题了"
+5. 团队场景追问："不同成员的记忆文件会混乱"
+6. 结晶原则：**`.kdev/` 是过程记录，不是最终产物；团队共享的是产物，不是过程**
+
+连带改造（一次合并发 release）：
+
+| 模块 | v0.6 | v0.7 |
+|---|---|---|
+| README 立场 | "应该进 git" | "本地过程目录，默认 gitignore" |
+| init 行为 | 只建文件 | 自动 append `.kdev/` 到 `.gitignore`（`KDEV_GIT_TRACK=1` 跳过） |
+| SessionEnd WARN | `git status --porcelain` | `.last-flush` mtime 比对（不依赖 git） |
+| Brief 欠评扫描 | 字面 grep "完成时间：—" | 销账识别（`status` 字段 + 启发式 `褪色补录` / `## Step M-` 兜底）+ 三层分层 P0/P1/P2 |
+| 过程 → 产物 | 无 | `/kdev-memory-promote` 命令 + `promote_status` schema |
+| 周总结 | 无 | `/kdev-memory-weekly` 滚动 7 天 + 四段骨架（过程资产 / 经验总结 / 问题教训 / 开发进展） |
+
+教训：**核心假设被证伪时优先反转前提而不是继续打补丁**。R-014/R-015/建议 8/9 四层补丁都在"git 托管"错误前提下挣扎，反转后全部消解。
+
+**0.7.1**（04-25）—— 补齐 worktree 共享的最后一公里：立场反转让 `.kdev/` 不托管之后，secondary worktree 默认看不到主 worktree 的记忆。新增 `hooks/lib/worktree-link.sh`：SessionStart hook 自动检测 secondary worktree，建 symlink（Linux/macOS）或 junction（Windows 用 `cmd /c mklink /J`，无需管理员权限）指向主 worktree 的 `.kdev/`。主 worktree 内切分支 **不特殊处理**——`.kdev/` gitignored 不被 git 切换影响，所有分支共用一份记忆；Brief 里加「当前分支」一行让 Claude 自觉分支语境。
+
+**三版合起来的方法论**：
+
+1. **skill 核心假设应在 README 里显式列出**（本例："`.kdev/` 应 git 托管"），便于证伪时精准定位
+2. **skill 作者做 dog-fooding 是最重要的 validation 路径**——理论上的设计再合理都不如实战一次的反转信号
+3. **跨平台要提前设计在 shell helper 里**——`stat -c` 配 `stat -f` 双 fallback、`date -d` 配 `date -v`、`ln -s` 配 `cmd /c mklink /J`，不是等 Windows 用户报 issue 再打补丁
+4. **skill 迭代史应作为公开产物保留**——本章就是反转证据链的公开面
+
+> 对应官方 §8 持续维护。立场反转是 "从产品哲学层面推倒重来"，跨平台补丁是"把同一产品在不同落地环境打磨"——两者都不是工艺活，是 skill 成熟度的真正标志。
+
+
 ### 3.7 横向调研要点（详细对比见文末附录 A）
 
 0.2.0 设计前覆盖了 6 家上游：claude-mem（45k stars，SQLite + 向量库）、OMC（25k，三层 notepad）、ECC（143k，SQLite State Store）、claude-memory-compiler（LLM 编译摘要）、claude-reflect（纠正捕获）。

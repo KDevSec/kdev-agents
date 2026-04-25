@@ -134,3 +134,29 @@ def test_outside_git_repo_skipped(tmp_path):
     r = _run_in(not_a_repo)
     assert r.returncode == 0
     assert not (not_a_repo / ".kdev").exists()
+
+
+@skip_on_windows
+def test_git_track_opt_in_secondary_worktree_not_symlinked(tmp_path):
+    """若用户选择 KDEV_GIT_TRACK=1 opt-in 托管 .kdev/（走 v0.6 遗留工作流），
+    secondary worktree 的 .kdev/ 是 git checkout 出来的真目录，worktree-link
+    应安全跳过（[ -e .kdev ] 守卫），不把真目录改成 symlink 破坏用户数据。"""
+    main = _init_main(tmp_path)
+    # 模拟用户 opt-in：把 .kdev/ commit 进 git
+    subprocess.run(["git", "add", ".kdev"], cwd=main, check=True)
+    subprocess.run(["git", "-c", "user.email=t@t", "-c", "user.name=t",
+                   "commit", "-q", "-m", "track .kdev (KDEV_GIT_TRACK=1 opt-in)"],
+                  cwd=main, check=True)
+
+    # 造 secondary worktree，会自动 checkout 出 .kdev/（因为被 track）
+    secondary = _add_secondary(main)
+    assert (secondary / ".kdev").is_dir(), "secondary worktree 应有从 git checkout 的真 .kdev/"
+    assert not (secondary / ".kdev").is_symlink()
+
+    # 关键：worktree-link 不应该覆盖真目录
+    r = _run_in(secondary)
+    assert r.returncode == 0
+    assert (secondary / ".kdev").is_dir(), "worktree-link 不应把真目录改成 symlink"
+    assert not (secondary / ".kdev").is_symlink()
+    # 原有文件保留
+    assert (secondary / ".kdev" / "memory" / "执行日志.md").exists()
