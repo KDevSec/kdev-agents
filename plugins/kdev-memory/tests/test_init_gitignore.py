@@ -1,30 +1,25 @@
-"""test init-gitignore.sh: 自动 append .kdev/ 到 .gitignore（v0.7 立场反转）"""
+"""test init-gitignore.py: 自动 append .kdev/ 到 .gitignore（v0.7 立场反转 / v0.8 转 Python）"""
+
+from __future__ import annotations
 
 import os
 import subprocess
 import sys
 from pathlib import Path
+from typing import Optional
 
-HELPER = Path(__file__).parent.parent / "hooks" / "lib" / "init-gitignore.sh"
-
-# Windows: Python subprocess 默认 'bash' 指向 WSL，需显式用 Git Bash
-BASH = (
-    "C:/Program Files/Git/usr/bin/bash.exe"
-    if sys.platform == "win32"
-    else "bash"
-)
+HELPER = Path(__file__).parent.parent / "hooks" / "lib" / "init-gitignore.py"
 
 
-def _run(project: Path, env_extra: dict | None = None) -> subprocess.CompletedProcess:
-    import os
+def _run(project: Path, env_extra: Optional[dict] = None) -> subprocess.CompletedProcess:
     env = {**os.environ, "LANG": "en_US.UTF-8", "LC_ALL": "en_US.UTF-8"}
     if env_extra is not None:
         env = {**env, **env_extra}
-    # Windows Path 用反斜杠，bash 需要正斜杠 -> 用 as_posix()
-    helper_path = HELPER.as_posix()
-    # Windows: Python text=True 用系统编码(GBK)，但 Git Bash 输出 UTF-8
-    # 解决方案：二进制捕获后手动 UTF-8 解码
-    result = subprocess.run([BASH, helper_path], cwd=project.as_posix(), capture_output=True, env=env)
+    # 二进制捕获 + UTF-8 解码（防 Windows 中文 GBK）
+    result = subprocess.run(
+        [sys.executable, str(HELPER)],
+        cwd=str(project), capture_output=True, env=env,
+    )
     result.stdout = result.stdout.decode("utf-8", errors="replace")
     result.stderr = result.stderr.decode("utf-8", errors="replace")
     return result

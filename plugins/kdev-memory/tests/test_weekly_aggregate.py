@@ -1,39 +1,30 @@
-"""test weekly.sh 滚动 7 天窗口聚合逻辑
+"""test weekly.py 滚动 7 天窗口聚合逻辑（v0.8 起为完全独立 CLI，无 bash wrapper）
 
 v0.7.2 起 weekly.sh 把内嵌 python3 heredoc 拆到 weekly.py 独立脚本，
-解决了 Windows Git-Bash 下 heredoc stdin 在 subprocess 失败的限制——
+v0.8.0 起 weekly.py 直接吸收 CLI 解析（argparse），weekly.sh 已删除。
 本文件 7 个测试在 Linux/macOS/Windows 三平台都应跑通。
 """
 
+from __future__ import annotations
+
+import os
 import subprocess
 import sys
 from datetime import date, timedelta
 from pathlib import Path
 
-LIB = Path(__file__).parent.parent / "hooks" / "lib" / "weekly.sh"
-
-# Windows: Python subprocess 默认 'bash' 指向 WSL，需显式用 Git Bash
-BASH = (
-    "C:/Program Files/Git/usr/bin/bash.exe"
-    if sys.platform == "win32"
-    else "bash"
-)
+LIB = Path(__file__).parent.parent / "hooks" / "lib" / "weekly.py"
 
 
 def _call(project: Path, date_from: str = "", date_to: str = "") -> subprocess.CompletedProcess:
-    import os
-    # Windows Path 用反斜杠，bash 需要正斜杠 -> 用 as_posix()
-    lib_path = LIB.as_posix()
-    project_path = project.as_posix()
-    args = [lib_path]
+    args = [sys.executable, str(LIB)]
     if date_from:
         args.extend(["--from", date_from])
     if date_to:
         args.extend(["--to", date_to])
     env = {**os.environ, "LANG": "en_US.UTF-8", "LC_ALL": "en_US.UTF-8"}
-    # Windows: Python text=True 用系统编码(GBK)，但 Git Bash 输出 UTF-8
-    # 解决方案：二进制捕获后手动 UTF-8 解码
-    result = subprocess.run([BASH] + args, cwd=project_path, capture_output=True, env=env)
+    # 二进制捕获 + UTF-8 解码（防 Windows 中文 GBK）
+    result = subprocess.run(args, cwd=str(project), capture_output=True, env=env)
     result.stdout = result.stdout.decode("utf-8", errors="replace")
     result.stderr = result.stderr.decode("utf-8", errors="replace")
     return result

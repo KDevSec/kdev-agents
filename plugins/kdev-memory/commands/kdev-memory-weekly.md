@@ -14,14 +14,14 @@ argument-hint: [无参数 | --from YYYY-MM-DD --to YYYY-MM-DD]
 
 ## 聚合数据
 
-!`bash "${CLAUDE_PLUGIN_ROOT}/hooks/lib/weekly.sh" $ARGUMENTS`
+!`python3 "${CLAUDE_PLUGIN_ROOT}/hooks/lib/weekly.py" $ARGUMENTS`
 
 ## 你的任务
 
-根据上面 bash 脚本的输出：
+根据上面脚本的输出：
 
 1. **复核聚合结果**：Step 数、G/Q/R 数量、评分均值是否合理
-2. **按汇报四段骨架补叙事**：bash 脚本只做机械聚合，你需要为每段补上"为什么"：
+2. **按汇报四段骨架补叙事**：脚本只做机械聚合，你需要为每段补上"为什么"：
 
    **📦 过程资产** —— 盘点段已机械输出，你只需做一件事：
    - 对 Step 条目做聚类（按主题而非日期），例如"collector 相关 3 条"、"鉴权相关 2 条"

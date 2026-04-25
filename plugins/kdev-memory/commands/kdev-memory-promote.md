@@ -7,13 +7,13 @@ argument-hint: [无参数 | --all]
 
 列出当前项目 `.kdev/memory/` 里所有"待沉淀"条目（改进建议 / R-NNN / G-NNN / Q-NNN），给出推荐沉淀去向，用户确认后把内容写入 `docs/` 并更新源条目的 `promote_status: done`。
 
-## 候选扫描（Bash 聚合）
+## 候选扫描（Python 聚合）
 
-!`bash "${CLAUDE_PLUGIN_ROOT}/hooks/lib/promote-list.sh" "$ARGUMENTS"`
+!`python3 "${CLAUDE_PLUGIN_ROOT}/hooks/lib/promote-list.py"`
 
 ## 你的任务
 
-根据上面 bash 脚本的输出：
+根据上面脚本的输出：
 
 1. **列出所有 pending 条目** —— 编号 + 标题 + 来源文件 + 建议去向（按下表）
 2. **向用户询问**："这些条目哪些要沉淀？（全选 / 指定编号 / 全跳过）"

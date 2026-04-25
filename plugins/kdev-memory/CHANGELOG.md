@@ -1,5 +1,28 @@
 # kdev-memory CHANGELOG
 
+## [Unreleased] — v0.8.0 进行中（方案 4：bash → Python）
+
+### Phase A 完成（standalone scripts 转 Python，2026-04-25）
+
+把 4 个独立调用的 .sh 脚本转为 Python（不依赖 bash sourcing 链，可独立完成）：
+
+- ✅ `init-gitignore.sh` → `init-gitignore.py`：纯 Python（pathlib + 文本 IO）替代 bash + grep + echo 组合
+- ✅ `migrate-v0.7.sh` → `migrate-v0.7.py`：用 `subprocess` 调 git 命令，pathlib 检查 .kdev/ 目录
+- ✅ `promote-list.sh` → `promote-list.py`：消除 `stat -c/-f` + `date -d/-v` 的 BSD/GNU 分叉，用 `os.stat().st_mtime` + `datetime` 一份代码三平台跑
+- ✅ `weekly.sh` 删除 + `weekly.py` 增强 argparse：吸收 `--from`/`--to` CLI 解析，weekly.sh 完全消失
+
+副作用：
+- `commands/kdev-memory-promote.md` 改调 `python3 promote-list.py`
+- `commands/kdev-memory-weekly.md` 改调 `python3 weekly.py`
+- `README.md` / `SKILL.md` 里的 `bash <name>.sh` 提示改为 `python3 <name>.py`
+- `tests/test_init_gitignore.py` / `tests/test_weekly_aggregate.py` 调用方式从 bash 改为 `sys.executable`，删 BASH 常量 + as_posix 转换
+
+后续 Phase B+C 工作（暂未发布）：
+- Phase B：6 个 hook 入口 + 8 个 source'd helper libs（migrate / frontmatter / missing-summaries / archive-hint / checkpoint / milestone / worktree-link / promote-scan）一并转 Python；hooks.json 改为 `python3` 调用
+- Phase C：删除所有 .sh + plugin.json bump 0.7.2 → 0.8.0 + release
+
+最低 Python 版本：**3.7**（每个 .py 文件顶部 `from __future__ import annotations`，运行时类型用 `typing.X`）。
+
 ## [0.7.2] — 2026-04-25
 
 ### 🔧 跨平台一致性

@@ -1,15 +1,18 @@
 #!/usr/bin/env python3
-"""kdev-memory weekly aggregator (v0.7.2)
+"""kdev-memory weekly aggregator (v0.8 起为完全独立 CLI，无 bash wrapper)
 
 聚合 .kdev/memory/ 在指定日期范围内的 Step / Q / G / R 条目，按汇报四段骨架输出 markdown：
   📦 过程资产 / 💡 经验总结 / ⚠️ 问题教训 / 🚀 开发进展
 
-调用：python3 weekly.py <kdev_dir> <date_from> <date_to>
-  - kdev_dir: 通常是 .kdev/memory（相对 cwd 也行）
-  - date_from / date_to: YYYY-MM-DD
+调用：python3 weekly.py [--from YYYY-MM-DD] [--to YYYY-MM-DD] [<kdev_dir>]
+  - 默认 kdev_dir: 当前 cwd 下的 .kdev/memory
+  - 默认 date_to: 今天；默认 date_from: date_to - 6 days
 
-由 hooks/lib/weekly.sh 调用（v0.7.2 起从内嵌 heredoc 拆为独立脚本，避免 Windows
-Git-Bash 下 `python3 - <<EOF` heredoc stdin 在 subprocess 失败的限制）。
+最低 Python 版本：3.7（`from __future__ import annotations` + typing.X）。
+
+迭代历史：
+  - v0.7.2 从 weekly.sh 内嵌 heredoc 拆出
+  - v0.8.0 吸收 weekly.sh 的 CLI 解析（argparse），weekly.sh 删除
 """
 
 from __future__ import annotations
@@ -187,16 +190,46 @@ def render(kdev: Path, d_from: date, d_to: date) -> None:
 
 
 def main() -> int:
-    if len(sys.argv) != 4:
-        print("usage: weekly.py <kdev_dir> <date_from> <date_to>", file=sys.stderr)
-        return 2
-    kdev = Path(sys.argv[1])
+    """v0.8 起：吸收原 weekly.sh 的 CLI 参数解析 + 默认日期 + 友好提示 + 目录检查，
+    weekly.sh 已删除。直接调用 `python3 weekly.py [--from X --to Y] [<kdev_dir>]`。"""
+    import argparse
+
+    parser = argparse.ArgumentParser(
+        description="kdev-memory 滚动 7 天周总结（默认 today-6 ~ today），输出按汇报四段骨架组织"
+    )
+    parser.add_argument(
+        "--from", dest="date_from", default=None,
+        help="起始日期 YYYY-MM-DD（默认：date_to - 6 days）",
+    )
+    parser.add_argument(
+        "--to", dest="date_to", default=None,
+        help="结束日期 YYYY-MM-DD（默认：今天）",
+    )
+    parser.add_argument(
+        "kdev_dir", nargs="?", default=".kdev/memory",
+        help="`.kdev/memory` 目录路径（默认：当前 cwd 下的 .kdev/memory）",
+    )
+    args = parser.parse_args()
+
+    today = date.today()
     try:
-        d_from = date.fromisoformat(sys.argv[2])
-        d_to = date.fromisoformat(sys.argv[3])
+        d_to = date.fromisoformat(args.date_to) if args.date_to else today
+        d_from = date.fromisoformat(args.date_from) if args.date_from else d_to - timedelta(days=6)
     except ValueError as e:
         print(f"weekly.py: invalid date — {e}", file=sys.stderr)
         return 2
+
+    kdev = Path(args.kdev_dir)
+    if not kdev.is_dir():
+        print(f"[kdev-memory] 当前项目无 {kdev}，无法生成周总结")
+        return 0
+
+    print(
+        f"（默认汇总过去 7 天 {d_from} ~ {d_to}；"
+        "可用 `--from YYYY-MM-DD --to YYYY-MM-DD` 指定范围）"
+    )
+    print()
+
     render(kdev, d_from, d_to)
     return 0
 

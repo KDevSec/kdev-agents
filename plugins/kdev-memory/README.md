@@ -247,7 +247,7 @@ v0.7 把 `.kdev/` 从"跟代码 commit"改为"**本地过程目录默认 gitigno
 
 ```bash
 # 在项目根目录执行
-bash "${CLAUDE_PLUGIN_ROOT}/hooks/lib/migrate-v0.7.sh"
+python3 "${CLAUDE_PLUGIN_ROOT}/hooks/lib/migrate-v0.7.py"
 
 # 核对后 commit
 git diff --cached
