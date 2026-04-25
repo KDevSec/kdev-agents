@@ -1,0 +1,136 @@
+"""test worktree-link.sh: secondary worktree 自动 symlink .kdev → 主 worktree（v0.7.1）
+
+平台覆盖：Linux / macOS。Windows (junction via mklink /J) 因为 CI 环境难以可靠模拟，跳过——
+通过 README + 人工验证保证。
+"""
+
+import os
+import subprocess
+import sys
+from pathlib import Path
+
+import pytest
+
+LIB = Path(__file__).parent.parent / "hooks" / "lib" / "worktree-link.sh"
+
+skip_on_windows = pytest.mark.skipif(
+    sys.platform == "win32",
+    reason="Windows junction 通过 cmd /c mklink /J 实现，需手动验证（README 说明手动方案）",
+)
+
+
+def _run_in(project: Path) -> subprocess.CompletedProcess:
+    """source 进来再调 worktree_link_kdev"""
+    script = f'''
+source "{LIB}"
+worktree_link_kdev
+'''
+    return subprocess.run(["bash", "-c", script], cwd=project, capture_output=True, text=True)
+
+
+def _init_main(tmp_path: Path) -> Path:
+    """造一个有 .kdev/memory/ 的主 worktree。"""
+    main = tmp_path / "main"
+    main.mkdir()
+    subprocess.run(["git", "init", "-q", "-b", "main"], cwd=main, check=True)
+    subprocess.run(["git", "-c", "user.email=t@t", "-c", "user.name=t",
+                   "commit", "-q", "--allow-empty", "-m", "init"], cwd=main, check=True)
+    (main / ".kdev" / "memory").mkdir(parents=True)
+    (main / ".kdev" / "memory" / "执行日志.md").write_text("# 执行日志\n", encoding="utf-8")
+    return main
+
+
+def _add_secondary(main: Path, branch: str = "feature/x") -> Path:
+    """在主 worktree 下挂一个 secondary worktree。"""
+    secondary = main.parent / "secondary"
+    subprocess.run(
+        ["git", "worktree", "add", "-b", branch, str(secondary)],
+        cwd=main, check=True, capture_output=True,
+    )
+    return secondary
+
+
+@skip_on_windows
+def test_main_worktree_skipped(tmp_path):
+    """主 worktree 调用时不创建 symlink（因为它自己就是真源）。"""
+    main = _init_main(tmp_path)
+    _run_in(main)
+    # .kdev/ 仍是真目录而非 symlink
+    assert (main / ".kdev").is_dir()
+    assert not (main / ".kdev").is_symlink()
+
+
+@skip_on_windows
+def test_secondary_worktree_auto_symlink(tmp_path):
+    """secondary worktree 启动时自动 symlink .kdev → 主 worktree 的 .kdev/。"""
+    main = _init_main(tmp_path)
+    secondary = _add_secondary(main)
+    # 起始 secondary 没有 .kdev/
+    assert not (secondary / ".kdev").exists()
+    # 调 helper
+    r = _run_in(secondary)
+    assert r.returncode == 0, f"helper failed: {r.stderr}"
+    # 现在 secondary 有 .kdev 且是 symlink
+    assert (secondary / ".kdev").is_symlink(), "应自动建 symlink"
+    # symlink 解出来等于主 worktree 的 .kdev/
+    target = (secondary / ".kdev").resolve()
+    expected = (main / ".kdev").resolve()
+    assert target == expected, f"symlink 指向错：{target} vs {expected}"
+    # 通过 symlink 能读到主 worktree 的内容
+    assert (secondary / ".kdev" / "memory" / "执行日志.md").read_text(encoding="utf-8") == "# 执行日志\n"
+
+
+@skip_on_windows
+def test_secondary_worktree_idempotent(tmp_path):
+    """重复调用不报错、不破坏已有 symlink。"""
+    main = _init_main(tmp_path)
+    secondary = _add_secondary(main)
+    _run_in(secondary)
+    first_target = (secondary / ".kdev").resolve()
+    # 第二次调
+    r = _run_in(secondary)
+    assert r.returncode == 0
+    second_target = (secondary / ".kdev").resolve()
+    assert first_target == second_target
+
+
+@skip_on_windows
+def test_secondary_worktree_local_kdev_preserved(tmp_path):
+    """secondary worktree 已有真 .kdev/（用户手动建的）→ 不覆盖。"""
+    main = _init_main(tmp_path)
+    secondary = _add_secondary(main)
+    # 用户手动建了本地 .kdev/
+    (secondary / ".kdev" / "memory").mkdir(parents=True)
+    (secondary / ".kdev" / "memory" / "本地.md").write_text("local-only\n", encoding="utf-8")
+    _run_in(secondary)
+    # 仍是真目录，本地文件没被覆盖
+    assert (secondary / ".kdev").is_dir()
+    assert not (secondary / ".kdev").is_symlink()
+    assert (secondary / ".kdev" / "memory" / "本地.md").exists()
+
+
+@skip_on_windows
+def test_secondary_worktree_skipped_when_main_has_no_kdev(tmp_path):
+    """主 worktree 没 .kdev/ → 不强建 symlink。"""
+    main = tmp_path / "main"
+    main.mkdir()
+    subprocess.run(["git", "init", "-q", "-b", "main"], cwd=main, check=True)
+    subprocess.run(["git", "-c", "user.email=t@t", "-c", "user.name=t",
+                   "commit", "-q", "--allow-empty", "-m", "init"], cwd=main, check=True)
+    secondary = main.parent / "secondary"
+    subprocess.run(
+        ["git", "worktree", "add", "-b", "feature/y", str(secondary)],
+        cwd=main, check=True, capture_output=True,
+    )
+    _run_in(secondary)
+    assert not (secondary / ".kdev").exists()
+
+
+@skip_on_windows
+def test_outside_git_repo_skipped(tmp_path):
+    """非 git 仓库调用 helper → 静默返回，不报错不创建。"""
+    not_a_repo = tmp_path / "not-git"
+    not_a_repo.mkdir()
+    r = _run_in(not_a_repo)
+    assert r.returncode == 0
+    assert not (not_a_repo / ".kdev").exists()

@@ -36,7 +36,10 @@ def test_time_trigger_over_7_days(tmp_path):
     k = _mkkdev(tmp_path)
     flush = k / ".last-promote"
     flush.touch()
-    old = time.time() - 8 * 86400
+    # 锚定到 _call 里硬编码的 today=2026-04-24，避免测试随真实日期漂移
+    import datetime as _dt
+    today_anchor = _dt.datetime.strptime("2026-04-24", "%Y-%m-%d").timestamp()
+    old = today_anchor - 15 * 86400  # 15 天前 → 触发 P1（>7），未到 P0（>30）
     os.utime(flush, (old, old))
     (k / "改进建议.md").write_text("""# 改进建议
 
@@ -94,7 +97,10 @@ def test_escalate_to_p0_over_30_days(tmp_path):
     k = _mkkdev(tmp_path)
     flush = k / ".last-promote"
     flush.touch()
-    very_old = time.time() - 35 * 86400
+    # 锚定到 _call 里硬编码的 today=2026-04-24，避免测试随真实日期漂移
+    import datetime as _dt
+    today_anchor = _dt.datetime.strptime("2026-04-24", "%Y-%m-%d").timestamp()
+    very_old = today_anchor - 35 * 86400
     os.utime(flush, (very_old, very_old))
     (k / "改进建议.md").write_text("## R-1\n", encoding="utf-8")
     out = _call(tmp_path)

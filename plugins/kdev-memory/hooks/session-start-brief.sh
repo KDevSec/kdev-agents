@@ -24,12 +24,19 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # shellcheck source=lib/missing-summaries.sh
 # shellcheck disable=SC1091
 . "$SCRIPT_DIR/lib/missing-summaries.sh"
+# shellcheck source=lib/worktree-link.sh
+# shellcheck disable=SC1091
+. "$SCRIPT_DIR/lib/worktree-link.sh"
 
 # 自动迁移（如果是 0.2.0 升级过来的老项目，这里完成搬家）
 kdev_memory_migrate
 
+# v0.7.1: secondary worktree 自动 symlink/junction .kdev → 主 worktree（多 worktree 共享记忆）
+worktree_link_kdev 2>/dev/null || true
+
 KDEV_DIR=".kdev/memory"
 TODAY=$(date +%F)
+GIT_BRANCH=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "")
 
 # 项目未启用 .kdev/memory/ → 静默（输出 suppressOutput，不注入任何内容）
 if [ ! -d "$KDEV_DIR" ]; then
@@ -232,6 +239,7 @@ build_brief() {
       brief+="📊 **今日进度**：\n"
       brief+="- 执行日志：$LOG_TODAY\n"
       brief+="- 每日汇总：$SUMMARY_TODAY_STATUS\n"
+      [ -n "$GIT_BRANCH" ] && brief+="- 当前分支：$GIT_BRANCH\n"
 
       if [ -n "$STATE_PHASE" ] || [ -n "$STATE_ITERATION" ] || [ -n "$STATE_CURRENT_STEP" ]; then
         brief+="\n🎯 **项目状态（来自 当前状态.md frontmatter）**：\n"
