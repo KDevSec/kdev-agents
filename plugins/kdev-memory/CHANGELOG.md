@@ -1,27 +1,61 @@
 # kdev-memory CHANGELOG
 
-## [Unreleased] — v0.8.0 进行中（方案 4：bash → Python）
+## [0.8.0] — 2026-04-25
 
-### Phase A 完成（standalone scripts 转 Python，2026-04-25）
+**纯 Python 化：bash 入口与 helper libs 全部转 Python，去除 bash 依赖。**
 
-把 4 个独立调用的 .sh 脚本转为 Python（不依赖 bash sourcing 链，可独立完成）：
+### 🔄 实现层重构（无用户感知行为变化）
+- 14 个 .sh 文件（6 个 hook 入口 + 8 个 source'd helper libs）全部转为 Python
+- `hooks/hooks.json`：6 处 `bash "..."` 全改为 `python3 "..."`
+- 跨平台分叉全部消除：`stat -c` vs `stat -f` / `date -d` vs `date -v` / `ln -s` vs `mklink /J` / `find -newer` —— 现在用 `os.stat().st_mtime` / `datetime` / `os.symlink` / `Path.rglob` 一份代码三平台跑
+- Windows 用户**不再依赖 Git Bash**——只需 Python 3.7+ 与 git CLI
 
-- ✅ `init-gitignore.sh` → `init-gitignore.py`：纯 Python（pathlib + 文本 IO）替代 bash + grep + echo 组合
-- ✅ `migrate-v0.7.sh` → `migrate-v0.7.py`：用 `subprocess` 调 git 命令，pathlib 检查 .kdev/ 目录
-- ✅ `promote-list.sh` → `promote-list.py`：消除 `stat -c/-f` + `date -d/-v` 的 BSD/GNU 分叉，用 `os.stat().st_mtime` + `datetime` 一份代码三平台跑
-- ✅ `weekly.sh` 删除 + `weekly.py` 增强 argparse：吸收 `--from`/`--to` CLI 解析，weekly.sh 完全消失
+### 转换清单
 
-副作用：
-- `commands/kdev-memory-promote.md` 改调 `python3 promote-list.py`
-- `commands/kdev-memory-weekly.md` 改调 `python3 weekly.py`
-- `README.md` / `SKILL.md` 里的 `bash <name>.sh` 提示改为 `python3 <name>.py`
-- `tests/test_init_gitignore.py` / `tests/test_weekly_aggregate.py` 调用方式从 bash 改为 `sys.executable`，删 BASH 常量 + as_posix 转换
+**Phase A**（v0.7.2 → v0.8.0 之间，标记为 [Unreleased] 中）：
+- `init-gitignore.sh` → `init-gitignore.py`
+- `migrate-v0.7.sh` → `migrate-v0.7.py`
+- `promote-list.sh` → `promote-list.py`
+- `weekly.sh` 删除 + `weekly.py` 增强 argparse
 
-后续 Phase B+C 工作（暂未发布）：
-- Phase B：6 个 hook 入口 + 8 个 source'd helper libs（migrate / frontmatter / missing-summaries / archive-hint / checkpoint / milestone / worktree-link / promote-scan）一并转 Python；hooks.json 改为 `python3` 调用
-- Phase C：删除所有 .sh + plugin.json bump 0.7.2 → 0.8.0 + release
+**Phase B helpers**（v0.8.0 落地）：
+- `frontmatter.sh` → `frontmatter.py`
+- `missing-summaries.sh` → `missing_summaries.py`
+- `milestone.sh` → `milestone.py`（路径 glob 用 fnmatch 替代 bash case 匹配）
+- `checkpoint.sh` → `checkpoint.py`
+- `archive-hint.sh` → `archive_hint.py`
+- `migrate.sh` → `migrate.py`（v0.2 → v0.3 自动迁移）
+- `worktree-link.sh` → `worktree_link.py`（os.symlink + cmd /c mklink /J 两路兜底）
+- `promote-scan.sh` → `promote_scan.py`
 
-最低 Python 版本：**3.7**（每个 .py 文件顶部 `from __future__ import annotations`，运行时类型用 `typing.X`）。
+**Phase B entries**（v0.8.0 落地）：
+- `session-start-brief.sh` → `session-start-brief.py`（最大入口，原 299 行 bash → 约 280 行 Python，逻辑全保留）
+- `session-end-check.sh` → `session-end-check.py`
+- `user-prompt-trigger.sh` → `user-prompt-trigger.py`
+- `stop-check.sh` → `stop-check.py`
+- `pre-compact-check.sh` → `pre-compact-check.py`
+- `post-write-check.sh` → `post-write-check.py`
+
+### 🐛 兼容性修复
+- 测试基础设施全部去 bash 依赖：`tests/test_*.py` 改用 `sys.executable` 直接调 .py，删 `BASH` 常量、`as_posix()` 转换、UTF-8 二进制解码 hack（保留 `LANG=en_US.UTF-8` env 防 Windows GBK 影响 Python subprocess）
+- `evals/run-hook-selftest.sh` 改调 `python3 user-prompt-trigger.py`
+
+### 📚 文档
+- README：里程碑白名单引用从 `milestone.sh` → `milestone.py`，验证 hook 命令从 `bash X.sh` → `python3 X.py`
+- SKILL.md / 切档与归档.md：bash 路径改 python3 路径
+- `commands/kdev-memory-promote.md` / `commands/kdev-memory-weekly.md`：脚本调用改 python3
+
+### ⚠️ 升级指引
+
+**对你的项目没有任何要求**：
+- `.kdev/memory/` 目录格式不变
+- CLAUDE.md 不需要改
+- 不需要跑迁移脚本
+- 跑 `/plugin update kdev-memory@kdev-agents` 后下一次会话自动生效
+
+**Python 版本下限**：3.7（覆盖内网旧设备）。每个 .py 文件用 `from __future__ import annotations` + `typing.List/Optional/Dict` 兼容，运行时不依赖 PEP 604 / PEP 585 现代语法。
+
+**外部脚本依赖 .sh**：v0.8 删除了 `plugins/kdev-memory/hooks/*.sh` 和 `plugins/kdev-memory/hooks/lib/*.sh`，无 wrapper 兼容。如果你的 CI/脚本直接调用过 plugin 的 .sh 文件，请改调对应的 .py。
 
 ## [0.7.2] — 2026-04-25
 
