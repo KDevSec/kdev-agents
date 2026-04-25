@@ -1,5 +1,40 @@
 # kdev-memory CHANGELOG
 
+## [0.8.1] — 2026-04-25
+
+**收口：把 v0.8.0 的 emoji 编码兼容修复扩展到所有相关 hook（dac5cfe 漏修了）。**
+
+### 🐛 修复
+
+- 新增 `hooks/lib/_utf8.py` —— `force_utf8_stdio()` helper，把 sys.stdout/stderr
+  切到 UTF-8（如果当前不是），失败静默不阻断 hook
+- `session-start-brief.py` / `stop-check.py` / `pre-compact-check.py`
+  顶部加 `force_utf8_stdio()` 调用，覆盖原 dac5cfe 漏掉的入口：
+  - session-start-brief 通过 `print(json.dumps(..., ensure_ascii=False))` 注入
+    含 🔴🟡⚪📊🎯📝💡 的 brief —— 之前在 Windows GBK 下含 emoji 时会抛
+    UnicodeEncodeError
+  - stop-check 的 `sys.stdout.write` reminders 含 ⚠️ 📦 —— 同样风险
+  - pre-compact 当前 stdout 暂无 emoji，但保险起见统一加（防未来 reminders 加 emoji 时回归）
+- `weekly.py` 改用共享 helper（替代 dac5cfe 的 inline reconfigure）
+
+### 🐛 触发场景
+
+v0.8.0 在 Windows 上之所以验证通过，是因为测试场景是干净临时项目
+（无 pending 沉淀候选、无跨期归档、无 P0 阻塞），session-start-brief 走的是
+"📊 今日进度"分支，**未触发 emoji-密集的 P0/P1/P2 块**。一旦真实项目积累内容
+触发到沉淀提醒（含 🔴 / 📝）、归档提醒（含 📦）等，Windows GBK console 会
+炸 UnicodeEncodeError 导致 hook JSON 注入失败。本版本预防性收口。
+
+### 📚 文档微修
+
+- `hooks/lib/claude_md_lint.py` 注释里残留的 "session-start-brief.sh" 引用
+  补成 "session-start-brief.py（v0.7 之前是 .sh）"
+
+### ⚠️ 升级指引
+
+无任何用户行为变化，行为完全等价于 v0.8.0；只是更稳。
+跑 `/plugin update kdev-memory@kdev-agents` 即可。
+
 ## [0.8.0] — 2026-04-25
 
 **纯 Python 化：bash 入口与 helper libs 全部转 Python，去除 bash 依赖。**
