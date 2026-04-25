@@ -24,6 +24,9 @@ SCRIPT_DIR = Path(__file__).resolve().parent
 LIB_DIR = SCRIPT_DIR / "lib"
 sys.path.insert(0, str(LIB_DIR))
 
+from _utf8 import force_utf8_stdio  # noqa: E402
+force_utf8_stdio()  # Windows GBK 兼容：v0.8.1+ 统一处理 emoji 编码（pre-compact 软提醒虽暂无 emoji，预防未来 reminders 含 emoji）
+
 from migrate import kdev_memory_migrate  # noqa: E402
 from checkpoint import prune_old_checkpoints  # noqa: E402
 

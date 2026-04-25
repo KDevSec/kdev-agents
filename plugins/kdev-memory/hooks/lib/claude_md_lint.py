@@ -22,7 +22,7 @@ CLAUDE.md 接口契约 lint
       "summary": "一行人类可读描述",
     }
 
-调用方（session-start-brief.sh）拿 JSON 后决定是否注入 ⚠️ 提示。
+调用方（session-start-brief.py，v0.7 之前是 .sh）拿 JSON 后决定是否注入 ⚠️ 提示。
 """
 
 from __future__ import annotations

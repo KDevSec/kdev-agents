@@ -19,15 +19,15 @@ from __future__ import annotations
 
 import re
 import sys
-
-# Windows 兼容：强制 stdout/stderr 使用 UTF-8（避免 GBK 无法编码 emoji）
-if sys.stdout.encoding != "utf-8":
-    sys.stdout.reconfigure(encoding="utf-8")
-if sys.stderr.encoding != "utf-8":
-    sys.stderr.reconfigure(encoding="utf-8")
-
 from datetime import date, timedelta
 from pathlib import Path
+
+# Windows 兼容：强制 stdout/stderr 使用 UTF-8（避免 GBK 无法编码 emoji）
+# v0.8.1 起统一走 _utf8.force_utf8_stdio helper
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from _utf8 import force_utf8_stdio  # noqa: E402
+
+force_utf8_stdio()
 
 
 def in_range(s: str | None, d_from: date, d_to: date) -> bool:
