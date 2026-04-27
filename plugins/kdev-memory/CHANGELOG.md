@@ -1,5 +1,21 @@
 # kdev-memory CHANGELOG
 
+## [0.8.2] — 2026-04-27
+
+**Windows python3 命令兼容性修复：polyglot wrapper 自动选择正确的 Python 解释器。**
+
+### 🐛 兼容性修复
+- 新增 `hooks/run-python-hook.cmd`：polyglot wrapper（单文件同时支持 Windows cmd + Unix bash）
+  - Windows 优先级：`py -3` → `python` → `python3`
+  - Unix/Mac 优先级：`python3` → `python`
+  - `py -3` 使用 Windows Python launcher，明确指定 Python 3，避免 Python 2 混淆
+- `hooks/hooks.json`：6 处 `python3 "..."` 全改为 `run-python-hook.cmd <script>.py`
+- 解决 Windows 上 `python3` 指向 Windows Store stub（返回 exit code 49）的问题
+- 解决旧系统 `python` 可能指向 Python 2 的问题
+
+### 📚 相关文档
+- `docs/skills/kdev-memory/dev-notes/2026-04-27-windows-python3-hook兼容性问题.md`：问题分析与解决方案对比
+
 ## [0.8.1] — 2026-04-25
 
 **收口：把 v0.8.0 的 emoji 编码兼容修复扩展到所有相关 hook（dac5cfe 漏修了）。**
