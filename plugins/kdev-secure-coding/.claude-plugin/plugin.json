@@ -1,0 +1,10 @@
+{
+  "name": "kdev-secure-coding",
+  "description": "公司安全编码规范 skill 集合。每个 skill 覆盖一种语言：description 触发为主路径、CLAUDE.md 锚点兜底（首次激活自举写入），编码期按关键词映射表 Read 对应 reference 章节，声明任务完成前 MUST 走完一份 8 类清单。当前已收录 python-security-coding（8 大类、50+ 条规则、含正反例代码）；规划中：java-security-coding / c-security-coding。",
+  "version": "0.1.0",
+  "author": {
+    "name": "ly"
+  },
+  "license": "MIT",
+  "keywords": ["security", "secure-coding", "coding-standards", "python", "compliance", "kdev"]
+}

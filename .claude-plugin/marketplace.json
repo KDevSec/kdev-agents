@@ -17,6 +17,12 @@
       "description": "AI commit + push 一体化：skill 引导 AI 用 <git user.name>-AI + 本地真实 email 完成 commit；hook 硬校验身份覆盖；push 前弹权限框让用户确认",
       "category": "development",
       "source": "./plugins/kdev-commit"
+    },
+    {
+      "name": "kdev-secure-coding",
+      "description": "公司安全编码规范 skill 集合：description 触发 + CLAUDE.md 锚点兜底 + 编码期按关键词 Read reference + 完成前 8 类清单核对。当前含 python-security-coding（8 大类、50+ 条规则、含正反例代码），后续扩展 Java / C 等语言",
+      "category": "development",
+      "source": "./plugins/kdev-secure-coding"
     }
   ]
 }

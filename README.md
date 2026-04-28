@@ -8,6 +8,7 @@ KDev 系列 Claude Code 插件集合 —— 工程记忆、流程辅助、代码
 |-----|------|
 | [kdev-memory](plugins/kdev-memory) | 工程记忆制度：实时落盘决策/踩坑/执行/评分，七层 hook 兜会话续航 + 按月/按季度归档 |
 | [kdev-commit](plugins/kdev-commit) | AI commit + push 一体化：AI 用 `<name>-AI` 身份提交，push 前弹 IDE 权限框让用户确认 |
+| [kdev-secure-coding](plugins/kdev-secure-coding) | 公司安全编码规范 skill 集合：description 触发 + CLAUDE.md 锚点兜底 + 编码期按需查阅 + 完成前 8 类清单核对。当前含 python-security-coding，规划 Java / C |
 
 ## 安装方式
 
@@ -18,6 +19,7 @@ claude plugin marketplace add KDevSec/kdev-agents
 # 2. 按需安装插件
 claude plugin install kdev-memory@kdev-agents
 claude plugin install kdev-commit@kdev-agents
+claude plugin install kdev-secure-coding@kdev-agents
 ```
 
 ## 更新
@@ -37,6 +39,7 @@ Claude Code 对官方 Anthropic marketplace 默认启用 auto-update，但对第
 # 再升级具体插件
 /plugin update kdev-memory@kdev-agents
 /plugin update kdev-commit@kdev-agents
+/plugin update kdev-secure-coding@kdev-agents
 ```
 
 两步都要跑——`marketplace update` 只刷新元数据，`plugin update` 才真正升级。
@@ -104,13 +107,21 @@ kdev-agents/
     │   ├── evals/                        # skill-creator 式 eval（端到端 hook 召回验证）
     │   ├── CHANGELOG.md
     │   └── README.md
-    └── kdev-commit/                      # AI commit + push 插件
+    ├── kdev-commit/                      # AI commit + push 插件
+    │   ├── .claude-plugin/plugin.json
+    │   ├── skills/kdev-commit/SKILL.md
+    │   ├── hooks/                        # 纯 Node，零外部依赖
+    │   │   ├── hooks.json
+    │   │   ├── block-unattributed-commit.js
+    │   │   └── confirm-push.js
+    │   └── README.md
+    └── kdev-secure-coding/               # 公司安全编码规范 skill 集合
         ├── .claude-plugin/plugin.json
-        ├── skills/kdev-commit/SKILL.md
-        ├── hooks/                        # 纯 Node，零外部依赖
-        │   ├── hooks.json
-        │   ├── block-unattributed-commit.js
-        │   └── confirm-push.js
+        ├── skills/python-security-coding/   # 8 大类、50+ 条规则
+        │   ├── SKILL.md
+        │   └── references/01-08*.md
+        ├── tests/verify-skill.py         # 结构验证器（heading + 三元组）
+        ├── CHANGELOG.md
         └── README.md
 ```
 
