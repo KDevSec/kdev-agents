@@ -1,0 +1,14 @@
+{
+  "scenario": "scenario-2-gotcha-record",
+  "config": "baseline",
+  "run_id": 2,
+  "assertions": [
+    {"id": "包含 ## G-NNN: pnpm install 在 workspace", "status": "PASS"},
+    {"id": "包含 triggers: 字段（中英文关键词）", "status": "PASS"},
+    {"id": "包含 现象、原因、解决", "status": "PASS"}
+  ],
+  "total_assertions": 3,
+  "passed": 3,
+  "failed": 0,
+  "grade": "PASS"
+}

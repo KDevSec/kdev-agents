@@ -1,0 +1,83 @@
+{
+  "eval_id": "eval-12-skill-simplification",
+  "purpose": "验证 SKILL.md 精简后行为一致性 + token 节省效果",
+  "eval_type": "discriminating",
+  "configs": [
+    {
+      "name": "baseline",
+      "description": "精简前 SKILL.md（v0.8.x 原版，从 git 恢复）",
+      "skill_version": "pre-simplification"
+    },
+    {
+      "name": "with_simplification",
+      "description": "精简后 SKILL.md（当前版本，符合 skill-creator <5k 词限制）",
+      "skill_version": "post-simplification"
+    }
+  ],
+  "runs_per_config": 1,
+  "scenarios": [
+    {
+      "id": "scenario-1-step-completion",
+      "prompt": "我刚完成了一个任务：实现了 token 消耗监控功能。工具调用约 15 次，报错 1 次（pnpm install 失败后重试），绕路 0 次，token 消耗感中等，使用的 skill 是 [brainstorming, tdd]。请帮我记录这个 Step。",
+      "fixture_path": "fixtures/skill-quality/eval-12-skill-simplification/",
+      "expected_outputs": [
+        {
+          "file": ".kdev/memory/执行日志.md",
+          "assertions": [
+            "包含 ## Step N: 实现了 token 消耗监控功能",
+            "包含 执行事实段（工具调用次数、报错次数、绕路次数、token 消耗感、使用的 skill）",
+            "包含 模型自评段（顺畅度 + 扣分项）",
+            "包含 用户评分段（待填）",
+            "包含 triggers: 字段"
+          ]
+        },
+        {
+          "file": ".kdev/memory/当前状态.md",
+          "assertions": [
+            "current_step 已更新",
+            "last_updated 已更新为今天"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "scenario-2-gotcha-record",
+      "prompt": "pnpm install 在 workspace 根目录会漏装子包依赖，子包 import 报错 Cannot find module，解决方案是 pnpm -r install 或在子包目录单独跑。请帮我记一条踩坑。",
+      "fixture_path": "fixtures/skill-quality/eval-12-skill-simplification/",
+      "expected_outputs": [
+        {
+          "file": ".kdev/memory/踩坑日志.md",
+          "assertions": [
+            "包含 ## G-NNN: pnpm install 在 workspace",
+            "包含 triggers: 字段（中英文关键词）",
+            "包含 现象、原因、解决"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "scenario-3-daily-summary",
+      "prompt": "写今天的总结。",
+      "fixture_path": "fixtures/skill-quality/eval-12-skill-simplification/",
+      "expected_outputs": [
+        {
+          "file": ".kdev/memory/每日汇总/YYYY-MM-DD.md",
+          "assertions": [
+            "包含 完成的工作（速览）",
+            "包含 本日新增踩坑/决策索引",
+            "不复述执行日志细节（只是索引）"
+          ]
+        }
+      ]
+    }
+  ],
+  "metrics_to_collect": [
+    "total_tokens",
+    "tool_uses",
+    "files_read",
+    "files_written",
+    "elapsed_seconds"
+  ],
+  "baseline_skill_commit": "HEAD~1",
+  "notes": "此 eval 验证方案 D+E 的核心假设：精简不逆转 iter-7 的显式化收益，tool_uses 不增加"
+}

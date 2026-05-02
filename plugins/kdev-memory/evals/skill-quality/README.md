@@ -33,6 +33,7 @@
 | 8 | claude-md-drift-fix | hook-interaction | "修 CLAUDE.md 漂移 / 接口漂移 / claude.md 对齐 skill" |
 | 9 | step-half-complete-fix | hook-interaction | SessionStart brief ⚠️ 欠评 Step 的补齐流程 |
 | 11 | skill-used-field | hook-interaction | Step 执行事实段「使用的 skill」字段 + N/A 语义（v0.6.0）|
+| 12 | skill-simplification | discriminating | SKILL.md 精简前后行为一致性 + token 节省（v0.9.0 候选）|
 
 **未覆盖**（skill description 里提到但暂不测的）：
 - `<kdev-memory-recall>` / `<kdev-memory-brief>` 注入的处理 —— 需要模拟 hook 注入的上下文，subagent harness 做不到
@@ -169,7 +170,8 @@ rm -rf $WS
 
 | iteration | 测什么 | 结论 |
 |---|---|---|
-| **[20260424-08-skill-used-field](iterations/20260424-08-skill-used-field/)** ← 最新 | v0.6.0 候选：Step 事实层加「使用的 skill」+ 粒度指引 discriminating | **合入**——with_field 11/11 vs baseline 7/11；behavior 质量提升（非成本下降），一次性 SKILL.md +1 行 / references +44 行 换字段结构化 + 跨 Step 聚合能力 |
+| **[20260429-12-skill-simplification](iterations/20260429-01-skill-simplification/)** ← 最新 | SKILL.md 精简 discriminating eval（方案 D+E 验证）| **合入**——行为 100% 一致 + tool_uses -6.4% + 词数 944 < 5k 规范；精简不逆转 iter-7 收益 |
+| [20260424-08-skill-used-field](iterations/20260424-08-skill-used-field/) | v0.6.0 候选：Step 事实层加「使用的 skill」+ 粒度指引 discriminating | **合入**——with_field 11/11 vs baseline 7/11；behavior 质量提升（非成本下降），一次性 SKILL.md +1 行 / references +44 行 换字段结构化 + 跨 Step 聚合能力 |
 | [20260423-07-p0-1-discriminating](iterations/20260423-07-p0-1-discriminating/) | P0-1 Step 完成闸门是否必要？discriminating eval | **结论反转：应当加**——虽然行为一致，但每次省 ~11.6k tokens，+22 行文档的一次性成本 ≤ 每次触发的长期收益；已合入 SKILL.md |
 | [20260423-06-step-completeness-lint](iterations/20260423-06-step-completeness-lint/) | Step 完整度 lint（P1-5 brief 告警 + P1-6 Stop 阻塞）| 8/8 pass，skill"坦诚反思"路线补齐半残 Step |
 | [20260422-05-eval6-coverage](iterations/20260422-05-eval6-coverage/) | 补跑 eval-6 跨会话续航（场景覆盖）| 8/8 pass，skill 严格只读回读，语义理解到位 |

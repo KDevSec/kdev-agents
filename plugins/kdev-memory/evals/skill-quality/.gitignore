@@ -7,6 +7,7 @@ iterations/*/eval-*/*/run-*/outputs/
 
 # 临时 workspace（放在本目录外的也忽略）
 workspace/
+workspace-*/
 iteration-tmp-*/
 
 # skill snapshot：通过 git show HEAD:<path> 取历史版本，不必常驻

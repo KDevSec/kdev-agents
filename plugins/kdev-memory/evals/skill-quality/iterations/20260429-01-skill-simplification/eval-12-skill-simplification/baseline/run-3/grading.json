@@ -1,0 +1,14 @@
+{
+  "scenario": "scenario-3-daily-summary",
+  "config": "baseline",
+  "run_id": 3,
+  "assertions": [
+    {"id": "包含 完成的工作（速览）", "status": "PASS"},
+    {"id": "包含 本日新增踩坑/决策索引", "status": "PASS"},
+    {"id": "不复述执行日志细节（只是索引）", "status": "PASS"}
+  ],
+  "total_assertions": 3,
+  "passed": 3,
+  "failed": 0,
+  "grade": "PASS"
+}

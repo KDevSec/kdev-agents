@@ -1,0 +1,18 @@
+{
+  "scenario": "scenario-1-step-completion",
+  "config": "baseline",
+  "run_id": 1,
+  "assertions": [
+    {"id": "包含 ## Step N: 实现了 token 消耗监控功能", "status": "PASS"},
+    {"id": "包含 执行事实段（工具调用次数、报错次数、绕路次数、token 消耗感、使用的 skill）", "status": "PASS"},
+    {"id": "包含 模型自评段（顺畅度 + 扣分项）", "status": "PASS"},
+    {"id": "包含 用户评分段（待填）", "status": "PASS"},
+    {"id": "包含 triggers: 字段", "status": "PASS"},
+    {"id": "current_step 已更新", "status": "PASS"},
+    {"id": "last_updated 已更新为今天", "status": "PASS"}
+  ],
+  "total_assertions": 7,
+  "passed": 7,
+  "failed": 0,
+  "grade": "PASS"
+}
