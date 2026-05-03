@@ -1,0 +1,25 @@
+README.md
+  31cf5f1fee7f141e 12,24,45,121-129,131,139
+.claude-plugin/marketplace.json
+  31cf5f1fee7f141e 34
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.3.4",
+  "base_commit_sha": "a876fa653b419d0bb6a330e7614b45c91a73aedc",
+  "prompts": {
+    "31cf5f1fee7f141e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5eb6df47-f6a5-4345-a018-25761cea6299",
+        "model": "glm-5"
+      },
+      "human_author": "liyong",
+      "messages": [],
+      "total_additions": 540,
+      "total_deletions": 831,
+      "accepted_lines": 3596,
+      "overriden_lines": 10
+    }
+  }
+}
