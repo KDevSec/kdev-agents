@@ -1,5 +1,44 @@
 # kdev-memory CHANGELOG
 
+## [0.9.0] — 2026-05-03
+
+**SKILL.md 极简重构：从 1326 词精简至 944 词（-28.8%），符合 skill-creator <5k 词规范。**
+
+iter-12 discriminating eval 验证：精简不逆转 iter-7 收益，行为 100% 一致。
+
+### ✨ 架构优化
+
+- **SKILL.md 主文精简**：从 1326 词 → 944 词（-28.8%）
+  - 移除低频场景细节（初始化模板、切档流程、升级流程等）→ 已承接至 references/
+  - 移除冗余描述（如"为什么这样设计"解释段）→ 精简为"参考 xxx reference"
+  - 移除 hook 实现细节列表 → 改为"见 references/自动化机制-hooks.md"
+  - 移除反模式枚举 → 精简为核心铁规
+- **references/ 承接完整**：移出的内容全部有对应 reference 文件承接，无信息丢失
+- **符合 skill-creator 规范**：944 词 < 5k 词限制，降低每次触发 token 成本
+
+### 📊 iter-12 discriminating eval 结果
+
+| 指标 | Baseline (v0.8.x) | With Simplification | 差异 |
+|------|-------------------|--------------------|------|
+| SKILL.md 词数 | 1326 | 944 | -28.8% |
+| 总 tokens | 134,194 | 134,540 | +0.26% |
+| 总 tool_uses | 47 | 44 | -6.4% |
+| Pass rate | 100% (13/13) | 100% (13/13) | 一致 |
+
+**结论**：行为完全一致，tool_uses 略降，精简不逆转 iter-7 的显式化收益。
+
+### 🔗 相关文档
+
+- `plugins/kdev-memory/evals/skill-quality/iterations/20260429-01-skill-simplification/`：完整 eval 数据
+- `docs/skills/kdev-memory/dev-notes/2026-04-29-kdev-memory-subagent记录模式方案-修订版.md`：方案 D+E 决策背景
+
+### ⚠️ 升级指引
+
+无任何用户行为变化，行为完全等价于 v0.8.2。
+跑 `/plugin update kdev-memory@kdev-agents` 即可。
+
+---
+
 ## [0.8.2] — 2026-04-27
 
 **Windows python3 命令兼容性修复：polyglot wrapper 自动选择正确的 Python 解释器。**
