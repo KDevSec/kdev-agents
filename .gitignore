@@ -30,6 +30,7 @@ yarn-error.log*
 # Python
 __pycache__/
 *.pyc
+.playwright-mcp
 
 # Node / build
 node_modules/
@@ -39,10 +40,14 @@ bridge/*.cjs
 # KDev / OMC runtime
 .omc/
 
+# References (local research projects, not for commit)
+references/
+
 # Claude Code 本地调试产物（仅忽略仓库根目录的 .kdev/；
 # 允许子目录里的 .kdev 作为测试 fixture 被跟踪，靠下面的 negation 放行）
 /.kdev/
 .claude/settings.local.json
+sandbox/*
 
 # eval fixture：.kdev/ 测试数据，必须跟踪
 !plugins/kdev-memory/evals/fixtures/**/.kdev/

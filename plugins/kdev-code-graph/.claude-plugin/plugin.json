@@ -1,0 +1,13 @@
+{
+  "name": "kdev-code-graph",
+  "version": "0.1.0",
+  "description": "Semantic knowledge graph for code review with doc-code tracing. Supports Markdown and images.",
+  "keywords": ["code-review", "semantic", "doc-code", "knowledge-graph", "md", "image"],
+  "skills": [
+    "./skills/semantic-trace",
+    "./skills/code-review-enhanced",
+    "./skills/doc-code-sync"
+  ],
+  "hooks": "./hooks/hooks.json",
+  "mcpServers": "./.mcp.json"
+}

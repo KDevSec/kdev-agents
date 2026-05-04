@@ -1,0 +1,13 @@
+{
+  "mcpServers": {
+    "semantic-graph": {
+      "type": "stdio",
+      "command": "python",
+      "args": ["${CLAUDE_PLUGIN_ROOT}/mcp-server/server.py", "serve"],
+      "env": {
+        "PYTHONUTF8": "1",
+        "ANTHROPIC_API_KEY": "${ANTHROPIC_API_KEY}"
+      }
+    }
+  }
+}
