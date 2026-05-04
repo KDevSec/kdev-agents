@@ -1,0 +1,47 @@
+plugins/kdev-code-graph/hooks/hooks.json
+  856511dcd53cc8a3 1-28
+plugins/kdev-code-graph/skills/code-review-enhanced/SKILL.md
+  856511dcd53cc8a3 1-136
+plugins/kdev-code-graph/skills/semantic-trace/SKILL.md
+  856511dcd53cc8a3 1-130
+plugins/kdev-code-graph/.mcp.json
+  856511dcd53cc8a3 1-13
+.gitignore
+  856511dcd53cc8a3 43-45
+docs/framework/01-design/编码阶段流程图.drawio
+  856511dcd53cc8a3 1-305
+plugins/kdev-code-graph/.claude-plugin/plugin.json
+  856511dcd53cc8a3 1-13
+docs/skills/kdev-memory/dev-notes/2026-04-28-kdev-memory-subagent方案评审意见.md
+  856511dcd53cc8a3 1-408
+docs/skills/kdev-memory/dev-notes/2026-04-29-kdev-memory-subagent记录模式方案-修订版.md
+  856511dcd53cc8a3 1-386
+docs/skills/kdev-memory/dev-notes/2026-04-28-kdev-memory-subagent记录模式方案.md
+  856511dcd53cc8a3 1-405
+docs/framework/01-design/2026-04-29-KDev执行阶段流程设计v3.0.3.md
+  856511dcd53cc8a3 1-470
+plugins/kdev-code-graph/README.md
+  856511dcd53cc8a3 1-109
+plugins/kdev-code-graph/skills/doc-code-sync/SKILL.md
+  856511dcd53cc8a3 1-146
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.3.4",
+  "base_commit_sha": "e4545a79c1ecbfa14c495c45435bdf547305c8ad",
+  "prompts": {
+    "856511dcd53cc8a3": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "0e47c6f9-769d-45d8-9970-bfea7392b9d8",
+        "model": "glm-5"
+      },
+      "human_author": "liyong",
+      "messages": [],
+      "total_additions": 3804,
+      "total_deletions": 1128,
+      "accepted_lines": 3499,
+      "overriden_lines": 0
+    }
+  }
+}
