@@ -1,0 +1,10 @@
+{
+  "name": "kdev-design-flow",
+  "description": "需求-原型-设计流程编排：串联 spec-kit:specify、frontend-design、spec-kit:plan 三段已有 skill，加 3 个评审闸门（默认 Claude 自评，可切人工/混合），把'原始需求 → SR 需求文档 → AR 用户故事 → 高保真原型 → 概要+详细设计'这条工程链路固化为一条可复跑的 skill。中间产物落 .kdev/design-flow/（gitignored），最终交付物落 docs/design-flow/。",
+  "version": "0.1.0",
+  "author": {
+    "name": "1qljc"
+  },
+  "license": "MIT",
+  "keywords": ["design", "requirements", "prototype", "orchestration", "spec-kit", "kdev"]
+}
