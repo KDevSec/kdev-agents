@@ -33,3 +33,21 @@ Claude Code 插件：把"需求 → 原型 → 设计"流程固化为一个 skil
 - `--review=human`：纯人工评审
 
 详见 [设计文档](../../docs/superpowers/specs/2026-05-07-kdev-design-flow-design.md)。
+
+## 已知限制 (v0.1)
+
+- 中间产物落 `.kdev/design-flow/`，不自动清理（保留迭代历史作 B 方案训练数据）
+- `--review=both` / `--review=human` 模式下，会话中断后必须 `--resume` 重新进入评审闸门
+- 不支持自定义 stage 顺序、跳过 stage、并行多 feature
+- `spec-kit:specify` / `spec-kit:plan` 是硬依赖，没装会硬中断
+- 中文 feature-name 走 SHA-1 hash 兜底（v0.1 不依赖拼音库），slug 形如 `00af4da9`，不可读但稳定
+- Claude 自评（`--review=ai`）有自我确认偏差风险，缓解靠评审 prompt 写死的硬性 criteria 清单；B 方案再升级真二号意见
+
+## 测试
+
+```bash
+cd plugins/kdev-design-flow
+python3 -m pytest tests/ -v
+```
+
+预期：28 passing（slug 11 + flow_state 8 + skill_md_lint 9）。
