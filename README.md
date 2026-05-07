@@ -10,6 +10,7 @@ KDev 系列 Claude Code 插件集合 —— 工程记忆、流程辅助、代码
 | [kdev-commit](plugins/kdev-commit) | AI commit + push 一体化：AI 用 `<name>-AI` 身份提交，push 前弹 IDE 权限框让用户确认 |
 | [kdev-secure-coding](plugins/kdev-secure-coding) | 公司安全编码规范 skill 集合：description 触发 + CLAUDE.md 锚点兜底 + 编码期按需查阅 + 完成前 8 类清单核对。当前含 python-security-coding，规划 Java / C |
 | [kdev-code-graph](plugins/kdev-code-graph) | 语义级代码图谱：需求追溯、变更爆炸半径分析、文档-代码同步检查，支持 Markdown 和图片解析 |
+| [kdev-design-flow](plugins/kdev-design-flow) | 需求-原型-设计流程编排：串联 spec-kit + frontend-design，加 3 个评审闸门（Claude 自评/人工/混合三档可选），把"原始需求 → SR 文档 → AR 用户故事 → 高保真原型 → 概要+详细设计"链路固化为一个可复跑 skill。**v0.1 实验版**：boot sequence 已验证，主循环依赖 spec-kit 安装环境验收 |
 
 ## 安装方式
 
@@ -22,6 +23,7 @@ claude plugin install kdev-memory@kdev-agents
 claude plugin install kdev-commit@kdev-agents
 claude plugin install kdev-secure-coding@kdev-agents
 claude plugin install kdev-code-graph@kdev-agents
+claude plugin install kdev-design-flow@kdev-agents   # v0.1 实验版，需先装 spec-kit
 ```
 
 ## 更新
@@ -43,6 +45,7 @@ Claude Code 对官方 Anthropic marketplace 默认启用 auto-update，但对第
 /plugin update kdev-commit@kdev-agents
 /plugin update kdev-secure-coding@kdev-agents
 /plugin update kdev-code-graph@kdev-agents
+/plugin update kdev-design-flow@kdev-agents
 ```
 
 两步都要跑——`marketplace update` 只刷新元数据，`plugin update` 才真正升级。
@@ -126,9 +129,19 @@ kdev-agents/
     │   ├── tests/verify-skill.py         # 结构验证器（heading + 三元组）
     │   ├── CHANGELOG.md
     │   └── README.md
-    └── kdev-code-graph/                  # 语义级代码图谱插件
+    ├── kdev-code-graph/                  # 语义级代码图谱插件
+    │   ├── .claude-plugin/plugin.json
+    │   ├── skills/kdev-code-graph/SKILL.md
+    │   └── README.md
+    └── kdev-design-flow/                 # 需求-原型-设计流程编排插件 (v0.1 实验)
         ├── .claude-plugin/plugin.json
-        ├── skills/kdev-code-graph/SKILL.md
+        ├── commands/kdev-design-flow.md  # /kdev-design-flow 斜杠命令
+        ├── skills/kdev-design-flow/
+        │   ├── SKILL.md                  # 5 阶段 + 3 评审闸门 + retry 主循环
+        │   └── references/               # SR prompt + 模板 + review 通用 prompt + 合并规则
+        ├── lib/                          # slug.py（slug 化）+ flow_state.py（原子状态 IO）
+        ├── tests/                        # pytest（slug 11 + flow_state 8 + skill_md_lint 9 = 28）
+        ├── CHANGELOG.md
         └── README.md
 ```
 
