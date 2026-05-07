@@ -172,3 +172,103 @@ grep -qE "^/?\.kdev/design-flow/?$" .gitignore || echo "/.kdev/design-flow/" >> 
 
 - 通知用户中断 + 给出 aborted.md 路径，停止流程。
 
+---
+
+## Stage 2: 进一步需求分析（spec-kit:specify）
+
+1. Read 上一步通过的 SR 文档：`.kdev/design-flow/<slug>/stage-1-sr/iter-<last_pass>.md`
+2. 调 `Skill` 工具，name=`spec-kit:specify`，提示词模板：
+
+```
+我有一份 SR 级需求文档（已通过初步评审），请按 spec-kit:specify 流程把它细化成 AR 级用户故事。
+
+输入 SR 文档：
+<<<
+{{paste sr doc content}}
+>>>
+
+输出落盘路径建议（spec-kit 自己决定即可）：
+.kdev/design-flow/<slug>/stage-2-ar/iter-<iter>.md
+
+约束：
+- 用户故事覆盖每个 SR
+- 每个 user story 包含 acceptance criteria
+- 不要重复 SR 文档里已经有的"显式不做"清单
+```
+
+3. spec-kit:specify 完成后，确认产物文件存在于 `.kdev/design-flow/<slug>/stage-2-ar/iter-<iter>.md`。如果落到了别的位置（spec-kit 默认路径），用 `mv` 移过来。
+4. **此处不评审**——Stage 2 + Stage 3 共用 Gate 2，等 Stage 3 跑完一起评。
+
+## Stage 3: 原型设计（frontend-design）
+
+1. Read 上一步的 AR 用户故事
+2. 调 `Skill` 工具，name=`frontend-design:frontend-design`，提示词模板：
+
+```
+为下面这组用户故事设计一个高保真原型（HTML/CSS/必要的 JS），目标是评审用，不是生产用。
+
+用户故事：
+<<<
+{{paste ar content}}
+>>>
+
+约束：
+- 可在浏览器直接打开（单 HTML 文件或带 index.html 的目录）
+- 涵盖核心交互路径（不需要每个 edge case 都画）
+- 视觉语言要和产品语境匹配（不要是默认浏览器原生灰色按钮）
+- 不要内嵌真实凭证 / 内部 URL / 敏感数据
+- 输出落盘到 `.kdev/design-flow/<slug>/stage-3-prototype/iter-<iter>/`
+```
+
+3. frontend-design 完成后，确认产物在 `.kdev/design-flow/<slug>/stage-3-prototype/iter-<iter>/`，至少有 `index.html`。如果不在，用 `mv` 移过来。
+4. **进入 Gate 2**（共评 AR + 原型；评审 prompt 把 stage-2-ar 和 stage-3-prototype 的产物都喂进去）
+
+## Stage 4: 实现方案设计（spec-kit:plan）
+
+1. Read Stage 2 的 AR 文档 + Stage 3 的原型 README/index.html
+2. 调 `Skill` 工具，name=`spec-kit:plan`，提示词模板：
+
+```
+为下面这组 AR 用户故事 + 高保真原型，做完整的实现方案设计（概要 + 详细）。
+
+用户故事：
+<<<
+{{paste ar}}
+>>>
+
+原型路径：
+.kdev/design-flow/<slug>/stage-3-prototype/iter-<last_pass>/
+
+输出要求：
+- 概要设计：架构图（Mermaid 也行）/ 模块划分 / 数据流
+- 详细设计：关键接口签名 / 数据模型（schema）/ 关键算法或状态机
+- 实现风险 ≥ 3 项 + 缓解
+- 输出落盘到 `.kdev/design-flow/<slug>/stage-4-plan/iter-<iter>.md`
+```
+
+3. spec-kit:plan 完成后，确认产物文件位置正确。
+4. **进入 Gate 3**
+
+## 通过 Gate 3 后：产物合并
+
+1. Read `references/output-merge-rules.md`
+2. 严格按规则执行（包括幂等性检查、`status = completed` 标记）
+3. 完成后用一段中文向用户汇报：
+   - 流程总耗时（用 `created_at` - `completed_at` 计算）
+   - 三个 Gate 各自跑了多少 iter（从 history 聚合）
+   - 最终交付物路径（`docs/design-flow/<slug>/`）
+
+## 恢复模式（`--resume <slug>`）
+
+如果用户带 `--resume <slug>`：
+
+1. Read `flow-state.json`，校验 `status == "in_progress"`
+2. 如果 `status == "aborted"`：提示用户"流程被标记为 aborted，先手动改 flow-state.json 里 status 字段才能继续"
+3. 否则：从 `current_stage` + `current_iter` 接着跑
+
+## 显式不做的事（v0.1）
+
+- ❌ 不会主动去删 `.kdev/design-flow/<slug>/`（即使流程完成）——保留迭代历史是 B 方案的训练数据
+- ❌ 不会跨会话续跑评审中的 `AskUserQuestion`（所以 `both`/`human` 模式中途断会话，需要 `--resume` 重新进入这一 Gate）
+- ❌ 不支持自定义 stage 顺序、跳过 stage、并行多 feature
+
