@@ -14,7 +14,6 @@ import hashlib
 import re
 
 
-_ASCII_TOKEN = re.compile(r"[a-z0-9]+")
 _NON_ASCII = re.compile(r"[^\x00-\x7f]")
 
 
