@@ -1,4 +1,3 @@
-````markdown
 # Stage 1 — SR 级需求分析 Prompt
 
 你正在为一个 feature 做 SR (System Requirements) 级别的需求分析。这是从"原始需求一句话"到"用户故事 (AR)"之间的桥接层：要把模糊愿望拆成可被 spec-kit:specify 接力的清晰需求。
@@ -32,4 +31,3 @@ USER_INPUT>>>
 `.kdev/design-flow/{{slug}}/stage-1-sr/iter-{{iter-1}}-review.md`
 
 读它，然后**针对每条不通过点修订**，不要从头重写。
-````
