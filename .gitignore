@@ -49,6 +49,9 @@ references/
 .claude/settings.local.json
 sandbox/*
 
+# Git worktrees (本地隔离工作区，不跟踪)
+/.worktrees/
+
 # eval fixture：.kdev/ 测试数据，必须跟踪
 !plugins/kdev-memory/evals/fixtures/**/.kdev/
 !plugins/kdev-memory/evals/fixtures/**/.kdev/**

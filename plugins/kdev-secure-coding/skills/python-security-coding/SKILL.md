@@ -1,6 +1,6 @@
 ---
 name: python-security-coding
-description: Use when designing, writing, reviewing, or testing Python backend code (Flask/Django/FastAPI/Tornado/aiohttp/Sanic/SQLAlchemy/pymysql/psycopg2/celery), or when project contains pyproject.toml/requirements.txt/setup.py with Python web/data framework dependencies, or when code touches SQL/crypto/eval/pickle/file-IO/auth/cookies/CORS/CSP/error-handling. Enforces 8-category company security standard with completion checklist before declaring work done.
+description: Use when 设计/编写/审查/测试 Python 后端/Web/Data 代码（Flask/Django/FastAPI/Tornado/aiohttp/Sanic/SQLAlchemy/pymysql/psycopg2/celery），或代码 *执行* SQL（cursor.execute/text()/ORM raw query）、*调用* eval/exec/compile/pickle.loads/yaml.load/subprocess/os.system、*设置* cookie/CSRF/CORS/CSP header、*处理* 密码/密钥/加密/哈希/安全随机数、*写入* 用户控制路径或调 chmod/mkstemp，或用户明确要求"安全审查/安全编码/合规检查"，或项目根目录 pyproject.toml/requirements.txt/setup.py *实际依赖* Web/Data 框架（仅文件存在不充分）。SKIP：开发防御性安全工具本身（SQL 注入检测器/WAF/SAST/扫描器/规则引擎/日志异常分析脚本）—— 这类代码 ABOUT 安全但不是被攻击面，8 类清单不适用；不接收外部输入的本地 CLI 脚本、不连数据库、不调 subprocess；仅做模式匹配/解析的工具（regex/AST/sqlparse 而不执行 SQL）；非 Python 代码或纯算法/数据分析/UI/ML 训练。例外：用户明确要求"审查这个防御工具自身的代码安全"则按正面触发。覆盖中文意图："写 Flask/Django/FastAPI 接口"、"Python 后端"、"参数化 SQL"、"加密/哈希/随机数"、"Cookie/CSRF/CORS"、"安全审查"。落地公司 8 类 Python 安全编码规范——按需查阅 references + 任务完成前 MUST 走 8 类清单核对。
 ---
 
 # Python 安全编码规范 Skill
