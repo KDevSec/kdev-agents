@@ -6,9 +6,9 @@
 
 | 来源（中间产物） | 目标（最终交付物） | 合并方式 |
 |------------------|--------------------|----------|
-| `.kdev/design-flow/<slug>/stage-1-sr/iter-{{last_pass}}.md` + `.kdev/design-flow/<slug>/stage-2-ar/iter-{{last_pass}}.md` | `docs/design-flow/<slug>/01-requirements.md` | 拼接：先 SR 再 AR，加 `# 第一部分：SR 级需求` / `# 第二部分：AR 级用户故事` 二级分节 |
-| `.kdev/design-flow/<slug>/stage-3-prototype/iter-{{last_pass}}/` | `docs/design-flow/<slug>/02-prototype/` | 整目录递归复制（保留 frontend-design 输出的子结构） |
-| `.kdev/design-flow/<slug>/stage-4-plan/iter-{{last_pass}}.md` | `docs/design-flow/<slug>/03-design.md` | 直接复制（spec-kit:plan 已经产出了完整概要+详细设计） |
+| `.kdev/design-flow/<slug>/stage-1-sr/iter-{{last_pass_stage1}}.md` + `.kdev/design-flow/<slug>/stage-2-ar/iter-{{last_pass_stage2}}.md` | `docs/design-flow/<slug>/01-requirements.md` | 拼接：先 SR 再 AR，加 `# 第一部分：SR 级需求` / `# 第二部分：AR 级用户故事` 二级分节。注意 `last_pass_stage1` 来自 Gate 1 的 PASS iter，`last_pass_stage2` 通常等于 Gate 2 的 PASS iter（Stage 2 不单独评审，与 Stage 3 共用 Gate 2）。 |
+| `.kdev/design-flow/<slug>/stage-3-prototype/iter-{{last_pass_stage3}}/` | `docs/design-flow/<slug>/02-prototype/` | 整目录递归复制（保留 frontend-design 输出的子结构）。`last_pass_stage3` 来自 Gate 2 的 PASS iter。 |
+| `.kdev/design-flow/<slug>/stage-4-plan/iter-{{last_pass_stage4}}.md` | `docs/design-flow/<slug>/03-design.md` | 直接复制（spec-kit:plan 已经产出了完整概要+详细设计）。`last_pass_stage4` 来自 Gate 3 的 PASS iter。 |
 
 ## 合并步骤
 
@@ -22,7 +22,7 @@
 
 **Slug:** {{slug}}
 **生成时间:** {{date}}
-**生成方式:** kdev-design-flow v0.1（手动 review 模式：{{review_mode}}）
+**生成方式:** kdev-design-flow v0.1（评审模式：{{review_mode}}）
 
 ## 交付物
 

@@ -81,7 +81,7 @@ plugins/kdev-design-flow/
 /kdev-design-flow --review=ai|both|human [feature-name]   # 默认 ai
 ```
 
-`feature-name` 由用户给一个自然语言名字，skill 内部 slug 化（中文转拼音 + 连字符）。
+`feature-name` 由用户给一个自然语言名字，skill 内部 slug 化（v0.1：ASCII 直传 + 小写化 + 非字母数字转连字符；中文/其他非 ASCII 走 SHA-1 hash 兜底，不依赖拼音库；混合输入保留 ASCII 部分 + 追加 6 字符 hash 后缀）。
 
 **description 兜底**（写在 SKILL.md frontmatter）：
 
@@ -198,8 +198,8 @@ docs/design-flow/<feature-slug>/
 
 ## 4. 验收标准（v0.1）
 
-- 在一个安装了 `spec-kit` 的项目上，`/kdev-design-flow 用户登录功能` 能完整跑完 5 个 Stage、3 个评审闸门，最终在 `docs/design-flow/yong-hu-deng-lu-gong-neng/` 下生成 3 份交付物
-- 中间产物完整落在 `.kdev/design-flow/yong-hu-deng-lu-gong-neng/`，并已被 `.gitignore` 排除
+- 在一个安装了 `spec-kit` 的项目上，`/kdev-design-flow 用户登录功能` 能完整跑完 4 个 Stage、3 个评审闸门 + Merge 步骤，最终在 `docs/design-flow/<slug>/` 下生成 3 份交付物（v0.1 实际 slug 形如 `43f2ed6a` 的 8 字符 SHA-1 hash，不是拼音）
+- 中间产物完整落在 `.kdev/design-flow/<slug>/`，并已被 `.gitignore` 排除
 - 三档 `--review` 模式（ai / both / human）都能跑通，默认 `ai` 时无任何弹窗打扰
 - 评审第 3 次仍 FAIL 时正确中断 + 落盘 `aborted.md`
 - `--resume` 能从中断的 stage 继续，不丢前面已通过的产物

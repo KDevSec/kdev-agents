@@ -33,9 +33,9 @@ description: Use when 用户明确请求"把这个需求走一遍设计流程 / 
 斜杠命令 `/kdev-design-flow` 注入 `$ARGUMENTS`，需要解析：
 - 必传：`feature_name`（位置参数；中文/英文均可）
 - 可选：`--review=ai|both|human`（默认 `ai`）
-- 可选：`--resume`（无值；存在即"恢复模式"）
+- 可选：`--resume <slug>`（带 slug 值；存在即"恢复模式"，跳过 feature_name 的 slugify 步骤）
 
-如果 `--resume`：跳到"恢复模式"段（见下面"恢复"节）。
+如果 `--resume <slug>`：跳到"恢复模式"段（见下面"恢复"节），用传入的 slug 直接定位 `flow-state.json`。
 
 ### 步骤 1：依赖检测
 
