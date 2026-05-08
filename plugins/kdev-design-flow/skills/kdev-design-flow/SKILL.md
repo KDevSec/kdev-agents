@@ -1,6 +1,6 @@
 ---
 name: kdev-design-flow
-description: Use when 用户明确请求"把这个需求走一遍设计流程 / 帮我从需求到设计完整跑一遍 / 走 kdev 设计流程 / 完整需求分析+原型+设计 / 需求到方案一条龙 / 一站式跑需求分析"等表达，且明确希望产出 SR 文档 + AR 用户故事 + 高保真原型 + 概要详细设计这一整套交付物时触发。**SKIP**：用户只是在探讨想法 / 在判断是否值得做（应让 superpowers:brainstorming 或 office-hours 处理）；用户只想做单点设计或只要求其中一个产物（直接调对应 skill 即可）；用户在执行已有计划（应让 superpowers:executing-plans 处理）。本 skill 编排：内置 SR 分析 → spec-kit:specify (AR) → frontend-design (高保真原型) → spec-kit:plan (概要+详细设计)，3 个评审闸门，每闸门最多 3 次重试，3 档评审模式（ai / both / human，默认 ai = Claude 自评）。
+description: Use when 用户明确请求"把这个需求走一遍设计流程 / 帮我从需求到设计完整跑一遍 / 走 kdev 设计流程 / 完整需求分析+原型+设计 / 需求到方案一条龙 / 一站式跑需求分析"等表达，且明确希望产出 SR 文档 + AR 用户故事 + 高保真原型 + 概要详细设计这一整套交付物时触发；**或者用户要求恢复 / 继续 / resume 之前被中断的 kdev-design-flow 流程**（典型表达："slug 是 X，用 resume 接着跑"、"之前那个 Y 的设计流跑到一半被打断了"、`/kdev-design-flow --resume <slug>`）——这种场景**仍然属于本 skill**，由 SKILL.md 的"恢复模式"段处理，**不**该让 superpowers:executing-plans 接手。**SKIP**：用户只是在探讨想法 / 在判断是否值得做（应让 superpowers:brainstorming 或 office-hours 处理）；用户只想做单点设计或只要求其中一个产物（直接调对应 skill 即可）；用户在执行**已写好的 plan.md 实现计划文件**（应让 superpowers:executing-plans 处理 —— 注意区分：执行 plan.md ≠ resume 本 skill 的 flow-state.json）。本 skill 编排：内置 SR 分析 → spec-kit:specify (AR) → frontend-design (高保真原型) → spec-kit:plan (概要+详细设计)，3 个评审闸门，每闸门最多 3 次重试，3 档评审模式（ai / both / human，默认 ai = Claude 自评）。
 ---
 
 # kdev-design-flow Skill
@@ -262,9 +262,26 @@ grep -qE "^/?\.kdev/design-flow/?$" .gitignore || echo "/.kdev/design-flow/" >> 
 
 如果用户带 `--resume <slug>`：
 
-1. Read `flow-state.json`，校验 `status == "in_progress"`
-2. 如果 `status == "aborted"`：提示用户"流程被标记为 aborted，先手动改 flow-state.json 里 status 字段才能继续"
-3. 否则：从 `current_stage` + `current_iter` 接着跑
+0. **先确认 flow-state.json 存在**——尝试 `read_state(workspace, slug)`。如果抛 `FlowStateError`（文件不存在），向用户输出（**不要继续执行**）：
+
+   ```
+   ❌ 找不到 slug "<slug>" 的流程记录。
+   预期路径：.kdev/design-flow/<slug>/flow-state.json
+   
+   请检查：
+   - slug 拼写是否正确（参考 .kdev/design-flow/ 下的子目录名）
+   - 是否在错误的工作目录下执行（应在项目根目录）
+   
+   如要新建流程，去掉 --resume 并提供 feature_name：
+     /kdev-design-flow <feature_name>
+   ```
+
+   提示用户后停止本次调用。
+
+1. Read `flow-state.json`（已确认存在），按 `status` 分支：
+   - `status == "in_progress"`：正常继续——读 `current_stage` + `current_iter`，跳到主循环对应位置接着跑
+   - `status == "aborted"`：提示用户"流程被标记为 aborted，先手动改 flow-state.json 里 status 字段（aborted → in_progress）才能继续"，然后停止
+   - `status == "completed"`：提示用户"该流程已完成，最终交付物在 docs/design-flow/<slug>/。如需重跑，请先删除或重命名 flow-state.json"，然后停止
 
 ## 显式不做的事（v0.1）
 

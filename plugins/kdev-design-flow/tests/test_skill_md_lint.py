@@ -68,3 +68,29 @@ def test_skill_md_mentions_all_three_stages():
     assert "Gate 1" in body
     assert "Gate 2" in body
     assert "Gate 3" in body
+
+
+def test_resume_section_handles_missing_state():
+    """Per v0.1.1 fix (B02 eval finding): the 恢复模式 section must explicitly
+    handle the case where flow-state.json doesn't exist — i.e., must mention
+    FlowStateError or the missing-slug user-facing error path. Otherwise users
+    typing `--resume <wrong-slug>` will hit an uncaught traceback."""
+    _, body = _read_skill()
+    resume_idx = body.find("恢复模式")
+    assert resume_idx > 0, "恢复模式 section missing from SKILL.md"
+    resume_section = body[resume_idx:]
+    # Must reference FlowStateError handling OR the user-facing 找不到 slug message
+    assert ("FlowStateError" in resume_section) or (
+        "找不到" in resume_section and "slug" in resume_section
+    ), "恢复模式 section must explicitly handle missing flow-state.json (the B02 bug)"
+
+
+def test_description_clarifies_resume_belongs_here():
+    """Per v0.1.1 fix (T07 eval finding): the description must explicitly tell
+    Claude that --resume belongs to this skill (not superpowers:executing-plans),
+    otherwise resume queries get routed away."""
+    fm, _ = _read_skill()
+    desc = fm["description"]
+    # Description must mention resume IS part of this skill, not just routed away
+    assert "resume" in desc.lower() or "恢复" in desc or "继续" in desc, \
+        "description must mention --resume / 恢复 / 继续 to capture that workflow"

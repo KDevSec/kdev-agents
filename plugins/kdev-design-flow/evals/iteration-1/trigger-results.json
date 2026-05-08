@@ -1,0 +1,40 @@
+{
+  "skill_name": "kdev-design-flow",
+  "version_under_test": "0.1.0",
+  "iteration": 1,
+  "model": "haiku",
+  "runs_per_query": 1,
+  "results": [
+    {"id": "T01", "expected": "TRIGGER", "got": "TRIGGER", "pass": true,  "confidence": 0.95, "duration_ms": 3898,  "tokens": 12474},
+    {"id": "T02", "expected": "TRIGGER", "got": "TRIGGER", "pass": true,  "confidence": 0.99, "duration_ms": 10143, "tokens": 12365},
+    {"id": "T03", "expected": "TRIGGER", "got": "TRIGGER", "pass": true,  "confidence": 0.95, "duration_ms": 8598,  "tokens": 12418},
+    {"id": "T04", "expected": "TRIGGER", "got": "TRIGGER", "pass": true,  "confidence": 0.95, "duration_ms": 11150, "tokens": 12370},
+    {"id": "T05", "expected": "TRIGGER", "got": "TRIGGER", "pass": true,  "confidence": 0.95, "duration_ms": 6455,  "tokens": 12408},
+    {"id": "T06", "expected": "TRIGGER", "got": "TRIGGER", "pass": true,  "confidence": 0.95, "duration_ms": 8224,  "tokens": 12349},
+    {"id": "T07", "expected": "TRIGGER", "got": "SKIP",    "pass": false, "confidence": 0.92, "duration_ms": 11723, "tokens": 12385, "miss_reason": "Confused --resume with superpowers:executing-plans"},
+    {"id": "T08", "expected": "TRIGGER", "got": "TRIGGER", "pass": true,  "confidence": 0.95, "duration_ms": 6283,  "tokens": 12381},
+    {"id": "T09", "expected": "SKIP",    "got": "SKIP",    "pass": true,  "confidence": 0.95, "duration_ms": 15738, "tokens": 12417},
+    {"id": "T10", "expected": "SKIP",    "got": "SKIP",    "pass": true,  "confidence": 0.95, "duration_ms": 9359,  "tokens": 12383},
+    {"id": "T11", "expected": "SKIP",    "got": "SKIP",    "pass": true,  "confidence": 0.95, "duration_ms": 6534,  "tokens": 12388},
+    {"id": "T12", "expected": "SKIP",    "got": "SKIP",    "pass": true,  "confidence": 0.95, "duration_ms": 26240, "tokens": 16479},
+    {"id": "T13", "expected": "SKIP",    "got": "SKIP",    "pass": true,  "confidence": 0.98, "duration_ms": 8963,  "tokens": 12376},
+    {"id": "T14", "expected": "SKIP",    "got": "SKIP",    "pass": true,  "confidence": 0.95, "duration_ms": 4524,  "tokens": 12379},
+    {"id": "T15", "expected": "SKIP",    "got": "SKIP",    "pass": true,  "confidence": 0.85, "duration_ms": 15720, "tokens": 12400},
+    {"id": "T16", "expected": "SKIP",    "got": "SKIP",    "pass": true,  "confidence": 0.95, "duration_ms": 9751,  "tokens": 12390}
+  ],
+  "summary": {
+    "total": 16,
+    "passed": 15,
+    "failed": 1,
+    "accuracy": 0.9375,
+    "true_positives": 7,
+    "true_negatives": 8,
+    "false_positives": 0,
+    "false_negatives": 1,
+    "precision": 1.0,
+    "recall": 0.875,
+    "mean_confidence_pass": 0.946,
+    "mean_duration_ms": 10231,
+    "total_tokens": 199662
+  }
+}
