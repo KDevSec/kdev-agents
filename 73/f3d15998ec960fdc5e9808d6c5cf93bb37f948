@@ -1,0 +1,19 @@
+plugins/kdev-memory/README.md
+  s_31cf5f1fee7f14::t_95cf05260afae3 3
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.1",
+  "base_commit_sha": "73f3d15998ec960fdc5e9808d6c5cf93bb37f948",
+  "prompts": {},
+  "sessions": {
+    "s_31cf5f1fee7f14": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5eb6df47-f6a5-4345-a018-25761cea6299",
+        "model": "glm-5"
+      },
+      "human_author": "liyong <ly1989abc@126.com>"
+    }
+  }
+}
