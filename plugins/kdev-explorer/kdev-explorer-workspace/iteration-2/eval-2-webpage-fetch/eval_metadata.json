@@ -1,0 +1,31 @@
+{
+  "eval_id": 2,
+  "eval_name": "webpage-fetch",
+  "prompt": "帮我抓取下 https://docs.anthropic.com/en/docs/claude-code 这个页面，看看 Claude Code 的主要功能有哪些，总结成列表",
+  "assertions": [
+    {
+      "name": "has_features_list",
+      "description": "输出包含功能列表",
+      "type": "contains",
+      "expected": "功能"
+    },
+    {
+      "name": "max_30_lines",
+      "description": "输出不超过30行（iteration-1核心问题）",
+      "type": "max_lines",
+      "expected": 30
+    },
+    {
+      "name": "no_raw_html",
+      "description": "没有原始HTML",
+      "type": "not_contains",
+      "expected": "<html"
+    },
+    {
+      "name": "bullet_format",
+      "description": "使用列表格式",
+      "type": "contains",
+      "expected": "-"
+    }
+  ]
+}

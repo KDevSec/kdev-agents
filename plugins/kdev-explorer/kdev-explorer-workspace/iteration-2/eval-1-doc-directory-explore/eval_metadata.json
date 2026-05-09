@@ -1,0 +1,31 @@
+{
+  "eval_id": 1,
+  "eval_name": "doc-directory-explore",
+  "prompt": "帮我看看 D:\\Works\\SecDev\\kdev-agents\\docs\\skills\\kdev-memory 目录下有哪些文档，总结下每个文档讲了什么，不要太详细，每个文档一两句话就行",
+  "assertions": [
+    {
+      "name": "has_directory_structure",
+      "description": "输出包含目录结构",
+      "type": "contains",
+      "expected": "文件"
+    },
+    {
+      "name": "has_document_summaries",
+      "description": "输出包含文档主题总结",
+      "type": "contains",
+      "expected": "主题"
+    },
+    {
+      "name": "max_50_lines",
+      "description": "输出不超过50行",
+      "type": "max_lines",
+      "expected": 50
+    },
+    {
+      "name": "each_doc_1_sentence",
+      "description": "每个文档总结1句话",
+      "type": "avg_sentence_per_item",
+      "expected": 1
+    }
+  ]
+}

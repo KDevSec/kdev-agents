@@ -1,0 +1,23 @@
+[
+  {"query": "帮我看看 docs 目录下有哪些文档，总结下每个讲了什么", "should_trigger": true},
+  {"query": "抓取下 https://example.com 这个页面，看看主要内容", "should_trigger": true},
+  {"query": "在 plugins 目录找找有没有用 MCP server 的地方", "should_trigger": true},
+  {"query": "帮我探索下这个目录，看看里面有什么", "should_trigger": true},
+  {"query": "D:\\Works\\SecDev\\kdev-agents\\docs\\skills 下有什么文档，帮我总结下", "should_trigger": true},
+  {"query": "ok so my boss wants me to check what's in the docs folder and give him a quick summary of each file, like 1 sentence per file", "should_trigger": true},
+  {"query": "我需要了解 plugins 目录的结构，帮我快速看看", "should_trigger": true},
+  {"query": "fetch this webpage and tell me the key points: https://docs.python.org", "should_trigger": true},
+  {"query": "帮我找找代码里有哪些地方用了 tree-sitter", "should_trigger": true},
+  {"query": "看看 docs/skills/kdev-memory 目录的内容，不要太详细", "should_trigger": true},
+
+  {"query": "帮我写一个 React 组件", "should_trigger": false},
+  {"query": "这个代码有个 bug，帮我看看", "should_trigger": false},
+  {"query": "运行 npm test", "should_trigger": false},
+  {"query": "帮我 commit 这些改动", "should_trigger": false},
+  {"query": "读取这个文件的内容", "should_trigger": false},
+  {"query": "帮我重构这个函数", "should_trigger": false},
+  {"query": "创建一个新的 skill 文件", "should_trigger": false},
+  {"query": "帮我写个测试", "should_trigger": false},
+  {"query": "git push 到远程", "should_trigger": false},
+  {"query": "这个函数是干嘛的，解释下", "should_trigger": false}
+]

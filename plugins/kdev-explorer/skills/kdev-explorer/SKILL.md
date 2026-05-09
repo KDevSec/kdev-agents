@@ -1,6 +1,7 @@
 ---
 name: kdev-explorer
-description: 派发独立 subagent 执行探索任务（网页抓取、文档总结、代码查找），释放主会话上下文
+description: |
+  派发独立 subagent 执行探索任务，释放主会话上下文。触发条件：用户说"看看目录"、"有哪些文档"、"总结下"、"抓取页面"、"找找有没有用"、"帮我探索"等需要多次工具调用但结果可简洁表达的任务。不要用于：单文件读取、代码编写、bug修复、git操作、简单执行命令。
 ---
 
 # KDev Explorer
@@ -13,6 +14,18 @@ description: 派发独立 subagent 执行探索任务（网页抓取、文档总
 - 主 agent 不被大量工具调用结果膨胀
 - Subagent 的探索过程不污染主会话历史
 - 只返回你需要的答案，不返回过程
+
+**为什么简洁至关重要**
+
+Subagent 的输出会直接进入主会话上下文。如果输出过长（如 100+ 行），主会话会被无用信息膨胀，导致：
+- 后续对话 token 消耗增加
+- 关键信息淹没在冗余内容中
+- 用户需要花时间过滤
+
+**目标输出长度：**
+- 文档探索：≤ 50 行（目录结构 + 每文档 1 句）
+- 网页抓取：≤ 30 行（要点列表 + 合成结论）
+- 代码搜索：≤ 40 行（文件列表 + 关键发现）
 
 ## When to Use
 
@@ -98,16 +111,18 @@ Explore documentation directory:
 **Task:**
 1. List all files using Glob `{pattern}`
 2. Read key documents (prioritize: {document_types})
-3. Summarize each document's core theme
+3. Summarize each document's core theme (1 sentence each)
 
 **Do NOT:**
 - Read every file
 - Include implementation details
+- Output more than 50 lines
 
 **Return:**
-- File tree structure
-- Document themes (filename + 1-2 sentences)
-- Overall purpose
+- File tree structure (brief, no full paths)
+- Document themes: filename + 1 sentence
+- Overall purpose (1 sentence)
+- Target length: ≤ 50 lines
 ```
 
 ### 网页抓取
@@ -120,15 +135,18 @@ Fetch and summarize web content:
 **Task:**
 1. Fetch each URL
 2. Extract key information: {what}
-3. Compare across sources if multiple URLs
+3. Synthesize into bullet points
 
 **Do NOT:**
 - Return raw HTML
 - Follow links beyond specified URLs
+- Output more than 30 lines
+- Include all details - only key findings
 
 **Return:**
-- Key findings per URL
-- Synthesis if multiple sources
+- 5-10 key findings (bullet points)
+- 1-2 sentence synthesis
+- Target length: ≤ 30 lines
 ```
 
 ### 代码探索
@@ -141,15 +159,18 @@ Explore codebase for {target}:
 **Task:**
 1. Search using Grep for: {pattern}
 2. Locate files using Glob: {glob_pattern}
-3. Read key files to understand {what}
+3. Read 3-5 key files to understand {what}
 
 **Do NOT:**
 - Read all matched files
 - Refactor or modify code
+- Output more than 40 lines
+- Include full code snippets
 
 **Return:**
-- Relevant files list
-- Key findings
+- Files list (paths only)
+- Key findings: 3-5 bullet points
+- Target length: ≤ 40 lines
 ```
 
 ## Common Mistakes
@@ -157,9 +178,11 @@ Explore codebase for {target}:
 | 错误 | 正确 |
 |------|------|
 | "去看看" | "探索 {path} 的 {target}" |
-| 没有约束 | 添加 Do NOT |
-| 没有输出格式 | 规定 Return 格式 |
+| 没有约束 | 添加 Do NOT + 行数限制 |
+| 没有输出格式 | 规定 Return 格式 + 目标长度 |
 | 主 agent 继续工作 | 等待 subagent 返回 |
+| 输出过长（100+行） | 强制 ≤ 50 行 |
+| 包含完整内容摘要 | 只返回 1 句核心主题 |
 
 ## Example
 
@@ -182,16 +205,18 @@ Agent(
 **Task:**
 1. List all markdown files using Glob `**/*.md`
 2. Read key documents (PRD, architecture, analysis)
-3. Summarize each document's core theme
+3. Summarize each document's core theme (1 sentence each)
 
 **Do NOT:**
 - Read every file exhaustively
 - Include implementation code details
+- Output more than 50 lines
 
 **Return:**
-- File tree structure
-- Document themes (table format)
-- Overall purpose (1-2 sentences)"
+- File tree structure (brief)
+- Document themes: filename + 1 sentence
+- Overall purpose (1 sentence)
+- Target length: ≤ 50 lines"
 )
 ```
 
