@@ -11,6 +11,8 @@ KDev 系列 Claude Code 插件集合 —— 工程记忆、流程辅助、代码
 | [kdev-secure-coding](plugins/kdev-secure-coding) | 公司安全编码规范 skill 集合：description 触发 + CLAUDE.md 锚点兜底 + 编码期按需查阅 + 完成前 8 类清单核对。当前含 python-security-coding，规划 Java / C |
 | [kdev-code-graph](plugins/kdev-code-graph) | 语义级代码图谱：需求追溯、变更爆炸半径分析、文档-代码同步检查，支持 Markdown 和图片解析 |
 | [kdev-design-flow](plugins/kdev-design-flow) | 需求-原型-设计流程编排：串联 spec-kit + frontend-design，加 3 个评审闸门（Claude 自评/人工/混合三档可选），把"原始需求 → SR 文档 → AR 用户故事 → 高保真原型 → 概要+详细设计"链路固化为一个可复跑 skill。**v0.1 实验版**：boot sequence 已验证，主循环依赖 spec-kit 安装环境验收 |
+| [kdev-test-case](plugins/kdev-test-case) | 测试用例设计 skill：基于 ISO/IEC/IEEE 29119-4（EP / BVA / 决策表 / 状态转换 / Pairwise / MC/DC / 错误推测）与 GB/T 25000.51 ≡ ISO/IEC 25051（三域 + 8×31 质量子特性 + 符合/部分符合/不符合 判定）双标准生成可审计的测试点与测试用例。覆盖 feature spec、API 契约、状态机、UI 流程、源码、就绪可用软件产品测评等场景；与下游 kdev-ui-autotest 衔接形成 spec → 测试点 → 用例 → Playwright 三段可追溯链 |
+| [kdev-ui-autotest](plugins/kdev-ui-autotest) | Playwright + pytest + Element-Plus UI 自动化测试规范固化 skill：把 6 大类规范（STEP 0 环境/菜单/弹窗实测前置、登录复用、资源清理、四件产物归档、Element-Plus 三大坑、用例命名、失败诊断）作为下游项目（KDevSec / Gen9 / 可信评估 / vfadmin 等）的强制实践。第零原则：测试脚本目的是发现 BUG，不是刷通过率 |
 
 ## 安装方式
 
@@ -24,6 +26,8 @@ claude plugin install kdev-commit@kdev-agents
 claude plugin install kdev-secure-coding@kdev-agents
 claude plugin install kdev-code-graph@kdev-agents
 claude plugin install kdev-design-flow@kdev-agents   # v0.1 实验版，需先装 spec-kit
+claude plugin install kdev-test-case@kdev-agents
+claude plugin install kdev-ui-autotest@kdev-agents
 ```
 
 ## 更新
@@ -46,6 +50,8 @@ Claude Code 对官方 Anthropic marketplace 默认启用 auto-update，但对第
 /plugin update kdev-secure-coding@kdev-agents
 /plugin update kdev-code-graph@kdev-agents
 /plugin update kdev-design-flow@kdev-agents
+/plugin update kdev-test-case@kdev-agents
+/plugin update kdev-ui-autotest@kdev-agents
 ```
 
 两步都要跑——`marketplace update` 只刷新元数据，`plugin update` 才真正升级。
@@ -133,16 +139,29 @@ kdev-agents/
     │   ├── .claude-plugin/plugin.json
     │   ├── skills/kdev-code-graph/SKILL.md
     │   └── README.md
-    └── kdev-design-flow/                 # 需求-原型-设计流程编排插件 (v0.1 实验)
+    ├── kdev-design-flow/                 # 需求-原型-设计流程编排插件 (v0.1 实验)
+    │   ├── .claude-plugin/plugin.json
+    │   ├── commands/kdev-design-flow.md  # /kdev-design-flow 斜杠命令
+    │   ├── skills/kdev-design-flow/
+    │   │   ├── SKILL.md                  # 5 阶段 + 3 评审闸门 + retry 主循环
+    │   │   └── references/               # SR prompt + 模板 + review 通用 prompt + 合并规则
+    │   ├── lib/                          # slug.py（slug 化）+ flow_state.py（原子状态 IO）
+    │   ├── tests/                        # pytest（slug 11 + flow_state 8 + skill_md_lint 9 = 28）
+    │   ├── CHANGELOG.md
+    │   └── README.md
+    ├── kdev-test-case/                   # 测试用例设计插件（ISO/IEC/IEEE 29119-4 + GB/T 25000.51）
+    │   ├── .claude-plugin/plugin.json
+    │   └── skills/kdev-test-case/
+    │       ├── SKILL.md                  # 双标准引擎：7 种黑盒方法 + 三域 + 8×31 子特性 + 五种模式
+    │       ├── references/               # quality-characteristics / output-templates / template-override / example-walkthrough
+    │       └── evals/evals.json
+    └── kdev-ui-autotest/                 # Playwright + pytest + Element-Plus 自动化测试规范插件
         ├── .claude-plugin/plugin.json
-        ├── commands/kdev-design-flow.md  # /kdev-design-flow 斜杠命令
-        ├── skills/kdev-design-flow/
-        │   ├── SKILL.md                  # 5 阶段 + 3 评审闸门 + retry 主循环
-        │   └── references/               # SR prompt + 模板 + review 通用 prompt + 合并规则
-        ├── lib/                          # slug.py（slug 化）+ flow_state.py（原子状态 IO）
-        ├── tests/                        # pytest（slug 11 + flow_state 8 + skill_md_lint 9 = 28）
-        ├── CHANGELOG.md
-        └── README.md
+        └── skills/kdev-ui-autotest/
+            ├── SKILL.md                  # 6 大类规范 + STEP 0 实测前置 + 第零原则
+            ├── references/               # env-recon-bootstrap / element-plus-pitfalls / case-skeleton / infra-standards / failure-diagnosis
+            ├── assets/                   # recon_env_bootstrap.py + test_arNN_skeleton.py + 用例 .md 头模板
+            └── evals/evals.json
 ```
 
 新增插件：在 `plugins/` 下新建目录 + 在 `marketplace.json` 的 `plugins` 数组里追加条目。
