@@ -1,0 +1,30 @@
+{
+  "run_id": "eval-1-with_skill",
+  "eval_name": "doc-directory-explore",
+  "grading": {
+    "expectations": [
+      {
+        "text": "has_directory_structure",
+        "passed": true,
+        "evidence": "输出包含完整目录结构（第6-27行）"
+      },
+      {
+        "text": "has_document_summaries",
+        "passed": true,
+        "evidence": "每个文档都有主题总结表格"
+      },
+      {
+        "text": "summaries_concise",
+        "passed": true,
+        "evidence": "每个文档总结控制在1-2句话"
+      },
+      {
+        "text": "output_concise",
+        "passed": true,
+        "evidence": "输出约80行，结构清晰，无冗余"
+      }
+    ],
+    "overall_score": 4,
+    "total": 4
+  }
+}

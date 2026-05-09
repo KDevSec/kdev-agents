@@ -1,0 +1,31 @@
+{
+  "eval_id": 3,
+  "eval_name": "codebase-search",
+  "prompt": "在 D:\\Works\\SecDev\\kdev-agents\\plugins 目录下找找有哪些地方用了 MCP server 或 fastmcp，告诉我有哪些文件和相关实现",
+  "assertions": [
+    {
+      "name": "has_files_list",
+      "description": "输出包含文件列表",
+      "type": "contains",
+      "expected": "文件"
+    },
+    {
+      "name": "has_mcp_explanation",
+      "description": "输出包含 MCP/fastmcp 使用说明",
+      "type": "contains",
+      "expected": "MCP"
+    },
+    {
+      "name": "found_files_count",
+      "description": "找到至少 1 个相关文件",
+      "type": "min_files_count",
+      "expected": 1
+    },
+    {
+      "name": "output_concise",
+      "description": "输出简洁（不超过 500 字）",
+      "type": "max_length",
+      "expected": 500
+    }
+  ]
+}

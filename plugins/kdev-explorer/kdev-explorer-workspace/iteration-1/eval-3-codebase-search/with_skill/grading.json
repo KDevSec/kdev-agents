@@ -1,0 +1,30 @@
+{
+  "run_id": "eval-3-with_skill",
+  "eval_name": "codebase-search",
+  "grading": {
+    "expectations": [
+      {
+        "text": "has_files_list",
+        "passed": true,
+        "evidence": "列出5个相关文件（.mcp.json, plugin.json, hooks.json, README.md, SKILL.md）"
+      },
+      {
+        "text": "has_mcp_explanation",
+        "passed": true,
+        "evidence": "详细说明 MCP Server 配置和实现状态"
+      },
+      {
+        "text": "found_files_count",
+        "passed": true,
+        "evidence": "找到5+相关文件"
+      },
+      {
+        "text": "output_concise",
+        "passed": true,
+        "evidence": "输出约50行，简洁清晰"
+      }
+    ],
+    "overall_score": 4,
+    "total": 4
+  }
+}

@@ -1,0 +1,30 @@
+{
+  "run_id": "eval-2-with_skill",
+  "eval_name": "webpage-fetch",
+  "grading": {
+    "expectations": [
+      {
+        "text": "has_features_list",
+        "passed": true,
+        "evidence": "包含11大核心功能分类"
+      },
+      {
+        "text": "features_count",
+        "passed": true,
+        "evidence": "功能列表超过12项"
+      },
+      {
+        "text": "no_raw_html",
+        "passed": true,
+        "evidence": "输出为结构化markdown，无HTML标签"
+      },
+      {
+        "text": "output_concise",
+        "passed": false,
+        "evidence": "输出约100行，超出简洁预期（希望<50行）"
+      }
+    ],
+    "overall_score": 3,
+    "total": 4
+  }
+}

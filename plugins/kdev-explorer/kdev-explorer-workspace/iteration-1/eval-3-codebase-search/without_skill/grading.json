@@ -1,0 +1,30 @@
+{
+  "run_id": "eval-3-without_skill",
+  "eval_name": "codebase-search",
+  "grading": {
+    "expectations": [
+      {
+        "text": "has_files_list",
+        "passed": true,
+        "evidence": "列出多个相关文件"
+      },
+      {
+        "text": "has_mcp_explanation",
+        "passed": true,
+        "evidence": "详细说明 MCP Server 和 fastmcp 使用情况"
+      },
+      {
+        "text": "found_files_count",
+        "passed": true,
+        "evidence": "找到多个文件"
+      },
+      {
+        "text": "output_concise",
+        "passed": false,
+        "evidence": "输出约79行，稍长"
+      }
+    ],
+    "overall_score": 3,
+    "total": 4
+  }
+}

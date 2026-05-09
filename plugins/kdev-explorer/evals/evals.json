@@ -1,0 +1,29 @@
+{
+  "skill_name": "kdev-explorer",
+  "evals": [
+    {
+      "id": 1,
+      "name": "doc-directory-explore",
+      "prompt": "帮我看看 D:\\Works\\SecDev\\kdev-agents\\docs\\skills\\kdev-memory 目录下有哪些文档，总结下每个文档讲了什么，不要太详细，每个文档一两句话就行",
+      "expected_output": "目录结构 + 每个文档的核心主题（1-2句话）",
+      "files": [],
+      "assertions": []
+    },
+    {
+      "id": 2,
+      "name": "webpage-fetch-summary",
+      "prompt": "帮我抓取下 https://docs.anthropic.com/en/docs/claude-code 这个页面，看看 Claude Code 的主要功能有哪些，总结成列表",
+      "expected_output": "Claude Code 主要功能的简洁列表",
+      "files": [],
+      "assertions": []
+    },
+    {
+      "id": 3,
+      "name": "codebase-search",
+      "prompt": "在 D:\\Works\\SecDev\\kdev-agents\\plugins 目录下找找有哪些地方用了 MCP server 或 fastmcp，告诉我有哪些文件和相关实现",
+      "expected_output": "使用 MCP server/fastmcp 的文件列表和简要说明",
+      "files": [],
+      "assertions": []
+    }
+  ]
+}
