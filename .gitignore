@@ -67,3 +67,18 @@ sandbox/*
 # 但 fixture 里的 hook 运行时产物不跟踪（state/ 是 UserPromptSubmit 去重状态、checkpoints/ 是 PreCompact 快照）
 plugins/kdev-memory/evals/fixtures/**/.kdev/memory/state/
 plugins/kdev-memory/evals/fixtures/**/.kdev/memory/checkpoints/
+
+# skill-creator dev artifacts: 只跟踪用例定义（evals.json / eval_metadata.json / trigger-eval.json），
+# 跑 run 的产物（response / grading / timing / benchmark / review.html / skill-snapshot）不入库
+plugins/*/evals/**/old_skill/
+plugins/*/evals/**/with_skill/
+plugins/*/evals/**/without_skill/
+plugins/*/evals/**/benchmark.json
+plugins/*/evals/**/benchmark.md
+plugins/*/evals/**/review.html
+plugins/*/evals/**/feedback.json
+plugins/*/evals/**/skill-snapshot/
+
+# skill workspace 临时产物（venv / 跑测试日志），只跟踪用例 JSON
+plugins/*/skills/*-workspace/.venv/
+plugins/*/skills/*-workspace/*.log

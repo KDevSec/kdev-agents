@@ -1,0 +1,13 @@
+{
+  "eval_id": 1,
+  "eval_name": "go-cli-bundle-strategy",
+  "prompt": "我要按 12 节点 SOP 实施一个 Go CLI 工具（用 cobra 框架），spec 里 12 个 atomic task 包括：命令注册（root + 5 个子命令）、配置加载（YAML）、HTTP client 调用、输出格式化（JSON / table）、单元测试（含 mock HTTP server）、集成测试。\n\n请告诉我：\n(1) 节点 5 复杂度判断这个 CLI 是简单还是复杂？该升档 opus 吗？给判据。\n(2) 节点 6b 该怎么 bundle 派单？给具体分组（哪几个 task 合并到哪个 implementer），并解释每个 bundle 边界为什么合理。",
+  "assertions": [
+    {"text": "Concludes complexity = simple AND does not upgrade to opus", "kind": "structural"},
+    {"text": "Bundle 分组 has ≥3 implementers and is shaped around CLI concerns (not only backend MVC layers)", "kind": "structural"},
+    {"text": "References quantitative dispatch limits (>6 files OR >15 tests OR similar threshold)", "kind": "must_contain_any"},
+    {"text": "Bundle reasoning addresses Go/cobra coupling (mentions AddCommand OR cobra OR root command)", "kind": "must_contain_any"},
+    {"text": "Avoids forcing DAO+VO/Service+Controller as the ONLY bundle template (no MVC-exclusive grouping)", "kind": "must_not_contain_all"},
+    {"text": "Mentions sonnet model for routine CLI tasks (not opus for everything)", "kind": "must_contain_any"}
+  ]
+}

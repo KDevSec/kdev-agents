@@ -1,0 +1,14 @@
+{
+  "eval_id": 2,
+  "eval_name": "rust-sdk-canary-test",
+  "prompt": "我开发一个 Rust HTTP client crate，被发布到 crates.io 给其他项目嵌入使用（不是独立 server，也不是 CLI，是个库 / SDK）。\n\n节点 12 部署 + E2E 测试要求 ≥1 条「业务关键入口金丝雀」用例。问题：\n(1) 对一个被嵌入到别人项目的库来说，「业务关键入口」该怎么定义？\n(2) 给我这条 canary 测试的 Rust 伪代码骨架（用 #[tokio::test] 写一个端到端用例，包含起 mock server + new client + 调主接口 + 断言）",
+  "assertions": [
+    {"text": "Defines 业务关键入口 for library/SDK (mentions first-mile / 第一公里 / public API entry / README first example / 主接口)", "kind": "must_contain_any"},
+    {"text": "Uses Rust mock library (wiremock OR httpmock)", "kind": "must_contain_any"},
+    {"text": "Provides #[tokio::test] code skeleton", "kind": "must_contain"},
+    {"text": "Test 真构造 Client (Client::new or builder, not bypassed) + 调主接口", "kind": "must_contain_any"},
+    {"text": "Asserts on business-layer fields (response body / 业务字段 not just status code)", "kind": "structural"},
+    {"text": "Avoids login-page-only fixation (no exclusive focus on /login UI / fill 用户名密码)", "kind": "must_not_contain_all"},
+    {"text": "Avoids wrong-stack tools (no Playwright / storage_state recommendation for a Rust crate)", "kind": "must_not_contain_all"}
+  ]
+}

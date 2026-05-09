@@ -1,0 +1,29 @@
+{
+  "skill_name": "coding-phase-sop-12nodes",
+  "evals": [
+    {
+      "id": 0,
+      "name": "node-express-postgres-sop-startup",
+      "prompt": "我有一个 Node.js + Express + Postgres 的需求。spec.md 有 4 个 user story 共 18 个 atomic task，prototype 是一个后台管理界面（用户管理 + 订单查询）。我想按 SOP 端到端跑这个需求，请给我两个具体输出：\n\n(1) 节点 0 环境锁定的具体命令清单（直接可执行的 bash 命令）\n(2) 派 sonnet implementer 跑第一个 task（用户列表 CRUD REST 接口 + Postgres 持久化 + 单元测试）的完整 prompt（要包含三段约束）",
+      "expected_output": "应给出 Node.js 适配的环境锁定命令（npm ci / npx / nvm use / 端口探测）；implementer prompt 含 Node 特定 env constraint，禁止 npm install 改用 npm ci，禁止全局 node 改用 ./node_modules/.bin/*，TDD 强制语保留，三段约束齐全。绝不应出现 .venv/bin/python、pytest、app.py、ServiceWarning、RuoYi、Pillow 等 Python/特定项目术语。",
+      "files": [],
+      "assertions": []
+    },
+    {
+      "id": 1,
+      "name": "go-cli-bundle-strategy",
+      "prompt": "我要按 12 节点 SOP 实施一个 Go CLI 工具（用 cobra 框架），spec 里 12 个 atomic task 包括：命令注册（root + 5 个子命令）、配置加载（YAML）、HTTP client 调用、输出格式化（JSON / table）、单元测试（含 mock HTTP server）、集成测试。\n\n请告诉我：\n(1) 节点 5 复杂度判断这个 CLI 是简单还是复杂？该升档 opus 吗？给判据。\n(2) 节点 6b 该怎么 bundle 派单？给具体分组（哪几个 task 合并到哪个 implementer），并解释每个 bundle 边界为什么合理。",
+      "expected_output": "复杂度判断用通用判据（不强行套 DB schema 迁移这种后端术语），合理判断该 CLI 不应升档 opus（无鉴权 / 无跨服务事务 / 无状态机）。Bundle 分组用 CLI 适配示例（命令解析 / 业务逻辑 / 输出格式化 各为 implementer），不应只用后端 MVC 的 DAO+VO / Service+Controller / Frontend+E2E 示例。单次派单上限阈值（>6 文件 / >15 测试 / 升档 opus）应被明确引用。",
+      "files": [],
+      "assertions": []
+    },
+    {
+      "id": 2,
+      "name": "rust-sdk-canary-test",
+      "prompt": "我开发一个 Rust HTTP client crate，被发布到 crates.io 给其他项目嵌入使用（不是独立 server，也不是 CLI，是个库 / SDK）。\n\n节点 12 部署 + E2E 测试要求 ≥1 条「业务关键入口金丝雀」用例。问题：\n(1) 对一个被嵌入到别人项目的库来说，「业务关键入口」该怎么定义？\n(2) 给我这条 canary 测试的 Rust 伪代码骨架（用 #[tokio::test] 写一个端到端用例，包含起 mock server + new client + 调主接口 + 断言）",
+      "expected_output": "应解释「业务关键入口」对库 / SDK 的含义（用户首次使用该库的第一公里）。给出 Rust 适配的 canary：起 mock HTTP server（如 wiremock 或 httpmock）→ new HttpClient → 调最常用入口方法 → 断言响应。绝不应只讲 web 登录页（/login UI、fill 用户名密码）—— 对库无意义。",
+      "files": [],
+      "assertions": []
+    }
+  ]
+}

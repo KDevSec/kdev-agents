@@ -1,0 +1,82 @@
+[
+  {
+    "query": "specs/001-user-auth 三件套都齐了（spec.md / plan.md / prototype），帮我按 SOP auto mode 跑完，主控只在 Gate 决策就行",
+    "should_trigger": true
+  },
+  {
+    "query": "现在 plan 已经过 review 了，开始端到端实施这个 ~20 个 task 的需求，TDD + Per-Increment E2E Gate 全套都要",
+    "should_trigger": true
+  },
+  {
+    "query": "帮我用 13 节点 SOP 跑通 specs/003-checkout，目标是部署 + E2E 全绿，前端用 Vue 后端 FastAPI",
+    "should_trigger": true
+  },
+  {
+    "query": "auto mode 把这个 feature 完整实施，从 implementation-plan 写到部署，subagent 自己派单",
+    "should_trigger": true
+  },
+  {
+    "query": "我把 spec 和 plan 都准备好了，prototype 在 figma 截图里。这个需求大概 25 个 atomic task，你按方法论自主跑完到上线",
+    "should_trigger": true
+  },
+  {
+    "query": "按编码 SOP 把 RuoYi 后台这个文章管理模块端到端跑完，要 Phase 0 环境对齐 + 业务关键入口金丝雀 E2E",
+    "should_trigger": true
+  },
+  {
+    "query": "实施 specs/feature-payment（spec/plan/原型都齐），完全自主，4-shot review，跑完报告 sop-execution-log",
+    "should_trigger": true
+  },
+  {
+    "query": "specs/004-notifications 这套需求，技术栈是 FastAPI + Vue + Playwright，按 13 节点 SOP 跑完",
+    "should_trigger": true
+  },
+  {
+    "query": "我有完整 spec.md / plan.md / prototype 三件套，希望 AI 自主完成实施直到 E2E 通过，不要中间打断我",
+    "should_trigger": true
+  },
+  {
+    "query": "用 13 节点 SOP 跑通这个需求：4 个 user story、约 25 个 task、要部署到本地被测环境跑完 Playwright",
+    "should_trigger": true
+  },
+  {
+    "query": "我有一个想法但还没写 spec，帮我先 brainstorm 一下：想做一个文档智能问答的工具",
+    "should_trigger": false
+  },
+  {
+    "query": "帮我 review 一下 specs/001/plan.md 的架构有没有问题，先不要实施",
+    "should_trigger": false
+  },
+  {
+    "query": "刚发现 src/utils/format.py 有个 bug：日期格式化 timezone 错了，帮我修一下",
+    "should_trigger": false
+  },
+  {
+    "query": "把刚才改的代码提交一下，commit message 你帮我写",
+    "should_trigger": false
+  },
+  {
+    "query": "code review 一下我刚 push 的这个 PR：feature/auth-refactor",
+    "should_trigger": false
+  },
+  {
+    "query": "解释一下 React 的 useMemo 和 useCallback 啥区别，我老搞混",
+    "should_trigger": false
+  },
+  {
+    "query": "specs/004 这个需求我还没写 plan，帮我起草一份 implementation-plan.md",
+    "should_trigger": false
+  },
+  {
+    "query": "我想做一个新的 agent skill 用来自动化 git workflow，帮我从零搭一个",
+    "should_trigger": false
+  },
+  {
+    "query": "把这周的 commit 整理成一个周报，按四段骨架输出",
+    "should_trigger": false
+  },
+  {
+    "query": "在项目根目录下面 plugins/kdev-coding-sop/skills/coding-sop/references/ 这个目录有没有被 gitignore 忽略",
+    "should_trigger": false
+  }
+]

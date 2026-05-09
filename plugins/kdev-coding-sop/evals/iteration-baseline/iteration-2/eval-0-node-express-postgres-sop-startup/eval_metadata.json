@@ -1,0 +1,14 @@
+{
+  "eval_id": 0,
+  "eval_name": "node-express-postgres-sop-startup",
+  "prompt": "我有一个 Node.js + Express + Postgres 的需求。spec.md 有 4 个 user story 共 18 个 atomic task，prototype 是一个后台管理界面（用户管理 + 订单查询）。我想按 SOP 端到端跑这个需求，请给我两个具体输出：\n\n(1) 节点 0 环境锁定的具体命令清单（直接可执行的 bash 命令）\n(2) 派 sonnet implementer 跑第一个 task（用户列表 CRUD REST 接口 + Postgres 持久化 + 单元测试）的完整 prompt（要包含三段约束）",
+  "assertions": [
+    {"text": "Uses 'npm ci' (not 'npm install') for Node lockfile-strict install", "kind": "must_contain"},
+    {"text": "Mentions Node version locking (nvm use OR .nvmrc)", "kind": "must_contain_any"},
+    {"text": "Prefers project-local binary path (npx OR ./node_modules/.bin)", "kind": "must_contain_any"},
+    {"text": "Probes port conflicts before docker start (ss -tlnp OR similar)", "kind": "must_contain"},
+    {"text": "Implementer prompt has 3 explicit constraint sections (约束 1/2/3 or equivalent labels)", "kind": "structural"},
+    {"text": "Avoids Python-specific commands (no .venv, pytest, app.py, python3)", "kind": "must_not_contain_all"},
+    {"text": "Avoids RuoYi/ServiceWarning/Pillow project contamination", "kind": "must_not_contain_all"}
+  ]
+}
