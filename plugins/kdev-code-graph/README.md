@@ -1,109 +1,48 @@
 # kdev-code-graph
 
-> Claude Code 插件 - 语义级代码图谱，支持需求追溯、变更爆炸半径分析和文档-代码同步检查
+> 基于 [Understand-Anything](https://github.com/Lum1104/Understand-Anything) 上游 + kdev-secure-coding 安全规范覆盖层的代码知识图谱 plugin。
 
-## 功能概述
+## 能力
 
-### 核心能力
+| 场景 | Skill | 一句话 |
+|---|---|---|
+| 建图 + 灌安全规范 | `/kdev-graph-build` | 调 UA `/understand` + ingestor 注入 |
+| 规范 ↔ 代码追溯 | `/trace-security` | "这条规范在哪实现 / 这段代码涉及哪些规范" |
+| 变更安全爆炸半径 | `/security-impact` | "改这段代码会影响哪些规范 / 该跑哪些回归" |
+| 文档代码同步审计 | `/doc-code-sync` | 四级状态报告（同步/需更新/缺实现/缺文档） |
 
-| 功能 | 说明 |
-|------|------|
-| **需求追溯** | 从设计文档(.md/图片)追溯到代码实现，带信心评分 |
-| **爆炸半径分析** | 修改代码时分析影响范围，可视化依赖链 |
-| **文档-代码同步** | 检查文档与代码的一致性，发现脱节问题 |
-
-### 支持格式
-
-- **代码**: .py, .js, .ts, .go, .java (Tree-sitter AST 解析)
-- **文档**: .md (概念提取 + LLM 语义关联)
-- **图片**: .png, .jpg, .webp (Claude Vision API 解析)
-
-## 安装方式
+## 安装
 
 ```bash
-# 方式 1: 从 Git 安装
-/plugins install https://github.com/your-org/kdev-code-graph
-
-# 方式 2: 从 npm 安装
-/plugins install @your-org/kdev-code-graph
-
-# 方式 3: 本地目录
-claude --plugin-dir ./kdev-code-graph
-
-# 方式 4: 验证结构
-/plugins validate ./kdev-code-graph
+cd plugins/kdev-code-graph
+./install.sh
 ```
 
-## 使用方式
-
-### 1. 需求追溯
+并在 Claude Code 中：
 
 ```
-用户: 追溯认证需求到代码
-Claude: [调用 semantic-trace Skill]
-       → 构建图谱
-       → 语义查询
-       → 输出追溯报告 (需求→代码映射 + 实现状态)
+/plugin marketplace add Lum1104/Understand-Anything
+/plugin install understand-anything
 ```
 
-### 2. 变更影响分析
+## 设计原则
 
+- **不重写代码图谱引擎** — 完全复用 UA 上游
+- **对 UA 0 修改** — 安全节点用 UA `concept` + `kdev:*` tag 编码
+- **Contract test 当护栏** — UA 升级会自动检测白名单变化
+
+详见 [实施计划 v2](../../docs/skills/kdev-code-graph/2026-05-10-实施计划-v2.md)。
+
+## 目录
+
+- [skills/_ua_adapter](skills/_ua_adapter/SKILL.md) — UA 命令调用协议
+- [ingestor/](ingestor/README.md) — Python 灌入器
+- [tests/contract/](tests/contract/) — UA schema 兼容护栏
+
+## 升级 UA 上游
+
+```bash
+cd plugins/kdev-code-graph
+python3 -m pytest tests/contract -v
+# 失败 → 看 skills/_ua_adapter/SKILL.md "升级 UA 上游" 章节
 ```
-用户: 这个改动会影响什么？
-Claude: [调用 code-review-enhanced Skill]
-       → 变更检测
-       → 爆炸半径分析
-       → 输出影响范围 (L1直接/L2间接/L3语义)
-```
-
-### 3. 文档同步检查
-
-```
-用户: 文档是否需要更新？
-Claude: [调用 doc-code-sync Skill]
-       → 扫描文档
-       → 对比代码
-       → 输出同步报告 (✅同步/⚠️需更新/❌缺实现)
-```
-
-## 技术架构
-
-```
-┌─────────────┐
-│ Skills Layer│  semantic-trace / code-review-enhanced / doc-code-sync
-├─────────────┤
-│ MCP Server  │  semantic_query / detect_changes / doc_code_trace / get_impact_radius
-├─────────────┤
-│ Parser Layer│  code_parser (AST) / md_parser (NLP) / image_parser (Vision)
-├─────────────┤
-│ Graph Store │  SQLite + BFS 爆炸半径分析
-└─────────────┘
-```
-
-详细架构设计见: [docs/architecture-design.md](docs/architecture-design.md)
-
-## 开发路线图
-
-| Phase | 内容 | 状态 |
-|-------|------|------|
-| Phase 1 | 基础插件结构 | ✅ 完成 |
-| Phase 2 | MCP Server 核心 | 📝 设计完成 |
-| Phase 3 | Markdown 解析 | 📝 设计完成 |
-| Phase 4 | 图片解析 | 📝 设计完成 |
-| Phase 5 | 语义关联 | 📝 设计完成 |
-| Phase 6 | Skills 完善 | 📝 设计完成 |
-
-## 系统要求
-
-- Claude Code >= v2.1.x
-- Python >= 3.10
-- Anthropic API Key (用于 Vision 和语义提取)
-
-## 许可证
-
-MIT License
-
----
-
-**版本**: 1.0.0
-**状态**: 设计完成，待实施

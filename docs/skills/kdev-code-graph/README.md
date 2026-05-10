@@ -1,47 +1,50 @@
 # kdev-code-graph 设计文档
 
-> Claude Code 插件 - 语义级代码图谱，支持需求追溯、变更爆炸半径分析和文档-代码同步检查
+> Claude Code plugin — 基于 Understand-Anything 上游 + kdev-secure-coding 安全规范覆盖层
 
 ## 文档索引
 
+### 当前生效（v2 路径）
+
 | 文档 | 说明 |
-|------|------|
-| [2026-04-27-产品需求文档.md](2026-04-27-产品需求文档.md) | PRD v1.1.0 - 功能需求、用户场景、数据模型、验收标准 |
-| [2026-04-27-架构设计方案.md](2026-04-27-架构设计方案.md) | 模块设计、MCP Tools、Skills、复用策略 |
-| [2026-04-28-调研报告.md](2026-04-28-调研报告.md) | code-review-graph + graphify 深度分析 |
-| [2026-04-28-实施计划.md](2026-04-28-实施计划.md) | Phase 1-4 详细拆解 + DoD + 回滚策略 + 术语表 |
-| [2026-04-28-评审方案.md](2026-04-28-评审方案.md) | 决策事项确认 + 评审结论 |
-| [2026-04-28-文档综合评审报告-by灵码.md](2026-04-28-文档综合评审报告-by灵码.md) | 灵码 AI 首次评审报告 |
-| [2026-04-28-文档二次评审报告-by灵码.md](2026-04-28-文档二次评审报告-by灵码.md) | 灵码 AI 复审报告 |
+|---|---|
+| [2026-05-10-实施计划-v2.md](2026-05-10-实施计划-v2.md) | **当前实施计划**——Spike 验证 + 12 个 TDD 任务 |
 
-## 核心功能
+### 历史归档
 
-| 功能 | 说明 |
-|------|------|
-| **需求追溯** | 从设计文档(.md/图片)追溯到代码实现，带信心评分 |
-| **爆炸半径分析** | 修改代码时分析影响范围，可视化依赖链 |
-| **文档-代码同步** | 检查文档与代码的一致性，发现脱节问题 |
+| 文档 | 说明 |
+|---|---|
+| [2026-04-27-产品需求文档.md](2026-04-27-产品需求文档.md) | PRD v1.1.0 |
+| [2026-04-27-架构设计方案.md](2026-04-27-架构设计方案.md) | v1 架构（部分仍适用） |
+| [2026-04-28-调研报告.md](2026-04-28-调研报告.md) | 一次调研 |
+| [2026-04-28-实施计划.md](2026-04-28-实施计划.md) | **已归档**——CRG 路径，被 v2 取代 |
+| [2026-04-28-评审方案.md](2026-04-28-评审方案.md) | v1 评审结论 |
+| [2026-04-28-文档综合评审报告-by灵码.md](2026-04-28-文档综合评审报告-by灵码.md) | 灵码评审 |
+| [2026-04-28-文档二次评审报告-by灵码.md](2026-04-28-文档二次评审报告-by灵码.md) | 灵码复审 |
 
-## 插件状态
+### 二次调研
+
+| 文档 | 说明 |
+|---|---|
+| [references/README.md](references/README.md) | 4 项目调研下载指引 |
+| [references/COMPARATIVE_ANALYSIS.md](references/COMPARATIVE_ANALYSIS.md) | 4 项目综合对比 |
+| [references/FEATURE_FIT_ANALYSIS.md](references/FEATURE_FIT_ANALYSIS.md) | 4 需求适配度（UA 20/20） |
+| [references/DISCUSSION_AGENDA.md](references/DISCUSSION_AGENDA.md) | 5 个待决策问题 |
+
+## 核心功能（v2）
+
+| 功能 | Skill | 实现 |
+|---|---|---|
+| 建图 + 安全规范灌入 | `/kdev-graph-build` | UA `/understand` + kdev-ingestor |
+| 规范 ↔ 代码追溯 | `/trace-security` | 查图谱 `kdev:security_rule` 节点 |
+| 变更爆炸半径 | `/security-impact` | UA `/understand-diff` + 安全节点过滤 |
+| 文档代码同步 | `/doc-code-sync` | UA `document` 节点 + 时间戳比对 |
+
+## 实施状态（v2）
 
 | 维度 | 状态 |
-|------|------|
-| 设计文档 | ✅ 完整 |
-| 插件结构 | ✅ 完整 |
-| Skills 定义 | ✅ 完整 (已优化) |
-| 调研完成 | ✅ 完成 |
-| 评审通过 | ✅ 通过 |
-| MCP Server 实现 | 📝 待实施 |
-| Python 代码 | 📝 待实施 (~400 行新增) |
-
-## 许可证
-
-| 项目 | 许可证 | 状态 |
-|------|--------|------|
-| kdev-code-graph | MIT License (建议) | 待声明 |
-| code-review-graph | MIT License | ✅ 已验证 (references/code-review-graph/LICENSE) |
-| graphify | MIT License | ✅ 已验证 (references/graphify/LICENSE) |
-
-## 开发路线图
-
-详见 [2026-04-27-架构设计方案.md](2026-04-27-架构设计方案.md) 第 10 节。
+|---|---|
+| 设计文档 | ✅ v2 完整 |
+| Spike 验证 | ✅ 通过（UA 21 节点 + 35 边 + passthrough） |
+| 实施计划 | ✅ 12 个 TDD 任务 |
+| 实施代码 | ✅ Tasks 0-12 完成 |
