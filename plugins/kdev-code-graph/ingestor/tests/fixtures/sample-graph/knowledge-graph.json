@@ -1,0 +1,44 @@
+{
+  "version": "1.0.0",
+  "kind": "codebase",
+  "project": {
+    "name": "tiny-project",
+    "languages": ["python"],
+    "frameworks": [],
+    "description": "A tiny project for testing.",
+    "analyzedAt": "2026-05-10T00:00:00.000Z",
+    "gitCommitHash": "abc1234"
+  },
+  "nodes": [
+    {
+      "id": "file:app.py",
+      "type": "file",
+      "name": "app.py",
+      "filePath": "app.py",
+      "summary": "HTTP entrypoint",
+      "tags": ["python"],
+      "complexity": "simple"
+    },
+    {
+      "id": "function:app.py:run_query",
+      "type": "function",
+      "name": "run_query",
+      "filePath": "app.py",
+      "lineRange": [10, 25],
+      "summary": "Executes a SQL query built from user input",
+      "tags": ["python", "database"],
+      "complexity": "moderate"
+    }
+  ],
+  "edges": [
+    {
+      "source": "file:app.py",
+      "target": "function:app.py:run_query",
+      "type": "contains",
+      "direction": "forward",
+      "weight": 1.0
+    }
+  ],
+  "layers": [],
+  "tour": []
+}
