@@ -82,3 +82,8 @@ plugins/*/evals/**/skill-snapshot/
 # skill workspace 临时产物（venv / 跑测试日志），只跟踪用例 JSON
 plugins/*/skills/*-workspace/.venv/
 plugins/*/skills/*-workspace/*.log
+
+# kdev-ingestor venv
+plugins/kdev-code-graph/ingestor/.venv/
+plugins/kdev-code-graph/ingestor/*.egg-info/
+plugins/kdev-code-graph/ingestor/.pytest_cache/
