@@ -82,7 +82,7 @@ ingestor 保证：节点 type 用 UA `concept`、安全语义用 `kdev:*` tag、
 1. 跑 `pytest plugins/kdev-code-graph/tests/contract -v` 看护栏
 2. 若 contract test 失败：
    - 节点/边白名单变 → 更新 [graph_io.py](../../ingestor/kdev_ingestor/graph_io.py)
-   - `passthrough()` 移除 → 紧急评估，参考 [实施计划 v2 §决策树](../../../../docs/skills/kdev-code-graph/2026-05-10-实施计划-v2.md)
+   - `passthrough()` 移除 → 紧急评估，参考 [实施计划 v2 §风险与回滚](../../../../docs/skills/kdev-code-graph/2026-05-10-实施计划-v2.md#风险与回滚)
 3. 命令名变 → 改本文件 + 引用本文件的 skill
 
 ## 不要做
