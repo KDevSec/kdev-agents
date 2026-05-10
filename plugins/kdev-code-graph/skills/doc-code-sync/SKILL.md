@@ -1,146 +1,112 @@
 ---
 name: doc-code-sync
-description: |
-  Use this skill to check synchronization status between documentation and code implementation.
-  Make sure to use this skill whenever the user mentions: "doc-code sync", "文档代码同步", "check if docs are up to date", "文档是否需要更新", "docs outdated", "document consistency audit", "文档和代码对不上", or when auditing documentation health across the project. Even if the user doesn't explicitly ask for "sync", trigger this skill when they mention outdated docs or doc-code mismatch concerns.
-version: 1.0.0
-allowed-tools:
-  - mcp__semantic-graph__semantic_query
-  - mcp__semantic-graph__doc_code_trace
-  - mcp__semantic-graph__build_graph
+description: 检查项目文档（PRD/设计/spec markdown）与代码的同步状态——基于 UA /understand 建出的 document 节点 + documents 边，比对 git 时间戳与图谱信心度，识别「✅同步 / ⚠️需更新 / ❌缺实现 / 🔍缺文档」四种状态。触发时机：用户说"文档代码同步检查 / 文档过期了吗 / docs 审计 / spec 漂移 / 有哪些 PRD 没实现"，或对一份 PRD 做实现状态盘点时。
 ---
 
-# Document-Code Sync Check Skill
+# /doc-code-sync
 
-Check synchronization status between documentation and code implementation.
+按 UA 知识图谱里的 `document` 节点逐份核对，识别四种状态：
 
-## When to Use
+| 状态 | 含义 |
+|---|---|
+| ✅ 同步 | 文档时间戳 ≥ 关联代码时间戳；存在 `documents` 边；信心 ≥ 0.7 |
+| ⚠️ 需更新 | 关联代码时间戳 > 文档时间戳超过 N 天 |
+| ❌ 缺实现 | 文档存在但无关联代码 |
+| 🔍 缺文档 | 代码有 file/function 但无 `document` 节点对其负责 |
 
-Trigger this skill when:
-- User asks "文档代码同步检查"
-- User wants to audit documentation consistency
-- User asks "文档是否需要更新"
-- User mentions "docs outdated" or "sync check"
+## 前置条件
 
-## Why This Skill Matters
+- 图谱已建好
+- 当前在 git 仓库
 
-文档代码同步是维护项目信息一致性的基础：
+## 流程
 
-- **减少信息不一致**：文档描述的功能与代码实现脱节会导致误导性信息
-- **降低新人理解成本**：同步的文档帮助新人快速定位正确代码
-- **预防维护隐患**：过时文档可能包含已废弃的接口，误导后续开发
-- **自动化审计**：无需人工逐一对照，批量识别需更新的文档并优先级排序
+### Step 1：列所有 document 节点
 
-## Workflow
-
-### Step 1: Build/Update Graph
-
-```
-Call mcp__semantic-graph__build_graph
-Input: { project_root: current working directory }
-Output: Graph with doc_nodes and code_nodes
+```bash
+grep -A 5 '"type": "document"' .understand-anything/knowledge-graph.json | head -50
 ```
 
-### Step 2: Scan Documents
+### Step 2：每份 doc 拉 git mtime
 
-For each document in the project:
-
-```
-Call mcp__semantic-graph__doc_code_trace
-Input: { doc_name: document_name }
-Output: { code_nodes, implementation_status }
+```bash
+git log -1 --format=%ct -- "<doc-path>"
 ```
 
-### Step 3: Analyze Sync Status
+### Step 3：找 document → code 的边
 
-Compare:
-- Document timestamps vs code timestamps
-- Document concepts vs implemented concepts
-- Unimplemented concepts (doc exists, code missing)
-- Orphan code (code exists, doc missing)
+按 [_ua_adapter](../_ua_adapter/SKILL.md) 中 ID 命名约定，找所有 `documents` 类型且 source/target 之一是当前 doc 的边。
 
-### Step 4: Generate Sync Report
+### Step 4：每个关联 code 节点拉 git mtime（取最大值）
 
-Provide detailed synchronization report.
+### Step 5：状态判定
 
-## Output Format
+| 条件 | 状态 |
+|---|---|
+| 没有任何 `documents` 边 | ❌ 缺实现 |
+| `code_mtime > doc_mtime + 30d` | ⚠️ 需更新 |
+| 否则 | ✅ 同步 |
 
+代码侧：找 `kind == "codebase"` 节点中没被任何 `documents` 边覆盖的 file/function/class → 🔍 缺文档（按文件聚合）。
+
+### Step 6：输出报告
+
+```markdown
+# 文档-代码同步审计报告
+
+## 摘要
+
+| 状态 | 数量 |
+|---|---|
+| ✅ 同步 | 12 |
+| ⚠️ 需更新 | 3 |
+| ❌ 缺实现 | 2 |
+| 🔍 缺文档 | 8（按文件聚合） |
+
+## 详情
+
+### ⚠️ 需更新（3）
+
+| 文档 | 文档时间 | 代码最新时间 | 漂移天数 | 建议 |
+|---|---|---|---|---|
+| docs/auth-spec.md | 2025-12-01 | 2026-04-22 | 142 | 立即处理 |
+
+### ❌ 缺实现（2）
+
+| 文档 | 关联节点数 |
+|---|---|
+| docs/proposed-feature-x.md | 0 |
+
+### 🔍 缺文档（按文件聚合）
+
+| 文件 | 节点数 | 建议 |
+|---|---|---|
+| app/billing/refund.py | 5 | 写 refund 流程 doc |
+
+## 推荐处理顺序
+
+1. 立即处理（漂移 > 90 天 OR 涉及 kdev:security_rule 关联）
+2. 本周处理（30-90 天）
+3. 后续处理（缺文档但模块稳定）
 ```
-## 文档-代码同步报告
 
-### 同步状态总览
+## 漂移阈值
 
-| 状态 | 数量 | 说明 |
-|------|------|------|
-| ✅ 同步 | 12 | 文档与代码一致 |
-| ⚠️ 需更新 | 3 | 代码已更新，文档滞后 |
-| ❌ 缺实现 | 2 | 文档描述功能未实现 |
-| 🔍 缺文档 | 1 | 代码存在但无文档 |
+可调，默认警示 30 天 / 严重 90 天。
 
-### 详细分析
+## 与 trace-security 协同
 
-#### ⚠️ 需更新的文档
+如果 doc 关联到带 `kdev:security_rule` tag 的节点 → 漂移阈值降为 14 天。
 
-| 文档 | 相关代码 | 变更时间 | 建议 |
-|------|----------|----------|------|
-| auth_design.md | src/auth/service.py | 代码更新于 2026-04-25 | 更新认证流程描述 |
-| api_spec.md | src/api/routes.py | 新增 2 个 API | 补充接口文档 |
+## 失败处理
 
-#### ❌ 缺实现的功能
+| 现象 | 应对 |
+|---|---|
+| 图谱无 `document` 节点 | 用户项目可能没在 `/understand` 配置文档目录——重跑 `/understand --full` |
+| git mtime 拉不到 | 文件未提交——按当前 mtime |
 
-| 文档 | 概念 | 描述位置 | 建议 |
-|------|------|----------|------|
-| security_rules.md | SessionStore | 第 3.2 节 | 需实现 session 存储 |
-| perf_spec.md | CacheLayer | 第 2.1 节 | 需实现缓存层 |
+## 不要做
 
-#### 🔍 缺文档的代码
-
-| 代码 | 类型 | 建议 |
-|------|------|------|
-| src/utils/crypto.py:CryptoHelper | 类 | 补充安全模块文档 |
-
-### 优先级建议
-
-1. 🔴 立即处理: auth_design.md - 认证流程已变更
-2. 🟠 本周处理: SessionStore 实现
-3. 🟢 后续处理: CryptoHelper 文档补充
-```
-
-## Sync Status Definitions
-
-|  Icon | Status | Condition |
-|------|--------|-----------|
-| ✅ | 同步 | doc timestamp ≈ code timestamp, concepts matched |
-| ⚠️ | 需更新 | code newer than doc, or concepts diverged |
-| ❌ | 缺实现 | doc concept not found in code |
-| 🔍 | 缺文档 | code exists without corresponding doc |
-
-## Notes
-
-- Use file modification timestamps for sync detection
-- Confidence threshold: 0.7 for concept matching
-- Include actionable recommendations prioritized by impact
-
-## Edge Cases / Error Handling
-
-| 场景 | 处理方式 |
-|------|----------|
-| 图谱缺失 | 自动调用 build_graph，提示首次构建需要等待 |
-| 新文档首次检查 | 标注为"新文档"，需要建立 doc-code 关联后才能评估同步状态 |
-| 无 timestamp 信息 | 依赖语义匹配而非时间戳，标注为"语义检查" |
-| 全新项目 | 提示"项目无历史文档"，建议先运行 semantic-trace 建立基础关联 |
-| 大量脱节文档 | 建议用户分批处理，按优先级从高到低逐步修复 |
-
-## Related Skills
-
-| Skill | 适用场景 | 选择依据 |
-|------|----------|----------|
-| **doc-code-sync** (本 skill) | **批量审计**全项目文档同步状态，生成优先级建议 | 用户问"文档是否需要更新"、"批量检查同步"、"文档健康度" |
-| **semantic-trace** | 追溯**单个文档**到代码，查看实现状态 | 用户问"这个需求实现了吗"、"找这个文档的对应代码" |
-| **code-review-enhanced** | 代码变更影响分析，爆炸半径评估 | 用户问"这个改动会影响什么" |
-
-**关键区别**：
-- 本 skill 是**批量扫描**，适合全项目文档健康度体检
-- semantic-trace 是**单点追溯**，适合快速定位特定需求的实现状态
-
-如果用户只是想知道某个文档对应的代码在哪，用 semantic-trace 更高效。如果要做全面审计，用本 skill。
+- ❌ 不要扫所有 .md——只信图谱里的 `document` 节点
+- ❌ 不要按函数级别刷"缺文档"——按文件聚合
+- ❌ 不要在「缺文档」误报 generated 文件（如 migrations / __pycache__）
