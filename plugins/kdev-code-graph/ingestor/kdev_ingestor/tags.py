@@ -49,6 +49,10 @@ def parse_tag(tag: str) -> tuple[str, str | None]:
     rest = tag[len(KDEV_PREFIX):]
     if ":" in rest:
         kind, value = rest.split(":", 1)
+        if not _VALUE_RE.match(value):
+            raise InvalidTagError(
+                f"value must match {_VALUE_RE.pattern!r}, got {value!r}"
+            )
         return kind, value
     return rest, None
 

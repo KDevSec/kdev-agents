@@ -55,6 +55,18 @@ def test_parse_tag_rejects_non_kdev():
         parse_tag("foo:bar")
 
 
+def test_parse_tag_rejects_value_with_extra_colon():
+    # parse_tag must round-trip safely with make_tag — values that contain ':'
+    # cannot be produced by make_tag, so parse_tag must reject them too.
+    with pytest.raises(InvalidTagError):
+        parse_tag("kdev:rule_id:3.1.1:extra")
+
+
+def test_parse_tag_rejects_value_with_uppercase():
+    with pytest.raises(InvalidTagError):
+        parse_tag("kdev:rule_id:Foo.BAR")
+
+
 def test_is_kdev_tag():
     assert is_kdev_tag("kdev:security_rule") is True
     assert is_kdev_tag("kdev:rule_id:3.1.1") is True
