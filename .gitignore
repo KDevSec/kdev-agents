@@ -87,3 +87,4 @@ plugins/*/skills/*-workspace/*.log
 plugins/kdev-code-graph/ingestor/.venv/
 plugins/kdev-code-graph/ingestor/*.egg-info/
 plugins/kdev-code-graph/ingestor/.pytest_cache/
+plugins/kdev-code-graph/ingestor/.coverage
