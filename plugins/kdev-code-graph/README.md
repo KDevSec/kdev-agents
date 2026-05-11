@@ -13,7 +13,41 @@
 
 ## 安装
 
-### 通过 Claude Code marketplace（推荐）
+### 一键安装（推荐）
+
+```bash
+curl -sSL https://raw.githubusercontent.com/KDevSec/kdev-agents/main/scripts/setup-kdev-codegraph.sh | bash
+```
+
+该脚本完成 3 件事：add 两个 marketplace + install kdev-code-graph（UA 通过 plugin.json `dependencies` 自动连带装）。
+
+> 安全考虑：`curl | bash` 是反模式。建议先 `curl -sSL .../setup-kdev-codegraph.sh | less` 看脚本内容再跑。
+
+### 本地 clone 后
+
+```bash
+git clone git@github.com:KDevSec/kdev-agents.git
+cd kdev-agents
+./scripts/setup-kdev-codegraph.sh
+```
+
+### 准备 Python ingestor
+
+`/plugin install` 装完 plugin 文件后，还需要准备 Python ingestor 环境：
+
+```bash
+cd ~/.claude/plugins/cache/kdev-agents/kdev-code-graph/<version>
+./install.sh
+```
+
+或本地开发场景：
+
+```bash
+cd plugins/kdev-code-graph
+./install.sh
+```
+
+### 在 Claude Code 内手动安装（不用脚本）
 
 ```
 /plugin marketplace add KDevSec/kdev-agents
@@ -21,25 +55,7 @@
 /plugin install kdev-code-graph
 ```
 
-UA 会作为依赖自动安装（通过 plugin.json `dependencies` 字段）。
-
-### 准备 Python ingestor
-
-`/plugin install` 装完 plugin 文件后，还需要准备 Python ingestor 环境（创建 venv + 安装 kdev-ingestor）：
-
-```bash
-cd ~/.claude/plugins/cache/kdev-agents/kdev-code-graph/<version>
-./install.sh
-```
-
-或在本地开发场景下直接：
-
-```bash
-cd plugins/kdev-code-graph
-./install.sh
-```
-
-> 注：未来 ingestor 可能改造为零安装（stdlib only），届时这一步可省略。
+⚠️ `/plugin` 命令在 VSCode 扩展里不可用，只在 Claude Code CLI / 桌面应用 / Web App 里可用。
 
 ## 设计原则
 
