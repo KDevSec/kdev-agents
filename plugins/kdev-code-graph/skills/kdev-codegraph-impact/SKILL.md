@@ -1,15 +1,15 @@
 ---
-name: security-impact
+name: kdev-codegraph-impact
 description: 计算代码变更对安全规范的影响——基于 UA /understand-diff 拿到爆炸半径，再叠加 kdev:security_rule 节点过滤。触发时机：用户说"这段改动有什么安全风险 / 影响了哪些规范 / 安全爆炸半径 / pre-merge 安全审查"，或在 PR 评审/发版前做安全确认时。
 ---
 
-# /security-impact
+# /kdev-codegraph-impact
 
 回答：本次代码改动间接影响了哪些安全规范？哪些规则需要回归测试？
 
 ## 前置条件
 
-- `.understand-anything/knowledge-graph.json` 存在并含 kdev 安全规则节点（即跑过 [`/kdev-graph-build`](../kdev-graph-build/SKILL.md)）
+- `.understand-anything/knowledge-graph.json` 存在并含 kdev 安全规则节点（即跑过 [`/kdev-codegraph-build`](../kdev-codegraph-build/SKILL.md)）
 - 当前在 git 仓库
 
 ## 流程
@@ -72,7 +72,7 @@ description: 计算代码变更对安全规范的影响——基于 UA /understa
 | 现象 | 应对 |
 |---|---|
 | git 无 diff | 提示 stage 或指定 base ref |
-| 受影响节点 0 但代码动了大量 | 图谱过期，跑 `/kdev-graph-build` |
+| 受影响节点 0 但代码动了大量 | 图谱过期，跑 `/kdev-codegraph-build` |
 | UA 报错 | 查 `.understand-anything/` 日志，常见图谱版本不匹配 |
 
 ## 不要做

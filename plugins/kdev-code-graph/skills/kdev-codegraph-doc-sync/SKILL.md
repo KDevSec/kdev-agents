@@ -1,9 +1,9 @@
 ---
-name: doc-code-sync
+name: kdev-codegraph-doc-sync
 description: 检查项目文档（PRD/设计/spec markdown）与代码的同步状态——基于 UA /understand 建出的 document 节点 + documents 边，比对 git 时间戳与图谱信心度，识别「✅同步 / ⚠️需更新 / ❌缺实现 / 🔍缺文档」四种状态。触发时机：用户说"文档代码同步检查 / 文档过期了吗 / docs 审计 / spec 漂移 / 有哪些 PRD 没实现"，或对一份 PRD 做实现状态盘点时。
 ---
 
-# /doc-code-sync
+# /kdev-codegraph-doc-sync
 
 按 UA 知识图谱里的 `document` 节点逐份核对，识别四种状态：
 
@@ -94,7 +94,7 @@ git log -1 --format=%ct -- "<doc-path>"
 
 可调，默认警示 30 天 / 严重 90 天。
 
-## 与 trace-security 协同
+## 与 kdev-codegraph-trace 协同
 
 如果 doc 关联到带 `kdev:security_rule` tag 的节点 → 漂移阈值降为 14 天。
 

@@ -1,15 +1,15 @@
 ---
-name: trace-security
+name: kdev-codegraph-trace
 description: 双向追溯安全规范与代码——给定一条 kdev-secure-coding 规则，找出代码里哪些函数/类实现/违反它；或给定一段代码，找出关联的安全规范条目。基于 .understand-anything/knowledge-graph.json + kdev:security_rule tag 节点。触发时机：用户说"这条规范在哪实现 / 这段代码涉及哪些安全规范 / 安全规范追溯 / 规范覆盖检查"，或对一段代码做安全审查需要查规范来源时。
 ---
 
-# /trace-security
+# /kdev-codegraph-trace
 
 在 kdev 知识图谱（详见 [_ua_adapter](../_ua_adapter/SKILL.md)）上做规范↔代码双向追溯。
 
 ## 前置条件
 
-`.understand-anything/knowledge-graph.json` 必须存在。如果不存在，先调 [`/kdev-graph-build`](../kdev-graph-build/SKILL.md)。
+`.understand-anything/knowledge-graph.json` 必须存在。如果不存在，先调 [`/kdev-codegraph-build`](../kdev-codegraph-build/SKILL.md)。
 
 ## 模式 1：规范 → 代码
 
@@ -74,9 +74,9 @@ description: 双向追溯安全规范与代码——给定一条 kdev-secure-cod
 |---|---|
 | 规则 ID 不存在 | 列出现有所有 `kdev:rule_id:*` 让用户选 |
 | 没有任何关联边 | 不是错误——明确告诉用户「这条规范暂未在代码中关联」 |
-| 图谱过期 | 提示用户跑 `/kdev-graph-build` 重建 |
+| 图谱过期 | 提示用户跑 `/kdev-codegraph-build` 重建 |
 
 ## 不要做
 
 - ❌ 不要凭空猜代码与规范的关联——只输出图谱里有的边
-- ❌ 不要直接读源码做判断——这是 LLM 关联器的职责，trace-security 只查图谱
+- ❌ 不要直接读源码做判断——这是 LLM 关联器的职责，kdev-codegraph-trace 只查图谱

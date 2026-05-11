@@ -6,23 +6,25 @@
 
 | 场景 | Skill | 一句话 |
 |---|---|---|
-| 建图 + 灌安全规范 | `/kdev-graph-build` | 调 UA `/understand` + ingestor 注入 |
-| 规范 ↔ 代码追溯 | `/trace-security` | "这条规范在哪实现 / 这段代码涉及哪些规范" |
-| 变更安全爆炸半径 | `/security-impact` | "改这段代码会影响哪些规范 / 该跑哪些回归" |
-| 文档代码同步审计 | `/doc-code-sync` | 四级状态报告（同步/需更新/缺实现/缺文档） |
+| 建图 + 灌安全规范 | `/kdev-codegraph-build` | 调 UA `/understand` + ingestor 注入 |
+| 规范 ↔ 代码追溯 | `/kdev-codegraph-trace` | "这条规范在哪实现 / 这段代码涉及哪些规范" |
+| 变更安全爆炸半径 | `/kdev-codegraph-impact` | "改这段代码会影响哪些规范 / 该跑哪些回归" |
+| 文档代码同步审计 | `/kdev-codegraph-doc-sync` | 四级状态报告（同步/需更新/缺实现/缺文档） |
 
 ## 安装
 
-```bash
-cd plugins/kdev-code-graph
-./install.sh
-```
-
-并在 Claude Code 中：
+本 plugin 依赖 [Understand-Anything](https://github.com/Lum1104/Understand-Anything) (UA) 作为图谱引擎，需要先装 UA：
 
 ```
 /plugin marketplace add Lum1104/Understand-Anything
 /plugin install understand-anything
+```
+
+然后安装 kdev-code-graph 的 Python ingestor：
+
+```bash
+cd plugins/kdev-code-graph
+./install.sh
 ```
 
 ## 设计原则

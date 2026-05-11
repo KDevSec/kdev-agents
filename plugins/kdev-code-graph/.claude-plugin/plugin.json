@@ -5,9 +5,9 @@
   "keywords": ["code-graph", "security", "doc-code-trace", "blast-radius", "understand-anything"],
   "skills": [
     "./skills/_ua_adapter",
-    "./skills/kdev-graph-build",
-    "./skills/trace-security",
-    "./skills/security-impact",
-    "./skills/doc-code-sync"
+    "./skills/kdev-codegraph-build",
+    "./skills/kdev-codegraph-trace",
+    "./skills/kdev-codegraph-impact",
+    "./skills/kdev-codegraph-doc-sync"
   ]
 }

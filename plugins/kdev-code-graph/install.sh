@@ -34,14 +34,19 @@ fi
 PY_VER=$(python3 -c 'import sys; print(f"{sys.version_info.major}.{sys.version_info.minor}")')
 ok "python $PY_VER"
 
-step "校验 Understand-Anything plugin 是否已安装"
+step "校验依赖 plugin: Understand-Anything (UA)"
 UA_CACHE="$HOME/.claude/plugins/cache/understand-anything"
 if [ -d "$UA_CACHE" ]; then
   ok "UA 已装"
 else
-  warn "UA 未装。请在 Claude Code 中："
+  warn "UA 未装 — kdev-code-graph 依赖 UA 作为图谱引擎"
+  echo ""
+  echo "  请在 Claude Code 中运行以下两条命令安装："
+  echo ""
   echo "    /plugin marketplace add Lum1104/Understand-Anything"
   echo "    /plugin install understand-anything"
+  echo ""
+  echo "  装完后重新跑 install.sh 验证。"
 fi
 
 step "安装 kdev-ingestor (editable)"
@@ -64,4 +69,4 @@ cd "$PLUGIN_ROOT"
 python3 -m pytest tests/contract --quiet || warn "contract test 失败——见 _ua_adapter/SKILL.md"
 
 step "完成"
-echo "下一步：cd <project>; 在 Claude Code 中跑 /kdev-graph-build"
+echo "下一步：cd <project>; 在 Claude Code 中跑 /kdev-codegraph-build"

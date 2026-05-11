@@ -35,10 +35,10 @@
 
 | 功能 | Skill | 实现 |
 |---|---|---|
-| 建图 + 安全规范灌入 | `/kdev-graph-build` | UA `/understand` + kdev-ingestor |
-| 规范 ↔ 代码追溯 | `/trace-security` | 查图谱 `kdev:security_rule` 节点 |
-| 变更爆炸半径 | `/security-impact` | UA `/understand-diff` + 安全节点过滤 |
-| 文档代码同步 | `/doc-code-sync` | UA `document` 节点 + 时间戳比对 |
+| 建图 + 安全规范灌入 | `/kdev-codegraph-build` | UA `/understand` + kdev-ingestor |
+| 规范 ↔ 代码追溯 | `/kdev-codegraph-trace` | 查图谱 `kdev:security_rule` 节点 |
+| 变更爆炸半径 | `/kdev-codegraph-impact` | UA `/understand-diff` + 安全节点过滤 |
+| 文档代码同步 | `/kdev-codegraph-doc-sync` | UA `document` 节点 + 时间戳比对 |
 
 ## 实施状态（v2）
 
