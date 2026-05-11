@@ -39,14 +39,14 @@ UA_CACHE="$HOME/.claude/plugins/cache/understand-anything"
 if [ -d "$UA_CACHE" ]; then
   ok "UA 已装"
 else
-  warn "UA 未装 — kdev-code-graph 依赖 UA 作为图谱引擎"
+  warn "UA 未装"
   echo ""
-  echo "  请在 Claude Code 中运行以下两条命令安装："
+  echo "  正常情况下 UA 会作为 kdev-code-graph 的依赖自动安装"
+  echo "  （通过 plugin.json dependencies + marketplace allowCrossMarketplaceDependenciesOn）"
   echo ""
+  echo "  如果你是本地开发 / 未通过 /plugin install 安装，请手动加 UA marketplace："
   echo "    /plugin marketplace add Lum1104/Understand-Anything"
   echo "    /plugin install understand-anything"
-  echo ""
-  echo "  装完后重新跑 install.sh 验证。"
 fi
 
 step "安装 kdev-ingestor (editable)"

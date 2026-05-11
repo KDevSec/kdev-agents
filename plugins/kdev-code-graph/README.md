@@ -13,19 +13,33 @@
 
 ## 安装
 
-本 plugin 依赖 [Understand-Anything](https://github.com/Lum1104/Understand-Anything) (UA) 作为图谱引擎，需要先装 UA：
+### 通过 Claude Code marketplace（推荐）
 
 ```
+/plugin marketplace add KDevSec/kdev-agents
 /plugin marketplace add Lum1104/Understand-Anything
-/plugin install understand-anything
+/plugin install kdev-code-graph
 ```
 
-然后安装 kdev-code-graph 的 Python ingestor：
+UA 会作为依赖自动安装（通过 plugin.json `dependencies` 字段）。
+
+### 准备 Python ingestor
+
+`/plugin install` 装完 plugin 文件后，还需要准备 Python ingestor 环境（创建 venv + 安装 kdev-ingestor）：
+
+```bash
+cd ~/.claude/plugins/cache/kdev-agents/kdev-code-graph/<version>
+./install.sh
+```
+
+或在本地开发场景下直接：
 
 ```bash
 cd plugins/kdev-code-graph
 ./install.sh
 ```
+
+> 注：未来 ingestor 可能改造为零安装（stdlib only），届时这一步可省略。
 
 ## 设计原则
 

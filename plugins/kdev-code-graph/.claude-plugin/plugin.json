@@ -9,5 +9,8 @@
     "./skills/kdev-codegraph-trace",
     "./skills/kdev-codegraph-impact",
     "./skills/kdev-codegraph-doc-sync"
+  ],
+  "dependencies": [
+    { "name": "understand-anything", "marketplace": "understand-anything" }
   ]
 }
