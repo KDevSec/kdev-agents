@@ -23,6 +23,8 @@ curl -sSL https://raw.githubusercontent.com/KDevSec/kdev-agents/main/scripts/set
 
 > 安全考虑：`curl | bash` 是反模式。建议先 `curl -sSL .../setup-kdev-codegraph.sh | less` 看脚本内容再跑。
 
+> Windows 用户请用 PowerShell 版本（见下方「Windows 10 / 11 一键安装」）。
+
 ### 本地 clone 后
 
 ```bash
@@ -30,6 +32,27 @@ git clone git@github.com:KDevSec/kdev-agents.git
 cd kdev-agents
 ./scripts/setup-kdev-codegraph.sh
 ```
+
+### Windows 10 / 11 一键安装
+
+Win10 默认 PowerShell 5.1 即可（不需要 PS 7+）。在 PowerShell 中跑：
+
+```powershell
+iwr -useb https://raw.githubusercontent.com/KDevSec/kdev-agents/main/scripts/setup-kdev-codegraph.ps1 | iex
+```
+
+或本地 clone 后：
+
+```powershell
+.\scripts\setup-kdev-codegraph.ps1
+```
+
+**Windows 前提条件：**
+- Claude Code Desktop / CLI 已安装（`claude` 命令在 PATH 里）
+- Python 3.11+ 已装（建议用 `py -3 --version` 验证；ingestor 用 stdlib only，零依赖）
+- Node.js 22+ 已装（UA 上游需要）
+
+ingestor 在 Windows 上调用方式：`py -3 run.py inject ...`（详见 `/kdev-codegraph-build` skill 的 PowerShell 命令块）
 
 ### Python ingestor（零安装）
 

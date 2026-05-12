@@ -33,6 +33,8 @@ test -f .understand-anything/knowledge-graph.json && echo "graph ready"
 
 ## Step 3：灌入 kdev 安全规范节点
 
+**Bash / macOS / Linux:**
+
 ```bash
 KDEV_RULES_DIR="<repo>/plugins/kdev-secure-coding/skills/python-security-coding/references"
 INGESTOR="${CLAUDE_PLUGIN_ROOT:-plugins/kdev-code-graph}/ingestor/run.py"
@@ -41,12 +43,28 @@ python3 "$INGESTOR" inject \
     --graph .understand-anything/knowledge-graph.json
 ```
 
+**PowerShell / Windows:**
+
+```powershell
+$KdevRulesDir = "<repo>\plugins\kdev-secure-coding\skills\python-security-coding\references"
+$Ingestor = if ($env:CLAUDE_PLUGIN_ROOT) { "$env:CLAUDE_PLUGIN_ROOT\ingestor\run.py" } else { "plugins\kdev-code-graph\ingestor\run.py" }
+& py -3 $Ingestor inject --rules-dir $KdevRulesDir --graph .understand-anything\knowledge-graph.json
+```
+
 预期：`injected N rule node(s) into ...`，N ≥ 8。
 
 ## Step 4：核对结果
 
+**Bash / macOS / Linux:**
+
 ```bash
 python3 "$INGESTOR" list-tags --graph .understand-anything/knowledge-graph.json
+```
+
+**PowerShell / Windows:**
+
+```powershell
+& py -3 $Ingestor list-tags --graph .understand-anything\knowledge-graph.json
 ```
 
 至少看到：`kdev:security_rule` / `kdev:rule_id:*` / `kdev:category:*` / `kdev:source:kdev-secure-coding`。
