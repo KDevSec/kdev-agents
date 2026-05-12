@@ -1,0 +1,10 @@
+{
+  "name": "kdev-env-recon",
+  "description": "测试环境实测前置 skill：登录测试环境 → 实测抓取左菜单全树 / Tab / 按钮 / 字段 / 弹窗 → 持久化为 recon/menu_list.md + 4 类 JSON + 截图，作为后续测试用例 .md 与 PageObject 的 UI 文案权威源。可选地对已有测试用例 .md 反向 diff，propose 步骤修正补丁（菜单名 / 按钮文案 / 弹窗标题 / 必填字段对齐）。从 kdev-ui-autotest 的 STEP 0 抽离独立，让'实测前置'在不写 Playwright 脚本的场景也可独立调用。本 skill 只管侦察 + 产物 + diff patch 建议；下游 kdev-ui-autotest / testcases-to-playwright-pipeline 把 recon/menu_list.md 当 STEP 0 已完成的前置消费",
+  "version": "0.1.0",
+  "author": {
+    "name": "ly"
+  },
+  "license": "MIT",
+  "keywords": ["env-recon", "menu-probe", "ui-truth-source", "playwright-prelude", "spec-ui-align", "element-plus", "kdev"]
+}

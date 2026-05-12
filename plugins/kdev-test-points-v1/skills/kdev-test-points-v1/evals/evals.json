@@ -1,0 +1,33 @@
+{
+  "skill_name": "kdev-test-points-v1",
+  "evals": [
+    {
+      "id": 1,
+      "name": "spec-with-sp15-template",
+      "prompt": "/kdev-test-points-v1 --input /home/sec/project/SOP_test/specs/001-pl-project-version-mgmt/spec.md --example /home/sec/project/ClaudeCodeTest/SOP_测试点MOD.md --output /tmp/eval-1-output.md\n\n这是一个针对 RuoYi-Vue3-FastAPI 项目的内部 spec（4 个 User Story / FR-001 ~ FR-023 / SC-001 ~ SC-007）。请按 example 模板的列定义渲染测试点表格，并产出可审计的测试设计文档。",
+      "expected_output": "Mode 自动判定为 feature-spec-lite。主文件：范围与参数表 + §6.5 测试点表（保留 example 列数，无 CI/子特性/技术 额外列）+ FR↔AR↔关键测试点 RTM + 残余风险段 + 自检清单。companion <stem>-audit.md：§6.1 Header、§6.2 在范围 quality matrix、§6.3 COND、§6.4 CI、§6.7 Coverage Summary、§6.8 Conformity light、§6.11 Risk-detail。AR 前缀沿用 example 的命名空间（AR-SATP-），模块号语义保留，单一角色贯穿。CRUD 拆三 AR、新增/编辑 AR 含 <script> 行、性能整体 OOS（不出现任何 ≤Ns 行）。",
+      "files": []
+    },
+    {
+      "id": 2,
+      "name": "spec-default-format",
+      "prompt": "/kdev-test-points-v1 --input /home/sec/project/SOP_test/specs/001-pl-project-version-mgmt/spec.md --output /tmp/eval-2-output.md\n\n按 skill 默认格式输出完整测试设计文档。",
+      "expected_output": "Mode 自动判定为 feature-spec（无 example）。完整 §6.1–§6.11 双标准格式：Header、Quality Coverage Matrix（在范围行）、Test Conditions、Coverage Items、Test Points/Cases（每条含覆盖项/质量子特性/所属域/技术/优先级判据/前置/后置）、§6.6 TC-DOC 跳过且给一句理由、Coverage Summary、Conformity Evaluation light、RTM、缺陷分类占位、残余风险显式段。",
+      "files": []
+    },
+    {
+      "id": 3,
+      "name": "small-api-contract",
+      "prompt": "/kdev-test-points-v1\n\n请为以下单一 API 接口契约设计测试点（无完整 PRD，无外部模板）：\n\nPOST /api/projects\nRequest body (JSON):\n  - name: string, 1-128 chars, required, unique within productLineId\n  - productLineId: int, required, must reference existing non-deleted productLine\n  - code: string, 1-32 chars, required, globally unique\n  - status: enum {planning, in_progress, completed}, required\n  - svnUrl: string, optional, must start with svn:// or http(s):// if provided\n\nResponse:\n  - 201 + project object on success\n  - 400 + 中文错误消息 on validation failure\n  - 409 + 中文冲突说明 on uniqueness violation\n  - 422 + 字段错误明细 on type/format error",
+      "expected_output": "Mode 自动判定为 api-contract。比例适当的测试设计文档（不应出现整套 8×31 矩阵展开式占位行；EP/BVA/Syntax/DT 技术应被选用；name 长度边界 0/1/2/127/128/129、code 边界、svnUrl 协议合法/非法、productLineId 不存在/已删除、唯一性 4 个组合、status 枚举内/外）。Quality matrix 仅保留在范围行；TC-DOC 跳过给理由；Conformity light 给到 per-FR 占位。",
+      "files": []
+    },
+    {
+      "id": 4,
+      "name": "rejects-testpoints-input",
+      "prompt": "/kdev-test-points-v1 --input /tmp/example-testpoints.md --example /home/sec/project/ClaudeCodeTest/SOP_测试用例MOD.md --output /tmp/eval-4-output.md\n\n用上游已生成的 测试点 .md 配 fielded-block example 跑一遍。",
+      "expected_output": "Skill 应在 workflow step 2 识别输入是已生成的 测试点 .md（含 `### AR-[A-Z]+-\\d{2}\\.\\d{3}\\.\\d{3}` 头 + 编号表格行），停止生成并提示用户改用 kdev-test-cases-v1 进行 fielded 渲染，而不是误把它当作 raw spec 再走一遍测试设计。",
+      "files": []
+    }
+  ]
+}

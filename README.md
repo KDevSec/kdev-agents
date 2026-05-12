@@ -11,8 +11,10 @@ KDev 系列 Claude Code 插件集合 —— 工程记忆、流程辅助、代码
 | [kdev-secure-coding](plugins/kdev-secure-coding) | 公司安全编码规范 skill 集合：description 触发 + CLAUDE.md 锚点兜底 + 编码期按需查阅 + 完成前 8 类清单核对。当前含 python-security-coding，规划 Java / C |
 | [kdev-code-graph](plugins/kdev-code-graph) | 语义级代码图谱：需求追溯、变更爆炸半径分析、文档-代码同步检查，支持 Markdown 和图片解析 |
 | [kdev-design-flow](plugins/kdev-design-flow) | 需求-原型-设计流程编排：串联 spec-kit + frontend-design，加 3 个评审闸门（Claude 自评/人工/混合三档可选），把"原始需求 → SR 文档 → AR 用户故事 → 高保真原型 → 概要+详细设计"链路固化为一个可复跑 skill。**v0.1 实验版**：boot sequence 已验证，主循环依赖 spec-kit 安装环境验收 |
-| [kdev-test-case](plugins/kdev-test-case) | 测试用例设计 skill：基于 ISO/IEC/IEEE 29119-4（EP / BVA / 决策表 / 状态转换 / Pairwise / MC/DC / 错误推测）与 GB/T 25000.51 ≡ ISO/IEC 25051（三域 + 8×31 质量子特性 + 符合/部分符合/不符合 判定）双标准生成可审计的测试点与测试用例。覆盖 feature spec、API 契约、状态机、UI 流程、源码、就绪可用软件产品测评等场景；与下游 kdev-ui-autotest 衔接形成 spec → 测试点 → 用例 → Playwright 三段可追溯链 |
+| [kdev-env-recon](plugins/kdev-env-recon) | 测试环境实测前置 skill：登录测试环境 → 实测抓取左菜单全树 / Tab / 按钮 / 字段 / 弹窗 → 持久化为 `recon/menu_list.md` + 4 类 JSON + 截图，作为后续测试用例 .md 与 PageObject 的 UI 文案权威源；可选反向 diff 已有用例并 propose 修正补丁。从 `kdev-ui-autotest` 的 STEP 0 抽离独立，下游 UI 自动化插件直接消费产物 |
 | [kdev-ui-autotest](plugins/kdev-ui-autotest) | Playwright + pytest + Element-Plus UI 自动化测试规范固化 skill：把 6 大类规范（STEP 0 环境/菜单/弹窗实测前置、登录复用、资源清理、四件产物归档、Element-Plus 三大坑、用例命名、失败诊断）作为下游项目（KDevSec / Gen9 / 可信评估 / vfadmin 等）的强制实践。第零原则：测试脚本目的是发现 BUG，不是刷通过率 |
+| [kdev-test-points-v1](plugins/kdev-test-points-v1) | 测试点 / 测试设计文档生成 skill：基于 ISO/IEC/IEEE 29119-4（EP / BVA / 决策表 / 状态迁移 / pairwise / MC/DC / error guessing）+ GB/T 25000.51 ≡ ISO/IEC 25051（三域覆盖 + 8×31 质量子特性 + 符合/部分符合/不符合 verdict）双标准，从 spec / PRD / API 契约 / RUSP / COTS 源生成可审计测试点。四种模式：feature-spec / feature-spec-lite / api-contract / full-conformity |
+| [kdev-test-cases-v1](plugins/kdev-test-cases-v1) | 测试用例渲染 skill：把上游 测试点 .md 1:1 渲染成 Playwright 友好 fielded 用例代码块（用例编号 / 名称 / 步骤 / 预期结果 等字段 + UI/API 自动化直通字段）。严格 byte-equality + arithmetic-equality 契约：用例名称逐字符相同、用例编号确定性 `TC-AR<8 位>-<3 位>`、预期结果同序保留。仅 测试步骤 / 前置条件 / 测试数据 生成式推断。`kdev-test-points-v1` + `kdev-test-cases-v1` 组合取代旧 kdev-test-case |
 
 ## 安装方式
 
@@ -26,8 +28,10 @@ claude plugin install kdev-commit@kdev-agents
 claude plugin install kdev-secure-coding@kdev-agents
 claude plugin install kdev-code-graph@kdev-agents
 claude plugin install kdev-design-flow@kdev-agents   # v0.1 实验版，需先装 spec-kit
-claude plugin install kdev-test-case@kdev-agents
+claude plugin install kdev-env-recon@kdev-agents
 claude plugin install kdev-ui-autotest@kdev-agents
+claude plugin install kdev-test-points-v1@kdev-agents
+claude plugin install kdev-test-cases-v1@kdev-agents
 ```
 
 ## 更新
@@ -50,8 +54,10 @@ Claude Code 对官方 Anthropic marketplace 默认启用 auto-update，但对第
 /plugin update kdev-secure-coding@kdev-agents
 /plugin update kdev-code-graph@kdev-agents
 /plugin update kdev-design-flow@kdev-agents
-/plugin update kdev-test-case@kdev-agents
+/plugin update kdev-env-recon@kdev-agents
 /plugin update kdev-ui-autotest@kdev-agents
+/plugin update kdev-test-points-v1@kdev-agents
+/plugin update kdev-test-cases-v1@kdev-agents
 ```
 
 两步都要跑——`marketplace update` 只刷新元数据，`plugin update` 才真正升级。
@@ -149,18 +155,30 @@ kdev-agents/
     │   ├── tests/                        # pytest（slug 11 + flow_state 8 + skill_md_lint 9 = 28）
     │   ├── CHANGELOG.md
     │   └── README.md
-    ├── kdev-test-case/                   # 测试用例设计插件（ISO/IEC/IEEE 29119-4 + GB/T 25000.51）
+    ├── kdev-env-recon/                   # 测试环境实测前置插件（菜单/Tab/按钮/弹窗/字段 UI 文案权威源）
     │   ├── .claude-plugin/plugin.json
-    │   └── skills/kdev-test-case/
-    │       ├── SKILL.md                  # 双标准引擎：7 种黑盒方法 + 三域 + 8×31 子特性 + 五种模式
+    │   └── skills/kdev-env-recon/
+    │       ├── SKILL.md                  # 登录 → probe → menu_list.md + 4 类 JSON + 截图；可选反向 diff 用例
+    │       ├── references/               # recon-workflow / menu-list-template / case-diff-patch
+    │       └── assets/recon_env_bootstrap.py
+    ├── kdev-ui-autotest/                 # Playwright + pytest + Element-Plus 自动化测试规范插件
+    │   ├── .claude-plugin/plugin.json
+    │   └── skills/kdev-ui-autotest/
+    │       ├── SKILL.md                  # 6 大类规范 + STEP 0 实测前置 + 第零原则
+    │       ├── references/               # env-recon-bootstrap / element-plus-pitfalls / case-skeleton / infra-standards / failure-diagnosis
+    │       ├── assets/                   # recon_env_bootstrap.py + test_arNN_skeleton.py + 用例 .md 头模板
+    │       └── evals/evals.json
+    ├── kdev-test-points-v1/              # 测试点 / 测试设计文档生成插件（29119-4 + 25051 双标准）
+    │   ├── .claude-plugin/plugin.json
+    │   └── skills/kdev-test-points-v1/
+    │       ├── SKILL.md                  # 四模式：feature-spec / feature-spec-lite / api-contract / full-conformity
     │       ├── references/               # quality-characteristics / output-templates / template-override / example-walkthrough
     │       └── evals/evals.json
-    └── kdev-ui-autotest/                 # Playwright + pytest + Element-Plus 自动化测试规范插件
+    └── kdev-test-cases-v1/               # 测试用例渲染插件（测试点 .md → Playwright fielded 用例代码块）
         ├── .claude-plugin/plugin.json
-        └── skills/kdev-ui-autotest/
-            ├── SKILL.md                  # 6 大类规范 + STEP 0 实测前置 + 第零原则
-            ├── references/               # env-recon-bootstrap / element-plus-pitfalls / case-skeleton / infra-standards / failure-diagnosis
-            ├── assets/                   # recon_env_bootstrap.py + test_arNN_skeleton.py + 用例 .md 头模板
+        └── skills/kdev-test-cases-v1/
+            ├── SKILL.md                  # byte-equality + arithmetic-equality 渲染契约
+            ├── references/               # output-skeleton / playwright-handoff
             └── evals/evals.json
 ```
 

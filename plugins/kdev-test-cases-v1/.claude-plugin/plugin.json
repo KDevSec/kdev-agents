@@ -1,0 +1,10 @@
+{
+  "name": "kdev-test-cases-v1",
+  "description": "测试用例渲染 skill：把上游 kdev-test-points-v1 产出的 测试点 .md（或任意 SP15/SOP-测试点 格式 markdown）1:1 渲染成 Playwright 友好的 fielded 测试用例代码块（用例编号 / 用例名称 / 需求编号 / 前置条件 / 测试步骤 / 测试数据 / 预期结果 + 用例类型 / 优先级 / 准入 / UI 自动化 / API 自动化 直通字段）。严格 byte-equality + arithmetic-equality 契约：用例名称 == 测试点标题逐字符相同；用例编号 == 确定性 TC-AR<8 位 AR>-<3 位行号>；类型/优先级/准入/自动化标志原样复制；预期结果同序保留、异常流追加'平台数据保持不变'。仅 测试步骤 / 前置条件 / 测试数据 生成式推断。kdev-test-points-v1 + kdev-test-cases-v1 组合取代旧 kdev-test-case",
+  "version": "0.1.0",
+  "author": {
+    "name": "ly"
+  },
+  "license": "MIT",
+  "keywords": ["test-cases", "playwright-handoff", "fielded-blocks", "test-rendering", "tc-id", "byte-equality", "kdev"]
+}
