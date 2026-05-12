@@ -11,11 +11,11 @@ KDev 系列 Claude Code 插件集合 —— 工程记忆、流程辅助、代码
 | [kdev-secure-coding](plugins/kdev-secure-coding) | 公司安全编码规范 skill 集合：description 触发 + CLAUDE.md 锚点兜底 + 编码期按需查阅 + 完成前 8 类清单核对。当前含 python-security-coding，规划 Java / C |
 | [kdev-code-graph](plugins/kdev-code-graph) | 语义级代码图谱：需求追溯、变更爆炸半径分析、文档-代码同步检查，支持 Markdown 和图片解析 |
 | [kdev-design-flow](plugins/kdev-design-flow) | 需求-原型-设计流程编排：串联 spec-kit + frontend-design，加 3 个评审闸门（Claude 自评/人工/混合三档可选），把"原始需求 → SR 文档 → AR 用户故事 → 高保真原型 → 概要+详细设计"链路固化为一个可复跑 skill。**v0.1 实验版**：boot sequence 已验证，主循环依赖 spec-kit 安装环境验收 |
-| [kdev-env-recon](plugins/kdev-env-recon) | 测试环境实测前置 skill：登录测试环境 → 实测抓取左菜单全树 / Tab / 按钮 / 字段 / 弹窗 → 持久化为 `recon/menu_list.md` + 4 类 JSON + 截图，作为后续测试用例 .md 与 PageObject 的 UI 文案权威源；可选反向 diff 已有用例并 propose 修正补丁。从 `kdev-ui-autotest` 的 STEP 0 抽离独立，下游 UI 自动化插件直接消费产物 |
-| [kdev-ui-autotest](plugins/kdev-ui-autotest) | Playwright + pytest + Element-Plus UI 自动化测试规范固化 skill：把 6 大类规范（STEP 0 环境/菜单/弹窗实测前置、登录复用、资源清理、四件产物归档、Element-Plus 三大坑、用例命名、失败诊断）作为下游项目（KDevSec / Gen9 / 可信评估 / vfadmin 等）的强制实践。第零原则：测试脚本目的是发现 BUG，不是刷通过率 |
-| [kdev-test-points-v1](plugins/kdev-test-points-v1) | 测试点 / 测试设计文档生成 skill：基于 ISO/IEC/IEEE 29119-4（EP / BVA / 决策表 / 状态迁移 / pairwise / MC/DC / error guessing）+ GB/T 25000.51 ≡ ISO/IEC 25051（三域覆盖 + 8×31 质量子特性 + 符合/部分符合/不符合 verdict）双标准，从 spec / PRD / API 契约 / RUSP / COTS 源生成可审计测试点。四种模式：feature-spec / feature-spec-lite / api-contract / full-conformity |
-| [kdev-test-cases-v1](plugins/kdev-test-cases-v1) | 测试用例渲染 skill：把上游 测试点 .md 1:1 渲染成 Playwright 友好 fielded 用例代码块（用例编号 / 名称 / 步骤 / 预期结果 等字段 + UI/API 自动化直通字段）。严格 byte-equality + arithmetic-equality 契约：用例名称逐字符相同、用例编号确定性 `TC-AR<8 位>-<3 位>`、预期结果同序保留。仅 测试步骤 / 前置条件 / 测试数据 生成式推断。`kdev-test-points-v1` + `kdev-test-cases-v1` 组合取代旧 kdev-test-case |
-| [kdev-uicase-to-apicase](plugins/kdev-uicase-to-apicase) | UI→API 测试用例转换 skill：把已有 UI/Playwright 测试用例 .md（含【测试用例信息】块、`TC-AR{XX}{YYY}{ZZZ}-{NNN}` 编号格式）沿 7 条转换规则批量改写为同结构的 API 测试用例 .md，让一份 UI 用例同时驱动 UI 与 API 两条自动化流水线。规则覆盖：基本流配套（1/2）、纯前端跳过（3/4/8）、必测断言（5/6）、等价类回收（7）。作为 `spec-to-testcases-pipeline → kdev-api-test-scaffold` 之间的桥接环节，与 `testcases-to-playwright-pipeline` 并行 |
+| [kdev-env-recon](plugins/kdev-env-recon) | 测试环境实测前置 skill：登录测试环境 → 实测抓取左菜单全树 / Tab / 按钮 / 字段 / 弹窗 → 持久化为 `recon/menu_list.md` + 4 类 JSON + 截图，作为后续测试用例 .md 与 PageObject 的 UI 文案权威源；可选反向 diff 已有用例并 propose 修正补丁。
+| [kdev-ui-autotest](plugins/kdev-ui-autotest) | Playwright + pytest + Element-Plus UI 自动化测试规范固化 skill
+| [kdev-test-points-v1](plugins/kdev-test-points-v1) | 测试点 / 测试设计文档生成 skill
+| [kdev-test-cases-v1](plugins/kdev-test-cases-v1) | 测试用例生成 skill：根据上游 测试点 .md 生成测试用例
+| [kdev-uicase-to-apicase](plugins/kdev-uicase-to-apicase) | UI→API 测试用例转换 skill：把已有 UI/Playwright 测试用例 .md批量改写为同结构的 API 测试用例 .md
 
 ## 安装方式
 
