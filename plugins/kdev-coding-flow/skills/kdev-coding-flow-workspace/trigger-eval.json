@@ -76,7 +76,7 @@
     "should_trigger": false
   },
   {
-    "query": "在项目根目录下面 plugins/kdev-coding-sop/skills/coding-sop/references/ 这个目录有没有被 gitignore 忽略",
+    "query": "在项目根目录下面 plugins/kdev-coding-flow/skills/kdev-coding-flow/references/ 这个目录有没有被 gitignore 忽略",
     "should_trigger": false
   }
 ]

@@ -38,6 +38,12 @@
       "source": "./plugins/kdev-design-flow"
     },
     {
+      "name": "kdev-coding-flow",
+      "description": "编码阶段 13 节点 SOP skill + /kdev-coding-flow 斜杠命令：把 spec.md + plan.md + prototype 三件套端到端跑到部署 + E2E 全绿。强制 TDD、Per-Increment E2E Gate、Phase 0 环境对齐、业务关键入口金丝雀；3 个人工判断 Gate（关联度 / 复杂度 / E2E 通行证），其余下放 subagent；按 CLAUDE.md 二档分工派单（sonnet 编码 / opus 评审与高复杂度）；4-shot review 上限。技术栈无关——栈通用约定（PEP8/gofmt/路由顺序）依赖模型自带，项目特定规则走 <repo>/docs/rules.md 外置",
+      "category": "development",
+      "source": "./plugins/kdev-coding-flow"
+    },
+    {
       "name": "kdev-ui-autotest",
       "description": "Playwright + pytest + Element-Plus UI 自动化测试规范固化 skill：把 6 大类规范（STEP 0 环境/菜单/弹窗实测前置、登录复用、资源清理、四件产物归档、Element-Plus 三大坑、用例命名、失败诊断）作为下游项目（KDevSec / Gen9 / 可信评估 / vfadmin 等）的强制实践。第零原则：测试脚本目的是发现 BUG，不是刷通过率",
       "category": "development",

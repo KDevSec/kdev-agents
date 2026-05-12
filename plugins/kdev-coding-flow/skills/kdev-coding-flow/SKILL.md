@@ -1,5 +1,5 @@
 ---
-name: coding-sop
+name: kdev-coding-flow
 description: 用 13 节点 SOP 把一个需求从 spec/plan/prototype 三件套端到端跑到部署 + E2E 全绿、产出可上线。强制 TDD、Per-Increment E2E Gate、Phase 0 环境对齐、业务关键入口金丝雀；支持 Auto Mode 完全自主；按 CLAUDE.md 二档分工派单（sonnet 编码 / opus 评审与高复杂度）。技术栈无关——主体方法论通用，项目特定规则走外置 docs/rules.md，栈通用约定（PEP8/gofmt/路由顺序等）依赖模型自带知识不内置。Use when 用户说"按 SOP 开发"、"端到端把 X 跑完"、"实施这个 plan"、"用 13 节点 SOP 跑通"、"自主完成这个需求"、"auto mode 跑完这个 feature"，或主控正面对一个含 spec.md/plan.md/prototype 三件套且已授权自主推进的实施任务。
 ---
 

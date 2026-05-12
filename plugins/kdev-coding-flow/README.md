@@ -1,4 +1,4 @@
-# kdev-coding-sop
+# kdev-coding-flow
 
 编码阶段 SOP skill 集合 —— 把「从需求到上线」的端到端实施流程沉淀为可复用的方法论 skill，让 Claude 能在 Auto Mode 下自主跑完一个 spec/plan/prototype 三件套定义的复杂需求。
 
@@ -20,7 +20,13 @@
 
 | skill | 覆盖范围 | 状态 |
 |-------|---------|------|
-| [coding-sop](skills/coding-sop/SKILL.md) | 13 节点 SOP（关联度 / worktree / writing-plans / plan-review / 复杂度 / 派单 / TDD / 验证 / code review + E2E Gate / 安全扫描 / 合并 / 部署 + 金丝雀 / 收尾） + 3 人工 Gate + 4-shot review | ✅ v0.1.0 |
+| [kdev-coding-flow](skills/kdev-coding-flow/SKILL.md) | 13 节点 SOP（关联度 / worktree / writing-plans / plan-review / 复杂度 / 派单 / TDD / 验证 / code review + E2E Gate / 安全扫描 / 合并 / 部署 + 金丝雀 / 收尾） + 3 人工 Gate + 4-shot review | ✅ v0.1.0 |
+
+## 斜杠命令
+
+| 命令 | 作用 |
+|------|------|
+| [`/kdev-coding-flow`](commands/kdev-coding-flow.md) | 显式触发本 skill；接受 `<specs-dir-or-feature-name>` + 可选 `--auto` / `--bundle-strategy` |
 
 ## 配套外置规范
 
