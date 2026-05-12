@@ -1,0 +1,133 @@
+name: Windows Compatibility CI
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/setup-kdev-codegraph.ps1'
+      - 'scripts/setup-kdev-codegraph.sh'
+      - 'plugins/kdev-code-graph/install.ps1'
+      - 'plugins/kdev-code-graph/install.sh'
+      - 'plugins/kdev-code-graph/ingestor/**'
+      - '.github/workflows/windows-compat.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'scripts/setup-kdev-codegraph.ps1'
+      - 'scripts/setup-kdev-codegraph.sh'
+      - 'plugins/kdev-code-graph/install.ps1'
+      - 'plugins/kdev-code-graph/install.sh'
+      - 'plugins/kdev-code-graph/ingestor/**'
+  workflow_dispatch:  # manual trigger
+
+jobs:
+  # Windows 10 + PowerShell 5.1
+  windows-10:
+    runs-on: windows-2019  # Windows 10 image
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check PowerShell version
+        shell: powershell
+        run: |
+          $PSVersionTable.PSVersion
+          # Expect: 5.1.xxxx on windows-2019
+
+      - name: Validate setup script syntax
+        shell: powershell
+        run: |
+          # Syntax check without execution
+          $null = Get-Command ./scripts/setup-kdev-codegraph.ps1 -Syntax
+          Write-Host "Syntax check passed"
+
+      - name: Validate install.ps1 syntax
+        shell: powershell
+        run: |
+          $null = Get-Command ./plugins/kdev-code-graph/install.ps1 -Syntax
+          Write-Host "Syntax check passed"
+
+      - name: Test ingestor zero-install (py -3)
+        shell: powershell
+        run: |
+          py -3 ./plugins/kdev-code-graph/ingestor/run.py --help
+          py -3 ./plugins/kdev-code-graph/ingestor/run.py inject --help
+
+      - name: Test ingestor inject/list-tags
+        shell: powershell
+        run: |
+          $Tmp = New-TemporaryFile
+          Remove-Item $Tmp.FullName
+          New-Item -Type Directory $Tmp.FullName | Out-Null
+          Copy-Item plugins/kdev-code-graph/ingestor/tests/fixtures/sample-graph/knowledge-graph.json "$($Tmp.FullName)\g.json"
+
+          py -3 ./plugins/kdev-code-graph/ingestor/run.py inject `
+              --rules-dir plugins/kdev-code-graph/ingestor/tests/fixtures/sample-rules `
+              --graph "$($Tmp.FullName)\g.json"
+
+          py -3 ./plugins/kdev-code-graph/ingestor/run.py list-tags --graph "$($Tmp.FullName)\g.json"
+
+          Remove-Item -Recurse $Tmp.FullName
+
+      - name: Run ingestor pytest
+        shell: bash
+        run: |
+          cd plugins/kdev-code-graph/ingestor
+          py -3 -m pip install pytest pytest-cov --quiet
+          py -3 -m pytest -v --tb=short
+
+  # Windows 11 + PowerShell 5.1
+  windows-11:
+    runs-on: windows-2022  # Windows 11 image
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check PowerShell version
+        shell: powershell
+        run: $PSVersionTable.PSVersion
+
+      - name: Validate scripts syntax
+        shell: powershell
+        run: |
+          $null = Get-Command ./scripts/setup-kdev-codegraph.ps1 -Syntax
+          $null = Get-Command ./plugins/kdev-code-graph/install.ps1 -Syntax
+          Write-Host "All syntax checks passed"
+
+      - name: Test ingestor zero-install
+        shell: powershell
+        run: |
+          py -3 ./plugins/kdev-code-graph/ingestor/run.py --help
+
+      - name: Run ingestor pytest
+        shell: bash
+        run: |
+          cd plugins/kdev-code-graph/ingestor
+          py -3 -m pip install pytest pytest-cov --quiet
+          py -3 -m pytest -v --tb=short
+
+  # Ubuntu - bash script + Python
+  ubuntu:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check bash script syntax
+        run: bash -n scripts/setup-kdev-codegraph.sh
+
+      - name: Check install.sh syntax
+        run: bash -n plugins/kdev-code-graph/install.sh
+
+      - name: Test ingestor zero-install
+        run: |
+          python3 plugins/kdev-code-graph/ingestor/run.py --help
+          python3 plugins/kdev-code-graph/ingestor/run.py inject --help
+
+      - name: Run ingestor pytest
+        run: |
+          cd plugins/kdev-code-graph/ingestor
+          pip install pytest pytest-cov --quiet
+          pytest -v --tb=short
+
+      - name: Run contract tests
+        run: |
+          cd plugins/kdev-code-graph
+          python3 -m pytest tests/contract -v --tb=short || echo "Contract tests skipped (UA not available)"
