@@ -1,14 +1,15 @@
 <#
 .SYNOPSIS
-  kdev-code-graph 一键安装脚本 (Windows / PowerShell)
+  kdev-code-graph one-click install script (Windows / PowerShell)
 
 .DESCRIPTION
-  完成 3 步：
+  Performs 3 steps:
     1. add KDevSec/kdev-agents marketplace
-    2. add Lum1104/Understand-Anything marketplace (UA 依赖)
-    3. install kdev-code-graph（UA 自动连带）
+    2. add Lum1104/Understand-Anything marketplace (UA dependency)
+    3. install kdev-code-graph (UA auto-installed as dependency)
 
-  兼容 Windows 10 + PowerShell 5.1 默认环境。
+  Compatible with Windows 10 + PowerShell 5.1 default environment.
+  Uses English comments to avoid UTF-8 encoding issues.
 
 .EXAMPLE
   ./scripts/setup-kdev-codegraph.ps1
@@ -17,37 +18,37 @@
 
 $ErrorActionPreference = 'Stop'
 
-function Write-Step($msg) { Write-Host "`n▶ $msg" -ForegroundColor Cyan }
-function Write-Ok($msg)   { Write-Host "  ✓ $msg" -ForegroundColor Green }
-function Write-Warn2($msg) { Write-Host "  ! $msg" -ForegroundColor Yellow }
-function Write-Err($msg)  { Write-Host "  ✗ $msg" -ForegroundColor Red; exit 1 }
+function Write-Step($msg) { Write-Host "`n> $msg" -ForegroundColor Cyan }
+function Write-Ok($msg)   { Write-Host "  [OK] $msg" -ForegroundColor Green }
+function Write-Warn2($msg) { Write-Host "  [WARN] $msg" -ForegroundColor Yellow }
+function Write-Err($msg)  { Write-Host "  [ERR] $msg" -ForegroundColor Red; exit 1 }
 
-Write-Step "检查 claude CLI 是否可用"
+Write-Step "Check claude CLI availability"
 $claudeCmd = Get-Command claude -ErrorAction SilentlyContinue
 if ($null -eq $claudeCmd) {
-    Write-Err "未找到 claude CLI。请先安装 Claude Code (https://claude.com/claude-code)"
+    Write-Err "claude CLI not found. Please install Claude Code first (https://claude.com/claude-code)"
 }
 $claudeVersion = (& claude --version 2>&1 | Select-Object -First 1)
 Write-Ok "claude $claudeVersion"
 
-Write-Step "添加 KDevSec/kdev-agents marketplace"
+Write-Step "Add KDevSec/kdev-agents marketplace"
 & claude plugin marketplace add KDevSec/kdev-agents
-if ($LASTEXITCODE -ne 0) { Write-Err "marketplace add 失败" }
-Write-Ok "kdev-agents marketplace 已添加"
+if ($LASTEXITCODE -ne 0) { Write-Err "marketplace add failed" }
+Write-Ok "kdev-agents marketplace added"
 
-Write-Step "添加 Lum1104/Understand-Anything marketplace (UA 依赖)"
+Write-Step "Add Lum1104/Understand-Anything marketplace (UA dependency)"
 & claude plugin marketplace add Lum1104/Understand-Anything
-if ($LASTEXITCODE -ne 0) { Write-Err "marketplace add 失败" }
-Write-Ok "understand-anything marketplace 已添加"
+if ($LASTEXITCODE -ne 0) { Write-Err "marketplace add failed" }
+Write-Ok "understand-anything marketplace added"
 
-Write-Step "安装 kdev-code-graph（UA 自动连带）"
+Write-Step "Install kdev-code-graph (UA auto-installed as dependency)"
 & claude plugin install kdev-code-graph
-if ($LASTEXITCODE -ne 0) { Write-Err "plugin install 失败" }
-Write-Ok "kdev-code-graph 已安装"
+if ($LASTEXITCODE -ne 0) { Write-Err "plugin install failed" }
+Write-Ok "kdev-code-graph installed"
 
-Write-Step "完成"
+Write-Step "Done"
 Write-Host ""
-Write-Host "下一步："
-Write-Host "  1. 重启 Claude Code 会话以加载 plugin"
-Write-Host "  2. 在目标项目下跑 /kdev-codegraph-build 建图"
-Write-Host "  3. ingestor 通过 run.py 零安装运行，无需额外步骤"
+Write-Host "Next steps:"
+Write-Host "  1. Restart Claude Code session to load the plugin"
+Write-Host "  2. Run /kdev-codegraph-build in your target project to build the graph"
+Write-Host "  3. ingestor runs via run.py with zero-install, no extra setup needed"
