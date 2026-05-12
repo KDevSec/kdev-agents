@@ -1,14 +1,20 @@
 #!/usr/bin/env bash
-# kdev-code-graph 一键安装脚本
+# kdev-code-graph one-click install script (macOS / Linux)
 #
-# 用法：
-#   ./scripts/setup-kdev-codegraph.sh                                    # 本地 clone 后跑
-#   curl -sSL <RAW_URL>/scripts/setup-kdev-codegraph.sh | bash          # 远程一键
+# Usage:
+#   ./scripts/setup-kdev-codegraph.sh                                    # after local clone
+#   curl -sSL https://raw.githubusercontent.com/KDevSec/kdev-agents/main/scripts/setup-kdev-codegraph.sh | bash
 #
-# 完成 3 步：
-#   1. add KDevSec/kdev-agents marketplace（我们的）
-#   2. add Lum1104/Understand-Anything marketplace（UA 依赖）
-#   3. install kdev-code-graph（UA 通过 plugin.json dependencies 自动连带装）
+# Windows alternative (PowerShell):
+#   iwr -useb https://raw.githubusercontent.com/KDevSec/kdev-agents/main/scripts/setup-kdev-codegraph.ps1 | iex
+#
+# Private repo alternative (raw URL not accessible):
+#   gh repo clone KDevSec/kdev-agents --depth 1 && cd kdev-agents && ./scripts/setup-kdev-codegraph.sh
+#
+# Performs 3 steps:
+#   1. add KDevSec/kdev-agents marketplace
+#   2. add Lum1104/Understand-Anything marketplace (UA dependency)
+#   3. install kdev-code-graph (UA auto-installed via plugin.json dependencies)
 
 set -euo pipefail
 

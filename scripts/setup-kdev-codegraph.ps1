@@ -12,8 +12,14 @@
   Uses English comments to avoid UTF-8 encoding issues.
 
 .EXAMPLE
-  ./scripts/setup-kdev-codegraph.ps1
+  # Public repo - remote one-click
   iwr -useb https://raw.githubusercontent.com/KDevSec/kdev-agents/main/scripts/setup-kdev-codegraph.ps1 | iex
+
+  # Private repo - clone first (raw URL not accessible)
+  gh repo clone KDevSec/kdev-agents --depth 1; cd kdev-agents; ./scripts/setup-kdev-codegraph.ps1
+
+  # Local clone
+  ./scripts/setup-kdev-codegraph.ps1
 #>
 
 $ErrorActionPreference = 'Stop'
