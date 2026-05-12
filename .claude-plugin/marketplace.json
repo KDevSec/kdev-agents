@@ -66,6 +66,12 @@
       "description": "测试用例渲染 skill：把上游 测试点 .md 1:1 渲染成 Playwright 友好的 fielded 测试用例代码块（用例编号 / 名称 / 步骤 / 预期结果 等字段 + UI/API 自动化直通字段）。严格 byte-equality + arithmetic-equality 契约：用例名称逐字符相同、用例编号确定性 TC-AR<8 位>-<3 位>、预期结果同序保留。仅 测试步骤 / 前置条件 / 测试数据 生成式推断。与 kdev-test-points-v1 组合取代旧 kdev-test-case",
       "category": "development",
       "source": "./plugins/kdev-test-cases-v1"
+    },
+    {
+      "name": "kdev-uicase-to-apicase",
+      "description": "UI→API 测试用例转换 skill：把已有的 UI/Playwright 测试用例 .md（标准模板：含【测试用例信息】块、TC-AR{XX}{YYY}{ZZZ}-{NNN} 编号格式）沿 7 条转换规则批量改写为同结构的 API 测试用例 .md，让一份 UI 用例同时驱动 UI 与 API 两条自动化流水线。规则覆盖：基本流配套（规则 1/2）、纯前端跳过（规则 3/4/8）、必测断言（规则 5/6）、等价类回收（规则 7）。作为 spec-to-testcases-pipeline → kdev-api-test-scaffold 之间的桥接环节，与 testcases-to-playwright-pipeline 并行",
+      "category": "development",
+      "source": "./plugins/kdev-uicase-to-apicase"
     }
   ]
 }

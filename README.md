@@ -15,6 +15,7 @@ KDev 系列 Claude Code 插件集合 —— 工程记忆、流程辅助、代码
 | [kdev-ui-autotest](plugins/kdev-ui-autotest) | Playwright + pytest + Element-Plus UI 自动化测试规范固化 skill：把 6 大类规范（STEP 0 环境/菜单/弹窗实测前置、登录复用、资源清理、四件产物归档、Element-Plus 三大坑、用例命名、失败诊断）作为下游项目（KDevSec / Gen9 / 可信评估 / vfadmin 等）的强制实践。第零原则：测试脚本目的是发现 BUG，不是刷通过率 |
 | [kdev-test-points-v1](plugins/kdev-test-points-v1) | 测试点 / 测试设计文档生成 skill：基于 ISO/IEC/IEEE 29119-4（EP / BVA / 决策表 / 状态迁移 / pairwise / MC/DC / error guessing）+ GB/T 25000.51 ≡ ISO/IEC 25051（三域覆盖 + 8×31 质量子特性 + 符合/部分符合/不符合 verdict）双标准，从 spec / PRD / API 契约 / RUSP / COTS 源生成可审计测试点。四种模式：feature-spec / feature-spec-lite / api-contract / full-conformity |
 | [kdev-test-cases-v1](plugins/kdev-test-cases-v1) | 测试用例渲染 skill：把上游 测试点 .md 1:1 渲染成 Playwright 友好 fielded 用例代码块（用例编号 / 名称 / 步骤 / 预期结果 等字段 + UI/API 自动化直通字段）。严格 byte-equality + arithmetic-equality 契约：用例名称逐字符相同、用例编号确定性 `TC-AR<8 位>-<3 位>`、预期结果同序保留。仅 测试步骤 / 前置条件 / 测试数据 生成式推断。`kdev-test-points-v1` + `kdev-test-cases-v1` 组合取代旧 kdev-test-case |
+| [kdev-uicase-to-apicase](plugins/kdev-uicase-to-apicase) | UI→API 测试用例转换 skill：把已有 UI/Playwright 测试用例 .md（含【测试用例信息】块、`TC-AR{XX}{YYY}{ZZZ}-{NNN}` 编号格式）沿 7 条转换规则批量改写为同结构的 API 测试用例 .md，让一份 UI 用例同时驱动 UI 与 API 两条自动化流水线。规则覆盖：基本流配套（1/2）、纯前端跳过（3/4/8）、必测断言（5/6）、等价类回收（7）。作为 `spec-to-testcases-pipeline → kdev-api-test-scaffold` 之间的桥接环节，与 `testcases-to-playwright-pipeline` 并行 |
 
 ## 安装方式
 
@@ -32,6 +33,7 @@ claude plugin install kdev-env-recon@kdev-agents
 claude plugin install kdev-ui-autotest@kdev-agents
 claude plugin install kdev-test-points-v1@kdev-agents
 claude plugin install kdev-test-cases-v1@kdev-agents
+claude plugin install kdev-uicase-to-apicase@kdev-agents
 ```
 
 ## 更新
@@ -58,6 +60,7 @@ Claude Code 对官方 Anthropic marketplace 默认启用 auto-update，但对第
 /plugin update kdev-ui-autotest@kdev-agents
 /plugin update kdev-test-points-v1@kdev-agents
 /plugin update kdev-test-cases-v1@kdev-agents
+/plugin update kdev-uicase-to-apicase@kdev-agents
 ```
 
 两步都要跑——`marketplace update` 只刷新元数据，`plugin update` 才真正升级。
@@ -174,12 +177,16 @@ kdev-agents/
     │       ├── SKILL.md                  # 四模式：feature-spec / feature-spec-lite / api-contract / full-conformity
     │       ├── references/               # quality-characteristics / output-templates / template-override / example-walkthrough
     │       └── evals/evals.json
-    └── kdev-test-cases-v1/               # 测试用例渲染插件（测试点 .md → Playwright fielded 用例代码块）
+    ├── kdev-test-cases-v1/               # 测试用例渲染插件（测试点 .md → Playwright fielded 用例代码块）
+    │   ├── .claude-plugin/plugin.json
+    │   └── skills/kdev-test-cases-v1/
+    │       ├── SKILL.md                  # byte-equality + arithmetic-equality 渲染契约
+    │       ├── references/               # output-skeleton / playwright-handoff
+    │       └── evals/evals.json
+    └── kdev-uicase-to-apicase/           # UI→API 测试用例转换插件（一份 UI 用例驱动 UI + API 双流水线）
         ├── .claude-plugin/plugin.json
-        └── skills/kdev-test-cases-v1/
-            ├── SKILL.md                  # byte-equality + arithmetic-equality 渲染契约
-            ├── references/               # output-skeleton / playwright-handoff
-            └── evals/evals.json
+        └── skills/kdev-uicase-to-apicase/
+            └── SKILL.md                  # 7 条转换规则：基本流配套 / 纯前端跳过 / 必测断言 / 等价类回收
 ```
 
 新增插件：在 `plugins/` 下新建目录 + 在 `marketplace.json` 的 `plugins` 数组里追加条目。

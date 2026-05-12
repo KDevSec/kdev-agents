@@ -1,0 +1,10 @@
+{
+  "name": "kdev-uicase-to-apicase",
+  "description": "UI→API 测试用例转换 skill：把已有的 UI/Playwright 测试用例 .md（标准模板：含【测试用例信息】块、TC-AR{XX}{YYY}{ZZZ}-{NNN} 编号格式）沿 7 条转换规则批量改写为同结构的 API 测试用例 .md，让一份 UI 用例同时驱动 UI 与 API 两条自动化流水线。规则覆盖：基本流配套（规则 1/2）、纯前端跳过（规则 3/4/8）、必测断言（规则 5/6）、等价类回收（规则 7）。作为 spec-to-testcases-pipeline → kdev-api-test-scaffold 之间的桥接环节，与 testcases-to-playwright-pipeline 并行。适用于任何 KDevSec / RuoYi 风格测试用例模板的下游项目（KDevSec / SOP_test / Gen9 / 可信评估 / vfadmin 等）",
+  "version": "0.1.0",
+  "author": {
+    "name": "ly"
+  },
+  "license": "MIT",
+  "keywords": ["test-case", "ui-to-api", "api-test", "test-conversion", "playwright", "pytest", "kdev"]
+}
