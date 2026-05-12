@@ -49,20 +49,25 @@ else
   echo "    /plugin install understand-anything"
 fi
 
-step "安装 kdev-ingestor (editable)"
-cd "$INGESTOR_DIR"
-if [ ! -d .venv ]; then
-  python3 -m venv .venv
-  ok "已创建 .venv"
+step "kdev-ingestor 零安装验证"
+if python3 "$INGESTOR_DIR/run.py" --help >/dev/null 2>&1; then
+  ok "ingestor 可零安装运行（python3 run.py ...）"
+else
+  err "ingestor 零安装路径失败 — 检查 $INGESTOR_DIR/run.py 是否存在"
 fi
-# shellcheck disable=SC1091
-source .venv/bin/activate
-pip install --quiet -e ".[dev]"
-ok "kdev-ingestor 安装完成"
 
-step "跑 ingestor 自测"
-pytest --quiet
-ok "ingestor 测试通过"
+step "（可选）安装 dev venv 跑测试"
+if [ -d "$INGESTOR_DIR/.venv" ]; then
+  cd "$INGESTOR_DIR"
+  # shellcheck disable=SC1091
+  source .venv/bin/activate
+  pytest --quiet
+  ok "ingestor 测试通过（dev venv）"
+  cd "$PLUGIN_ROOT"
+else
+  warn "未安装 dev venv — 生产用不需要。若需跑测试："
+  echo "    cd $INGESTOR_DIR && python3 -m venv .venv && source .venv/bin/activate && pip install -e \".[dev]\" && pytest"
+fi
 
 step "跑 UA contract test"
 cd "$PLUGIN_ROOT"

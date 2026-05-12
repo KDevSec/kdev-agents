@@ -35,7 +35,8 @@ test -f .understand-anything/knowledge-graph.json && echo "graph ready"
 
 ```bash
 KDEV_RULES_DIR="<repo>/plugins/kdev-secure-coding/skills/python-security-coding/references"
-python -m kdev_ingestor.cli inject \
+INGESTOR="${CLAUDE_PLUGIN_ROOT:-plugins/kdev-code-graph}/ingestor/run.py"
+python3 "$INGESTOR" inject \
     --rules-dir "$KDEV_RULES_DIR" \
     --graph .understand-anything/knowledge-graph.json
 ```
@@ -45,7 +46,7 @@ python -m kdev_ingestor.cli inject \
 ## Step 4：核对结果
 
 ```bash
-python -m kdev_ingestor.cli list-tags --graph .understand-anything/knowledge-graph.json
+python3 "$INGESTOR" list-tags --graph .understand-anything/knowledge-graph.json
 ```
 
 至少看到：`kdev:security_rule` / `kdev:rule_id:*` / `kdev:category:*` / `kdev:source:kdev-secure-coding`。

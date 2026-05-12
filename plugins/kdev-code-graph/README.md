@@ -31,20 +31,15 @@ cd kdev-agents
 ./scripts/setup-kdev-codegraph.sh
 ```
 
-### 准备 Python ingestor
+### Python ingestor（零安装）
 
-`/plugin install` 装完 plugin 文件后，还需要准备 Python ingestor 环境：
+ingestor 是 stdlib only 的 Python 工具，通过 `${CLAUDE_PLUGIN_ROOT}/ingestor/run.py` 直接调用，**不需要 venv 也不需要 pip install**。`/kdev-codegraph-build` skill 已经按这个路径调。
 
-```bash
-cd ~/.claude/plugins/cache/kdev-agents/kdev-code-graph/<version>
-./install.sh
-```
-
-或本地开发场景：
+如需跑 ingestor 自测（开发场景）：
 
 ```bash
 cd plugins/kdev-code-graph
-./install.sh
+./install.sh   # 会跑零安装验证 + 可选 dev venv 自测
 ```
 
 ### 在 Claude Code 内手动安装（不用脚本）
