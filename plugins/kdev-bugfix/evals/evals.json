@@ -1,0 +1,107 @@
+{
+  "skill_name": "kdev-bugfix",
+  "version_under_test": "0.2.2",
+  "notes": "8 个 core eval 覆盖 4 个维度：(1) 流程纪律 — Iron Law / RED-before-GREEN / 最小变更；(2) 评审升档 — P0/鉴权/跨模块 自动升级 multi；(3) 模式判定 — openspec autodetect / 双源 intake / dry-run 拦截；(4) 实测踩坑回归 — 禅道 URL 路径前缀 / .pri vs .priority / .profile.* 字段路径 / Spec_Impact 不夹带。每条 eval 用 Agent 派单跑 → 观察 Claude reading skill 的输出 → 按 assertions 判 PASS/FAIL。",
+  "evals": [
+    {
+      "id": 1,
+      "name": "iron-law-root-cause-discipline",
+      "category": "discipline",
+      "prompt": "我有个 bug 想用 kdev-bugfix 流程修：用户偶尔登录页打不开，没有 stack trace，本地复现不稳定（10 次能撞到 2 次）。我猜可能是某个第三方 CDN 偶尔抽风，先帮我跳到步骤 5 写修复——给登录页加个 CDN fallback 重试逻辑。",
+      "expected_behavior": "skill 应停在步骤 3 复现/根因投资段，**拒绝**进步骤 4。理由：(1) 复现不稳定不算复现成功；(2) 用户给的'CDN 抽风'是猜测不是 Iron Law 意义上的根因；(3) skill 应引导用户先收集更多信息（网络抓包 / 用户端 console / CDN access log）再判根因。",
+      "assertions": [
+        { "kind": "must_contain", "text": "根因未定" },
+        { "kind": "must_contain_any", "values": ["Iron Law", "systematic-debugging", "根因投资"] },
+        { "kind": "must_contain_any", "values": ["拒绝", "不能跳", "NO", "不会跳"], "note": "skill 必须显式拒绝" },
+        { "kind": "must_not_contain", "text": "我已经知道根因" },
+        { "kind": "must_not_contain", "text": "好的，跳到步骤 5", "note": "compliance phrase（不要换成字面 '跳到步骤 5' —— 会误伤'拒绝跳到步骤 5'）" }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "red-before-green-discipline",
+      "category": "discipline",
+      "prompt": "/kdev-bugfix login-button-error。我已经定位到根因了：onClick handler 里 e.preventDefault() 拦截了真实跳转。直接告诉我步骤 5 GREEN 的修复代码就行，回归测试我之后会自己补。",
+      "expected_behavior": "skill 应**拒绝**直接跳 GREEN。理由：先 RED 再 GREEN 是核心原则之一，'回归测试我之后会自己补' 是经典反模式（约等于不补）。skill 应坚持先写测试看到失败再写修复。",
+      "assertions": [
+        { "kind": "must_contain_any", "values": ["先 RED 再 GREEN", "RED before GREEN", "回归测试必须先"] },
+        { "kind": "must_contain_any", "values": ["watch it fail", "测试真的失败", "实测失败"] },
+        { "kind": "must_not_contain", "text": "好的，直接给修复代码" }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "review-escalation-mandatory-auth",
+      "category": "review",
+      "prompt": "/kdev-bugfix 修复用户鉴权 token 验证漏过期检查的 bug --review-mode=ai。我只想要 AI 自评，不想派 subagent 评审，太慢。",
+      "expected_behavior": "即便用户显式传 `--review-mode=ai`，skill 应当**强制升级到 multi**。理由：鉴权 / 权限 / 会话相关 bug 命中强制升级条件。skill 应明确报告'升级理由：鉴权类'，并向用户解释为什么必须 multi。",
+      "assertions": [
+        { "kind": "must_contain_any", "values": ["强制升级", "升级到 multi", "auto-upgrade"] },
+        { "kind": "must_contain_any", "values": ["鉴权", "auth", "权限"] },
+        { "kind": "must_not_contain", "text": "OK，仅 AI 自评" }
+      ]
+    },
+    {
+      "id": 4,
+      "name": "dry-run-zero-side-effects",
+      "category": "dry-run",
+      "prompt": "/kdev-bugfix login-button-error --dry-run。详细告诉我步骤 2 你会做什么，会不会真创建 openspec/changes/login-button-error/ 目录？会不会真写 proposal.md 到磁盘？",
+      "expected_behavior": "skill 应明确说**不会**真创建目录、不会真写文件。会以 inline 代码块形式 print proposal.md 的内容预览，前缀 `🔵 DRY-RUN | step 2: ...`。底线保证 5 条（不写产物 / 不动 src / 不动 git / 不 commit / 不调禅道写接口）应被引用。",
+      "assertions": [
+        { "kind": "must_contain", "text": "🔵 DRY-RUN" },
+        { "kind": "must_contain_any", "values": ["不会真创建", "inline 显示", "不写文件"] },
+        { "kind": "must_contain_any", "values": ["底线保证", "不动持久状态", "零副作用"] },
+        { "kind": "must_not_contain", "text": "好的，开始创建 openspec/changes/", "note": "compliance phrase（不要写 `openspec new change login-button-error` 这种字面——会误伤 subagent 写的反例描述如'本来要执行 openspec new change login-button-error 但被拦截'）" }
+      ]
+    },
+    {
+      "id": 5,
+      "name": "mode-autodetect-openspec-present",
+      "category": "mode",
+      "prompt": "我在一个 repo 根目录跑 /kdev-bugfix login-bug，repo 里有 openspec/changes/ 和 openspec/specs/ 目录，没有 docs/bugfix/。你判定走哪个模式？产物落哪？",
+      "expected_behavior": "应判定 **OpenSpec 模式**，产物落 `openspec/changes/login-bug/{proposal.md, design.md, [specs/], tasks.md}`。理由：autodetect 检查 `<repo>/openspec/` 存在 → OpenSpec 模式默认。`openspec validate` 闸门会在步骤 7 跑。",
+      "assertions": [
+        { "kind": "must_contain", "text": "OpenSpec 模式" },
+        { "kind": "must_contain", "text": "openspec/changes/login-bug/" },
+        { "kind": "must_contain_any", "values": ["proposal.md", "design.md", "tasks.md"] },
+        { "kind": "must_contain_any", "values": ["openspec validate", "validate 闸门"] }
+      ]
+    },
+    {
+      "id": 6,
+      "name": "zentao-url-prefix-trap",
+      "category": "real-world-trap",
+      "prompt": "我的 .kdev/zentao.env 配的是 ZENTAO_API_URL=https://zentao.mycompany.com/zentao，禅道是开源版 22.1。我跑 /kdev-bugfix --from-zentao 12345，但探测一直 302 重定向到登录页。怎么回事？",
+      "expected_behavior": "skill 应指出**开源版 22.1 nginx rewrite 后外部访问不带 `/zentao` 后缀**，要求改成 `ZENTAO_API_URL=https://zentao.mycompany.com`（去掉 /zentao）。这是 zentao-integration.md 实测记录的 v0.2.0 → v0.2.1 阶段发现的踩坑。",
+      "assertions": [
+        { "kind": "must_contain_any", "values": ["去掉 /zentao", "不带 /zentao", "去除 /zentao 后缀"] },
+        { "kind": "must_contain_any", "values": ["nginx rewrite", "rewrite 后", "外部访问"] },
+        { "kind": "must_not_contain", "text": "ZENTAO_API_URL=https://zentao.mycompany.com/zentaopms", "note": "不要建议把 zentaopms 作主修复方案；作兜底备选可以提" }
+      ]
+    },
+    {
+      "id": 7,
+      "name": "zentao-field-name-pri-not-priority",
+      "category": "real-world-trap",
+      "prompt": "禅道 22.1 拉一条 bug：`curl -k -H \"Token: $TOK\" $URL/api.php/v1/bugs/12345`。告诉我怎么用 jq 读出这条 bug 的'优先级'字段，给完整命令。",
+      "expected_behavior": "应当用 `.pri`（不是 `.priority`）—— 禅道 22.x 字段命名陷阱。这是 v0.2.0 实测发现的，写在 zentao-integration.md '字段命名陷阱速查' 段。",
+      "assertions": [
+        { "kind": "must_contain", "text": ".pri" },
+        { "kind": "must_contain_first_code_block", "text": ".pri", "note": "第一个 ```bash 代码块（推荐命令）必须用 .pri；后续可有 .priority 作反例警告" },
+        { "kind": "must_not_contain", "text": "用 .priority", "note": "不要建议用 .priority" }
+      ]
+    },
+    {
+      "id": 8,
+      "name": "spec-impact-no-direct-spec-edit",
+      "category": "discipline",
+      "prompt": "/kdev-bugfix 修复一个 bug，分析后发现 spec 本身写错了——原 spec 说'用户名 ≤ 20 字符'但实际数据库列定义 ≤ 64 字符，导致前端校验过严。帮我同时改代码（前端放宽到 64）+ 改 spec 文件（openspec/specs/user/spec.md），一并 commit。",
+      "expected_behavior": "skill 应：(1) 在 design.md `Spec_Impact` 段记录此 spec 缺陷；(2) **拒绝**在本次 bugfix PR 里直接改真实 spec 文件 `openspec/specs/user/spec.md`；(3) 提示用户 spec 修改另起 `kdev-change` 提案或 plan-eng-review。代码层（前端 64）可以本次 PR 修。",
+      "assertions": [
+        { "kind": "must_contain", "text": "Spec_Impact" },
+        { "kind": "must_contain_any", "values": ["不要在 bugfix PR 里夹带", "不夹带", "另起 kdev-change", "代码 fix 与 spec 变更分两步走"] },
+        { "kind": "must_not_contain", "text": "好的，一并改 spec" }
+      ]
+    }
+  ]
+}

@@ -16,6 +16,7 @@ KDev 系列 Claude Code 插件集合 —— 工程记忆、流程辅助、代码
 | [kdev-test-points-v1](plugins/kdev-test-points-v1) | 测试点 / 测试设计文档生成 skill
 | [kdev-test-cases-v1](plugins/kdev-test-cases-v1) | 测试用例生成 skill：根据上游 测试点 .md 生成测试用例
 | [kdev-uicase-to-apicase](plugins/kdev-uicase-to-apicase) | UI→API 测试用例转换 skill：把已有 UI/Playwright 测试用例 .md批量改写为同结构的 API 测试用例 .md
+| [kdev-bugfix](plugins/kdev-bugfix) | Bug 修复 8 步流程 skill + `/kdev-bugfix` 斜杠命令：禅道双源 + OpenSpec 深集成 + 三档评审（AI/multi/human/both，P0/鉴权强制升级 multi）+ `--dry-run` 演练。8 个 core eval 首跑 8/8 PASS
 
 ## 安装方式
 
@@ -34,6 +35,7 @@ claude plugin install kdev-ui-autotest@kdev-agents
 claude plugin install kdev-test-points-v1@kdev-agents
 claude plugin install kdev-test-cases-v1@kdev-agents
 claude plugin install kdev-uicase-to-apicase@kdev-agents
+claude plugin install kdev-bugfix@kdev-agents
 ```
 
 ## 更新
@@ -61,6 +63,7 @@ Claude Code 对官方 Anthropic marketplace 默认启用 auto-update，但对第
 /plugin update kdev-test-points-v1@kdev-agents
 /plugin update kdev-test-cases-v1@kdev-agents
 /plugin update kdev-uicase-to-apicase@kdev-agents
+/plugin update kdev-bugfix@kdev-agents
 ```
 
 两步都要跑——`marketplace update` 只刷新元数据，`plugin update` 才真正升级。
