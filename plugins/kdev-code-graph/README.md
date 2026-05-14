@@ -13,53 +13,35 @@
 
 ## 安装
 
-### 一键安装（公开仓库）
+### 一键安装（推荐）
 
 ```bash
 # macOS / Linux
-curl -sSL https://raw.githubusercontent.com/KDevSec/kdev-agents/main/scripts/setup-kdev-codegraph.sh | bash
+curl -sSL https://raw.githubusercontent.com/KDevSec/kdev-plugins-dist/main/releases/kdev-code-graph/latest/setup.sh | bash
 
 # Windows / PowerShell
-iwr -useb https://raw.githubusercontent.com/KDevSec/kdev-agents/main/scripts/setup-kdev-codegraph.ps1 | iex
+iwr -useb https://raw.githubusercontent.com/KDevSec/kdev-plugins-dist/main/releases/kdev-code-graph/latest/setup.ps1 | iex
 ```
 
 该脚本完成 3 件事：add 两个 marketplace + install kdev-code-graph（UA 通过 plugin.json `dependencies` 自动连带装）。
 
-> 安全考虑：`curl | bash` 是反模式。建议先 `curl -sSL .../setup-kdev-codegraph.sh | less` 看脚本内容再跑。
-> Windows 用户请用 PowerShell 版本（见下方「Windows 10 / 11 一键安装」）。
+> 安全考虑：`curl | bash` 是反模式。建议先 `curl -sSL .../setup.sh | less` 看脚本内容再跑。
 
-### 私有仓库安装
-
-如果仓库是私有的，raw.githubusercontent.com 无法直接访问。使用 GitHub CLI：
+### 本地 clone 后安装
 
 ```bash
-# macOS / Linux
-gh repo clone KDevSec/kdev-agents --depth 1 -- && cd kdev-agents && ./scripts/setup-kdev-codegraph.sh
-
-# Windows / PowerShell
-gh repo clone KDevSec/kdev-agents --depth 1; cd kdev-agents; ./scripts/setup-kdev-codegraph.ps1
-```
-
-或者先 clone 再安装：
-
-```bash
-git clone git@github.com:KDevSec/kdev-agents.git
+git clone https://github.com/KDevSec/kdev-agents.git
 cd kdev-agents
-./scripts/setup-kdev-codegraph.sh  # 或 .ps1 on Windows
+./scripts/setup-kdev-codegraph.sh  # macOS / Linux
+./scripts/setup-kdev-codegraph.ps1 # Windows
 ```
 
 ### Windows 10 / 11 一键安装
 
-Win10 默认 PowerShell 5.1 即可（不需要 PS 7+）。在 PowerShell 中跑：
+Win10 默认 PowerShell 5.1 即可（不需要 PS 7+）：
 
 ```powershell
-iwr -useb https://raw.githubusercontent.com/KDevSec/kdev-agents/main/scripts/setup-kdev-codegraph.ps1 | iex
-```
-
-或本地 clone 后：
-
-```powershell
-.\scripts\setup-kdev-codegraph.ps1
+iwr -useb https://raw.githubusercontent.com/KDevSec/kdev-plugins-dist/main/releases/kdev-code-graph/latest/setup.ps1 | iex
 ```
 
 **Windows 前提条件：**
