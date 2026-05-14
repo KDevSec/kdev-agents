@@ -17,10 +17,10 @@
 
 ```bash
 # macOS / Linux
-curl -sSL https://raw.githubusercontent.com/KDevSec/kdev-plugins-dist/main/releases/kdev-code-graph/latest/setup.sh | bash
+curl -sSL https://raw.githubusercontent.com/KDevSec/kdev-plugins-dist/master/releases/kdev-code-graph/latest/setup.sh | bash
 
 # Windows / PowerShell
-iwr -useb https://raw.githubusercontent.com/KDevSec/kdev-plugins-dist/main/releases/kdev-code-graph/latest/setup.ps1 | iex
+iwr -useb https://raw.githubusercontent.com/KDevSec/kdev-plugins-dist/master/releases/kdev-code-graph/latest/setup.ps1 | iex
 ```
 
 该脚本完成 3 件事：add 两个 marketplace + install kdev-code-graph（UA 通过 plugin.json `dependencies` 自动连带装）。
@@ -33,7 +33,7 @@ iwr -useb https://raw.githubusercontent.com/KDevSec/kdev-plugins-dist/main/relea
 git clone https://github.com/KDevSec/kdev-agents.git
 cd kdev-agents
 ./scripts/setup-kdev-codegraph.sh  # macOS / Linux
-./scripts/setup-kdev-codegraph.ps1 # Windows
+.\scripts\setup-kdev-codegraph.ps1 # Windows
 ```
 
 ### Windows 10 / 11 一键安装
@@ -41,7 +41,7 @@ cd kdev-agents
 Win10 默认 PowerShell 5.1 即可（不需要 PS 7+）：
 
 ```powershell
-iwr -useb https://raw.githubusercontent.com/KDevSec/kdev-plugins-dist/main/releases/kdev-code-graph/latest/setup.ps1 | iex
+iwr -useb https://raw.githubusercontent.com/KDevSec/kdev-plugins-dist/master/releases/kdev-code-graph/latest/setup.ps1 | iex
 ```
 
 **Windows 前提条件：**
