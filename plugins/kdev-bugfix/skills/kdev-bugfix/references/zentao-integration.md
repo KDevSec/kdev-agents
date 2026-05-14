@@ -300,22 +300,35 @@ bug_source: direct
 ```bash
 COMMIT_SHA=$(git log -1 --format=%H)
 ARTIFACT_PATH="openspec/changes/$BUG_ID/"   # 或 docs/bugfix/$BUG_ID/
-REGRESSION_TEST="tests/test_xxx.py::test_yyy"
-ROOT_CAUSE="一句话压缩描述"
+
+# 三段交付摘要（详细模板见 delivery-summary.md）
+ROOT_CAUSE_PARA="<根因分析 1-3 句：哪行代码 + 哪个条件 + 为什么 trigger>"
+IMPACT_PARA="<影响范围：受影响用户/角色 + 数据/路径/功能 + 严重度/时间窗口>"
+FIX_PARA="<修复方案：改了什么文件/行号 + 为什么这么改 + 回归测试 cover 什么>"
 
 COMMENT=$(cat <<EOF
-已修复，详见：
-- Commit: $COMMIT_SHA
-- 产物: $ARTIFACT_PATH
-- 回归测试: $REGRESSION_TEST
-- Root cause: $ROOT_CAUSE
+【根因分析】
+$ROOT_CAUSE_PARA
+
+【影响范围】
+$IMPACT_PARA
+
+【修复方案】
+$FIX_PARA
+
+---
+Commit: $COMMIT_SHA
+产物: $ARTIFACT_PATH
 EOF
 )
 
 # JSON-escape comment
 COMMENT_JSON=$(jq -nR --arg c "$COMMENT" '$c')
 
-curl -s -X POST \
+CURL_OPTS=""
+[[ "$ZENTAO_INSECURE_TLS" == "true" ]] && CURL_OPTS="-k"
+
+curl -sS $CURL_OPTS -X POST \
   -H "Token: $(cat $ZENTAO_SESSION_CACHE 2>/dev/null || echo $ZENTAO_API_TOKEN)" \
   -H "Content-Type: application/json" \
   -d "{
@@ -326,6 +339,8 @@ curl -s -X POST \
   "$ZENTAO_API_URL/api.php/v1/bugs/$ZENTAO_BUG_ID/resolve" \
   | tee /tmp/zentao-resolve-response.json
 ```
+
+**comment 格式**：固定 **【根因分析】/【影响范围】/【修复方案】** 三段中文方括号段头 + 段间空行，末尾用 `---` 分隔追加 `Commit:` + `产物:` 元数据行。这套格式跨**禅道 comment / 会话报告 / 产物文档 / commit message** 共用，详细规范见 [delivery-summary.md](delivery-summary.md)。
 
 **响应字段**：成功返回 `{ "id": 12345, "status": "resolved", "resolvedDate": "..." }`；失败返回 `{ "error": "...", "code": "..." }`。
 
@@ -376,12 +391,20 @@ curl 失败时输出给用户的"手动改状态"指引模板：
    2. 点"解决"按钮
    3. resolution 选：fixed
    4. resolvedBuild 填：<build name，默认 trunk>
-   5. 备注粘贴下面这段：
+   5. 备注粘贴下面这段（保留段头【】方括号，禅道纯文本渲染会保留）：
       ─────────────────────
+      【根因分析】
+      <根因分析 1-3 句>
+
+      【影响范围】
+      <影响范围：用户/角色 + 数据/路径 + 严重度/时间窗口>
+
+      【修复方案】
+      <修复方案：文件/行号 + 为什么 + 回归测试 cover>
+
+      ---
       Commit: <SHA>
       产物: <path>
-      回归测试: <test>
-      Root cause: <一句话>
       ─────────────────────
    6. 点保存
 ```

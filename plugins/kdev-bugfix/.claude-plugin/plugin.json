@@ -1,7 +1,7 @@
 {
   "name": "kdev-bugfix",
   "description": "Bug 修复 8 步流程 skill（深集成 OpenSpec + 禅道双源 + 三档评审 + dry-run 演练）：禅道拉取 OR 直接对话 → proposal/design/specs/tasks → 根因投资 → RED 回归测试 → GREEN 最小修复 → 验证闸门 → 评审闸门（AI/multi/human/both）→ openspec validate → kdev-commit → 禅道 active→resolved 自动回写。autodetect openspec/ 决定模式；ZENTAO_API_URL + TOKEN 触发禅道源；强制升级 multi 评审（P0/鉴权/跨模块/数据迁移/文件>3）；--dry-run 完整跑 8 步但不动持久状态（演练 / 教学 / wet-test 评估）",
-  "version": "0.2.2",
+  "version": "0.2.3",
   "author": {
     "name": "ly"
   },

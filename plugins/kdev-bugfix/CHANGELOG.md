@@ -1,5 +1,36 @@
 # kdev-bugfix Changelog
 
+## v0.2.3 (2026-05-14)
+
+**统一三段交付摘要格式**：【根因分析】/【影响范围】/【修复方案】，跨多个出口共用。
+
+### 背景
+
+v0.2.2 的禅道 resolve comment 用了"`已修复，详见：- Commit / 产物 / 回归测试 / Root cause`" 列表风格——但纯模式无禅道时，会话报告没有同样的结构化输出，用户口头转述给非技术干系人时缺统一交付摘要。
+
+### 新增
+
+- `references/delivery-summary.md` — 定义统一三段格式 + 字段来源对照表 + 风格规范 + 4 个落点速查
+- 落点 1：禅道 bug resolve comment（步骤 8.1）—— 三段中文方括号段头 + 空行分隔 + 末尾 `---` 分隔 `Commit:` / `产物:` 元数据
+- 落点 2：会话终态报告（步骤 8.2）—— 标准元数据 + 三段摘要
+- 落点 3：OpenSpec `design.md` 末尾新增 `## Delivery_Summary` 段；纯模式 `fix.md` 同步新增
+- 落点 4：commit message body 用三段格式（替代原 `Root cause:` / `Regression test:` 自由行；元数据降级到 `---` 之后）
+
+### 风格规范
+
+- 段头固定中文方括号 `【根因分析】` / `【影响范围】` / `【修复方案】`（不用英文 / markdown emphasis）
+- 段间一个空行
+- 总长度 200-500 字符（禅道列表预览友好 + commit `git log` 一屏可读）
+- **不是新主存储字段**——三段是 Root_Cause / Why+Environment+Capabilities / Fix_Description 的浓缩衍生视图
+
+### 纯模式不省略
+
+bug_source=direct 时**仍要输出三段交付摘要**到会话报告 + 写到 `fix.md ## Delivery_Summary` 段。这是 skill 的"修复结论文档"统一交付格式，不因为没禅道而省略。
+
+### 修复 v0.2.2 的不一致
+
+v0.2.2 zentao-integration.md §3 的 resolve curl 模板末尾 `Token: $ZENTAO_API_TOKEN` 是 v0.1 残留——本次顺便修正为 `$(cat $ZENTAO_SESSION_CACHE 2>/dev/null || echo $ZENTAO_API_TOKEN)`，跟 §1 拉取 bug 的 token 取值逻辑一致。
+
 ## v0.2.2 (2026-05-13)
 
 **新增 `--dry-run` flag**：完整跑 8 步但不动任何持久状态。

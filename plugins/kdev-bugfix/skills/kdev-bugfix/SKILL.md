@@ -207,15 +207,23 @@ openspec validate <bug-id>   # schema 校验，红了按报错补字段
 **Commit**（委派 `Skill: kdev-commit`）：
 
 - 分支 `fix/<bug-id>`（已在 feature 分支问用户复用或新开）
-- message 模板：
+- message 模板（body 含统一三段交付摘要——禅道 comment / 会话报告 / commit 共享同一格式，详见 [delivery-summary.md](references/delivery-summary.md)）：
 
   ```
   fix: <Symptom 一句话> (#<bug-id>)
 
-  Root cause: <Root_Cause 一两句压缩>
+  【根因分析】
+  <Root_Cause 1-3 句，浓缩>
+
+  【影响范围】
+  <受影响用户/角色 + 数据/路径/功能 + 严重度/时间窗口>
+
+  【修复方案】
+  <改了什么文件/行号 + 为什么 + 回归测试 cover 什么>
+
+  ---
   Regression test: <测试文件路径或测试名>
   Reviewers: AI (PASS), multi-agent (PASS/N/A), human (PASS/N/A)
-
   Refs: openspec/changes/<bug-id>/   # 或 docs/bugfix/<bug-id>/
   Zentao: #<bug-id>                  # 仅 bug_source=zentao
   ```
@@ -228,7 +236,9 @@ openspec validate <bug-id>   # schema 校验，红了按报错补字段
 
 失败兜底：API 错（401/403/5xx）→ STDOUT 输出手动指引（按 [§5](references/zentao-integration.md)），**不阻塞**——代码已 commit。
 
-**8.2 终态报告**：bug-id / 来源 / 模式 / 严重度 / 根因 / 改动文件 / 任务清单 / 评审 / 产物路径 / commit / 禅道状态 / Spec 影响。
+**8.2 终态报告**：标准元数据（bug-id / 来源 / 模式 / 严重度 / 改动文件 / 任务清单 / 评审 / 产物路径 / commit / 禅道状态 / Spec 影响）+ **统一三段交付摘要**（【根因分析】/【影响范围】/【修复方案】），格式与禅道 comment / commit message body 完全一致，便于复制到任何场合。详见 [delivery-summary.md](references/delivery-summary.md)。
+
+**纯模式特别说明**：bug_source=direct 且无禅道源时，**三段交付摘要仍然要输出到会话报告 + 写到 fix.md `## Delivery_Summary` 段**——这是 skill 的"修复结论文档"统一交付格式，不因为没禅道而省略。
 
 ## P0 hotfix 快路径
 
@@ -299,6 +309,7 @@ skill 内附：
 - [references/review-modes.md](references/review-modes.md) — 3 档评审详解、强制升级条件、Review_Decisions 落档格式
 - [references/prompts/multi-agent-review.md](references/prompts/multi-agent-review.md) — 步骤 6.2 subagent 派单 prompt 模板（带占位符替换规范）
 - [references/dry-run-mode.md](references/dry-run-mode.md) — `--dry-run` 详解：每步行为差异、diff 预览格式、plan-review 评审变体、底线保证
+- [references/delivery-summary.md](references/delivery-summary.md) — 统一三段交付摘要格式（【根因分析】/【影响范围】/【修复方案】），跨禅道 comment / 会话报告 / 产物文档 / commit message 共用
 
 ## 触发示例
 

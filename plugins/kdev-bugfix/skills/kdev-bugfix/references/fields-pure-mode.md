@@ -125,6 +125,20 @@ zentao_severity: 2                 # 仅 bug_source=zentao
 ## Follow_Up（可选）
 <本次发现但不修的相关项。开 chore/refactor issue 跟踪>
 
+## Delivery_Summary
+<步骤 7 commit 完成后追加。**统一三段格式**，跨会话报告 / commit message body 共用（纯模式无禅道回写，但同一格式便于日后迁移到 OpenSpec 模式）。详细规范见 [delivery-summary.md](delivery-summary.md)>
+
+```
+【根因分析】
+<1-3 句，浓缩 Root_Cause>
+
+【影响范围】
+<受影响用户/角色 + 数据/路径/功能 + 严重度/时间窗口>
+
+【修复方案】
+<改了什么文件/行号 + 为什么这么改 + 回归测试 cover 什么>
+```
+
 ## Review_Decisions
 <步骤 6 评审完成后追加，详细格式见 [review-modes.md §5](review-modes.md)>
 

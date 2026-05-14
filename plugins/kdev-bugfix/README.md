@@ -145,6 +145,7 @@ commit 成功 → PUT /api.php/v1/bugs/<id>/resolve
 | references | [review-modes.md](skills/kdev-bugfix/references/review-modes.md) | 3 档评审详解 + 强制升级条件 + Review_Decisions 落档格式 |
 | references | [prompts/multi-agent-review.md](skills/kdev-bugfix/references/prompts/multi-agent-review.md) | multi 模式 subagent 派单 prompt 模板（带占位符替换规范） |
 | references | [dry-run-mode.md](skills/kdev-bugfix/references/dry-run-mode.md) | `--dry-run` 详解：每步行为差异、diff 预览、plan-review 评审、底线保证 |
+| references | [delivery-summary.md](skills/kdev-bugfix/references/delivery-summary.md) | 统一三段交付摘要格式（【根因分析】/【影响范围】/【修复方案】），跨禅道 comment / 会话报告 / 产物文档 / commit message 共用 |
 | 命令 | [`/kdev-bugfix`](commands/kdev-bugfix.md) | 显式触发，含 `--from-zentao` / `--review-mode` / `--no-zentao-update` 等 |
 
 ## 触发示例
@@ -161,7 +162,8 @@ commit 成功 → PUT /api.php/v1/bugs/<id>/resolve
 
 ## 演进历史
 
-- **v0.2.2**（当前）：`--dry-run` flag — 完整跑 8 步但不动持久状态（演练 / 教学 / wet-test 评估）
+- **v0.2.3**（当前）：统一三段交付摘要格式（【根因分析】/【影响范围】/【修复方案】），跨禅道 comment / 会话报告 / 产物文档 / commit message 共用
+- **v0.2.2**：`--dry-run` flag — 完整跑 8 步但不动持久状态（演练 / 教学 / wet-test 评估）
 - **v0.2.1**：references 拆分（bugfix-fields-reference.md → 6 个 fields-*.md）+ subagent prompt 抽出独立模板
 - **v0.2.0**：双源 Intake + 三档评审 + 禅道状态回写（开源版 22.1 IP 部署实测）
 - **v0.1.1**：OpenSpec 深集成 + autodetect + `--openspec` / `--no-openspec` / `--archive`

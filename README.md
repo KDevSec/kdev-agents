@@ -16,7 +16,7 @@ KDev 系列 Claude Code 插件集合 —— 工程记忆、流程辅助、代码
 | [kdev-test-points-v1](plugins/kdev-test-points-v1) | 测试点 / 测试设计文档生成 skill
 | [kdev-test-cases-v1](plugins/kdev-test-cases-v1) | 测试用例生成 skill：根据上游 测试点 .md 生成测试用例
 | [kdev-uicase-to-apicase](plugins/kdev-uicase-to-apicase) | UI→API 测试用例转换 skill：把已有 UI/Playwright 测试用例 .md批量改写为同结构的 API 测试用例 .md
-| [kdev-bugfix](plugins/kdev-bugfix) | Bug 修复 8 步流程 skill + `/kdev-bugfix` 斜杠命令：禅道双源 + OpenSpec 深集成 + 三档评审（AI/multi/human/both，P0/鉴权强制升级 multi）+ `--dry-run` 演练。8 个 core eval 首跑 8/8 PASS
+| [kdev-bugfix](plugins/kdev-bugfix) | Bug 修复 8 步流程 skill + `/kdev-bugfix` 斜杠命令：禅道双源 + OpenSpec 深集成 + 三档评审（AI/multi/human/both，P0/鉴权强制升级 multi）+ `--dry-run` 演练 + 统一三段交付摘要（【根因分析】/【影响范围】/【修复方案】）跨禅道 comment / 会话报告 / 产物文档 / commit 共享。8 个 core eval 首跑 8/8 PASS
 
 ## 安装方式
 

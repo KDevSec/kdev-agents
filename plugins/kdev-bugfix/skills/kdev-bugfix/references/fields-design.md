@@ -59,6 +59,25 @@ upstream 默认 `design.md` 偏 feature 设计语义（架构图 / 数据流 / A
 - refactor: <跟进项>
 - docs: 追加规则到 `<repo>/docs/rules.md`：<规则一句话>
 
+## Delivery_Summary
+
+<步骤 7 commit 完成后追加。**统一三段格式**，跨禅道 comment / 会话报告 / commit message body 共用。详细规范见 [delivery-summary.md](delivery-summary.md)>
+
+```
+【根因分析】
+<1-3 句，浓缩 Root_Cause 段。回答"为什么 bug 产生"，精确到哪行代码 + 哪个条件 + 为什么 trigger>
+
+【影响范围】
+<浓缩 Impact_Scope。三维度：受影响用户/角色 + 受影响数据/路径/功能 + 严重度/时间窗口>
+
+【修复方案】
+<浓缩 Fix_Description。三要点：改了什么文件/行号 + 为什么这么改 + 回归测试 cover 什么>
+```
+
+**字段来源**：根因分析 ← 本文 `## Root_Cause` 段；影响范围 ← proposal.md `## Why` + Bug Context `### Environment`；修复方案 ← 本文 `## Fix_Description` + tasks.md T2-T3 + T1 回归测试名。
+
+**风格**：段头用中文方括号 `【】`，段间一个空行，**不要**用 markdown emphasis（`**`/`*`），总长度 300-500 字符。
+
 ## Review_Decisions
 
 <步骤 6 评审完成后追加。详细格式见 [review-modes.md §5](review-modes.md)>
