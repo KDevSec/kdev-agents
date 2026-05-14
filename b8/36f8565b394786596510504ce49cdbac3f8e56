@@ -1,0 +1,19 @@
+plugins/kdev-code-graph/README.md
+  s_615f5c799328e4::t_bfc0ca391fded9 16,20,23,28,30,33,35-36,41,44
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "b836f8565b394786596510504ce49cdbac3f8e56",
+  "prompts": {},
+  "sessions": {
+    "s_615f5c799328e4": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f2c92eab-0c92-43de-b1ff-181caab6f6d0",
+        "model": "glm-5"
+      },
+      "human_author": "liyong <ly1989abc@126.com>"
+    }
+  }
+}
