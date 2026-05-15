@@ -184,6 +184,98 @@
       ]
     },
     {
+      "id": 20,
+      "name": "f-nnn-rfe-l1-trigger",
+      "category": "feedback-channel",
+      "prompt": "我刚才在做异常处理重构，用了 kdev-memory 的召回机制——结果它把 3 条完全不沾边的踩坑都翻出来了，看得我头都大。这破召回要是能学着不刷屏就好了，比如同一个 session 已经命中过一次就降权。你能不能给我把这个反馈记一下？项目当前 .kdev/memory/ 已经初始化，skill-feedback.md 是空的。",
+      "fixture": "eval-20-f-nnn-rfe/target-project/",
+      "assertions": [
+        {"text": "skill 识别这是对外部 plugin 的反馈（不是项目代码问题），决定走 F-NNN 通道而不是 R-NNN（改进建议）"},
+        {"text": "skill 把这条记入 skill-feedback.md（不是改进建议.md / 不是执行日志.md）"},
+        {"text": "F-NNN 条目的 subject 字段 = plugin:kdev-memory（L1 显式提及，用户直接说出名字）"},
+        {"text": "F-NNN 条目含 subject_inferred_by 字段，标记为 L1-显式提及 或等价表达"},
+        {"text": "F-NNN 条目含 subject_confidence 字段，取值 high（L1 默认高置信度）"},
+        {"text": "F-NNN 条目的 type 字段 = RFE（或同时含痛点+RFE 标签，因用户既吐槽又给出改进建议）"},
+        {"text": "verbatim 字段必填且为用户原话（保留'这破召回要是能学着不刷屏就好了'这一句的原句，不是改写后的总结）"},
+        {"text": "verbatim 字段绝不能是'用户希望增加 demote 机制'/'用户认为召回准确性不足'这种改写——必须原句"},
+        {"text": "skill 在落盘前用一句话向用户确认（'听到你说 X，记 F 给 subject Y 当 Z 信号，对吗？'或等价确认），不是直接默默写入"},
+        {"text": "F-NNN 条目含 desired 字段（智能体补充），提到'demote 机制' / 'session 内同主题降权' / 等价表达"},
+        {"text": "score 字段显式为 null（不强制打分；用户没给分就不要编造分数）"},
+        {"text": "执行日志.md / 改进建议.md / 当前状态.md frontmatter **未**被改动（这条反馈不属于项目内方法论，纯外部 skill 反馈）"}
+      ]
+    },
+    {
+      "id": 21,
+      "name": "rating-split-step-with-skill-feedback",
+      "category": "feedback-channel",
+      "prompt": "Step 12 我打个分：顺畅度 4 分，主要是 brainstorming skill 这次引导得很到位，开题问得很对，但 kdev-memory 又召回了一堆无关的，太吵了——加起来扣一分。完成时间 14:35。项目 .kdev/memory/执行日志.md 里 Step 12 的模型自评段已经写好（完成时间 14:30, 顺畅度自评 4.5/5, 扣分项: 中间走了一次错路），用户评分段是空的（顺畅度: —/5）。skill-feedback.md 是空的。",
+      "fixture": "eval-21-rating-split/target-project/",
+      "assertions": [
+        {"text": "skill 识别用户评分含两条独立 skill 反馈（brainstorming + kdev-memory），触发评分裂解"},
+        {"text": "执行日志.md 的 Step 12 用户评分段被填充：顺畅度 4/5、完成时间 14:35、用户评价（不必含 skill 反馈原话，因已拆到 F）"},
+        {"text": "Step 12 用户评分时分戳晚于模型自评（14:35 > 14:30），满足锁定铁规"},
+        {"text": "skill-feedback.md 新增至少 2 条 F-NNN（不是 1 条塞两个 skill 名，而是物理拆成两条独立条目）"},
+        {"text": "第 1 条 F：subject = skill:brainstorming（或等价命名空间），type = 表扬，verbatim 含用户原话'引导得很到位 / 开题问得很对'部分"},
+        {"text": "第 2 条 F：subject = plugin:kdev-memory（或等价），type = 痛点，verbatim 含用户原话'又召回了一堆无关的 / 太吵了'部分"},
+        {"text": "两条 F 的 verbatim 字段均为用户原话片段（不是改写），且两条加起来覆盖用户原话中的两个 skill 反馈点"},
+        {"text": "Step 12 用户评分段**不**包含'brainstorming 引导得很到位' 或 'kdev-memory 又召回了一堆无关的'整段原话（已拆到 F，避免重复且污染项目评分）"},
+        {"text": "两条 F 的 subject_inferred_by = L1-显式提及，subject_confidence = high"},
+        {"text": "评分差异分析段被生成：差值 = -0.5（模型 4.5 / 用户 4，弱信号），不触发 R-NNN（差值未到 2）"},
+        {"text": "当前状态.md 的 last_updated 字段更新到 2026-05-15（补齐 Step 评分属 frontmatter 修改），current_step 保持 12 不变（fixture 起始已是 12，无新 Step）；outputs 目录必须含 当前状态.md 副本以便验证"}
+      ]
+    },
+    {
+      "id": 22,
+      "name": "l3-disambiguate-low-confidence",
+      "category": "feedback-channel",
+      "prompt": "这玩意刚才完全没用啊，我要的东西没找到。给我记一下。项目 .kdev/memory/ 已初始化但今天没有任何 hook 召回、当前 Step 没有 skill 调用记录、用户上一句也没提到任何 skill / 工具名字。",
+      "fixture": "eval-22-l3-disambiguate/target-project/",
+      "assertions": [
+        {"text": "skill 识别这是反馈语义（痛点），但 L1（显式提及）和 L2（上下文）都推不出 subject"},
+        {"text": "skill **不**默认归 subject:project（这会污染项目评分；用户明确说'这玩意'指向某个外部组件）"},
+        {"text": "skill 走 L3 候选 disambiguate 流程：向用户给出 2-3 个候选选项（不是让用户从空白打字）"},
+        {"text": "L3 候选问句格式合理（如'你说的'这玩意'是指：(a) X (b) Y (c) 别的？'），不是开放式问题"},
+        {"text": "在用户回答之前，skill **不**预先写入 skill-feedback.md（等用户答完再决定 subject）"},
+        {"text": "如果 skill 无法推断任何候选（项目记忆里没有上下文信号），可以暂时写入 subject: unknown + subject_confidence: low，并在 REPORT 里说明待回填"},
+        {"text": "verbatim 字段保留用户原话'这玩意刚才完全没用啊'整句（不是改写）"},
+        {"text": "REPORT 明确解释了为什么不能默认归 project / 为什么需要 L3 询问"}
+      ]
+    },
+    {
+      "id": 23,
+      "name": "f-nnn-false-positive-guard",
+      "category": "feedback-channel",
+      "prompt": "我们组里有人说 kdev-memory 这套召回机制有点过度设计，但我自己觉得还行——你怎么看这种产品决策的取舍？项目 .kdev/memory/ 已初始化。",
+      "fixture": "eval-23-false-positive/target-project/",
+      "assertions": [
+        {"text": "skill **不**起 F-NNN 条目——这是用户引用他人观点 / 讨论产品取舍，不是用户自己的反馈"},
+        {"text": "skill-feedback.md 未被写入（保持空 / 保持原样）"},
+        {"text": "skill 正常回应用户的讨论问题（关于产品设计的对话），不要把对话本身当反馈采集"},
+        {"text": "REPORT（如有）或对话回复明确说明为什么没起 F：'用户在引用他人观点 / 讨论取舍，不是自己的吐槽'"},
+        {"text": "执行日志.md / 改进建议.md / 当前状态.md 均未被修改"},
+        {"text": "skill 不主动问'要不要记一下'（除非用户明确说'我也这么觉得，帮我记一下'，否则反讽 / 引用 / 讨论不触发采集）"}
+      ]
+    },
+    {
+      "id": 24,
+      "name": "export-md-distillation",
+      "category": "distillation-export",
+      "prompt": "把 .kdev/memory/ 里的数据导出来给我做蒸馏。项目里有 6 条 Step（其中 Step 5 评分差值 +2、Step 8 评分差值 -1.8）、3 条 G-NNN、2 条 Q-NNN、4 条 F-NNN（subject 涵盖 plugin:kdev-memory 2 条、skill:brainstorming 1 条、tool:bash 1 条）、1 条 R-NNN。期望产出能直接喂给 fine-tuning 管道。",
+      "fixture": "eval-24-export-md/target-project/",
+      "assertions": [
+        {"text": "skill 走 markdown 切片导出流程（不是导出 JSONL，**绝不能**输出 .jsonl 文件——架构决策禁止）"},
+        {"text": "产出三个切片包文件：dataset-full.md / dataset-misalignment.md / dataset-skill-feedback-by-subject/<slug>.md（或等价路径）"},
+        {"text": "dataset-full.md 包含全部 16 条条目（6 Step + 3 G + 2 Q + 4 F + 1 R），按时间排序"},
+        {"text": "dataset-misalignment.md 只含差值 |≥1.5| 的 Step：Step 5（差值 +2）和 Step 8（差值 -1.8）。其他 Step 不应出现"},
+        {"text": "dataset-skill-feedback-by-subject/ 子目录下按 subject 切片：至少 3 个独立文件（plugin-kdev-memory.md / skill-brainstorming.md / tool-bash.md，slug 形式合理）"},
+        {"text": "dataset-skill-feedback-by-subject/plugin-kdev-memory.md 含 2 条 F 条目（对应 plugin:kdev-memory subject 的两条），verbatim 字段原样保留"},
+        {"text": "导出过程含 sanitize 步骤（脱敏 email / 内部路径 / API key 等），REPORT 说明 sanitize 是否通过验证"},
+        {"text": "原 .kdev/memory/*.md 文件**未**被修改（导出是只读动作）"},
+        {"text": "REPORT 提供产出统计：每个切片包的条目数、文件大小、sanitize 状态"},
+        {"text": "REPORT 不建议把 markdown 转 JSONL（架构终态决策，违反此条 = 违反 SKILL.md 顶部条款）"}
+      ]
+    },
+    {
       "id": 11,
       "name": "skill-used-field",
       "category": "hook-interaction",
