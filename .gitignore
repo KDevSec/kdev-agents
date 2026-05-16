@@ -55,6 +55,8 @@ docs/skills/kdev-code-graph/references/ops-codegraph-tool/
 # 允许子目录里的 .kdev 作为测试 fixture 被跟踪，靠下面的 negation 放行）
 /.kdev/
 .claude/settings.local.json
+.claude/scheduled_tasks.lock
+.claude/*.lock
 sandbox/*
 
 # Git worktrees (本地隔离工作区，不跟踪)
@@ -84,6 +86,8 @@ plugins/*/skills/*-workspace/.venv/
 plugins/*/skills/*-workspace/*.log
 # skill-creator iteration 产物（outputs / grading / benchmark / review.html 每次跑都重生成）
 plugins/*/skills/*-workspace/iteration-*/
+# skill-creator trigger-eval 输入（每次跑可能调整 query，不入库）
+plugins/*/skills/*-workspace/trigger-eval.json
 
 # kdev-ingestor venv
 plugins/kdev-code-graph/ingestor/.venv/

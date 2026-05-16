@@ -1,5 +1,100 @@
 # kdev-memory CHANGELOG
 
+## [0.10.0] — 2026-05-16
+
+**蒸馏管道 + 自动蒸馏机制：subject 路由全栈打通——F-NNN 反馈通道 + /kdev-memory-distill 统一蒸馏入口 + SessionStart hook 自动触发。**
+
+经 5+ 轮设计讨论确认 5 条核心决策（详见 .claude/memory/kdev-memory-distillation-design.md）。
+3 个 commit 累计：c153aca（蒸馏管道改造）+ 98253f4（promote+export-md 合并）+ 796555c（自动蒸馏机制）。
+单测 145/145 PASS（新增 18 distill_trigger 测试）+ skill-quality eval 19/19 PASS（iter-2 + iter-3 三轮跑通）。
+
+### ✨ 新增功能
+
+#### F-NNN 反馈通道（七类记录扩展）
+
+- **新增 `skill-feedback.md`**（F-NNN）—— 与 R-NNN 物理隔离的"对外部 skill / plugin / 工具 / 方法论反馈"通道
+- 三铁规：`subject` 必填、`verbatim`（用户原话）必填不可改写、`score` 显式可空
+- 智能体在主对话流自动识别 5 类语义（RFE / 痛点 / bug / 表扬 / 困惑），起草后**落盘前一句话向用户确认**避免误采
+- 新增 `references/skill-反馈通道-F.md`：完整 schema + 识别规则 + 边界（哪些不属于 F-NNN）
+
+#### subject 三级自动推断（数据路由器）
+
+- 每条评分/反馈必须显式标记 subject：`project` / `skill:X` / `plugin:X` / `tool:X` / `methodology:X` / `collaboration:X` / `unknown`
+- **三级推断策略**：L1 显式提及（~40%）+ L2 上下文推断（~50%）+ L3 候选 disambiguate（~10%），共 90% 场景不打扰用户
+- **评分裂解**：用户评分时夹带 skill 反馈（如"4 分但 X 太吵"）自动拆两条独立条目，绝不塞同一条
+- 推不出时归 `unknown`，绝不默认归 `project`（避免污染项目评分子集）
+- 新增 `references/subject-推断与评分裂解.md`
+
+#### /kdev-memory-distill 统一蒸馏入口
+
+合并旧 `/kdev-memory-promote`（人沉淀）+ `/kdev-memory-export-md`（机器训练）为一个命令——按 subject 字段路由数据：
+
+```
+.kdev/memory/ 全量原始记录
+       ↓ 按 subject 路由
+       ├── subject = project             ──→ promote 阶段（人工挑选）
+       │                                    ──→ docs/ 反哺项目
+       └── subject = skill/plugin/        ──→ dataset 阶段（自动打包）
+           tool/methodology/                 ──→ 三个 markdown 切片包：
+           collaboration                       - dataset-full.md
+                                               - dataset-misalignment.md
+                                               - dataset-skill-feedback-by-subject/<slug>.md
+```
+
+- **不引入 JSONL**——markdown 主存 + markdown 切片包导出，现代蒸馏管道（Axolotl / Unsloth / HuggingFace SFT）原生支持 markdown，多一层中间格式徒增维护并丢失因果链 reasoning trace
+- 新增 `hooks/lib/distill.py`（端到端切片导出 + sanitize + 验证）
+- 新增 `hooks/lib/sanitize.py`（PII 脱敏：email / home 路径 / API key / Bearer / 私网 IP / 内部 URL）
+- 新增 `references/markdown-切片导出.md`
+
+#### 自动蒸馏机制（auto / manual 两档）
+
+- **默认 auto**：SessionStart hook 检测阈值满足时后台 `subprocess.Popen distill.py --auto-context --skip-promote`（detach 子进程，hook 立刻返回）；brief 注入"🤖 已开始后台自动蒸馏"
+- **manual 模式**：仅 brief 注入"📋 建议蒸馏：[原因]，跑 /kdev-memory-distill"，不自动跑
+- **触发条件（AND 语义）**：距上次蒸馏 ≥ 7 天 AND（F 新增 ≥10 OR misalign Step 新增 ≥3 OR R 新增 ≥5）
+- **promote 阶段永远不自动**（写 docs/ 是版本控制相关高风险动作，必须人工挑选）
+- **失败显式 WARN**：写 `WARN-distill-failed-*.md`，下次 SessionStart 显眼提醒（不静默）
+- **配置**：`.kdev/memory/config.yaml` 的 `distill.mode` / `reminder_days` / `reminder_new_f` / `reminder_new_misalign`
+- 新增 `hooks/lib/distill_trigger.py`（阈值检测）+ `references/蒸馏触发机制.md`
+
+#### subagent 落盘两档配置
+
+- **`record_mode: hybrid`（默认）** —— 小高频（Step / Q / G / R / F 落盘 / subject 推断）留主会话内联；大单次（每日汇总 / weekly / distill）+ F-NNN 实体写入走 subagent
+- **`record_mode: inline`** —— 全部主会话内联（平台不支持 subagent 或用户偏好极简）
+- F-NNN 实体写入是 **fire-and-forget 异步落盘最大杠杆点**——让用户随口吐槽不打断对话
+- 新增 `references/subagent-落盘机制.md` + `hooks/lib/memory_config.py`（嵌套 yaml parser + 配置读取）
+
+### 🔧 schema 扩展
+
+- 执行日志 Step §3：顶部加 `about` 字段（缺省 = project），评分裂解段（用户评分夹带 skill 反馈时如何拆条目）
+- 七类记录总览表 + 速览：F-NNN 作为第六类列入，原 6 / 7 类编号顺延为 7 / 8
+
+### 📊 验证
+
+- **单测**：145/145 PASS（既有 127 + 新增 18 个 distill_trigger / config / sanitize / 端到端测试）
+- **skill-quality eval**：
+  - iter-2 47/47 = 100%（5 个新 case 覆盖 F-NNN/评分裂解/L3 disambiguate/误采防护/切片导出）
+  - iter-3 19/19 = 100%（3 个新 case 覆盖自动蒸馏 auto/manual/无触发，**实跑脚本验证** trigger-check.json + brief-output.txt 硬证据）
+
+### 🔗 升级指引
+
+兼容老项目：
+- 老项目无 `.last-distill` 时 fallback 到 `.last-promote` mtime——平滑过渡
+- `/kdev-memory-promote` 和 `/kdev-memory-export-md` 旧命令已删除，全部走新 `/kdev-memory-distill`（含历史迁移说明段供新用户理解 v0.9 → v0.10 演进）
+- `record_mode` / `distill.mode` 未配置 → 默认 hybrid + auto（fail-open 偏 UX 友好），无需配置即可享受新能力
+
+跑 `/plugin update kdev-memory@kdev-agents` 即可。
+
+### 📝 相关文档
+
+- `.claude/memory/kdev-memory-distillation-design.md`（4 条核心决策完整论证）
+- `plugins/kdev-memory/skills/kdev-memory/references/skill-反馈通道-F.md`
+- `plugins/kdev-memory/skills/kdev-memory/references/subject-推断与评分裂解.md`
+- `plugins/kdev-memory/skills/kdev-memory/references/markdown-切片导出.md`
+- `plugins/kdev-memory/skills/kdev-memory/references/subagent-落盘机制.md`
+- `plugins/kdev-memory/skills/kdev-memory/references/蒸馏触发机制.md`
+
+---
+
 ## [0.9.0] — 2026-05-03
 
 **SKILL.md 极简重构：从 1326 词精简至 944 词（-28.8%），符合 skill-creator <5k 词规范。**

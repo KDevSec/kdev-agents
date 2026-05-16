@@ -1,10 +1,10 @@
 {
   "name": "kdev-memory",
-  "description": "工程记忆制度插件：为多迭代项目建立实时落盘的决策/踩坑/执行/评分记忆 + 智能召回（triggers）。七层 hook（SessionStart 注入 + UserPromptSubmit 智能召回 + Stop 软提醒/归档提醒 + Strict 阻塞 + PostToolUse 里程碑联动 + PreCompact 压缩前写盘 + SessionEnd 兜底警告）+ 状态结构化（YAML frontmatter）+ .kdev/memory 命名空间化（插件隔离）+ 按月/按季度归档切档（执行日志按月、踩坑/决策按季度进 归档/ 子目录，改进建议不切档）+ CLAUDE.md 接口 / 实现解耦（规则段只放 claude_md_contract 接口契约，实现细节留 skill 本体，避免 skill 升级与项目 CLAUDE.md 漂移）+ 接口漂移 lint（SessionStart 自动检测缺少的 hook 标签 / 文件模式 / 贯穿铁规，召唤 skill 说「修 CLAUDE.md 漂移」即一键精确 diff patch）",
-  "version": "0.9.0",
+  "description": "工程记忆制度插件：实时落盘决策/踩坑/执行/评分 + skill 反馈（F-NNN）+ 智能召回 + 知识蒸馏（markdown 切片导出）。七层 hook（SessionStart 注入 + UserPromptSubmit 智能召回 + Stop 软提醒 + Strict 阻塞 + PostToolUse 里程碑 + PreCompact 写盘 + SessionEnd 兜底）+ subject 三级自动推断（L1/L2/L3 + 评分裂解 + unknown fallback）+ F-NNN 反馈通道（verbatim 原话不可改写 + 5 类语义识别）+ /kdev-memory-distill 统一蒸馏入口（promote 沉淀 docs/ 反哺项目 + dataset 切片喂 skill 维护方）+ 自动蒸馏机制（auto 默认 + 7 天/数据增长阈值 AND 触发 + SessionStart 后台 Popen + WARN 失败兜底，manual 仅提醒）+ subagent 落盘两档（hybrid/inline）+ 按月/季度归档切档 + CLAUDE.md 接口契约化 + 接口漂移 lint",
+  "version": "0.10.0",
   "author": {
     "name": "ly"
   },
   "license": "MIT",
-  "keywords": ["memory", "engineering", "journal", "daily-summary", "archive", "contract-lint", "kdev"]
+  "keywords": ["memory", "engineering", "journal", "daily-summary", "archive", "contract-lint", "distillation", "skill-feedback", "subject-routing", "kdev"]
 }
