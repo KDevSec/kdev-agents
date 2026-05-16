@@ -189,7 +189,7 @@ def render(kdev: Path, d_from: date, d_to: date) -> None:
 
     # --- 附：待沉淀候选 ---
     print("## 📌 附录：待沉淀候选（→ docs/）\n")
-    print("（执行 `/kdev-memory-promote` 查看完整候选列表与去向建议）\n")
+    print("（执行 `/kdev-memory-distill` 查看完整候选列表与去向建议）\n")
 
     if not (steps or ques or gotchas or rules):
         print()

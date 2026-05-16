@@ -1,14 +1,14 @@
-"""单测 hooks/lib/export_md.py + sanitize.py + memory_config.py。
+"""单测 hooks/lib/distill.py + sanitize.py + memory_config.py。
 
 覆盖：
 - memory_config.read_record_mode 的 4 个 fallback 路径
 - sanitize.sanitize_text 各类 PII 规则
 - sanitize.verify_no_leaks 反查
-- export_md.collect_entries 解析 frontmatter / 切分条目 / 归档目录
-- export_md.is_misalignment_step 筛选逻辑
-- export_md.is_skill_feedback_high 筛选逻辑
-- export_md.subject_slug 文件名安全化
-- export_md.export_markdown_slices 端到端（含输出文件 / 条目数 / sanitize 验证）
+- distill.collect_entries 解析 frontmatter / 切分条目 / 归档目录
+- distill.is_misalignment_step 筛选逻辑
+- distill.is_skill_feedback_high 筛选逻辑
+- distill.subject_slug 文件名安全化
+- distill.export_markdown_slices 端到端（含输出文件 / 条目数 / sanitize 验证）
 
 零外部依赖，纯 stdlib + tempfile fixture。
 
@@ -25,7 +25,7 @@ from textwrap import dedent
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "hooks" / "lib"))
 
-import export_md  # noqa: E402
+import distill  # noqa: E402
 import memory_config  # noqa: E402
 import sanitize  # noqa: E402
 
@@ -155,7 +155,7 @@ class TestSanitize(unittest.TestCase):
         self.assertEqual(leaks[0][0], "email")
 
 
-# ==================== export_md ====================
+# ==================== distill ====================
 
 def _write_fixture(kdev: Path) -> None:
     """建一个完整 fixture，含所有 5 类条目 + misalignment + skill-feedback 多 subject。"""
@@ -279,7 +279,7 @@ class TestEntryParsing(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             kdev = Path(tmp) / "memory"
             _write_fixture(kdev)
-            entries = export_md.collect_entries(kdev)
+            entries = distill.collect_entries(kdev)
             kinds = {}
             for e in entries:
                 kind = e.entry_id.split("-")[0] if "-" in e.entry_id else e.entry_id.split()[0]
@@ -294,7 +294,7 @@ class TestEntryParsing(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             kdev = Path(tmp) / "memory"
             _write_fixture(kdev)
-            entries = export_md.collect_entries(kdev)
+            entries = distill.collect_entries(kdev)
             f001 = next(e for e in entries if e.entry_id == "F-001")
             self.assertEqual(f001.fields.get("subject"), "plugin:kdev-memory")
             self.assertEqual(f001.fields.get("subject_confidence"), "high")
@@ -313,7 +313,7 @@ class TestEntryParsing(unittest.TestCase):
                 日期：2026-04-15
                 status: scored
             """), encoding="utf-8")
-            entries = export_md.collect_entries(kdev)
+            entries = distill.collect_entries(kdev)
             old_step = [e for e in entries if e.entry_id == "Step 0"]
             self.assertEqual(len(old_step), 1)
             self.assertEqual(old_step[0].source_file, "执行日志-2026-04.md")
@@ -325,8 +325,8 @@ class TestFilters(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             kdev = Path(tmp) / "memory"
             _write_fixture(kdev)
-            entries = export_md.collect_entries(kdev)
-            misalign = [e for e in entries if export_md.is_misalignment_step(e)]
+            entries = distill.collect_entries(kdev)
+            misalign = [e for e in entries if distill.is_misalignment_step(e)]
             # 只有 Step 2 应该 PASS（差值 +2 ≥ 1.5），Step 1（0）和 Step 3（-1）不应该
             self.assertEqual(len(misalign), 1)
             self.assertEqual(misalign[0].entry_id, "Step 2")
@@ -335,8 +335,8 @@ class TestFilters(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             kdev = Path(tmp) / "memory"
             _write_fixture(kdev)
-            entries = export_md.collect_entries(kdev)
-            high = [e for e in entries if export_md.is_skill_feedback_high(e)]
+            entries = distill.collect_entries(kdev)
+            high = [e for e in entries if distill.is_skill_feedback_high(e)]
             # F-001 / F-002 / F-003 应该进（high）；F-004 不进（low + unknown）
             self.assertEqual(len(high), 3)
             ids = sorted(e.entry_id for e in high)
@@ -351,7 +351,7 @@ class TestFilters(unittest.TestCase):
             ("methodology:TDD", "methodology-tdd"),
         ]
         for subject, expected in cases:
-            self.assertEqual(export_md.subject_slug(subject), expected, f"failed for {subject}")
+            self.assertEqual(distill.subject_slug(subject), expected, f"failed for {subject}")
 
 
 class TestEndToEnd(unittest.TestCase):
@@ -362,7 +362,7 @@ class TestEndToEnd(unittest.TestCase):
             _write_fixture(kdev)
             out = Path(tmp) / "dataset"
 
-            stats = export_md.export_markdown_slices(kdev, out, do_sanitize=True)
+            stats = distill.export_markdown_slices(kdev, out, do_sanitize=True)
 
             # 文件齐全
             self.assertTrue((out / "dataset-full.md").is_file())
@@ -388,7 +388,7 @@ class TestEndToEnd(unittest.TestCase):
             kdev = Path(tmp) / "memory"
             _write_fixture(kdev)
             out = Path(tmp) / "dataset"
-            export_md.export_markdown_slices(kdev, out, do_sanitize=True)
+            distill.export_markdown_slices(kdev, out, do_sanitize=True)
             jsonl_files = list(out.rglob("*.jsonl"))
             self.assertEqual(jsonl_files, [], "出现了 .jsonl 文件，违反架构终态决策")
 
@@ -401,7 +401,7 @@ class TestEndToEnd(unittest.TestCase):
                 p.name: p.read_text(encoding="utf-8")
                 for p in kdev.glob("*.md")
             }
-            export_md.export_markdown_slices(kdev, kdev / "dataset", do_sanitize=True)
+            distill.export_markdown_slices(kdev, kdev / "dataset", do_sanitize=True)
             for name, content in before.items():
                 self.assertEqual(
                     (kdev / name).read_text(encoding="utf-8"),
@@ -423,8 +423,8 @@ class TestEndToEnd(unittest.TestCase):
                 ### 评分差异分析
                 差值：+2
             """), encoding="utf-8")
-            entries = export_md.collect_entries(kdev)
-            misalign = [e for e in entries if export_md.is_misalignment_step(e)]
+            entries = distill.collect_entries(kdev)
+            misalign = [e for e in entries if distill.is_misalignment_step(e)]
             self.assertEqual(misalign, [], "about=skill 的 Step 不应进 misalignment")
 
     def test_sanitize_in_export(self):
@@ -445,7 +445,7 @@ class TestEndToEnd(unittest.TestCase):
                 score: null
             """), encoding="utf-8")
             out = Path(tmp) / "dataset"
-            stats = export_md.export_markdown_slices(kdev, out, do_sanitize=True)
+            stats = distill.export_markdown_slices(kdev, out, do_sanitize=True)
 
             self.assertEqual(stats.sanitize_status, "verified")
             full = (out / "dataset-full.md").read_text(encoding="utf-8")

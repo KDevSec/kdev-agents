@@ -1,8 +1,12 @@
 #!/usr/bin/env python3
 """kdev-memory promote-list（v0.8 改写为 Python）
 
-给 /kdev-memory-promote slash command 调用：列出 .kdev/memory/ 下所有
+给 /kdev-memory-distill 命令的 promote 阶段调用：列出 .kdev/memory/ 下所有
 promote_status != done 的条目，附推荐沉淀去向。
+
+历史命令名 /kdev-memory-promote 已合并到 /kdev-memory-distill（2026-05-15）——
+promote（人工挑选 → docs/）和 dataset（全量打包 → .kdev/memory/dataset/）两步
+合一个命令，因为 markdown 既给人看也给机器看。
 
 最低 Python 版本：3.7。
 """
@@ -87,7 +91,7 @@ def main() -> int:
     today = date.today().isoformat()
     days = days_since_promote(kdev_dir)
 
-    print("# /kdev-memory-promote 候选列表")
+    print("# /kdev-memory-distill promote 阶段：沉淀候选列表")
     print("")
     print(f"- 扫描时间：{today}")
     print(f"- 距上次沉淀：{days} 天")

@@ -8,7 +8,7 @@
 
 **不引入 JSONL**——架构终态决策，markdown 主存 + markdown 切片包是直接喂蒸馏管道的形态。
 
-CLI：`python3 export_md.py [<kdev_dir>] [--out <dir>] [--no-sanitize]`
+CLI：`python3 distill.py [<kdev_dir>] [--out <dir>] [--no-sanitize]`
 - kdev_dir 默认 `.kdev/memory`
 - out 默认 `<kdev_dir>/dataset/`
 - --no-sanitize 仅用于测试 / debug，绝不应在分享数据集时使用
@@ -437,13 +437,13 @@ def main() -> int:
 
     kdev = Path(args.kdev_dir)
     if not kdev.is_dir():
-        print(f"[export_md] {kdev} 不存在或不是目录", file=sys.stderr)
+        print(f"[distill] {kdev} 不存在或不是目录", file=sys.stderr)
         return 2
 
     out = Path(args.out) if args.out else kdev / "dataset"
     stats = export_markdown_slices(kdev, out, do_sanitize=not args.no_sanitize)
 
-    print(f"# export_md 完成（{datetime.now().isoformat(timespec='seconds')}）")
+    print(f"# distill 完成（{datetime.now().isoformat(timespec='seconds')}）")
     print()
     print(f"**输出目录**：{out}")
     print()

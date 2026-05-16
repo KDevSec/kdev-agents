@@ -5,7 +5,7 @@
 - 用户在对话流里对外部 skill / 插件 / 工具 / 方法论 / 协作模式说出 5 类语义之一（RFE / 痛点 / bug / 表扬 / 困惑）
 - 用户给 Step 打分时夹带了 skill 反馈，触发评分裂解（详见 `references/subject-推断与评分裂解.md`）
 - 第一次写 F-NNN 条目，确认 schema 和铁规
-- 准备实现 `/kdev-memory-export-md` 的 `dataset-skill-feedback-by-subject/` 切片
+- 准备实现 `/kdev-memory-distill` 的 `dataset-skill-feedback-by-subject/` 切片
 
 ## 这个文件存在的原因
 

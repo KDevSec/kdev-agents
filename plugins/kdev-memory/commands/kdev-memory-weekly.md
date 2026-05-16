@@ -42,7 +42,7 @@ argument-hint: [无参数 | --from YYYY-MM-DD --to YYYY-MM-DD]
    - 补完下期展望：如果 `当前状态.md` 的"下一步"为空，从 Step 轨迹推演
    - 明确标记阻塞项（`unresolved_gotchas` 字段 + 未升规则的重复踩坑）
 
-3. **待沉淀候选（附录段）**：从 `/kdev-memory-promote` 视角扫描 pending 条目，给出 docs/ 去向建议
+3. **待沉淀候选（附录段）**：从 `/kdev-memory-distill` 视角扫描 pending 条目，给出 docs/ 去向建议
 4. **补完下期展望**（若 `当前状态.md` 不全）
 5. **落盘**：把最终周总结写入：
 
@@ -59,5 +59,5 @@ argument-hint: [无参数 | --from YYYY-MM-DD --to YYYY-MM-DD]
 - **严禁翻会话上下文**：只用 `.kdev/memory/` 源文件聚合，这是 kdev-memory 的铁规
 - **四段骨架不可删**：过程资产 / 经验总结 / 问题教训 / 开发进展 —— 这是汇报骨架，即便某段为空也要保留标题并标"（本期无信号）"
 - **经验/教训必须解释为什么**：例如不能只写 `Step 15 评分 4.5/5`，要写 `Step 15 评分 4.5/5 —— collector 双适配方案一次做通，差值 +0.5 说明方法论比预期更顺`
-- **待沉淀候选要给出去向建议**：参考 `/kdev-memory-promote` 的推荐表
+- **待沉淀候选要给出去向建议**：参考 `/kdev-memory-distill` 的推荐表
 - **不做 data 修改**：周总结是只读聚合，不改源条目 frontmatter

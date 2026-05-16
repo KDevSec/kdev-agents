@@ -140,9 +140,9 @@ def scan_promote_candidates(kdev_dir: str, today: str) -> str:
         return (
             f"  - 🔴 长期未沉淀（{days_since_promote} 天）：团队已长期未获本项目过程结晶\n"
             f"    · 改进建议 pending: {r_pending}；R-NNN: {rule_pending}；G-NNN: {g_pending}\n"
-            f"    · 执行 /kdev-memory-promote 查看沉淀候选并更新 .last-promote\n"
+            f"    · 执行 /kdev-memory-distill 查看沉淀候选并更新 .last-promote\n"
         )
     return (
         f"  - 📝 建议沉淀（{'；'.join(reasons)}）：\n"
-        f"    · 执行 /kdev-memory-promote 查看沉淀候选并写入 docs/ 产物通道\n"
+        f"    · 执行 /kdev-memory-distill 查看沉淀候选并写入 docs/ 产物通道\n"
     )

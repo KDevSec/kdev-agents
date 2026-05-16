@@ -130,7 +130,7 @@ Claude 看到工具不在可用列表，会自然降级，无需显式 detection
 
 ## 命令模板分支逻辑（hybrid 下 subagent / inline 下内联）
 
-`/kdev-memory-daily`、`/kdev-memory-weekly`、`/kdev-memory-export-md` 这三个命令的 command.md 模板应包含分支：
+`/kdev-memory-daily`、`/kdev-memory-weekly`、`/kdev-memory-distill` 这三个命令的 command.md 模板应包含分支：
 
 ```markdown
 读 .kdev/memory/config.yaml 取 record_mode（未配置默认 hybrid）。
