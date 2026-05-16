@@ -84,19 +84,85 @@ touch .kdev/memory/strict
 ### 周总结
 > "/kdev-memory-weekly" —— 滚动 7 天周总结（汇报四段骨架：过程资产/经验总结/问题教训/开发进展）
 
-## 六类记录
+## 七类记录
 
 | 触发时机 | 写入文件 | 编号 |
 |---------|---------|------|
 | 需人做决策（有歧义、多选项、不可逆） | 决策日志.md | Q-NNN |
 | 踩坑 / 绕路 / 报错 / 命令失败 | 踩坑日志.md | G-NNN（带 triggers）|
-| 每步/每里程碑完成 | 执行日志.md | Step N（双评分）|
+| 每步/每里程碑完成 | 执行日志.md | Step N（双评分 + about 字段）|
 | 用户当场反馈体验/规则 | 执行日志.md 评估区 | — |
 | 会话结束前 | 每日汇总/YYYY-MM-DD.md | — |
-| 评分差值 ≥ 2 或反复出现的感受信号 | 改进建议.md | R-NNN |
+| 项目内方法论反思（评分差值 ≥ 2 等） | 改进建议.md | R-NNN |
+| **对外部 skill/插件/工具的 5 类语义反馈**（RFE/痛点/bug/表扬/困惑） | **skill-feedback.md**【v0.10+】 | **F-NNN**（subject + verbatim 必填） |
 | 流程状态变更 | 当前状态.md | — |
 
-详细 schema 见 `skills/kdev-memory/references/六类记录-schema.md`。
+详细 schema 见 `skills/kdev-memory/references/六类记录-schema.md` 和 `skills/kdev-memory/references/skill-反馈通道-F.md`。
+
+## 知识蒸馏（v0.10+）
+
+`/kdev-memory-distill` 统一入口，按 subject 字段路由数据：
+
+```
+.kdev/memory/ 全量原始记录
+       ↓ 按 subject 路由
+       ├── subject = project           ──→ promote 阶段（人工挑选）
+       │   (项目内方法论 / 决策 /         ──→ docs/ 项目知识库
+       │    高分 Step / 高频踩坑)         ──→ 抽象成规则反哺项目
+       │
+       └── subject = skill:X / plugin:X ──→ dataset 阶段（自动打包）
+           tool:X / methodology:X        ──→ .kdev/memory/dataset/
+                                          ──→ 三个 markdown 切片包：
+                                             - dataset-full.md
+                                             - dataset-misalignment.md
+                                             - dataset-skill-feedback-by-subject/<slug>.md
+                                          ──→ 喂给对应 skill 维护方做自主进化
+```
+
+**不引入 JSONL**——markdown 主存 + markdown 切片包导出，现代蒸馏管道（Axolotl / Unsloth / HuggingFace SFT trainer）原生吃 markdown，多一层中间格式会丢失因果链 reasoning trace。导出含 sanitize（脱敏 email / 内部路径 / API key / Bearer / 私网 IP / 内部 URL）。
+
+详见 `skills/kdev-memory/references/markdown-切片导出.md`。
+
+### 自动蒸馏机制（v0.10+，auto / manual 两档）
+
+`.kdev/memory/config.yaml`：
+
+```yaml
+distill:
+  mode: auto                    # auto（默认）| manual
+  reminder_days: 7              # 时间阈值
+  reminder_new_f: 10            # F 新增条数阈值
+  reminder_new_misalign: 3      # misalign Step 新增条数阈值
+```
+
+**触发条件（AND 语义）**：距上次蒸馏 ≥ 7 天 **AND**（F 新增 ≥10 OR misalign 新增 ≥3 OR R 新增 ≥5）。
+
+- **`auto`（默认）**：SessionStart hook 检测满足时后台 `subprocess.Popen distill.py --auto-context --skip-promote`（detach 子进程不阻塞 hook），brief 注入"🤖 已开始后台自动蒸馏"
+- **`manual`**：仅 brief 注入"📋 建议蒸馏 + 跑 /kdev-memory-distill"
+- **promote 阶段永远不自动**（写 docs/ 是高风险动作）
+- **失败显式 WARN**：写 `WARN-distill-failed-*.md` 下次 SessionStart 显眼提醒（不静默）
+
+详见 `skills/kdev-memory/references/蒸馏触发机制.md`。
+
+### subject 三级自动推断（数据路由器，v0.10+）
+
+每条评分/反馈必须显式标记 subject：`project` / `skill:X` / `plugin:X` / `tool:X` / `methodology:X` / `collaboration:X` / `unknown`。**subject 由智能体自动推断**，绝不让用户从空白打字。
+
+- **L1 显式提及（~40%）**：用户原话直接说出名字 → 字符串匹配
+- **L2 上下文推断（~50%）**：当前 Step 内最近调用的 skill / hook 注入信号
+- **L3 候选 disambiguate（~10%）**：给 2-3 个候选选一个（不打字）
+
+**评分裂解**：用户给 Step 打分时夹带 skill 反馈（如"4 分但 X 太吵"），自动拆两条独立条目（Step 评分段 = project + F-NNN = skill），绝不塞同一条。
+
+推不出归 `unknown`（绝不默认归 project，避免污染项目评分子集）。
+
+详见 `skills/kdev-memory/references/subject-推断与评分裂解.md`。
+
+### subagent 落盘两档（v0.10+）
+
+`record_mode: hybrid`（默认）小高频留主会话内联 + 大单次（每日汇总 / weekly / distill）+ F-NNN 实体写入走 subagent；`record_mode: inline` 全部主会话内联。F-NNN 实体写入是 fire-and-forget 异步落盘最大杠杆点——让用户随口吐槽不打断对话。
+
+详见 `skills/kdev-memory/references/subagent-落盘机制.md`。
 
 ## Hook 行为（七层防线）
 
@@ -148,16 +214,26 @@ touch .kdev/memory/strict
     ├── 当前状态.md             # 工作状态单一真相源（YAML frontmatter）
     ├── 决策日志.md             # Q-NNN
     ├── 踩坑日志.md             # G-NNN（每条带 triggers: [...]）
-    ├── 执行日志.md             # Step N + 双评分 + triggers
+    ├── 执行日志.md             # Step N + 双评分 + about 字段 + triggers
     ├── 每日汇总/               # YYYY-MM-DD.md
-    ├── 改进建议.md             # R-NNN（不切档，保完整）
+    ├── 改进建议.md             # R-NNN（项目内方法论反思）
+    ├── skill-feedback.md      # 【v0.10+】F-NNN（对外部 skill / 插件 / 工具 / 方法论反馈，verbatim 原话）
     ├── 方法论铁规.md           # 可选
+    ├── config.yaml            # 【v0.10+】record_mode（hybrid/inline）+ distill.mode（auto/manual）+ 阈值
+    ├── dataset/               # 【v0.10+】/kdev-memory-distill 产出（gitignored）
+    │   ├── dataset-full.md
+    │   ├── dataset-misalignment.md
+    │   └── dataset-skill-feedback-by-subject/
+    │       └── <slug>.md
     ├── 归档/                   # 长项目切档产物
     │   ├── 执行日志-YYYY-MM.md
     │   ├── 踩坑日志-YYYYQN.md
     │   └── 决策日志-YYYYQN.md
     ├── strict                  # 启用 Strict 阻塞
+    ├── .last-distill           # 【v0.10+】上次蒸馏时间戳（兼容老项目 .last-promote）
+    ├── .last-distill-auto      # 【v0.10+】上次自动蒸馏标记（24h 内 brief 注入"完成于 X"）
     ├── WARN-未记录-*.md        # SessionEnd 兜底
+    ├── WARN-distill-failed-*.md  # 【v0.10+】自动蒸馏失败兜底（手处理后删除）
     ├── state/                  # hook 运行时状态
     │   └── trigger-sessions.json
     └── checkpoints/            # PreCompact 快照（7 天 retention）

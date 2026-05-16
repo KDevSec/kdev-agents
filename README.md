@@ -6,7 +6,7 @@ KDev 系列 Claude Code 插件集合 —— 工程记忆、流程辅助、代码
 
 | 插件 | 说明 |
 |-----|------|
-| [kdev-memory](plugins/kdev-memory) | 工程记忆制度：实时落盘决策/踩坑/执行/评分，七层 hook 兜会话续航 + 按月/按季度归档 |
+| [kdev-memory](plugins/kdev-memory) | 工程记忆制度：实时落盘 Q/G/Step/双评分 + F-NNN skill 反馈（verbatim 原话不可改写）+ subject 三级自动推断（L1/L2/L3 + 评分裂解）+ `/kdev-memory-distill` 统一蒸馏入口（promote 沉淀 docs/ 反哺项目 + dataset 切片喂 skill 维护方）+ 自动蒸馏（auto 默认 + 7 天/数据增长 AND 阈值触发，SessionStart 后台 Popen + 失败 WARN）+ subagent 落盘 hybrid/inline 两档 + 七层 hook + 按月/季度归档 |
 | [kdev-commit](plugins/kdev-commit) | AI commit + push 一体化：AI 用 `<name>-AI` 身份提交，push 前弹 IDE 权限框让用户确认 |
 | [kdev-secure-coding](plugins/kdev-secure-coding) | 公司安全编码规范 skill 集合：description 触发 + CLAUDE.md 锚点兜底 + 编码期按需查阅 + 完成前 8 类清单核对。当前含 python-security-coding，规划 Java / C |
 | [kdev-code-graph](plugins/kdev-code-graph) | 语义级代码图谱：需求追溯、变更爆炸半径分析、文档-代码同步检查，支持 Markdown 和图片解析 |
