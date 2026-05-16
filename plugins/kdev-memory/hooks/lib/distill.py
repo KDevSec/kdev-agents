@@ -423,6 +423,30 @@ def export_markdown_slices(
     return stats
 
 
+def _write_failure_warn(kdev: Path, error_msg: str, ctx: str = "auto") -> Path:
+    """蒸馏失败时写 WARN-distill-failed-*.md，下次 SessionStart brief 显眼提醒。
+
+    格式：跟 SessionEnd 的 WARN-未记录-*.md 一致（顶层 .kdev/memory/ 文件，glob 扫描可见）。
+    """
+    ts = datetime.now().strftime("%Y-%m-%dT%H-%M-%S")
+    warn_path = kdev / f"WARN-distill-failed-{ts}.md"
+    body = (
+        f"# 蒸馏失败警告（{ctx}）\n\n"
+        f"时间：{datetime.now().isoformat(timespec='seconds')}\n"
+        f"触发场景：{ctx}（auto = 后台自动跑 / manual = 用户主动跑）\n\n"
+        f"## 错误信息\n\n```\n{error_msg}\n```\n\n"
+        f"## 处理建议\n\n"
+        f"1. 看上面错误信息定位原因（常见：fixture 解析失败 / 写盘权限 / sanitize 漏脱）\n"
+        f"2. 修复后手动跑：`python3 ${{CLAUDE_PLUGIN_ROOT}}/hooks/lib/distill.py`\n"
+        f"3. 跑成功后删除本 WARN 文件\n"
+    )
+    try:
+        warn_path.write_text(body, encoding="utf-8")
+    except OSError:
+        pass
+    return warn_path
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(
         description="kdev-memory markdown 切片导出（决策 3：不引入 JSONL）",
@@ -433,6 +457,14 @@ def main() -> int:
         "--no-sanitize", action="store_true",
         help="跳过 PII 脱敏（仅测试/debug 用，分享数据集前严禁开）",
     )
+    parser.add_argument(
+        "--auto-context", action="store_true",
+        help="标记本次是自动触发（影响 WARN 文件命名 + .last-distill-auto 标记）",
+    )
+    parser.add_argument(
+        "--skip-promote", action="store_true",
+        help="占位参数（distill.py 本身只跑 dataset 阶段，promote 由命令模板处理；保留参数兼容命令模板传入）",
+    )
     args = parser.parse_args()
 
     kdev = Path(args.kdev_dir)
@@ -441,7 +473,16 @@ def main() -> int:
         return 2
 
     out = Path(args.out) if args.out else kdev / "dataset"
-    stats = export_markdown_slices(kdev, out, do_sanitize=not args.no_sanitize)
+    ctx = "auto" if args.auto_context else "manual"
+
+    try:
+        stats = export_markdown_slices(kdev, out, do_sanitize=not args.no_sanitize)
+    except Exception as e:
+        # 失败时写 WARN 文件，让下次 SessionStart 能显眼提醒
+        warn = _write_failure_warn(kdev, f"{type(e).__name__}: {e}", ctx=ctx)
+        print(f"[distill] 失败：{e}", file=sys.stderr)
+        print(f"[distill] 已写 WARN：{warn}", file=sys.stderr)
+        return 4
 
     print(f"# distill 完成（{datetime.now().isoformat(timespec='seconds')}）")
     print()
@@ -468,7 +509,17 @@ def main() -> int:
         print("⚠️ 漏脱（请检查 sanitize 规则）：")
         for name, snippet in stats.leaks[:10]:
             print(f"- {name}: {snippet[:60]}")
-    return 0 if stats.sanitize_status != "leaks_found" else 3
+
+    # 成功时 touch 蒸馏时间戳（auto 模式额外 touch .last-distill-auto 标记）
+    if stats.sanitize_status != "leaks_found":
+        try:
+            (kdev / ".last-distill").touch()
+            if args.auto_context:
+                (kdev / ".last-distill-auto").touch()
+        except OSError as e:
+            print(f"[distill] 警告：无法 touch .last-distill：{e}", file=sys.stderr)
+        return 0
+    return 3
 
 
 if __name__ == "__main__":

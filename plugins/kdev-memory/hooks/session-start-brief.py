@@ -32,6 +32,7 @@ from frontmatter import read_state_field  # noqa: E402
 from missing_summaries import list_missing_past_summaries  # noqa: E402
 from worktree_link import worktree_link_kdev  # noqa: E402
 from promote_scan import scan_promote_candidates  # noqa: E402
+from distill_trigger import check_distill_trigger  # noqa: E402
 
 SUPPRESS = json.dumps({"continue": True, "suppressOutput": True})
 
@@ -124,6 +125,75 @@ def _claude_md_drift_hint() -> str:
         return ""
 
 
+def _distill_hint(kdev_dir: Path) -> str:
+    """蒸馏触发提醒（详见 references/蒸馏触发机制.md）。
+
+    - mode=auto + should_trigger → 后台 Popen 跑 distill.py --auto-context；
+      brief 注入 "已开始后台自动蒸馏"
+    - mode=manual + should_trigger → brief 注入 "建议蒸馏：[原因]，跑 /kdev-memory-distill"
+    - mode=auto 且 .last-distill-auto 在最近 24h 内 → brief 注入 "上次自动蒸馏完成于 X"
+    - 否则返回空字符串（不注入）
+
+    失败时不抛错（hook 必须健壮）：返回空字符串。
+    """
+    try:
+        check = check_distill_trigger(kdev_dir)
+    except Exception:
+        return ""
+
+    # 检查是否有最近的自动蒸馏成功标记
+    auto_marker = kdev_dir / ".last-distill-auto"
+    recent_auto_msg = ""
+    if auto_marker.is_file():
+        try:
+            mtime = auto_marker.stat().st_mtime
+            import time
+            age_hours = (time.time() - mtime) / 3600
+            if age_hours <= 24:
+                from datetime import datetime
+                when = datetime.fromtimestamp(mtime).strftime("%Y-%m-%d %H:%M")
+                recent_auto_msg = (
+                    f"  - 🤖 上次自动蒸馏完成于 {when}（数据集在 .kdev/memory/dataset/）"
+                )
+        except OSError:
+            pass
+
+    if not check.should_trigger:
+        # 不触发但仍要把最近的自动蒸馏标记露出来
+        return recent_auto_msg
+
+    reasons_str = "；".join(check.reasons) if check.reasons else "阈值满足"
+
+    if check.mode == "auto":
+        # auto 模式：后台 Popen 跑 distill.py，不阻塞 hook
+        try:
+            import subprocess
+            distill_lib = SCRIPT_DIR / "lib" / "distill.py"
+            if distill_lib.is_file():
+                subprocess.Popen(
+                    [sys.executable, str(distill_lib), str(kdev_dir), "--auto-context"],
+                    stdout=subprocess.DEVNULL,
+                    stderr=subprocess.DEVNULL,
+                    start_new_session=True,  # detach 子进程，hook 立刻可返回
+                )
+                msg = (
+                    f"  - 🤖 **已开始后台自动蒸馏**（{reasons_str}）—— "
+                    f"结果将在 .kdev/memory/dataset/，失败时会写 WARN-distill-failed-*.md。"
+                    f"\n    （如不希望自动跑，可在 .kdev/memory/config.yaml 写 `distill.mode: manual`）"
+                )
+                return msg + ("\n" + recent_auto_msg if recent_auto_msg else "")
+        except Exception:
+            # Popen 失败 → 降级为 manual 提醒
+            pass
+
+    # manual 模式 或 auto Popen 失败 → 仅提醒
+    msg = (
+        f"  - 📋 **建议蒸馏**（{reasons_str}）—— "
+        f"跑 `/kdev-memory-distill` 把项目记录沉淀到 docs/ + 打包到 .kdev/memory/dataset/"
+    )
+    return msg + ("\n" + recent_auto_msg if recent_auto_msg else "")
+
+
 def _step_hint(log_file: Path, today: str) -> str:
     """跑 step_completeness.run_check + format_hint_for_brief。"""
     lint_lib = LIB_DIR / "step_completeness.py"
@@ -153,6 +223,7 @@ def _build_brief(
     drift_hint: str,
     step_hint: str,
     promote_hint: str,
+    distill_hint: str,
     state_phase: str,
     state_iter: str,
     state_step: str,
@@ -188,6 +259,8 @@ def _build_brief(
         p1_lines.append(step_hint)
     if promote_hint:
         p1_lines.append(promote_hint.rstrip("\n"))
+    if distill_hint:
+        p1_lines.append(distill_hint.rstrip("\n"))
 
     # P2: checkpoint references
     for c in checkpoint_files:
@@ -292,6 +365,7 @@ def main() -> int:
     drift_hint = _claude_md_drift_hint()
     step_hint = _step_hint(log_file, today)
     promote_hint = scan_promote_candidates(str(kdev_dir), today)
+    distill_hint = _distill_hint(kdev_dir)
 
     state_phase = read_state_field("phase")
     state_iter = read_state_field("iteration")
@@ -316,6 +390,7 @@ def main() -> int:
         drift_hint=drift_hint,
         step_hint=step_hint,
         promote_hint=promote_hint,
+        distill_hint=distill_hint,
         state_phase=state_phase,
         state_iter=state_iter,
         state_step=state_step,
