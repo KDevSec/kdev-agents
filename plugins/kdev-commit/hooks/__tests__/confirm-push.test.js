@@ -80,3 +80,32 @@ test('T3: env=off + git push --force 仍不弹框（off 即全关）', () => {
   });
   assert.equal(out.stdout, '', `期望静默但 stdout=${out.stdout}`);
 });
+
+test('T4: env=warn-force + 普通 push 不弹框', () => {
+  const out = runHook({
+    cmd: 'git push',
+    env: { KDEV_COMMIT_PUSH_CONFIRM: 'warn-force' },
+  });
+  assert.equal(out.stdout, '');
+});
+
+test('T5: env=warn-force + git push --force 弹框', () => {
+  const out = runHook({
+    cmd: 'git push --force',
+    env: { KDEV_COMMIT_PUSH_CONFIRM: 'warn-force' },
+  });
+  assert.ok(asksForConfirm(out), `期望弹框但 stdout=${out.stdout}`);
+  assert.match(
+    out.parsed.hookSpecificOutput.permissionDecisionReason,
+    /--force/,
+    '弹框 reason 应包含 --force 警告'
+  );
+});
+
+test('T6: env=warn-force + git push --force-with-lease 不弹框', () => {
+  const out = runHook({
+    cmd: 'git push --force-with-lease',
+    env: { KDEV_COMMIT_PUSH_CONFIRM: 'warn-force' },
+  });
+  assert.equal(out.stdout, '');
+});
