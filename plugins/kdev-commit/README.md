@@ -9,7 +9,7 @@ AI commit + push 一体化插件：skill 引导 AI 按正确身份 commit、hook
 1. **作者混淆**：人工 commit 和 AI 代写 commit 的作者信息一模一样，`git log` / `git blame` / code review 都分不清
 2. **推送失控**：AI 可能在用户没明确同意的情况下把代码推到远端
 
-## 核心机制（v0.2.0）
+## 核心机制
 
 ### 1. skill：`kdev-commit`
 
@@ -31,6 +31,34 @@ AI commit + push 一体化插件：skill 引导 AI 按正确身份 commit、hook
 ### 4. 运行时动态派生 AI 身份
 
 hook 不硬编码任何值。每次触发时读当前仓库的 `git config user.name` / `user.email`（遵守 local > global > system 优先级）。团队成员换名字 / 不同项目用不同身份都自动适配，无需重装。
+
+### 5. 可配置 push 弹窗（v0.3.0+）
+
+默认每次 push 都弹 IDE 权限框（"两道 gate"）。成熟用户可关掉 IDE 那道，节省一次点击。**对话层那道永远在**：AI 仍由 SKILL.md 约束不擅自 push。
+
+三档：
+
+| 值 | 行为 |
+|---|---|
+| `ask`（默认） | 所有 push 弹框 |
+| `warn-force` | 仅裸 `--force`（非 `--force-with-lease`）弹框，普通 push 静默 |
+| `off` | 完全不弹框（含 `--force`；要保留 `--force` gate 请用 `warn-force`） |
+
+两个配置通道（**env 优先级高于文件**）：
+
+```bash
+# 临时切换（当前 shell 生效）
+export KDEV_COMMIT_PUSH_CONFIRM=warn-force
+
+# 持久化（Linux/macOS）
+mkdir -p ~/.config/kdev-commit
+echo '{"pushConfirm":"warn-force"}' > ~/.config/kdev-commit/config.json
+
+# Windows
+# %APPDATA%/kdev-commit/config.json
+```
+
+配置错误（JSON 损坏 / 非法值 / 文件不存在）→ 静默回落到 `ask`（默认行为），不影响 push 流程。
 
 ### 零外部依赖
 
