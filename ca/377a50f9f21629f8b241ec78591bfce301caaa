@@ -1,0 +1,21 @@
+docs/superpowers/plans/2026-05-18-kdev-commit-push-confirm-config.md
+  s_5398f92390df94::t_292bb77aadcfd1 1-668,670-677,679-680,682-708
+  s_5398f92390df94::t_ce424b7c0609fa 669
+  s_5398f92390df94::t_0c9e4a53fef577 678,681
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "ca377a50f9f21629f8b241ec78591bfce301caaa",
+  "prompts": {},
+  "sessions": {
+    "s_5398f92390df94": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "462f7353-3d09-48c9-bf84-c60de6caaf57",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
