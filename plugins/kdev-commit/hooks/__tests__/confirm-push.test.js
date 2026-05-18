@@ -64,3 +64,19 @@ test('T1: 默认（env 未设、文件不存在）git push 应弹框', () => {
   const out = runHook({ cmd: 'git push' });
   assert.ok(asksForConfirm(out), `期望弹框但 stdout=${out.stdout}`);
 });
+
+test('T2: env=off + git push 不弹框', () => {
+  const out = runHook({
+    cmd: 'git push',
+    env: { KDEV_COMMIT_PUSH_CONFIRM: 'off' },
+  });
+  assert.equal(out.stdout, '', `期望静默但 stdout=${out.stdout}`);
+});
+
+test('T3: env=off + git push --force 仍不弹框（off 即全关）', () => {
+  const out = runHook({
+    cmd: 'git push --force',
+    env: { KDEV_COMMIT_PUSH_CONFIRM: 'off' },
+  });
+  assert.equal(out.stdout, '', `期望静默但 stdout=${out.stdout}`);
+});

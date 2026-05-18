@@ -3,8 +3,37 @@
 // PreToolUse/Bash hook. Emits permissionDecision="ask" so Claude Code
 // surfaces a one-click allow/deny dialog.
 // --force (without -with-lease) is flagged in the reason.
+// v0.3.0+: KDEV_COMMIT_PUSH_CONFIRM env / ~/.config/kdev-commit/config.json
+//          three-level config (off / warn-force / ask). SKILL.md 仍硬约束 AI
+//          不擅自 push——hook 关只关 IDE 弹窗，对话层 gate 永在。
 
 'use strict';
+
+const fs = require('fs');
+const path = require('path');
+const os = require('os');
+
+const VALID_MODES = new Set(['off', 'warn-force', 'ask']);
+
+function getConfigPath() {
+  if (process.platform === 'win32') {
+    const base = process.env.APPDATA || path.join(os.homedir(), 'AppData', 'Roaming');
+    return path.join(base, 'kdev-commit', 'config.json');
+  }
+  return path.join(os.homedir(), '.config', 'kdev-commit', 'config.json');
+}
+
+function readMode() {
+  const env = process.env.KDEV_COMMIT_PUSH_CONFIRM;
+  if (env && VALID_MODES.has(env)) return env;
+
+  try {
+    const data = JSON.parse(fs.readFileSync(getConfigPath(), 'utf8'));
+    if (data && VALID_MODES.has(data.pushConfirm)) return data.pushConfirm;
+  } catch { /* 静默回落 */ }
+
+  return 'ask';
+}
 
 function readStdin() {
   return new Promise((resolve) => {
@@ -29,8 +58,12 @@ function readStdin() {
     return;
   }
 
-  // 只警告裸 --force；--force-with-lease 等变体不警告
+  const mode = readMode();
   const hasBareForce = /(^|\s)--force(\s|$)/.test(cmd);
+
+  if (mode === 'off') return;
+  if (mode === 'warn-force' && !hasBareForce) return;
+
   const warn = hasBareForce
     ? '\n警告：包含 --force（非 --force-with-lease），可能覆盖远端历史。'
     : '';
