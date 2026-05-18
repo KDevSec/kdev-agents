@@ -59,7 +59,8 @@ function readStdin() {
   }
 
   const mode = readMode();
-  const hasBareForce = /(^|\s)--force(\s|$)/.test(cmd);
+  // 裸强推：`--force`（后面不接 `-`，区分 `--force-with-lease`）或短别名 `-f`
+  const hasBareForce = /(^|\s)(--force(?!-)(\s|$)|-f(\s|$))/.test(cmd);
 
   if (mode === 'off') return;
   if (mode === 'warn-force' && !hasBareForce) return;

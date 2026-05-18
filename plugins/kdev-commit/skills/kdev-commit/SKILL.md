@@ -12,8 +12,8 @@ description: 用 AI 身份（本地 git user.name + -AI 后缀，email 沿用本
 **这个 skill 不管**：
 - commit message 的具体模板（跟项目 commit 历史风格走）
 - commit 粒度（用户说怎么分就怎么分，不主动拆/合）
-- push 的权限弹窗（confirm-push.sh hook 处理）
-- 身份校验失败的兜底（block-unattributed-commit.sh hook 处理）
+- push 的权限弹窗（confirm-push.js hook 处理）
+- 身份校验失败的兜底（block-unattributed-commit.js hook 处理）
 
 ## 身份策略（v0.2.0）
 

@@ -110,6 +110,22 @@ test('T6: env=warn-force + git push --force-with-lease 不弹框', () => {
   assert.equal(out.stdout, '');
 });
 
+test('T5b: env=warn-force + git push -f（短别名）弹框', () => {
+  const out = runHook({
+    cmd: 'git push -f',
+    env: { KDEV_COMMIT_PUSH_CONFIRM: 'warn-force' },
+  });
+  assert.ok(asksForConfirm(out), `期望弹框（-f 是 --force 短别名）但 stdout=${out.stdout}`);
+});
+
+test('T5c: env=warn-force + git push -f origin main 弹框', () => {
+  const out = runHook({
+    cmd: 'git push -f origin main',
+    env: { KDEV_COMMIT_PUSH_CONFIRM: 'warn-force' },
+  });
+  assert.ok(asksForConfirm(out));
+});
+
 test('T7: env=ask + file=off → env 赢，弹框', () => {
   const out = runHook({
     cmd: 'git push',
