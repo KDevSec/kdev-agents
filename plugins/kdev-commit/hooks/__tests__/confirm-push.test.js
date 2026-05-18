@@ -109,3 +109,20 @@ test('T6: env=warn-force + git push --force-with-lease 不弹框', () => {
   });
   assert.equal(out.stdout, '');
 });
+
+test('T7: env=ask + file=off → env 赢，弹框', () => {
+  const out = runHook({
+    cmd: 'git push',
+    env: { KDEV_COMMIT_PUSH_CONFIRM: 'ask' },
+    configContent: JSON.stringify({ pushConfirm: 'off' }),
+  });
+  assert.ok(asksForConfirm(out), `期望弹框（env 优先）但 stdout=${out.stdout}`);
+});
+
+test('T7b: env 未设 + file=off → file 生效，不弹框', () => {
+  const out = runHook({
+    cmd: 'git push',
+    configContent: JSON.stringify({ pushConfirm: 'off' }),
+  });
+  assert.equal(out.stdout, '', '期望 file=off 生效');
+});
