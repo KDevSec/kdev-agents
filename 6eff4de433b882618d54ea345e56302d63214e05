@@ -1,0 +1,19 @@
+scripts/sync-to-dist.sh
+  s_615f5c799328e4::t_751c7a1b14662f 1-53
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.4",
+  "base_commit_sha": "6eff4de433b882618d54ea345e56302d63214e05",
+  "prompts": {},
+  "sessions": {
+    "s_615f5c799328e4": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f2c92eab-0c92-43de-b1ff-181caab6f6d0",
+        "model": "glm-5"
+      },
+      "human_author": "liyong <ly1989abc@126.com>"
+    }
+  }
+}
