@@ -1,0 +1,19 @@
+plugins/kdev-commit/hooks/__tests__/confirm-push.test.js
+  s_5398f92390df94::t_5e02349eb9b2c1 83-111
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "b280348eb088ac8b637d9b6f3ece78beb28db9fe",
+  "prompts": {},
+  "sessions": {
+    "s_5398f92390df94": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "462f7353-3d09-48c9-bf84-c60de6caaf57",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
