@@ -1,0 +1,19 @@
+plugins/kdev-commit/.claude-plugin/plugin.json
+  s_5398f92390df94::t_b5f4031d4ed034 4
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "4892aaab88471c8b86be3b0abf383377faa3ad24",
+  "prompts": {},
+  "sessions": {
+    "s_5398f92390df94": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "462f7353-3d09-48c9-bf84-c60de6caaf57",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
