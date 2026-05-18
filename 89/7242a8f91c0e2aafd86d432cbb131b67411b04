@@ -1,0 +1,23 @@
+plugins/kdev-commit/hooks/__tests__/run-tests.sh
+  s_5398f92390df94::t_f90f3066038ab0 1-4
+  s_5398f92390df94::t_0a131812f134e4 5
+plugins/kdev-commit/hooks/__tests__/confirm-push.test.js
+  s_5398f92390df94::t_1869afc8afab09 39
+  s_5398f92390df94::t_135e8416f39ba9 1-38,40-66
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "897242a8f91c0e2aafd86d432cbb131b67411b04",
+  "prompts": {},
+  "sessions": {
+    "s_5398f92390df94": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "462f7353-3d09-48c9-bf84-c60de6caaf57",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
