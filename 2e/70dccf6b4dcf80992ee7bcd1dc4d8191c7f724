@@ -1,0 +1,20 @@
+plugins/kdev-commit/README.md
+  s_5398f92390df94::t_7ac28d437b8c84 12
+  s_5398f92390df94::t_ff14f68ff34eba 35-62
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "2e70dccf6b4dcf80992ee7bcd1dc4d8191c7f724",
+  "prompts": {},
+  "sessions": {
+    "s_5398f92390df94": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "462f7353-3d09-48c9-bf84-c60de6caaf57",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
