@@ -126,3 +126,51 @@ test('T7b: env 未设 + file=off → file 生效，不弹框', () => {
   });
   assert.equal(out.stdout, '', '期望 file=off 生效');
 });
+
+test('T8: 配置文件 JSON 损坏 → 回落 ask，弹框，不崩溃', () => {
+  const out = runHook({
+    cmd: 'git push',
+    configContent: '{ this is not valid json',
+  });
+  assert.ok(asksForConfirm(out), `期望弹框（回落 ask）但 stdout=${out.stdout}`);
+  assert.equal(out.status, 0, 'hook 应正常退出（不崩溃）');
+});
+
+test('T9: env 非法值（"yes"） → 回落到 file/default，弹框', () => {
+  const out = runHook({
+    cmd: 'git push',
+    env: { KDEV_COMMIT_PUSH_CONFIRM: 'yes' },
+  });
+  assert.ok(asksForConfirm(out));
+});
+
+test('T9b: file 字段非法值（"yes"） → 回落 ask', () => {
+  const out = runHook({
+    cmd: 'git push',
+    configContent: JSON.stringify({ pushConfirm: 'yes' }),
+  });
+  assert.ok(asksForConfirm(out));
+});
+
+test('T9c: file 缺少 pushConfirm 字段 → 回落 ask', () => {
+  const out = runHook({
+    cmd: 'git push',
+    configContent: JSON.stringify({ unrelated: 'value' }),
+  });
+  assert.ok(asksForConfirm(out));
+});
+
+test('不破坏验证: 非 git push 命令（如 git status）→ 不拦截', () => {
+  const out = runHook({
+    cmd: 'git status',
+    env: { KDEV_COMMIT_PUSH_CONFIRM: 'ask' },
+  });
+  assert.equal(out.stdout, '');
+});
+
+test('不破坏验证: 名字像 push 的别的命令（npm run push:foo）不拦截', () => {
+  const out = runHook({
+    cmd: 'npm run push:foo',
+  });
+  assert.equal(out.stdout, '');
+});
