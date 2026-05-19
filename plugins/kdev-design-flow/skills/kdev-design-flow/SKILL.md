@@ -201,27 +201,33 @@ grep -qE "^/?\.kdev/design-flow/?$" .gitignore || echo "/.kdev/design-flow/" >> 
 
 ## Stage 3: 原型设计（frontend-design）
 
-1. Read 上一步的 AR 用户故事
-2. 调 `Skill` 工具，name=`frontend-design:frontend-design`，提示词模板：
+> ⚠️ **反发散原则**：本 stage 容易"发散"——frontend-design 是通用前端设计 skill，不知道项目宪法。
+> **MUST** 在调它之前把项目宪法里的前端规范 + 设计系统参考显式注入到 prompt 中；
+> 不要假定 frontend-design 会自己去翻 `.specify/memory/constitution.md`。
 
-```
-为下面这组用户故事设计一个高保真原型（HTML/CSS/必要的 JS），目标是评审用，不是生产用。
+### 步骤 0：抽取项目宪法 UI 约束（**不可跳过**）
 
-用户故事：
-<<<
-{{paste ar content}}
->>>
+1. **探测宪法文件**：检查 `.specify/memory/constitution.md` 是否存在
+   - 存在 → Read 全文，提取所有提及以下关键词的段落（含上下文）：
+     `前端 / 视觉 / 原型 / UI / UED / token / 栅格 / 字号 / 字阶 / 行高 / 间距 / 颜色 / 对比度 / 字体 / 画板 / 8px / 24 列 / hex / px`
+   - 不存在 → `{{constitution_ui_block}}` 填入"⚠️ 本仓库未声明 `.specify/memory/constitution.md`，无项目级前端宪法约束。frontend-design 按通用 Web 设计最佳实践输出即可，但 Gate 2 评审将以宪法不存在为前提，不会扣分。"
 
-约束：
-- 可在浏览器直接打开（单 HTML 文件或带 index.html 的目录）
-- 涵盖核心交互路径（不需要每个 edge case 都画）
-- 视觉语言要和产品语境匹配（不要是默认浏览器原生灰色按钮）
-- 不要内嵌真实凭证 / 内部 URL / 敏感数据
-- 输出落盘到 `.kdev/design-flow/<slug>/stage-3-prototype/iter-<iter>/`
-```
+2. **探测设计系统参考目录**（用 glob 扫，全部相对仓库根）：
+   - `references/*ued*/`、`references/*UED*/`、`references/04-ued*/`
+   - `references/*design-system*/`、`references/*design-tokens*/`、`docs/design-system/`
+   - 任何在宪法中被显式引用为"前端实现唯一权威来源"的路径
+   - 命中的所有目录路径列表 → 填入 `{{design_system_refs_block}}`，并明确告诉 frontend-design **Read 这些目录里的 AGENTS.md / README.md / tokens 文件后再动笔**
+   - 都没命中 → `{{design_system_refs_block}}` 填入"（项目无独立设计系统目录；以宪法 UI 约束段为准）"
 
-3. frontend-design 完成后，确认产物在 `.kdev/design-flow/<slug>/stage-3-prototype/iter-<iter>/`，至少有 `index.html`。如果不在，用 `mv` 移过来。
-4. **进入 Gate 2**（共评 AR + 原型；评审 prompt 把 stage-2-ar 和 stage-3-prototype 的产物都喂进去）
+3. **抽取"前端实现唯一权威来源"路径**（若宪法显式声明，如 `references/04-ued6.0/`），追加进 `{{design_system_refs_block}}`，标注"⚠️ 宪法已声明此目录为唯一权威来源，原型 MUST 与其一致"。
+
+### 步骤 1：填充并调用 frontend-design
+
+1. Read `references/stage3-prototype-prompt.md`
+2. 把模板中的 `{{ar_content}}` / `{{constitution_ui_block}}` / `{{design_system_refs_block}}` / `{{slug}}` / `{{iter}}` / `{{prev_iter}}` 占位符**全部填好**（不允许保留空占位符发给 frontend-design）
+3. 调 `Skill` 工具，name=`frontend-design:frontend-design`，把**填充完的 prompt 全文**作为 args 传入
+4. frontend-design 完成后，确认产物在 `.kdev/design-flow/<slug>/stage-3-prototype/iter-<iter>/`，至少有 `index.html` + `self-check.md`。如果不在，用 `mv` 移过来；如果 `self-check.md` 缺失，记录到 flow-state.json 的 `history` 数组里（`stage3_selfcheck_missing: true`），Gate 2 评审会据此扣分但不阻断。
+5. **进入 Gate 2**（共评 AR + 原型；评审 prompt 把 stage-2-ar 和 stage-3-prototype 的产物 + 步骤 0 抽出的宪法约束块都喂进去）
 
 ## Stage 4: 实现方案设计（spec-kit:plan）
 

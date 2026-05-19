@@ -55,6 +55,13 @@ REVISIONS (only if FAIL):
 - C-2.3: 原型涵盖 AR 中的核心交互路径
 - C-2.4: 原型未包含真实凭证 / 内部 URL / 敏感数据
 - C-2.5: 原型样式与产品语境匹配（不是默认浏览器灰色按钮）
+- **C-2.6: 项目宪法 UI 约束遵从**（若 `.specify/memory/constitution.md` 存在）：
+  - 原型 MUST 使用宪法中显式声明的具体数值（字号 / 行高 / 栅格 / 间距 / 画板宽度等）
+  - 原型 MUST 使用 token 化的颜色（CSS 变量或宪法明列的色板），未授权的裸 `#hex` 不允许
+  - 原型 MUST 满足宪法声明的对比度阈值（如 AAA ≥ 7:1）
+  - 若宪法显式声明"前端实现唯一权威来源"目录（如 `references/04-ued6.0/`），原型 MUST 与之一致（命名 / 组件层级 / 视觉 token）
+  - 若 frontend-design 产出的 `self-check.md` 缺失或自检失败项 ≥ 2 → 本条 FAIL
+  - 宪法不存在 → 本条标记 `N/A`，不影响 PASS 判定
 
 ### Stage 4 (设计方案 — 这是 Gate 3)
 
