@@ -1,0 +1,26 @@
+plugins/kdev-code-graph/ingestor/kdev_ingestor/graph_io.py
+  s_4c902eb1423154::t_63cbd1d103082b 146-152
+  s_4c902eb1423154::t_fa75455e04e99e 159-164
+  s_4c902eb1423154::t_0342d573715b03 55-61
+  s_4c902eb1423154::t_4983344d83d4de 127
+  s_4c902eb1423154::t_39cf308a8b1585 156-157
+  s_4c902eb1423154::t_77832a1905d898 86-94,98-99,103-104
+plugins/kdev-code-graph/ingestor/tests/test_graph_io_perf.py
+  s_4c902eb1423154::t_f7b925d14d33c2 1-81
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "1bfddee7fe114dab5d9fdc353e5d1a02931b3e2d",
+  "prompts": {},
+  "sessions": {
+    "s_4c902eb1423154": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5a4386c9-1d3d-4ad5-a727-15ea02304ca3",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
