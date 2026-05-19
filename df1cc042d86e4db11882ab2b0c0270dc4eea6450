@@ -1,0 +1,21 @@
+plugins/kdev-test-points-v1/skills/kdev-test-points-v1/SKILL.md
+  s_7714c5d4e50790::t_64c9088945ead2 3-4
+plugins/kdev-test-cases-v1/skills/kdev-test-cases-v1/SKILL.md
+  s_7714c5d4e50790::t_52249c95a8a889 3-4
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.9",
+  "base_commit_sha": "df1cc042d86e4db11882ab2b0c0270dc4eea6450",
+  "prompts": {},
+  "sessions": {
+    "s_7714c5d4e50790": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "9f4cd65a-2815-48e9-b239-97384555ac74",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "doudoudou-dou <82752251@qq.com>"
+    }
+  }
+}
