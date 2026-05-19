@@ -1,0 +1,30 @@
+plugins/kdev-design-flow/.claude-plugin/plugin.json
+  s_bcb23fcdca6194::t_fb7db8d416c3a2 4
+plugins/kdev-design-flow/CHANGELOG.md
+  s_bcb23fcdca6194::t_fbaeec19ce1327 3-27
+plugins/kdev-design-flow/skills/kdev-design-flow/references/stage3-prototype-prompt.md
+  s_bcb23fcdca6194::t_bf9c480eee0c42 1-55
+plugins/kdev-design-flow/skills/kdev-design-flow/SKILL.md
+  s_bcb23fcdca6194::t_661417d4a7da9c 204-206,208,210-213,215-224,226-230
+plugins/kdev-design-flow/skills/kdev-design-flow/references/review-gate-prompt.md
+  s_bcb23fcdca6194::t_f91a749aac4539 58-64
+plugins/kdev-design-flow/tests/test_skill_md_lint.py
+  s_bcb23fcdca6194::t_fdfe3d1841f63b 45
+  s_bcb23fcdca6194::t_e3bd90e565429b 98-133
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.9",
+  "base_commit_sha": "26fc5110dbd462901bfeb6ee5c3636af3386f2e6",
+  "prompts": {},
+  "sessions": {
+    "s_bcb23fcdca6194": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "88180a15-f835-48e5-bb22-93330cf90d66",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "ljccc-rbs <631114161@qq.com>"
+    }
+  }
+}
