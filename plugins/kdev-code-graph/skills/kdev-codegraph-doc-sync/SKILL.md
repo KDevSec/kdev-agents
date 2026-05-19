@@ -35,7 +35,7 @@ git log -1 --format=%ct -- "<doc-path>"
 
 ### Step 3：找 document → code 的边
 
-按 [_ua_adapter](../_ua_adapter/SKILL.md) 中 ID 命名约定，找所有 `documents` 类型且 source/target 之一是当前 doc 的边。
+在 `knowledge-graph.json` 中按节点 ID 约定（`file:<path>` / `document:<path>` 等），找所有 `documents` 类型且 source/target 之一是当前 doc 的边。
 
 ### Step 4：每个关联 code 节点拉 git mtime（取最大值）
 

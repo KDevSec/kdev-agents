@@ -4,12 +4,12 @@
   "description": "Code knowledge graph for security-aware development. Wraps Understand-Anything with security rule tracing, blast radius and doc-code sync.",
   "keywords": ["code-graph", "security", "doc-code-trace", "blast-radius", "understand-anything"],
   "skills": [
-    "./skills/_ua_adapter",
     "./skills/kdev-codegraph-build",
     "./skills/kdev-codegraph-trace",
     "./skills/kdev-codegraph-impact",
     "./skills/kdev-codegraph-doc-sync"
   ],
+  "allowCrossMarketplaceDependenciesOn": ["understand-anything"],
   "dependencies": [
     { "name": "understand-anything", "marketplace": "understand-anything" }
   ]

@@ -16,7 +16,7 @@ description: 计算代码变更对安全规范的影响——基于 UA /understa
 
 ### Step 1：调 UA 取爆炸半径
 
-按 [_ua_adapter](../_ua_adapter/SKILL.md) 调 `/understand-diff`，拿到：
+调 UA skill `/understand-diff`（即 understand-anything 插件的爆炸半径命令），拿到：
 - L1 直接修改的节点
 - L2 间接调用链上的节点
 - L3 语义关联节点

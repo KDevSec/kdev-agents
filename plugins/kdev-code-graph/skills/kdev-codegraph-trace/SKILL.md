@@ -5,7 +5,17 @@ description: 双向追溯安全规范与代码——给定一条 kdev-secure-cod
 
 # /kdev-codegraph-trace
 
-在 kdev 知识图谱（详见 [_ua_adapter](../_ua_adapter/SKILL.md)）上做规范↔代码双向追溯。
+在 kdev 知识图谱（`.understand-anything/knowledge-graph.json`，由 `/kdev-codegraph-build` 构建）上做规范↔代码双向追溯。
+
+图谱节点 ID 约定：
+
+| Kind | ID |
+|---|---|
+| 文件 | `file:<relative_path>` |
+| 函数 | `function:<relative_path>:<name>` |
+| 类 | `class:<relative_path>:<name>` |
+| kdev 安全规则 | `kdev-sec:rule:<rule_id>` |
+| kdev 漏洞 | `kdev-sec:vuln:<slug>` |
 
 ## 前置条件
 

@@ -82,7 +82,6 @@ cd plugins/kdev-code-graph
 
 ## 目录
 
-- [skills/_ua_adapter](skills/_ua_adapter/SKILL.md) — UA 命令调用协议
 - [ingestor/](ingestor/README.md) — Python 灌入器
 - [tests/contract/](tests/contract/) — UA schema 兼容护栏
 
@@ -91,5 +90,5 @@ cd plugins/kdev-code-graph
 ```bash
 cd plugins/kdev-code-graph
 python3 -m pytest tests/contract -v
-# 失败 → 看 skills/_ua_adapter/SKILL.md "升级 UA 上游" 章节
+# 失败 → 节点/边白名单变 → 更新 ingestor/graph_io.py；命令名变 → 更新引用该命令的 kdev skill
 ```

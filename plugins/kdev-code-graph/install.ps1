@@ -126,7 +126,7 @@ Push-Location $PluginRoot
 $contractArgs = if ($pyParts.Count -gt 1) { $pyParts[1..($pyParts.Count-1)] + @('-m', 'pytest', 'tests/contract', '--quiet') } else { @('-m', 'pytest', 'tests/contract', '--quiet') }
 & $pyParts[0] $contractArgs
 if ($LASTEXITCODE -ne 0) {
-    Write-Warn2 "contract test failed or skipped - see skills/_ua_adapter/SKILL.md"
+    Write-Warn2 "contract test failed or skipped - node/edge allowlists may have changed, check ingestor/graph_io.py"
 }
 Pop-Location
 

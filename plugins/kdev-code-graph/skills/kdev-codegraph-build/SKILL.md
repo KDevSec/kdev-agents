@@ -23,7 +23,7 @@ UA 未装时引导用户：
 
 ## Step 2：调 UA 建基础图谱
 
-按 [_ua_adapter](../_ua_adapter/SKILL.md) 调 `/understand`。透传 `--full` / 项目路径等参数。
+调 UA skill `/understand`（即 understand-anything 插件的 `/understand` 命令）建基础图谱。透传 `--full` / 项目路径等参数。
 
 跑完确认：
 

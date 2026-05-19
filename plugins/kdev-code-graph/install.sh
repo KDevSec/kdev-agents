@@ -71,7 +71,7 @@ fi
 
 step "跑 UA contract test"
 cd "$PLUGIN_ROOT"
-python3 -m pytest tests/contract --quiet || warn "contract test 失败——见 _ua_adapter/SKILL.md"
+python3 -m pytest tests/contract --quiet || warn "contract test 失败——节点/边白名单可能已变，检查 ingestor/graph_io.py"
 
 step "完成"
 echo "下一步：cd <project>; 在 Claude Code 中跑 /kdev-codegraph-build"
