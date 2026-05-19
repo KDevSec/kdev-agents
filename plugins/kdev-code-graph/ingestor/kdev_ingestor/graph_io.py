@@ -52,6 +52,13 @@ class KnowledgeGraph:
     layers: list[dict[str, Any]] = field(default_factory=list)
     tour: list[dict[str, Any]] = field(default_factory=list)
     extras: dict[str, Any] = field(default_factory=dict)
+    # Private indexes — O(1) lookup; never written to JSON.
+    _node_id_to_index: dict[str, int] = field(
+        default_factory=dict, repr=False
+    )
+    _edge_triple_to_index: dict[tuple[str, str, str], int] = field(
+        default_factory=dict, repr=False
+    )
 
     def to_dict(self) -> dict[str, Any]:
         out: dict[str, Any] = {
@@ -76,14 +83,25 @@ def load_graph(path: Path) -> KnowledgeGraph:
         if key not in raw:
             raise GraphIOError(f"required key missing: {key}")
     extras = {k: v for k, v in raw.items() if k not in REQUIRED_TOP_KEYS}
+    nodes: list[dict[str, Any]] = list(raw["nodes"])
+    edges: list[dict[str, Any]] = list(raw["edges"])
+    node_id_to_index: dict[str, int] = {
+        n["id"]: i for i, n in enumerate(nodes)
+    }
+    edge_triple_to_index: dict[tuple[str, str, str], int] = {
+        (e["source"], e["target"], e["type"]): i
+        for i, e in enumerate(edges)
+    }
     return KnowledgeGraph(
         version=raw["version"],
         project=raw["project"],
-        nodes=list(raw["nodes"]),
-        edges=list(raw["edges"]),
+        nodes=nodes,
+        edges=edges,
         layers=list(raw["layers"]),
         tour=list(raw["tour"]),
         extras=extras,
+        _node_id_to_index=node_id_to_index,
+        _edge_triple_to_index=edge_triple_to_index,
     )
 
 
@@ -106,7 +124,7 @@ def _validate_node(node: dict[str, Any]) -> None:
         raise GraphIOError(f"invalid complexity: {node['complexity']!r}")
 
 
-def _validate_edge(edge: dict[str, Any], node_ids: set[str]) -> None:
+def _validate_edge(edge: dict[str, Any], node_ids: set[str] | dict[str, Any]) -> None:
     for f in REQUIRED_EDGE_FIELDS:
         if f not in edge:
             raise GraphIOError(f"edge missing required field: {f}")
@@ -125,22 +143,25 @@ def _validate_edge(edge: dict[str, Any], node_ids: set[str]) -> None:
 
 def upsert_node(graph: KnowledgeGraph, node: dict[str, Any]) -> None:
     _validate_node(node)
-    for i, existing in enumerate(graph.nodes):
-        if existing["id"] == node["id"]:
-            graph.nodes[i] = node
-            return
-    graph.nodes.append(node)
+    node_id = node["id"]
+    if node_id in graph._node_id_to_index:
+        i = graph._node_id_to_index[node_id]
+        graph.nodes[i] = node
+    else:
+        graph._node_id_to_index[node_id] = len(graph.nodes)
+        graph.nodes.append(node)
 
 
 def upsert_edge(graph: KnowledgeGraph, edge: dict[str, Any]) -> None:
-    node_ids = {n["id"] for n in graph.nodes}
-    _validate_edge(edge, node_ids)
+    # Pass the index dict directly — dict `in` is O(1), no set copy needed.
+    _validate_edge(edge, graph._node_id_to_index)
     triple = (edge["source"], edge["target"], edge["type"])
-    for i, existing in enumerate(graph.edges):
-        if (existing["source"], existing["target"], existing["type"]) == triple:
-            graph.edges[i] = edge
-            return
-    graph.edges.append(edge)
+    if triple in graph._edge_triple_to_index:
+        i = graph._edge_triple_to_index[triple]
+        graph.edges[i] = edge
+    else:
+        graph._edge_triple_to_index[triple] = len(graph.edges)
+        graph.edges.append(edge)
 
 
 def find_nodes_by_tag(graph: KnowledgeGraph, tag: str) -> list[dict[str, Any]]:
