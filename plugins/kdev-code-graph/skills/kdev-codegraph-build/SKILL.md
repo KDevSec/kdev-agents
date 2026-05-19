@@ -5,6 +5,8 @@ description: 在当前项目构建代码知识图谱（先调 UA /understand 建
 
 # /kdev-codegraph-build
 
+> 节点 ID / tag 命名约定：详见 [conventions.md](../../references/conventions.md)
+
 构建可供 kdev-code-graph 其他 skill 使用的代码知识图谱。
 
 ## Step 1：检查前置依赖

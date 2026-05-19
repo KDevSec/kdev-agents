@@ -5,9 +5,11 @@ description: 双向追溯安全规范与代码——给定一条 kdev-secure-cod
 
 # /kdev-codegraph-trace
 
+> 节点 ID / tag 命名约定：详见 [conventions.md](../../references/conventions.md)
+
 在 kdev 知识图谱（`.understand-anything/knowledge-graph.json`，由 `/kdev-codegraph-build` 构建）上做规范↔代码双向追溯。
 
-图谱节点 ID 约定：
+图谱节点 ID 约定（速查表，完整定义见 [conventions.md](../../references/conventions.md)）：
 
 | Kind | ID |
 |---|---|

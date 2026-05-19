@@ -5,6 +5,8 @@ description: 计算代码变更对安全规范的影响——基于 UA /understa
 
 # /kdev-codegraph-impact
 
+> 节点 ID / tag 命名约定：详见 [conventions.md](../../references/conventions.md)
+
 回答：本次代码改动间接影响了哪些安全规范？哪些规则需要回归测试？
 
 ## 前置条件
