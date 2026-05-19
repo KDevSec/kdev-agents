@@ -1,0 +1,23 @@
+plugins/kdev-commit/skills/kdev-commit/SKILL.md
+  s_5398f92390df94::t_eda48d01931e74 15-16
+plugins/kdev-commit/hooks/__tests__/confirm-push.test.js
+  s_5398f92390df94::t_137c920bed7289 113-128
+plugins/kdev-commit/hooks/confirm-push.js
+  s_5398f92390df94::t_8cd5ad6bd4e7df 62-63
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "a3435716e99054a968d84b27e0fd7f5c11faa65d",
+  "prompts": {},
+  "sessions": {
+    "s_5398f92390df94": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "462f7353-3d09-48c9-bf84-c60de6caaf57",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}

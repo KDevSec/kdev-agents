@@ -1,0 +1,57 @@
+plugins/kdev-explorer/kdev-explorer-workspace/iteration-2/eval-3-codebase-search/without_skill/outputs/result.md
+  s_dea14f142679af::t_24e2dae31eb5fa 1-90
+plugins/kdev-explorer/kdev-explorer-workspace/iteration-2/eval-1-doc-directory-explore/with_skill/timing.json
+  s_dea14f142679af::t_10a47f287ea310 1
+plugins/kdev-explorer/kdev-explorer-workspace/iteration-2/eval-3-codebase-search/with_skill/timing.json
+  s_dea14f142679af::t_e35672d2767ad3 1
+plugins/kdev-explorer/kdev-explorer-workspace/iteration-2/eval-3-codebase-search/with_skill/outputs/result.md
+  s_dea14f142679af::t_c18a78e14a6fc9 1-28
+plugins/kdev-explorer/kdev-explorer-workspace/iteration-2/eval-1-doc-directory-explore/without_skill/outputs/result.md
+  s_dea14f142679af::t_69945f0eef79cc 1-72
+plugins/kdev-explorer/skills/kdev-explorer/SKILL.md
+  s_dea14f142679af::t_78db0077348660 208,213,216-219
+  s_dea14f142679af::t_6dac5192989445 181-182,184-185
+  s_dea14f142679af::t_4f747e14909626 3-4
+  s_dea14f142679af::t_52e1fce1ed3e54 18-29
+  s_dea14f142679af::t_1db28f45c2e1eb 114,119,122-125,138,143-144,147-149,162,167-168,171-173
+plugins/kdev-explorer/kdev-explorer-workspace/iteration-2/eval-2-webpage-fetch/without_skill/outputs/result.md
+  s_dea14f142679af::t_a7c7a28a22deaf 1-68
+plugins/kdev-explorer/kdev-explorer-workspace/trigger_eval_queries.json
+  s_dea14f142679af::t_8e2ed33130e5be 1-23
+plugins/kdev-explorer/kdev-explorer-workspace/iteration-2/eval-1-doc-directory-explore/with_skill/outputs/result.md
+  s_dea14f142679af::t_17d6f7c005b48f 1-50
+plugins/kdev-explorer/kdev-explorer-workspace/iteration-2/eval-1-doc-directory-explore/without_skill/timing.json
+  s_dea14f142679af::t_bfadb0ba56e2bf 1
+plugins/kdev-explorer/kdev-explorer-workspace/iteration-2/eval-2-webpage-fetch/eval_metadata.json
+  s_dea14f142679af::t_74b758e1fecf7f 1-31
+plugins/kdev-explorer/kdev-explorer-workspace/iteration-2/eval-2-webpage-fetch/with_skill/timing.json
+  s_dea14f142679af::t_bb45736a1f5718 1
+plugins/kdev-explorer/kdev-explorer-workspace/iteration-2/eval-1-doc-directory-explore/eval_metadata.json
+  s_dea14f142679af::t_812d3d313ba311 1-31
+plugins/kdev-explorer/kdev-explorer-workspace/iteration-2/eval-2-webpage-fetch/with_skill/outputs/result.md
+  s_dea14f142679af::t_6473aea4a60ece 1-8
+plugins/kdev-explorer/kdev-explorer-workspace/iteration-2/eval-3-codebase-search/eval_metadata.json
+  s_dea14f142679af::t_62e15a173f3a9d 1-31
+plugins/kdev-explorer/kdev-explorer-workspace/iteration-2/eval-2-webpage-fetch/without_skill/timing.json
+  s_dea14f142679af::t_6165824a0037d5 1
+plugins/kdev-explorer/kdev-explorer-workspace/iteration-2/eval-3-codebase-search/without_skill/timing.json
+  s_dea14f142679af::t_0535b3ea40fd69 1
+plugins/kdev-explorer/kdev-explorer-workspace/iteration-2/benchmark.md
+  s_dea14f142679af::t_5298f39423045c 1-52
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.1",
+  "base_commit_sha": "58cd509acf998885ce677abed1226c1479cfdbe3",
+  "prompts": {},
+  "sessions": {
+    "s_dea14f142679af": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "1dd42caf-dd95-423f-9a55-f58c01a27a0f",
+        "model": "glm-5"
+      },
+      "human_author": "liyong <ly1989abc@126.com>"
+    }
+  }
+}

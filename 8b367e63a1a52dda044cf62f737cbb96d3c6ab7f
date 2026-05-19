@@ -1,0 +1,20 @@
+docs/skills/kdev-commit/specs/2026-05-18-push-confirm-config-design.md
+  s_5398f92390df94::t_bb829e6d90563f 1-198,200-207
+  s_5398f92390df94::t_c87591ee1d03a3 199
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "8b367e63a1a52dda044cf62f737cbb96d3c6ab7f",
+  "prompts": {},
+  "sessions": {
+    "s_5398f92390df94": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "462f7353-3d09-48c9-bf84-c60de6caaf57",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}

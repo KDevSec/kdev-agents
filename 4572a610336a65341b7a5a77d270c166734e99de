@@ -1,0 +1,19 @@
+docs/skills/kdev-commit/dev-notes/2026-05-18-push-确认可关闭-配置开关-backlog.md
+  s_264ea0acfa128e::t_e077b5efbb4b69 1-112
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "4572a610336a65341b7a5a77d270c166734e99de",
+  "prompts": {},
+  "sessions": {
+    "s_264ea0acfa128e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "2e000140-daa0-4c09-a59d-c65c90ef5b0a",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}

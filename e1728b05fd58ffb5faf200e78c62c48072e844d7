@@ -1,0 +1,32 @@
+plugins/kdev-memory/README.md
+  s_31cf5f1fee7f14::t_dd5a08131b1a50 13,17,19-21,27,29,41,43-44,46-47,49-50,52-53,55-58,60-61,63-64,70,72,77,79,81,83,85-86,90,92,94,98,102,106,108,110-131,145,148,150,152,154,156,158-161,163,166-167,170,178,181,184,188,190
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.1",
+  "base_commit_sha": "e1728b05fd58ffb5faf200e78c62c48072e844d7",
+  "prompts": {
+    "56791c6f129422ff": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "fc318ab0-53a9-46ad-8193-5b17c20b60a4",
+        "model": "glm-5"
+      },
+      "human_author": "liyong <ly1989abc@126.com>",
+      "total_additions": 99,
+      "total_deletions": 58,
+      "accepted_lines": 99,
+      "overriden_lines": 0
+    }
+  },
+  "sessions": {
+    "s_31cf5f1fee7f14": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5eb6df47-f6a5-4345-a018-25761cea6299",
+        "model": "unknown"
+      },
+      "human_author": "liyong <ly1989abc@126.com>"
+    }
+  }
+}

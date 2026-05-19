@@ -1,0 +1,20 @@
+plugins/kdev-commit/skills/kdev-commit/SKILL.md
+  s_5398f92390df94::t_6f86ebec90eac7 81,84-88
+  s_5398f92390df94::t_e28de19e0ded33 107
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "e36a9627f6fc3ac477276739140c146f65bd7fd8",
+  "prompts": {},
+  "sessions": {
+    "s_5398f92390df94": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "462f7353-3d09-48c9-bf84-c60de6caaf57",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}

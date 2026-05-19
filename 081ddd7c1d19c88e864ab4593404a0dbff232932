@@ -1,0 +1,57 @@
+plugins/kdev-memory/evals/skill-quality/iterations/20260429-01-skill-simplification/eval-12-skill-simplification/with_simplification/run-1/grading.json
+  31cf5f1fee7f141e 1-18
+plugins/kdev-memory/evals/skill-quality/iterations/20260429-01-skill-simplification/eval-12-skill-simplification/with_simplification/run-2/timing.json
+  31cf5f1fee7f141e 1-6
+plugins/kdev-memory/evals/skill-quality/iterations/20260429-01-skill-simplification/eval-12-skill-simplification/with_simplification/run-3/timing.json
+  31cf5f1fee7f141e 1-6
+plugins/kdev-memory/evals/skill-quality/iterations/20260429-01-skill-simplification/eval-12-skill-simplification/baseline/run-3/grading.json
+  31cf5f1fee7f141e 1-14
+plugins/kdev-memory/evals/skill-quality/iterations/20260429-01-skill-simplification/eval-12-skill-simplification/baseline/run-1/grading.json
+  31cf5f1fee7f141e 1-18
+plugins/kdev-memory/evals/skill-quality/.gitignore
+  31cf5f1fee7f141e 10
+plugins/kdev-memory/evals/skill-quality/iterations/20260429-01-skill-simplification/benchmark.json
+  31cf5f1fee7f141e 1-85
+plugins/kdev-memory/evals/skill-quality/iterations/20260429-01-skill-simplification/benchmark.md
+  31cf5f1fee7f141e 1-104
+plugins/kdev-memory/evals/skill-quality/README.md
+  31cf5f1fee7f141e 36,173-174
+plugins/kdev-memory/evals/skill-quality/iterations/20260429-01-skill-simplification/notes.md
+  31cf5f1fee7f141e 1-77
+plugins/kdev-memory/evals/skill-quality/iterations/20260429-01-skill-simplification/eval-12-skill-simplification/with_simplification/run-1/timing.json
+  31cf5f1fee7f141e 1-6
+plugins/kdev-memory/evals/skill-quality/iterations/20260429-01-skill-simplification/eval-12-skill-simplification/eval_metadata.json
+  31cf5f1fee7f141e 1-83
+plugins/kdev-memory/evals/skill-quality/iterations/20260429-01-skill-simplification/eval-12-skill-simplification/baseline/run-1/timing.json
+  31cf5f1fee7f141e 1-6
+plugins/kdev-memory/evals/skill-quality/iterations/20260429-01-skill-simplification/eval-12-skill-simplification/baseline/run-2/timing.json
+  31cf5f1fee7f141e 1-6
+plugins/kdev-memory/evals/skill-quality/iterations/20260429-01-skill-simplification/eval-12-skill-simplification/baseline/run-3/timing.json
+  31cf5f1fee7f141e 1-6
+plugins/kdev-memory/evals/skill-quality/iterations/20260429-01-skill-simplification/eval-12-skill-simplification/baseline/run-2/grading.json
+  31cf5f1fee7f141e 1-14
+plugins/kdev-memory/evals/skill-quality/iterations/20260429-01-skill-simplification/eval-12-skill-simplification/with_simplification/run-2/grading.json
+  31cf5f1fee7f141e 1-14
+plugins/kdev-memory/evals/skill-quality/iterations/20260429-01-skill-simplification/eval-12-skill-simplification/with_simplification/run-3/grading.json
+  31cf5f1fee7f141e 1-14
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.3.4",
+  "base_commit_sha": "081ddd7c1d19c88e864ab4593404a0dbff232932",
+  "prompts": {
+    "31cf5f1fee7f141e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5eb6df47-f6a5-4345-a018-25761cea6299",
+        "model": "glm-5"
+      },
+      "human_author": "liyong",
+      "messages": [],
+      "total_additions": 1701,
+      "total_deletions": 1133,
+      "accepted_lines": 805,
+      "overriden_lines": 3
+    }
+  }
+}
