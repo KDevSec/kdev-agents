@@ -69,3 +69,72 @@ def test_list_tags_outputs_kdev_tags(tmp_path: Path, capsys, sample_graph_path, 
 def test_main_with_no_command_returns_error():
     with pytest.raises(SystemExit):
         main([])
+
+
+def test_link_creates_related_edges(tmp_path, sample_rules_dir):
+    import json
+    from kdev_ingestor.cli import main
+
+    src = tmp_path / "src"
+    src.mkdir()
+    (src / "a.py").write_text("def f():\n    flagged_call('x')\n", encoding="utf-8")
+
+    graph_path = tmp_path / "knowledge-graph.json"
+    graph_path.write_text(json.dumps({
+        "version": "1", "project": {}, "layers": [], "tour": [],
+        "nodes": [
+            {"id": "file:a.py", "type": "file", "name": "a.py",
+             "filePath": "a.py", "summary": "s", "tags": [], "complexity": "simple"},
+            {"id": "function:a.py:f", "type": "function", "name": "f",
+             "filePath": "a.py", "lineRange": [1, 2], "summary": "s",
+             "tags": [], "complexity": "simple"},
+        ],
+        "edges": [],
+    }, ensure_ascii=False), encoding="utf-8")
+
+    assert main(["inject", "--rules-dir", str(sample_rules_dir),
+                 "--graph", str(graph_path)]) == 0
+    assert main(["link", "--rules-dir", str(sample_rules_dir),
+                 "--graph", str(graph_path), "--source-root", str(src)]) == 0
+
+    g = json.loads(graph_path.read_text(encoding="utf-8"))
+    related = [e for e in g["edges"] if e["type"] == "related"]
+    assert any(e["source"] == "kdev-sec:rule:3.1.1"
+               and e["target"] == "function:a.py:f" for e in related)
+
+
+def test_link_idempotent(tmp_path, sample_rules_dir):
+    import json
+    from kdev_ingestor.cli import main
+
+    src = tmp_path / "src"; src.mkdir()
+    (src / "a.py").write_text("flagged_call('x')\n", encoding="utf-8")
+    graph_path = tmp_path / "kg.json"
+    graph_path.write_text(json.dumps({
+        "version": "1", "project": {}, "layers": [], "tour": [],
+        "nodes": [{"id": "file:a.py", "type": "file", "name": "a.py",
+                   "filePath": "a.py", "summary": "s", "tags": [],
+                   "complexity": "simple"}],
+        "edges": [],
+    }), encoding="utf-8")
+    main(["inject", "--rules-dir", str(sample_rules_dir), "--graph", str(graph_path)])
+    main(["link", "--rules-dir", str(sample_rules_dir), "--graph", str(graph_path),
+          "--source-root", str(src)])
+    n1 = len(json.loads(graph_path.read_text())["edges"])
+    main(["link", "--rules-dir", str(sample_rules_dir), "--graph", str(graph_path),
+          "--source-root", str(src)])
+    n2 = len(json.loads(graph_path.read_text())["edges"])
+    assert n1 == n2
+
+
+def test_link_missing_source_root_errors(tmp_path, sample_rules_dir, capsys):
+    import json
+    from kdev_ingestor.cli import main
+    graph_path = tmp_path / "kg.json"
+    graph_path.write_text(json.dumps({
+        "version": "1", "project": {}, "layers": [], "tour": [],
+        "nodes": [], "edges": [],
+    }), encoding="utf-8")
+    rc = main(["link", "--rules-dir", str(sample_rules_dir),
+               "--graph", str(graph_path), "--source-root", str(tmp_path / "nope")])
+    assert rc == 2
