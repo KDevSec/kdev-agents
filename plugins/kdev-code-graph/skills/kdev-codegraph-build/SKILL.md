@@ -55,6 +55,27 @@ $Ingestor = if ($env:CLAUDE_PLUGIN_ROOT) { "$env:CLAUDE_PLUGIN_ROOT\ingestor\run
 
 预期：`injected N rule node(s) into ...`，N ≥ 8。
 
+## Step 3.5：连边（安全规则 → 代码）
+
+inject 只灌规则节点，需再跑 `link` 把规则连到使用了其点名 API 的代码节点（产 `related` 边）。
+
+**Bash / macOS / Linux:**
+
+```bash
+python3 "$INGESTOR" link \
+    --rules-dir "$KDEV_RULES_DIR" \
+    --graph .understand-anything/knowledge-graph.json \
+    --source-root .
+```
+
+**PowerShell / Windows:**
+
+```powershell
+& py -3 $Ingestor link --rules-dir $KdevRulesDir --graph .understand-anything\knowledge-graph.json --source-root .
+```
+
+预期：`linked N security edge(s) into ...`。N=0 不是错误（可能项目没用到规则点名的 API，或规则无 pattern）。
+
 ## Step 4：核对结果
 
 **Bash / macOS / Linux:**
@@ -81,6 +102,7 @@ python3 "$INGESTOR" list-tags --graph .understand-anything/knowledge-graph.json
 | UA 节点 | <N> |
 | kdev 安全规则节点 | <N> |
 | 总边数 | <N> |
+| 安全关联边(related) | <N> |
 | 图谱文件 | `.understand-anything/knowledge-graph.json` |
 
 并提示：

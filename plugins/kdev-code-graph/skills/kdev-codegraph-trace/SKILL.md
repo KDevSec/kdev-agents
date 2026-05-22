@@ -33,6 +33,7 @@ description: 双向追溯安全规范与代码——给定一条 kdev-secure-cod
 2. 找所有 source 或 target 是该 rule node 的边：
    - `documents` 边 → 直接关联代码
    - `tested_by` 边 → 测试覆盖
+   - `related` 边（source 是该 rule node）→ ⚠️ 疑似涉及（模式命中，weight=0.6）
 3. 跨 1 跳邻居取 file/function/class 节点。
 4. 输出 markdown 报告：
 
@@ -53,6 +54,14 @@ description: 双向追溯安全规范与代码——给定一条 kdev-secure-cod
 |---|---|
 | tests/test_api.py | test_command_injection |
 
+## 疑似涉及（模式命中，需人工确认是否违规）
+
+| 文件 | 函数/类 | 命中说明 |
+|---|---|---|
+| app/web/api.py | run_cmd | 使用了该规则点名的 API（related） |
+
+> 模式命中 ≠ 一定违规——表示该规则适用于此处，请对照规则的正例/反例人工核对。
+
 ## 未覆盖警告
 
 无关联代码——可能项目里没人实现这条规范，建议人工核对。
@@ -65,7 +74,7 @@ description: 双向追溯安全规范与代码——给定一条 kdev-secure-cod
 **步骤**：
 
 1. 找 `file:<path>` 或 `function:<path>:<name>` 节点。
-2. 找邻边：source 端是 `concept` 节点 + `kdev:security_rule` tag → 关联的规范。
+2. 找邻边：邻居是带 `kdev:security_rule` tag 的 concept 节点（经 `documents` 或 `related` 边相连）→ 关联/疑似涉及的规范。
 3. 输出：
 
 ```markdown
