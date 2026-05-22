@@ -2,6 +2,7 @@
 
 Usage:
     kdev-ingest inject --rules-dir <dir> --graph <path>
+    kdev-ingest link --rules-dir <dir> --graph <path> --source-root <dir>
     kdev-ingest list-tags --graph <path>
 """
 
