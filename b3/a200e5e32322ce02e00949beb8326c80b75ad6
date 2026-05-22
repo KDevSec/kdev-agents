@@ -1,0 +1,21 @@
+docs/skills/kdev-code-graph/2026-05-22-CRG融合评估与目标定位结论.md
+  s_604daa9a27f194::t_3ec98700557094 1-110
+docs/skills/kdev-code-graph/2026-05-22-安全模式linker设计.md
+  s_604daa9a27f194::t_11218c392532a6 1-214
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.0",
+  "base_commit_sha": "b3a200e5e32322ce02e00949beb8326c80b75ad6",
+  "prompts": {},
+  "sessions": {
+    "s_604daa9a27f194": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a825b2bf-c0e0-4981-9f2f-64c679268c0a",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
