@@ -3,7 +3,7 @@
 from __future__ import annotations
 
 import re
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Any
 
@@ -21,6 +21,12 @@ _RULE_HEADING_RE = re.compile(
 _RULES_SECTION_RE = re.compile(r"^###\s+(?:规则|Rules)\s*$", re.MULTILINE)
 # Slug from filename: `01-input-validation.md` → `input_validation`
 _FILENAME_SLUG_RE = re.compile(r"^\d+-(?P<slug>.+?)\.md$")
+# Matches `### 适用场景` (Chinese applicability section)
+_SCENARIO_SECTION_RE = re.compile(r"^###\s+适用场景\s*$", re.MULTILINE)
+# Backtick-quoted spans
+_BACKTICK_RE = re.compile(r"`([^`]+)`")
+# Valid API pattern token: identifier, optionally dotted (e.g. mod.func)
+_PATTERN_TOKEN_RE = re.compile(r"^[A-Za-z_][A-Za-z0-9_.]*$")
 
 
 class RuleParseError(Exception):
@@ -34,6 +40,7 @@ class SecurityRule:
     summary: str
     category: str
     source_file: Path
+    patterns: list[str] = field(default_factory=list)
 
 
 def _extract_category(filename: str) -> str:
@@ -58,6 +65,22 @@ def _extract_summary(body: str) -> str:
     return ""
 
 
+def _extract_patterns(body: str) -> list[str]:
+    """Extract backtick-quoted API tokens from the `### 适用场景` section."""
+    m = _SCENARIO_SECTION_RE.search(body)
+    if not m:
+        return []
+    after = body[m.end():]
+    nxt = re.search(r"^###\s+", after, re.MULTILINE)
+    section = after[: nxt.start()] if nxt else after
+    seen: dict[str, None] = {}
+    for tok in _BACKTICK_RE.findall(section):
+        tok = tok.strip()
+        if _PATTERN_TOKEN_RE.match(tok) and tok not in seen:
+            seen[tok] = None
+    return list(seen.keys())
+
+
 def parse_rule_file(path: Path) -> list[SecurityRule]:
     if not path.exists():
         raise RuleParseError(f"rule file not found: {path}")
@@ -78,6 +101,7 @@ def parse_rule_file(path: Path) -> list[SecurityRule]:
             summary=summary,
             category=category,
             source_file=path,
+            patterns=_extract_patterns(body),
         ))
     return rules
 

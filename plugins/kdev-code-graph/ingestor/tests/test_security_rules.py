@@ -85,3 +85,18 @@ def test_security_rule_dataclass_fields():
         source_file=Path("/tmp/x.md"),
     )
     assert rule.rule_id == "3.1.1"
+
+
+def test_parse_rule_file_extracts_patterns(sample_rules_dir: Path):
+    rules = parse_rule_file(sample_rules_dir / "01-input-validation.md")
+    assert rules[0].patterns == ["flagged_call", "risky_run", "tainted_load"]
+    # 3.1.2 没有"适用场景"段 → 空 patterns
+    assert rules[1].patterns == []
+
+
+def test_security_rule_patterns_default_empty():
+    rule = SecurityRule(
+        rule_id="3.1.1", title="x", summary="y",
+        category="input_validation", source_file=Path("/tmp/x.md"),
+    )
+    assert rule.patterns == []
