@@ -1,0 +1,21 @@
+plugins/kdev-code-graph/README.md
+  s_604daa9a27f194::t_35b94fc424e159 12
+plugins/kdev-code-graph/.claude-plugin/plugin.json
+  s_604daa9a27f194::t_806ff31d6a38b7 10
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.0",
+  "base_commit_sha": "cece55a6a9f55528ce4eed411dedc97fd00ef54b",
+  "prompts": {},
+  "sessions": {
+    "s_604daa9a27f194": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a825b2bf-c0e0-4981-9f2f-64c679268c0a",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
