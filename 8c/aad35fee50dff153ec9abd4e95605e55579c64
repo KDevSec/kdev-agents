@@ -1,0 +1,22 @@
+plugins/kdev-code-graph/ingestor/tests/test_semantic_linker_prepare.py
+  s_604daa9a27f194::t_e2c64b9fb11ad6 111-139
+plugins/kdev-code-graph/ingestor/kdev_ingestor/linkers/semantic_linker_prepare.py
+  s_604daa9a27f194::t_721163fadeecb2 40,54,61-71
+  s_604daa9a27f194::t_070d9cb30519ac 6
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.0",
+  "base_commit_sha": "8caad35fee50dff153ec9abd4e95605e55579c64",
+  "prompts": {},
+  "sessions": {
+    "s_604daa9a27f194": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a825b2bf-c0e0-4981-9f2f-64c679268c0a",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
