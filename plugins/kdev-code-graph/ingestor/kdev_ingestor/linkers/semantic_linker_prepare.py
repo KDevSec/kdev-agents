@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import json
+import sys
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -36,6 +37,7 @@ def prepare_intents(
     retriever = retriever or KeywordRetriever()
     doc_nodes = _doc_nodes(graph)
     intents_payload: list[dict] = []
+    seen_ids: dict[str, int] = {}  # intent_id -> index in intents_payload
     for d in doc_nodes:
         fp = d["filePath"]
         md_path = source_root / fp
@@ -49,14 +51,24 @@ def prepare_intents(
             candidates = retriever.retrieve(
                 intent.intent_title, intent.intent_text, graph, top_k=top_k
             )
-            intents_payload.append({
+            entry = {
                 "intent_id": intent.intent_id,
                 "source_doc": intent.source_doc,
                 "intent_kind": intent.intent_kind,
                 "intent_title": intent.intent_title,
                 "intent_text": intent.intent_text,
                 "candidates": candidates,
-            })
+            }
+            if intent.intent_id in seen_ids:
+                print(
+                    f"warning: duplicate intent_id {intent.intent_id!r}, "
+                    f"overriding earlier entry",
+                    file=sys.stderr,
+                )
+                intents_payload[seen_ids[intent.intent_id]] = entry
+            else:
+                seen_ids[intent.intent_id] = len(intents_payload)
+                intents_payload.append(entry)
 
     return {
         "schema_version": 1,

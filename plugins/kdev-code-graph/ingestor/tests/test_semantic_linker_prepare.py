@@ -108,3 +108,32 @@ def test_prepare_default_top_k(tmp_path):
     data = json.loads(out.read_text(encoding="utf-8"))
     assert data["intent_count"] == 1
     assert len(data["intents"][0]["candidates"]) == 30  # default top_k
+
+
+def test_prepare_duplicate_intent_id_warns_and_overrides(tmp_path, capsys):
+    """Two sections with the same heading (same intent_id) → second overrides + stderr warn."""
+    src = tmp_path / "src"; src.mkdir()
+    (src / "docs").mkdir()
+    # two H2 with identical title → same intent_id; second has distinctive body
+    (src / "docs" / "dup.md").write_text(
+        "# Dup\n\n## 同名\n第一段。\n\n## 同名\n第二段，覆盖前者。\n",
+        encoding="utf-8",
+    )
+    g = tmp_path / "kg.json"
+    _write_graph(g, [_doc_node("docs/dup.md")])
+    out = tmp_path / "intents.json"
+    rc = main(["spec-link-prepare",
+               "--graph", str(g),
+               "--source-root", str(src),
+               "--out", str(out)])
+    assert rc == 0
+    data = json.loads(out.read_text(encoding="utf-8"))
+    # only one intent (second overrode first)
+    assert data["intent_count"] == 1
+    assert data["intents"][0]["intent_id"] == "docs/dup.md#同名"
+    # surviving entry is the SECOND (its text)
+    assert "覆盖前者" in data["intents"][0]["intent_text"]
+    # stderr carries the warning
+    err = capsys.readouterr().err
+    assert "duplicate intent_id" in err
+    assert "docs/dup.md#同名" in err
