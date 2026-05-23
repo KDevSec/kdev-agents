@@ -9,7 +9,7 @@
 | 建图 + 灌安全规范 | `/kdev-codegraph-build` | 调 UA `/understand` + ingestor 注入 |
 | 规范 ↔ 代码追溯 | `/kdev-codegraph-trace` | "这条规范在哪实现 / 这段代码涉及哪些规范" |
 | 变更安全爆炸半径 | `/kdev-codegraph-impact` | "改这段代码会影响哪些规范 / 该跑哪些回归" |
-| 文档代码同步审计 | `/kdev-codegraph-doc-sync` | 四级状态报告（同步/需更新/缺实现/缺文档） |
+| spec ↔ code 对齐审计 | `/kdev-codegraph-spec-link` | LLM 判定每条 spec 是否实现 + 两维（实现状态+同步）报告，取代 doc-sync |
 
 ## 安装
 

@@ -7,7 +7,7 @@
     "./skills/kdev-codegraph-build",
     "./skills/kdev-codegraph-trace",
     "./skills/kdev-codegraph-impact",
-    "./skills/kdev-codegraph-doc-sync"
+    "./skills/kdev-codegraph-spec-link"
   ],
   "allowCrossMarketplaceDependenciesOn": ["understand-anything"],
   "dependencies": [
