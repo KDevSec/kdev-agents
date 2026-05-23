@@ -184,3 +184,30 @@ def test_finalize_writes_report_file(tmp_path):
     body = reports[0].read_text(encoding="utf-8")
     assert "Spec ↔ Code 对齐审计报告" in body
     assert "✅ 有实现" in body
+
+
+def test_finalize_report_surfaces_skipped_invalid_target(tmp_path):
+    """LLM hallucination (target not in graph) is counted in extras and reported."""
+    g = tmp_path / "kg.json"
+    _write_graph(g, [_doc("docs/s.md"), _func("a.py", "f")])
+    v = tmp_path / "v.json"
+    # mix one valid + one hallucinated target
+    v.write_text(json.dumps(_verdicts([
+        {"intent_id": "docs/s.md#X", "status": "implemented",
+         "linked": [
+             {"target_node_id": "function:a.py:f",
+              "confidence": 0.9, "reason": "r"},
+             {"target_node_id": "function:NO_SUCH.py:ghost",
+              "confidence": 0.9, "reason": "hallucination"},
+         ]},
+    ])), encoding="utf-8")
+    rdir = tmp_path / "reports"
+    main(["spec-link-finalize", "--graph", str(g), "--verdicts", str(v),
+          "--source-root", str(tmp_path), "--report-dir", str(rdir)])
+    # extras count
+    raw = json.loads(g.read_text(encoding="utf-8"))
+    assert raw["kdev_spec_link"]["skipped_invalid_target"] == 1
+    # report surfaces the metric
+    body = list(rdir.glob("spec-link-*.md"))[0].read_text(encoding="utf-8")
+    assert "LLM 输出无效 target 被跳过" in body
+    assert "| 🚫 LLM 输出无效 target 被跳过 | 1 |" in body

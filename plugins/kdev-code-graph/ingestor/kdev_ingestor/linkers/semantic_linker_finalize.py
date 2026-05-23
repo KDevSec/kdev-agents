@@ -253,6 +253,7 @@ def render_report(
     out.append("|---|---|")
     out.append(f"| ⚠️ 漂移(>阈值) | {len(drift_rows)} |")
     out.append(f"| 🔍 缺文档(代码无 doc 归属) | {len(missing_doc_files)} 文件 |")
+    out.append(f"| 🚫 LLM 输出无效 target 被跳过 | {report_data.get('skipped_invalid_target', 0)} |")
     out.append("")
 
     if report_data["not_found_intents"]:
