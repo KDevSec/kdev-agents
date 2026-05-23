@@ -5,11 +5,13 @@ Usage:
     kdev-ingest link --rules-dir <dir> --graph <path> --source-root <dir>
     kdev-ingest list-tags --graph <path>
     kdev-ingest spec-link-prepare --graph <path> --source-root <dir> --out <file> [--top-k N]
+    kdev-ingest spec-link-finalize --graph <path> --verdicts <file> --source-root <dir> --report-dir <dir>
 """
 
 from __future__ import annotations
 
 import argparse
+import json
 import sys
 from collections import Counter
 from pathlib import Path
@@ -30,6 +32,11 @@ from kdev_ingestor.linkers.pattern_linker import PatternLinker
 from kdev_ingestor.linkers.semantic_linker_prepare import (
     prepare_intents,
     write_intents_json,
+)
+from kdev_ingestor.linkers.semantic_linker_finalize import (
+    finalize,
+    render_report,
+    write_report,
 )
 
 
@@ -132,6 +139,37 @@ def _cmd_spec_link_prepare(args: argparse.Namespace) -> int:
     return 0
 
 
+def _cmd_spec_link_finalize(args: argparse.Namespace) -> int:
+    graph_path = Path(args.graph)
+    verdicts_path = Path(args.verdicts)
+    source_root = Path(args.source_root)
+    report_dir = Path(args.report_dir)
+    try:
+        graph = load_graph(graph_path)
+    except GraphIOError as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return 2
+    try:
+        verdicts_payload = json.loads(verdicts_path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        print(f"error: cannot read verdicts: {exc}", file=sys.stderr)
+        return 2
+    verdicts = verdicts_payload.get("verdicts", [])
+
+    graph, report_data = finalize(graph, verdicts, source_root)
+    try:
+        save_graph(graph, graph_path)
+    except GraphIOError as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return 2
+
+    report_text = render_report(graph, report_data, source_root)
+    report_path = write_report(report_text, report_dir)
+    print(f"wrote {report_data['edges_written']} documents edge(s); "
+          f"report -> {report_path}")
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="kdev-ingest")
     sub = parser.add_subparsers(dest="cmd", required=True)
@@ -160,6 +198,16 @@ def main(argv: list[str] | None = None) -> int:
     p_prep.add_argument("--out", required=True)
     p_prep.add_argument("--top-k", type=int, default=30)
     p_prep.set_defaults(func=_cmd_spec_link_prepare)
+
+    p_fin = sub.add_parser(
+        "spec-link-finalize",
+        help="apply verdicts to graph (upsert documents edges + report)",
+    )
+    p_fin.add_argument("--graph", required=True)
+    p_fin.add_argument("--verdicts", required=True)
+    p_fin.add_argument("--source-root", required=True)
+    p_fin.add_argument("--report-dir", required=True)
+    p_fin.set_defaults(func=_cmd_spec_link_finalize)
 
     args = parser.parse_args(argv)
     return args.func(args)
