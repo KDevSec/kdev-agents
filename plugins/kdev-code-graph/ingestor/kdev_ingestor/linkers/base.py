@@ -1,7 +1,16 @@
 """Linker family: connect kdev rule nodes to code nodes in a UA graph.
 
-Member 1 is PatternLinker (deterministic, pattern-based). Member 2 (a future
-LLM-based SemanticLinker) shares the `Linker` protocol below.
+The family has more than one shape:
+- Member 1 — PatternLinker (deterministic, pattern-based) implements the
+  `Linker` Protocol below: `link(rules, graph, source_root) -> [edge]`.
+- Member 2 — SemanticLinker (LLM-driven, in `semantic_linker_prepare` +
+  `semantic_linker_finalize`) is intentionally a different shape: it splits
+  into a `prepare → subagent judge → finalize` pipeline driven by the
+  `kdev-codegraph-spec-link` skill. It does NOT implement this Protocol.
+
+The constants and helpers below (`SECURITY_EDGE_TYPE`, `make_security_edge`,
+`build_path_index`, `resolve_node_id`) are shared by PatternLinker; future
+non-pattern members may reuse them as needed.
 """
 
 from __future__ import annotations

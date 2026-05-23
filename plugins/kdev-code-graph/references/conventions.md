@@ -1,6 +1,6 @@
 # kdev-code-graph 图谱命名约定（节点 ID + tag）
 
-> 单一权威来源。trace / impact / doc-sync / build 4 个 skill 引用本文件。
+> 单一权威来源。trace / impact / spec-link / build 4 个 skill 引用本文件。
 > 修改前先看 `ingestor/kdev_ingestor/tags.py` 和 `graph_io.py`（**源码是真的真相**）。
 
 ---
@@ -118,7 +118,7 @@
 ### 文档 / Schema
 | type | 含义 |
 |---|---|
-| `documents` | 文档对代码的覆盖关系（doc-sync skill 核心边） |
+| `documents` | 文档对代码的覆盖关系（spec-link 写：direction=backward，weight=LLM confidence） |
 | `defines_schema` | Schema 定义 |
 
 ### 流程
