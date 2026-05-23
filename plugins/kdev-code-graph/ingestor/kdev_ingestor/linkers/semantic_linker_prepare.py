@@ -32,7 +32,7 @@ def prepare_intents(
     top_k: int = 30,
     retriever: CandidateRetriever | None = None,
 ) -> dict[str, Any]:
-    """Compose the intents.json payload. Pure (no IO)."""
+    """Compose the intents.json payload (reads source .md files; no graph writes)."""
     retriever = retriever or KeywordRetriever()
     doc_nodes = _doc_nodes(graph)
     intents_payload: list[dict] = []
