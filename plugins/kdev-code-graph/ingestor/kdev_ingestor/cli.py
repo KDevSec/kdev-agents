@@ -4,6 +4,7 @@ Usage:
     kdev-ingest inject --rules-dir <dir> --graph <path>
     kdev-ingest link --rules-dir <dir> --graph <path> --source-root <dir>
     kdev-ingest list-tags --graph <path>
+    kdev-ingest spec-link-prepare --graph <path> --source-root <dir> --out <file> [--top-k N]
 """
 
 from __future__ import annotations
@@ -26,6 +27,10 @@ from kdev_ingestor.security_rules import (
     rule_to_node,
 )
 from kdev_ingestor.linkers.pattern_linker import PatternLinker
+from kdev_ingestor.linkers.semantic_linker_prepare import (
+    prepare_intents,
+    write_intents_json,
+)
 
 
 def _cmd_inject(args: argparse.Namespace) -> int:
@@ -104,6 +109,29 @@ def _cmd_link(args: argparse.Namespace) -> int:
     return 0
 
 
+def _cmd_spec_link_prepare(args: argparse.Namespace) -> int:
+    graph_path = Path(args.graph)
+    source_root = Path(args.source_root)
+    out_path = Path(args.out)
+    if not source_root.exists():
+        print(f"error: source root not found: {source_root}", file=sys.stderr)
+        return 2
+    try:
+        graph = load_graph(graph_path)
+    except GraphIOError as exc:
+        print(f"error: {exc}", file=sys.stderr)
+        return 2
+    payload = prepare_intents(
+        graph, str(graph_path), source_root, top_k=args.top_k
+    )
+    write_intents_json(payload, out_path)
+    print(
+        f"prepared {payload['intent_count']} intent(s) from "
+        f"{payload['doc_count']} doc node(s) -> {out_path}"
+    )
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="kdev-ingest")
     sub = parser.add_subparsers(dest="cmd", required=True)
@@ -122,6 +150,16 @@ def main(argv: list[str] | None = None) -> int:
     p_link.add_argument("--graph", required=True)
     p_link.add_argument("--source-root", required=True)
     p_link.set_defaults(func=_cmd_link)
+
+    p_prep = sub.add_parser(
+        "spec-link-prepare",
+        help="extract spec intents + candidates -> intents.json",
+    )
+    p_prep.add_argument("--graph", required=True)
+    p_prep.add_argument("--source-root", required=True)
+    p_prep.add_argument("--out", required=True)
+    p_prep.add_argument("--top-k", type=int, default=30)
+    p_prep.set_defaults(func=_cmd_spec_link_prepare)
 
     args = parser.parse_args(argv)
     return args.func(args)
