@@ -186,6 +186,70 @@ def test_finalize_writes_report_file(tmp_path):
     assert "✅ 有实现" in body
 
 
+def _fake_mtime_factory(doc_t: float, code_t: float):
+    """Build a fake _git_mtime returning doc_t for .md paths, code_t otherwise."""
+    def fake(path, repo_root=None):
+        return doc_t if str(path).endswith(".md") else code_t
+    return fake
+
+
+def test_finalize_drift_threshold_security_14d(tmp_path, monkeypatch):
+    """Security-tagged doc with 20-day drift IS flagged (threshold = 14d)."""
+    # doc 30 days ago, code 10 days ago → 20-day drift
+    code_t = 1_700_000_000.0
+    doc_t = code_t - 20 * 86400
+    from kdev_ingestor.linkers import semantic_linker_finalize as f
+    monkeypatch.setattr(f, "_git_mtime", _fake_mtime_factory(doc_t, code_t))
+
+    g = tmp_path / "kg.json"
+    # doc node carries kdev:security_rule tag → security threshold (14d)
+    sec_doc = {
+        "id": "document:docs/s.md", "type": "document", "name": "s.md",
+        "filePath": "docs/s.md", "summary": "d",
+        "tags": ["kdev:security_rule"], "complexity": "simple",
+    }
+    _write_graph(g, [sec_doc, _func("a.py", "f")])
+    v = tmp_path / "v.json"
+    v.write_text(json.dumps(_verdicts([
+        {"intent_id": "docs/s.md#X", "status": "implemented",
+         "linked": [{"target_node_id": "function:a.py:f",
+                     "confidence": 0.9, "reason": "r"}]},
+    ])), encoding="utf-8")
+    rdir = tmp_path / "reports"
+    main(["spec-link-finalize", "--graph", str(g), "--verdicts", str(v),
+          "--source-root", str(tmp_path), "--report-dir", str(rdir)])
+    body = list(rdir.glob("spec-link-*.md"))[0].read_text(encoding="utf-8")
+    # 20-day drift exceeds 14-day security threshold → row present + marked "是"
+    assert "## ⚠️ 漂移" in body
+    assert "docs/s.md#X" in body
+    # the "安全相关" column should show 是 for this row
+    drift_section = body.split("## ⚠️ 漂移")[1].split("##")[0]
+    assert "| 是 |" in drift_section
+
+
+def test_finalize_drift_threshold_default_30d_suppresses_20d(tmp_path, monkeypatch):
+    """Non-security doc with 20-day drift is NOT flagged (threshold = 30d)."""
+    code_t = 1_700_000_000.0
+    doc_t = code_t - 20 * 86400  # 20-day drift, below 30d default
+    from kdev_ingestor.linkers import semantic_linker_finalize as f
+    monkeypatch.setattr(f, "_git_mtime", _fake_mtime_factory(doc_t, code_t))
+
+    g = tmp_path / "kg.json"
+    _write_graph(g, [_doc("docs/s.md"), _func("a.py", "f")])  # no security tag
+    v = tmp_path / "v.json"
+    v.write_text(json.dumps(_verdicts([
+        {"intent_id": "docs/s.md#X", "status": "implemented",
+         "linked": [{"target_node_id": "function:a.py:f",
+                     "confidence": 0.9, "reason": "r"}]},
+    ])), encoding="utf-8")
+    rdir = tmp_path / "reports"
+    main(["spec-link-finalize", "--graph", str(g), "--verdicts", str(v),
+          "--source-root", str(tmp_path), "--report-dir", str(rdir)])
+    body = list(rdir.glob("spec-link-*.md"))[0].read_text(encoding="utf-8")
+    # 20-day drift below 30d threshold → no drift section header
+    assert "## ⚠️ 漂移" not in body
+
+
 def test_finalize_report_surfaces_skipped_invalid_target(tmp_path):
     """LLM hallucination (target not in graph) is counted in extras and reported."""
     g = tmp_path / "kg.json"
