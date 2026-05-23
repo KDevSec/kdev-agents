@@ -9,6 +9,40 @@ description: 在当前项目构建代码知识图谱（先调 UA /understand 建
 
 构建可供 kdev-code-graph 其他 skill 使用的代码知识图谱。
 
+## Step 0：前置面板（人友好知情同意）
+
+向用户展示：
+
+```markdown
+## 即将执行: /kdev-codegraph-build
+
+### 这次会做什么
+1. **UA `/understand`**：全库语义分析，产 `.understand-anything/knowledge-graph.json`（每个文件由 LLM file-analyzer agent 分析）
+2. **ingestor inject**：把 kdev-secure-coding 安全规则灌成 concept 节点（本地，0 LLM）
+3. **ingestor link**：模式匹配把规则连到使用了点名 API 的代码（本地，0 LLM）
+
+### 成本提示 🔴 重要
+- **UA 全库语义分析会派出几十~上百个 file-analyzer subagent**
+- **强烈建议不要在按"请求次数"计费的 coding plan 上跑** —— 配额会被快速打空
+- 推荐：切到 API 计费，或对增量项目用 `/understand`（UA 默认增量），别用 `--full` 除非必要
+- 估算耗时：中等项目首次 build 可能数分钟到数十分钟
+
+### 这次会产生
+- `.understand-anything/knowledge-graph.json`（主图谱）
+- 含 N 条安全规则节点 + M 条 related 边（模式命中）
+
+### 跑完后你可以做的事
+- `/kdev-codegraph-trace` —— 安全规则 ↔ 代码双向追溯
+- `/kdev-codegraph-impact` —— 变更安全爆炸半径分析
+- `/kdev-codegraph-spec-link` —— spec ↔ 代码对齐审计（也烧 LLM，按需跑）
+```
+
+用户 `n` → 退出。`y` → 进入 Step 1。
+
+`--yes` 跳过此 prompt。
+
+---
+
 ## Step 1：检查前置依赖
 
 ```bash
