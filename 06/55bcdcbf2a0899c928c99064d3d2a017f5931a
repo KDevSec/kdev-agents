@@ -1,0 +1,26 @@
+plugins/kdev-code-graph/ingestor/tests/test_semantic_linker_finalize.py
+  s_604daa9a27f194::t_8c6f1726a9994f 1-186
+plugins/kdev-code-graph/ingestor/kdev_ingestor/linkers/semantic_linker_finalize.py
+  s_604daa9a27f194::t_e7358b615ba728 1-303
+plugins/kdev-code-graph/ingestor/kdev_ingestor/cli.py
+  s_604daa9a27f194::t_fa6d91b1e3ea9b 142-172
+  s_604daa9a27f194::t_82eb553e5cbcbb 8,14
+  s_604daa9a27f194::t_a40a024b4428f0 36-40
+  s_604daa9a27f194::t_9f2492a6ca0b9d 202-211
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.0",
+  "base_commit_sha": "0655bcdcbf2a0899c928c99064d3d2a017f5931a",
+  "prompts": {},
+  "sessions": {
+    "s_604daa9a27f194": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a825b2bf-c0e0-4981-9f2f-64c679268c0a",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
