@@ -1,7 +1,7 @@
 {
   "name": "kdev-code-graph",
-  "version": "0.2.0",
-  "description": "Code knowledge graph for security-aware development. Wraps Understand-Anything with security rule tracing, blast radius and doc-code sync.",
+  "version": "0.3.0",
+  "description": "Code knowledge graph for security-aware development. Wraps Understand-Anything with security rule tracing (PatternLinker), spec-to-code semantic linking (SemanticLinker / spec-link) and blast radius.",
   "keywords": ["code-graph", "security", "doc-code-trace", "blast-radius", "understand-anything"],
   "skills": [
     "./skills/kdev-codegraph-build",
