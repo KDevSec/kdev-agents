@@ -1,0 +1,19 @@
+docs/framework/01-design/2026-05-24-01-多智能体集群落地方案对比-方案B-vs-方案D.md
+  s_9f129d982a3e32::t_b5ba354fe026d1 1-606
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.0",
+  "base_commit_sha": "df7a7d20e90bf1618a7b36a9468b39b296c17691",
+  "prompts": {},
+  "sessions": {
+    "s_9f129d982a3e32": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "56ad11fc-53cf-43b8-ad88-dfc62288f07c",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
