@@ -13,56 +13,7 @@
 
 ## 安装
 
-### 一键安装（推荐）
-
-```bash
-# macOS / Linux
-curl -sSL https://raw.githubusercontent.com/KDevSec/kdev-plugins-dist/master/releases/kdev-code-graph/latest/setup.sh | bash
-
-# Windows / PowerShell
-iwr -useb https://raw.githubusercontent.com/KDevSec/kdev-plugins-dist/master/releases/kdev-code-graph/latest/setup.ps1 | iex
-```
-
-该脚本完成 3 件事：add 两个 marketplace + install kdev-code-graph（UA 通过 plugin.json `dependencies` 自动连带装）。
-
-> 安全考虑：`curl | bash` 是反模式。建议先 `curl -sSL .../setup.sh | less` 看脚本内容再跑。
-
-### 本地 clone 后安装
-
-```bash
-git clone https://github.com/KDevSec/kdev-agents.git
-cd kdev-agents
-./scripts/setup-kdev-codegraph.sh  # macOS / Linux
-.\scripts\setup-kdev-codegraph.ps1 # Windows
-```
-
-### Windows 10 / 11 一键安装
-
-Win10 默认 PowerShell 5.1 即可（不需要 PS 7+）：
-
-```powershell
-iwr -useb https://raw.githubusercontent.com/KDevSec/kdev-plugins-dist/master/releases/kdev-code-graph/latest/setup.ps1 | iex
-```
-
-**Windows 前提条件：**
-- Claude Code Desktop / CLI 已安装（`claude` 命令在 PATH 里）
-- Python 3.11+ 已装（建议用 `py -3 --version` 验证；ingestor 用 stdlib only，零依赖）
-- Node.js 22+ 已装（UA 上游需要）
-
-ingestor 在 Windows 上调用方式：`py -3 run.py inject ...`（详见 `/kdev-codegraph-build` skill 的 PowerShell 命令块）
-
-### Python ingestor（零安装）
-
-ingestor 是 stdlib only 的 Python 工具，通过 `${CLAUDE_PLUGIN_ROOT}/ingestor/run.py` 直接调用，**不需要 venv 也不需要 pip install**。`/kdev-codegraph-build` skill 已经按这个路径调。
-
-如需跑 ingestor 自测（开发场景）：
-
-```bash
-cd plugins/kdev-code-graph
-./install.sh   # 会跑零安装验证 + 可选 dev venv 自测
-```
-
-### 在 Claude Code 内手动安装（不用脚本）
+### 推荐：在 Claude Code 内 `/plugin install`
 
 ```
 /plugin marketplace add KDevSec/kdev-agents
@@ -70,7 +21,34 @@ cd plugins/kdev-code-graph
 /plugin install kdev-code-graph
 ```
 
+UA 上游通过 `plugin.json` 的 `dependencies` 自动连带装（声明在 `allowCrossMarketplaceDependenciesOn`），所以装 kdev-code-graph 时不用单独 `/plugin install understand-anything`。
+
 ⚠️ `/plugin` 命令在 VSCode 扩展里不可用，只在 Claude Code CLI / 桌面应用 / Web App 里可用。
+
+**前提条件：**
+- Claude Code Desktop / CLI 已安装
+- Python 3.11+（ingestor 是 stdlib only，零依赖；Windows 用 `py -3 --version` 验证）
+- Node.js 22+（UA 上游需要）
+
+### 本地 clone 后用脚本一行装（macOS / Linux / Windows）
+
+```bash
+git clone https://github.com/KDevSec/kdev-agents.git
+cd kdev-agents
+./scripts/setup-kdev-codegraph.sh   # macOS / Linux
+.\scripts\setup-kdev-codegraph.ps1  # Windows PowerShell 5.1+
+```
+
+该脚本就是把上面那三条 `claude plugin` 命令按顺序跑了一遍，没有调外部分发仓库。
+
+### Python ingestor（零安装，dev 自测）
+
+ingestor 是 stdlib only 的 Python 工具，通过 `${CLAUDE_PLUGIN_ROOT}/ingestor/run.py` 直接调用，**不需要 venv 也不需要 pip install**。如需跑自测：
+
+```bash
+cd plugins/kdev-code-graph
+./install.sh   # 跑零安装验证 + 可选 dev venv 自测
+```
 
 ## 设计原则
 
