@@ -1,0 +1,10 @@
+{
+  "name": "kdev-cluster-x3",
+  "description": "KDev 多智能体集群 — X3 矩阵式方案（轻组长 / 组长当顾问 PM）。主控员 + 4 组长 + 26 工作 agent + 评审池。通信走扁平（2 跳），组长仅在阶段聚合 + 异常应急 + 标准维护时激活。BLOCKED 由 events.log + hook 自动触发组长介入。当前 Phase 1 仅 plugin 骨架，agent/skill/standards/hooks 实际内容由 Phase 2 (superpowers + skill-creator) 实施。",
+  "version": "0.0.1",
+  "author": {
+    "name": "ly"
+  },
+  "license": "MIT",
+  "keywords": ["kdev", "multi-agent", "cluster", "x3", "matrix", "light-tl", "advisor", "scaffold"]
+}
