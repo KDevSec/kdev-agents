@@ -1,5 +1,14 @@
 # kdev-memory CHANGELOG
 
+## [0.10.1] — 2026-05-27
+
+**Patch：修 Linux/macOS 上 hook 全线 "Permission denied" 报错。**
+
+### 🐛 修复
+
+- `hooks/run-python-hook.cmd` 加 +x 位（git mode 100644 → 100755）。该文件是 7 个 hook 事件（SessionStart / UserPromptSubmit / Stop / PostToolUse / PreCompact / SessionEnd）的共用入口，`hooks.json` 直接把它当可执行文件调用；之前唯独这个文件没有执行位，Linux/macOS 上每次 hook 触发都报 `/bin/sh: ... .cmd: Permission denied`（non-blocking 不阻断，但日志噪声大）。Windows 不受影响。
+- **已装 0.10.0 的用户升级到 0.10.1 后自动修复**。如果暂不升级，本地 `chmod +x ~/.claude/plugins/cache/kdev-agents/kdev-memory/0.10.0/hooks/run-python-hook.cmd` 也可绕过。
+
 ## [0.10.0] — 2026-05-16
 
 **蒸馏管道 + 自动蒸馏机制：subject 路由全栈打通——F-NNN 反馈通道 + /kdev-memory-distill 统一蒸馏入口 + SessionStart hook 自动触发。**
