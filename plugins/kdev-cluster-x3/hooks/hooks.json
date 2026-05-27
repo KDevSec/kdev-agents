@@ -1,0 +1,17 @@
+{
+  "description": "kdev-cluster-x3: BLOCKED 事件自动触发组长介入。监听 PostToolUse(Write|Edit) — 当 .kdev/events.log 被追加时，hook 检测最后一行是否 blocked 并向对话流注入派单指令。",
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Write|Edit|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "\"${CLAUDE_PLUGIN_ROOT}/hooks/run-python-hook.cmd\" on-blocked.py",
+            "timeout": 5
+          }
+        ]
+      }
+    ]
+  }
+}
