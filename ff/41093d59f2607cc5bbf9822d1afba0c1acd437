@@ -1,0 +1,25 @@
+plugins/kdev-cluster-x3/standards/reqs/system-prompt-template.md
+  s_6002f3dd225689::t_82adc9651951ff 1-46
+plugins/kdev-cluster-x3/standards/review/system-prompt-template.md
+  s_6002f3dd225689::t_000050fb93c26d 1-72
+plugins/kdev-cluster-x3/standards/dev/system-prompt-template.md
+  s_6002f3dd225689::t_dd73e843b12be3 1-46
+plugins/kdev-cluster-x3/standards/test/system-prompt-template.md
+  s_6002f3dd225689::t_f93ed5708f7b6c 1-46
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "ff41093d59f2607cc5bbf9822d1afba0c1acd437",
+  "prompts": {},
+  "sessions": {
+    "s_6002f3dd225689": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5690e195-ed84-4553-a230-44db83a823b2",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
