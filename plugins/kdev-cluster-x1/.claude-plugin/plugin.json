@@ -1,0 +1,10 @@
+{
+  "name": "kdev-cluster-x1",
+  "description": "KDev 多智能体集群 — X1 群组原版方案（严格层级 / 组长当路由 PgM）。主控员 + 4 组长 + 26 工作 agent + 评审池。跨组通信必经 '组长→主控→另一组长' 三跳。当前 Phase 1 仅 plugin 骨架，agent/skill/standards 实际内容由 Phase 2 (superpowers + skill-creator) 实施。",
+  "version": "0.0.1",
+  "author": {
+    "name": "ly"
+  },
+  "license": "MIT",
+  "keywords": ["kdev", "multi-agent", "cluster", "x1", "hierarchical", "tl-router", "scaffold"]
+}
