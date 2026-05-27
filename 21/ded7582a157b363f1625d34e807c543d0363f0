@@ -1,0 +1,32 @@
+docs/skills/kdev-memory/dev-notes/2026-05-27-hook-launcher-跨平台执行位防回归.md
+  s_a4458148a48f01::t_90ff01a4fd3f4f 1-74
+docs/skills/kdev-memory/README.md
+  s_8ca2fb6bdd4016::t_444d7303592470 9
+  s_a4458148a48f01::t_5704184fb21b7e 21
+.github/workflows/hook-launcher-perms.yml
+  s_8ca2fb6bdd4016::t_e602a9b28ead09 1-56
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "21ded7582a157b363f1625d34e807c543d0363f0",
+  "prompts": {},
+  "sessions": {
+    "s_8ca2fb6bdd4016": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "41300a5d-ce56-4e2f-aa32-f40f2e6ecd4f",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    },
+    "s_a4458148a48f01": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "726b8374-a2f5-4e3f-ab4c-ad7361708b3e",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
