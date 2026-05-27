@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "kdev-cluster-x3"
+version = "0.0.1"
+requires-python = ">=3.10"
+
+[project.optional-dependencies]
+pinyin = ["pypinyin>=0.44"]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["kdev_cluster_x3*"]
+namespaces = false
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]
