@@ -6,10 +6,10 @@
 
 | 项 | 值 |
 |---|---|
-| 当前阶段 | **Phase 1 骨架**（v0.0.1）|
+| 当前阶段 | **Phase 2 实施完成**（v0.1.0）|
 | 设计依据 | [X1 vs X3 对比文档 v0.2](../../docs/framework/01-design/2026-05-27-02-KDev多智能体集群-X1群组-vs-X3矩阵对比.md) §3 |
 | Worktree | `feature/cluster-x3` 分支独立开发，与 X1 互不冲突 |
-| 下一步 | Phase 2 用 `superpowers:writing-plans` 写实施计划 → 用 `skill-creator` 实施 |
+| 下一步 | Phase 3：在 sop_test0518-x3 跑真实切片实测 |
 
 ## 架构（X3 矩阵式 / 轻组长）
 
@@ -55,7 +55,7 @@ kdev-cluster-x3/
 └── hooks/          # ★ on-blocked.sh：监听 events.log 自动派组长（X3 特有）
 ```
 
-## Agent 清单（待 Phase 2 填充）
+## Agent 清单
 
 ### 主控层
 - 主控员（懂快/慢路径双判断）
@@ -85,3 +85,14 @@ kdev-cluster-x3/
 ## 实测目标
 
 跑 [sop_test0518](https://github.com/KDevSec/sop_test0518) 的"产品管理三层模型（产品线/项目/版本）"功能，对比 X1 plugin 在同一需求上的表现。详见对比文档 §8 实测计划。
+
+## 遗留议题（v0.1 → v0.2 待回写）
+
+> 来源：[X1 vs X3 对比 v0.2 §5.7](../../docs/framework/01-design/2026-05-27-02-KDev多智能体集群-X1群组-vs-X3矩阵对比.md#57-待用户细化议题v02-填)。在 Phase 3 实测之前不强制回答，等实测真实数据回来后回写本节。
+
+- [ ] IR 阶段（R1）是否需要独立评审员
+- [ ] D1 实施计划完成是阻断还是告警
+- [ ] TDD 增量（D2）的"增量颗粒度"——按 commit / 按 AR / 按 unit test 文件
+- [ ] 终审聚合员（F2）额外评审标准
+- [ ] 评审循环 3 次后 BLOCKED 阈值是否合理
+- [ ] 评审员之间冲突（如代码评审员 vs 质量评审员）仲裁默认归属

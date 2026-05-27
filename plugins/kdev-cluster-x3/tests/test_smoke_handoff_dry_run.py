@@ -58,3 +58,32 @@ def test_full_lifecycle(tmp_kdev):
 
     # 6 events.log entries minimum (1 step_complete in this micro-test; real flow has many more)
     assert len(log.read_all()) >= 1
+
+
+def test_resume_after_interrupt(tmp_kdev):
+    """Simulate: reqs complete, dev half-done (node-6b), then new session reads state and resumes."""
+    from datetime import datetime, timezone
+    from pathlib import Path
+    from kdev_cluster_x3.lib.state_md import StateMd
+    from kdev_cluster_x3.lib.events_log import EventsLog, EventType
+
+    # "previous session": reqs done, dev stopped at node-6b
+    s = StateMd.init(tmp_kdev / "state.md", feature="x", slug="x", started_at=datetime.now(timezone.utc))
+    s.update_group("reqs", status="complete", current_step="-")
+    s.update_group("dev", status="in_progress", current_step="node-6b", last_progress="TDD 实现员跑到一半")
+    s.write(tmp_kdev / "state.md")
+    log = EventsLog(tmp_kdev / "events.log")
+    log.append(agent="TDD实现员", event_type=EventType.STEP_START, msg="开始 node-6b")
+    # session crash here — no step_complete
+
+    # "new session": read state.md, identify which group is mid-progress
+    s2 = StateMd.read(tmp_kdev / "state.md")
+    assert s2.groups["reqs"]["status"] == "complete"
+    assert s2.groups["dev"]["status"] == "in_progress"
+    assert s2.groups["dev"]["current_step"] == "node-6b"
+    # main agent's recovery logic should now re-dispatch TDD实现员 starting at node-6b
+    # (idempotency: it should detect step_start without matching step_complete in events.log)
+    events = log.read_all()
+    starts = [e for e in events if e.event_type == "step_start" and e.agent == "TDD实现员"]
+    completes = [e for e in events if e.event_type == "step_complete" and e.agent == "TDD实现员"]
+    assert len(starts) > len(completes), "should detect dangling step_start (= needs resume)"
