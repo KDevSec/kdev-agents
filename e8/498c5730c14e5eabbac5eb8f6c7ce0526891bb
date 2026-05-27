@@ -1,0 +1,21 @@
+plugins/kdev-cluster-x1/skills/kdev-start-feature/SKILL.md
+  s_c1d0e441c085b2::t_e983d06320f0cb 1-119
+plugins/kdev-cluster-x1/tools/tests/test_skill_start_feature.py
+  s_c1d0e441c085b2::t_a6669121a03b70 1-26
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "e8498c5730c14e5eabbac5eb8f6c7ce0526891bb",
+  "prompts": {},
+  "sessions": {
+    "s_c1d0e441c085b2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "3abfbc17-3c68-4fed-9d79-9acbd73c9baf",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
