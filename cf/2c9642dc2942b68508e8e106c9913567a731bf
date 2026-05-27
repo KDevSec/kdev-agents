@@ -1,0 +1,21 @@
+plugins/kdev-cluster-x3/skills/kdev-statusline/kdev-statusline.sh
+  s_6002f3dd225689::t_92115d1a6d72c8 1-60
+plugins/kdev-cluster-x3/tests/test_statusline.py
+  s_6002f3dd225689::t_049807d9431a62 1-55
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "cf2c9642dc2942b68508e8e106c9913567a731bf",
+  "prompts": {},
+  "sessions": {
+    "s_6002f3dd225689": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5690e195-ed84-4553-a230-44db83a823b2",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
