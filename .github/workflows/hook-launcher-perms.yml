@@ -1,0 +1,56 @@
+name: Hook Launcher Exec-Bit Guard
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'plugins/**/hooks/**'
+      - 'plugins/**/install.sh'
+      - 'scripts/*.sh'
+      - '.github/workflows/hook-launcher-perms.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'plugins/**/hooks/**'
+      - 'plugins/**/install.sh'
+      - 'scripts/*.sh'
+  workflow_dispatch:
+
+jobs:
+  check-exec-bit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Assert launchers are git mode 100755
+        run: |
+          set -euo pipefail
+          # Targets: any *.sh anywhere we ship, plus polyglot hook launchers
+          # (.cmd files registered in plugin hooks.json that bash also execs).
+          # .ps1 / .js excluded — invoked via PowerShell / node, no unix mode bit needed.
+          mapfile -t files < <(
+            git ls-files \
+              'plugins/*/hooks/*.cmd' \
+              'plugins/*/hooks/*.sh' \
+              'plugins/*/hooks/**/*.sh' \
+              'plugins/*/install.sh' \
+              'scripts/*.sh'
+          )
+
+          if [ "${#files[@]}" -eq 0 ]; then
+            echo "No launcher files matched — nothing to check."
+            exit 0
+          fi
+
+          echo "Checking ${#files[@]} launcher file(s):"
+          bad=0
+          for f in "${files[@]}"; do
+            mode=$(git ls-files -s -- "$f" | awk '{print $1}')
+            if [ "$mode" != "100755" ]; then
+              echo "::error file=$f::missing +x (git mode $mode, expected 100755)"
+              bad=1
+            else
+              echo "  ok  $f"
+            fi
+          done
+          exit $bad

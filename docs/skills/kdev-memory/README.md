@@ -6,7 +6,7 @@
 
 | 文档 | 内容 |
 |------|------|
-| [开发历程.md](开发历程.md) | **两 Part 长文**：Part 1（0.1.0 → 0.3.0）讲从 token-statistics Sprint 0 自用脚手架到插件 0.3.0 的 10 天 4 迭代；Part 2（0.3.0 → 0.5.1）讲 2026-04-22 ~ 04-23 两天内 7 轮 skill-quality iteration + iter-7 决策反转教训。[meta/skill-开发通用流程.md](../../meta/skill-开发通用流程.md) 多处引用本文 |
+| [kdev-memory 开发历程技术分享.md](kdev-memory%20开发历程技术分享.md) | **两 Part 长文**：Part 1（0.1.0 → 0.3.0）讲从 token-statistics Sprint 0 自用脚手架到插件 0.3.0 的 10 天 4 迭代；Part 2（0.3.0 → 0.5.1）讲 2026-04-22 ~ 04-23 两天内 7 轮 skill-quality iteration + iter-7 决策反转教训。[meta/skill-开发通用流程.md](../../meta/skill-开发通用流程.md) 多处引用本文 |
 | [dev-notes/](dev-notes/) | 版本迭代期间的专题笔记（见下） |
 
 ## dev-notes 清单
@@ -18,6 +18,7 @@
 | [2026-04-22](dev-notes/2026-04-22-skill-CLAUDEmd模板漂移审计-token-statistics与KDevSec对照.md) | CLAUDE.md 模板在 token-statistics 和 KDevSec 之间的漂移审计 | 0.5.0 解耦改造的主驱动 |
 | [2026-04-22](dev-notes/2026-04-22-审计修订对账-session-end-state.md) | 审计修订对账 + 2026-04-22 session 结束态归档 | 0.5.0 发布前的状态对账 |
 | [2026-04-22](dev-notes/2026-04-22-skill使用记录与体验评分维度缺口.md) | Step schema 缺"使用的 skill"事实字段 + 评分维度取舍 | v0.6.0 候选（方案 A：事实列表 + 单一评分）|
+| [2026-05-27](dev-notes/2026-05-27-hook-launcher-跨平台执行位防回归.md) | hook launcher 跨平台执行位防回归（CI 校验 + launcher 拆分两条 backlog） | 0.10.1 patch 事后改进点 |
 
 ## skill-quality eval 线（2026-04-22 起）
 
