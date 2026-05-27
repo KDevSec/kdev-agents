@@ -4,7 +4,6 @@ from dataclasses import dataclass, field
 from datetime import datetime
 from pathlib import Path
 import re
-from typing import Optional
 
 GROUPS = ("reqs", "dev", "test", "review")
 _GROUP_FIELDS = ("status", "current_step", "started_at", "completed_at", "last_progress")

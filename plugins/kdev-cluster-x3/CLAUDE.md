@@ -43,7 +43,7 @@ CLI 用户可以加 statusLine：
 🔴 **铁规 1**：主控员 / 30 agent 不直接对话用户。用户只跟当前 session 的主控员说话。
 🔴 **铁规 2**：`.kdev/` 目录由插件管理（state.md / events.log / handoffs/）。不要手动改 — 改了会被下次 agent 派单覆盖。
 🔴 **铁规 3**：评审循环 3 轮上限。第 4 轮自动 events.log `blocked` 触发组长介入（on-blocked hook）。
-🔴 **铁规 4**：AR 编号格式 `AR-{DOMAIN}-{MAJOR:02d}.{MINOR:03d}.{PATCH:003d}`。需求拆解师产出 ar.csv 时强校验。
+🔴 **铁规 4**：AR 编号格式 `AR-{DOMAIN}-{MAJOR:02d}.{MINOR:03d}.{PATCH:03d}`。需求拆解师产出 ar.csv 时强校验。
 
 ## 故障 / 应急
 
