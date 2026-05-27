@@ -1,0 +1,21 @@
+plugins/kdev-cluster-x3/kdev_cluster_x3/lib/ar_number.py
+  s_6002f3dd225689::t_3e33f349268d61 1-37
+plugins/kdev-cluster-x3/tests/test_ar_number.py
+  s_6002f3dd225689::t_85f94fa60a53d7 1-34
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "b96b55fb1ad9f2a6cb90dbe351d1ce509c04c0bd",
+  "prompts": {},
+  "sessions": {
+    "s_6002f3dd225689": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5690e195-ed84-4553-a230-44db83a823b2",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
