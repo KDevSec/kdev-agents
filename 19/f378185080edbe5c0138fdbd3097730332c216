@@ -1,0 +1,27 @@
+plugins/kdev-cluster-x3/tests/test_on_blocked.py
+  s_6002f3dd225689::t_1bd3c1d9caf0ae 1-53
+plugins/kdev-cluster-x3/README.md
+  s_6002f3dd225689::t_b753b07100b07c 75
+plugins/kdev-cluster-x3/CLAUDE.md
+  s_6002f3dd225689::t_f1a98080c03f72 46
+plugins/kdev-cluster-x3/pyproject.toml
+  s_6002f3dd225689::t_51c5cf0db1a18c 7
+docs/superpowers/plans/2026-05-27-kdev-cluster-x3.md
+  s_6002f3dd225689::t_9844b8d2d9e9d2 1-3503
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "19f378185080edbe5c0138fdbd3097730332c216",
+  "prompts": {},
+  "sessions": {
+    "s_6002f3dd225689": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5690e195-ed84-4553-a230-44db83a823b2",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
