@@ -1,0 +1,23 @@
+plugins/kdev-cluster-x3/.claude-plugin/plugin.json
+  s_9f129d982a3e32::t_6949185157e332 1-10
+plugins/kdev-cluster-x3/hooks/on-blocked.sh.placeholder
+  s_9f129d982a3e32::t_8aae538cc14a81 1-18
+plugins/kdev-cluster-x3/README.md
+  s_9f129d982a3e32::t_f5286bf37a4a6c 1-87
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "b40e518f70009767bd17f4d41c40d78e87f56597",
+  "prompts": {},
+  "sessions": {
+    "s_9f129d982a3e32": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "56ad11fc-53cf-43b8-ad88-dfc62288f07c",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
