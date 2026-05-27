@@ -1,0 +1,39 @@
+plugins/kdev-cluster-x1/standards/review-checklist-final.md
+  s_c1d0e441c085b2::t_d0be32cadcc101 1-16
+plugins/kdev-cluster-x1/standards/review-checklist-architecture.md
+  s_c1d0e441c085b2::t_a3e9ed0b6754ce 1-16
+plugins/kdev-cluster-x1/standards/review-checklist-prototype.md
+  s_c1d0e441c085b2::t_c232923de59498 1-16
+plugins/kdev-cluster-x1/standards/review-checklist-security.md
+  s_c1d0e441c085b2::t_8a9e0bc815d2f3 1-16
+plugins/kdev-cluster-x1/standards/review-checklist-ceo.md
+  s_c1d0e441c085b2::t_0d20d77587d39f 1-16
+plugins/kdev-cluster-x1/standards/review-checklist-sr.md
+  s_c1d0e441c085b2::t_5f9f269639c439 1-16
+plugins/kdev-cluster-x1/standards/review-checklist-design.md
+  s_c1d0e441c085b2::t_f6616d8e4dd9ce 1-16
+plugins/kdev-cluster-x1/tools/tests/test_checklists_present.py
+  s_c1d0e441c085b2::t_b789cd6cc17483 1-16
+plugins/kdev-cluster-x1/standards/review-checklist-code.md
+  s_c1d0e441c085b2::t_f201bb3deb8a04 1-16
+plugins/kdev-cluster-x1/standards/review-checklist-quality.md
+  s_c1d0e441c085b2::t_ed605ccb10ed92 1-16
+plugins/kdev-cluster-x1/standards/review-checklist-testdesign.md
+  s_c1d0e441c085b2::t_007555299dcd67 1-16
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "40a28809e928556b704d07146b66647efd45812f",
+  "prompts": {},
+  "sessions": {
+    "s_c1d0e441c085b2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "3abfbc17-3c68-4fed-9d79-9acbd73c9baf",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
