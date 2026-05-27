@@ -1,0 +1,19 @@
+plugins/kdev-cluster-x1/agents/需求拆解师.md
+  s_c1d0e441c085b2::t_5b08597ae22e40 1-36
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "3af8c8ae3f0d07ec918b6ffb06b31ad3290620b6",
+  "prompts": {},
+  "sessions": {
+    "s_c1d0e441c085b2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "3abfbc17-3c68-4fed-9d79-9acbd73c9baf",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
