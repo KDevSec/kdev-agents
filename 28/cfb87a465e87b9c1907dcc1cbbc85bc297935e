@@ -1,0 +1,25 @@
+plugins/kdev-cluster-x3/agents/测试点设计师.md
+  s_6002f3dd225689::t_b26816952d1f1d 1-34
+plugins/kdev-cluster-x3/agents/API自动化工程师.md
+  s_6002f3dd225689::t_e640dbf84662e0 1-28
+plugins/kdev-cluster-x3/agents/UI自动化工程师.md
+  s_6002f3dd225689::t_e343ef7a7acebf 1-28
+plugins/kdev-cluster-x3/agents/测试用例渲染员.md
+  s_6002f3dd225689::t_c12e2fe2080fb1 1-28
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "28cfb87a465e87b9c1907dcc1cbbc85bc297935e",
+  "prompts": {},
+  "sessions": {
+    "s_6002f3dd225689": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5690e195-ed84-4553-a230-44db83a823b2",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
