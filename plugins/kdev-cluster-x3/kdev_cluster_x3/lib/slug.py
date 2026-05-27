@@ -17,9 +17,9 @@ def slugify(name: str, max_len: int = 60) -> str:
     if not name or not name.strip():
         return "feature"
     raw = name.strip()
-    if HAS_PINYIN and any("一" <= ch <= "鿿" for ch in raw):
+    if HAS_PINYIN:
         raw = "-".join(lazy_pinyin(raw))
     s = raw.lower()
     s = _NON_SLUG.sub("-", s)
     s = _MULTI_DASH.sub("-", s).strip("-")
-    return s[:max_len] if len(s) > max_len else s
+    return s[:max_len]
