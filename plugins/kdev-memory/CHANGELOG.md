@@ -10,7 +10,7 @@
 
 - **`hooks/lib/step_id.py`** — slug + counter + mint 一站式接口：
   - `compute_branch_slug()`：git rev-parse → 干净的 ASCII slug（`feature/X` / `feat/X` 去前缀；非法字符 sanitize；detached HEAD → `detached`；非 git → `unknown`）
-  - `read_counter(slug, state_dir)` / `increment_counter(slug, state_dir)`：每分支独立计数器，flock 保护 atomic 递增（POSIX `fcntl` / Windows `msvcrt`），并发 20 线程零冲突（实测 100 线程也零冲突）
+  - `read_counter(slug, state_dir)` / `increment_counter(slug, state_dir)`：每分支独立计数器，flock 保护 atomic 递增（POSIX `fcntl` / Windows `msvcrt`），committed 20 线程并发测试零冲突（reviewer 临时扩到 100 线程也零冲突，未入测试套）
   - `mint_next_step_id(state_dir, slug=None)` → `"Step <slug>-<N>"`
 - **`SessionStart brief`** 在「今日进度」段加 `- 本次 Step ID 前缀：\`<slug>-\``，让智能体新会话立刻知道用什么前缀
 - **`step_completeness` regex 兼容性回归测试**：显式覆盖 `Step main-9` / `Step cluster-x1-1` / 历史无前缀混合解析
