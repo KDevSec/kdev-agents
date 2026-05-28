@@ -101,6 +101,7 @@ CLAUDE.md 规则段扮演的是 skill 的**对外接口**——只列出 Claude 
 
 - `.kdev/memory/` 下的记录文件**不需要逐条请示**即可写入——这是制度，不是每次询问的一次性操作
 - 每完成 Step 要顺手更新 `.kdev/memory/当前状态.md` 的 frontmatter（`current_step` + `last_updated`），不要攒到每日汇总时才改
+- **v0.11+ Step ID 加分支前缀**：新建 Step 用 `Step <branch-slug>-N` 格式（main 上是 `Step main-N`），通过 `step_id.mint_next_step_id()` 自动算。具体规则见 skill 里的「多 worktree 并发场景」段。
 
 ---
 
