@@ -1,0 +1,21 @@
+CLAUDE.md
+  s_fece168c93654a::t_b5c121a07fcd5e 37
+plugins/kdev-memory/skills/kdev-memory/references/初始化-claude-md-模板.md
+  s_fece168c93654a::t_0ac0157238fa50 104
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "5048abea156d5b0c23c1806b75fd34830e4b1042",
+  "prompts": {},
+  "sessions": {
+    "s_fece168c93654a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "6fe183ce-25a4-4763-8fac-304107fed6b5",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
