@@ -26,7 +26,7 @@
 | 条目类型 | Claude 写入时顺手做 |
 |---|---|
 | 新 G-NNN 踩坑 | 在 `## G-NNN: 标题` 下一行加 `triggers: [...]` |
-| 新 Step（完成时顺手） | 在 `## Step N: 标题` 下一行加 `triggers: [...]` |
+| 新 Step（完成时顺手） | 在 `## Step <branch-slug>-N: 标题` 下一行加 `triggers: [...]` |
 | 方法论铁规 新规则 | 在 `## 规则名` 下一行加 `triggers: [...]` |
 | 项目级 spec（`constitution.md`/`spec.md` 等） | 人写，放文件 frontmatter 或每条规则下 |
 
@@ -41,7 +41,7 @@ triggers: ["pnpm install", "pnpm i", "workspace 依赖"]
 
 **简明逗号分隔**（适合短关键词）：
 ```markdown
-## Step 23: 实现采集器核心循环
+## Step main-23: 实现采集器核心循环
 triggers: 采集器, 核心循环, collector
 日期：2026-04-19
 ```
