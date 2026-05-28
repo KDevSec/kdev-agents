@@ -123,6 +123,8 @@ skill-feedback.md（F-NNN）的 `verbatim` 字段必须保留**用户原句**—
 
 **初始化时必须问用户一个决策（走 Q-001）**：Step 编号用全局递增还是迭代内递增？默认倾向全局递增。
 
+**v0.11+ 升级**：全局递增的基础上**加分支前缀**——`Step <branch-slug>-N` 格式。原因：多 worktree symlink 共享 `.kdev/` 架构下，两个 session 并发独立递增会产生 ID 冲突。新格式让每个分支有独立计数器，互不干扰。详见 §「多 worktree 并发场景」。
+
 **关键授权**：这些文件**不需要向用户请示即可写入**——在 CLAUDE.md 里显式授权一次，后续智能体自动维护。
 
 > 目录结构、CLAUDE.md 模板、接口契约、v0.2.0 升级迁移、.gitignore 配置等完整步骤见 **`references/初始化-claude-md-模板.md`**。
@@ -133,7 +135,7 @@ skill-feedback.md（F-NNN）的 `verbatim` 字段必须保留**用户原句**—
 |---------|---------|------|------------|
 | 需要人做决策（有歧义、多选项、不可逆） | 决策日志.md | Q-NNN | `references/六类记录-schema.md` §1 |
 | 踩坑 / 绕路 / 报错 / 命令失败 | 踩坑日志.md | G-NNN | §2 |
-| 每步/每里程碑完成 | 执行日志.md（双评分） | Step N | §3 |
+| 每步/每里程碑完成 | 执行日志.md（双评分） | Step <slug>-N | §3 |
 | 用户当场反馈体验/规则 | 执行日志.md 的评估区 | — | §3 |
 | 会话结束前 | 每日汇总/YYYY-MM-DD.md | — | §4 |
 | 评分差值 ≥ 2 或反复出现的感受信号（项目内方法论） | 改进建议.md | R-NNN | §5 |
@@ -345,3 +347,63 @@ F-NNN 的 `verbatim` 字段（用户原话）是最高价值的 RFE 信号源—
 ### 本 skill 的边界
 
 只负责**把料备好**：写记录、推断 subject、采集 verbatim、产出切片包。**下游训练管道、聚类归纳、产出新 skill 是别的 skill 或人工要做的事。** 本 skill 不管训练、不管 fine-tuning、不管 RM/DPO 实际配置——只管原料的采集、归属和导出。
+
+## 多 worktree 并发场景：Step ID 加分支前缀（v0.11+）
+
+### 何时触发
+
+任何会让多个 Claude session 共享同一份 `.kdev/memory/` 的场景：
+- secondary worktree（通过 [worktree_link.py](../../hooks/lib/worktree_link.py) 自动 symlink）
+- 多终端开同一仓库
+- 主仓库 + 镜像/挂载点同时 Claude 会话
+
+### 新 ID 格式
+
+`Step <branch-slug>-N`，例：
+- `Step main-9`（主分支第 9 条）
+- `Step cluster-x1-1`（feature/cluster-x1 分支第 1 条）
+- `Step bugfix-issue-42-3`（bugfix/issue-42 分支第 3 条）
+
+### Slug 规则（由 [step_id.compute_branch_slug()](../../hooks/lib/step_id.py) 实现，不手算）
+
+- `main` / `master` → 原样
+- `feature/X` / `feat/X` → 去前缀
+- 其他 `A/B` → `A-B`
+- 非 ASCII / 特殊字符 → sanitize 成 `[a-zA-Z0-9\-_]+`
+- 不在 git → `unknown`
+- detached HEAD → `detached`
+
+### 智能体落 Step 时的标准流程
+
+```python
+import sys
+sys.path.insert(0, "plugins/kdev-memory/hooks/lib")
+from step_id import mint_next_step_id
+from pathlib import Path
+step_id = mint_next_step_id(Path(".kdev/memory/state"))
+# step_id = "Step main-9"
+```
+
+然后用这个 ID 作为 Step 条目的标题：
+
+```markdown
+## Step main-9: 实现 step_id.py
+triggers: [...]
+日期：2026-05-28
+...
+```
+
+智能体可以直接读 [step_id.py](../../hooks/lib/step_id.py) 实现细节；本节只规范"用哪个接口"。
+
+### 历史兼容
+
+`step_id_prefix_since: <date>` 是 `执行日志.md` 第二段后面的 HTML 注释，标识切换时点。该日期之前的 Step 保持无前缀格式（`Step 1` ~ `Step 8` 等）；之后的全部带前缀。SessionStart brief 显示「本次 Step ID 前缀：`<slug>-`」帮助智能体确认。
+
+### 子文件位置
+
+- 计数器：`.kdev/memory/state/step-counter-<slug>.txt`，纯整数
+- 切换点注释：在 `执行日志.md` header 段（搜索 `step_id_prefix_since`）
+
+### main 分支特殊性
+
+main 分支的计数器初始化为「历史 Step 1~8 的最大编号」（本仓库为 8），让 main 上下一条新 Step = `Step main-9`，保持时间线连贯。**新建分支的计数器从 0 起**，下一条 = `Step <slug>-1`。
