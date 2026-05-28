@@ -143,3 +143,55 @@ def test_increment_initial_value_seed(tmp_path):
     """预置 counter=8（模拟 main 分支历史 Step 1~8 切换），下一次应该返回 9。"""
     (tmp_path / "step-counter-main.txt").write_text("8\n", encoding="utf-8")
     assert increment_counter("main", tmp_path) == 9
+
+
+# ── Task 3: mint_next_step_id one-stop interface ──────────────────────────────
+
+from step_id import mint_next_step_id  # noqa: E402
+
+
+def test_mint_default_slug_from_git(tmp_path, monkeypatch):
+    repo = _git_init(tmp_path, "main")
+    state = repo / ".kdev" / "memory" / "state"
+    monkeypatch.chdir(repo)
+    assert mint_next_step_id(state) == "Step main-1"
+    assert mint_next_step_id(state) == "Step main-2"
+
+
+def test_mint_with_seeded_counter(tmp_path, monkeypatch):
+    repo = _git_init(tmp_path, "main")
+    state = repo / ".kdev" / "memory" / "state"
+    state.mkdir(parents=True)
+    (state / "step-counter-main.txt").write_text("8\n", encoding="utf-8")
+    monkeypatch.chdir(repo)
+    assert mint_next_step_id(state) == "Step main-9"
+
+
+def test_mint_explicit_slug_overrides_git(tmp_path):
+    state = tmp_path / "state"
+    assert mint_next_step_id(state, slug="cluster-x1") == "Step cluster-x1-1"
+    assert mint_next_step_id(state, slug="cluster-x1") == "Step cluster-x1-2"
+
+
+def test_mint_concurrent_main_and_secondary_no_collision(tmp_path, monkeypatch):
+    """模拟 main + secondary worktree 共享 state/，并发 mint 各自的 ID，无冲突。"""
+    state = tmp_path / "state"
+    main_ids: list[str] = []
+    sec_ids: list[str] = []
+    lock = threading.Lock()
+
+    def main_worker():
+        for _ in range(10):
+            with lock:
+                main_ids.append(mint_next_step_id(state, slug="main"))
+
+    def sec_worker():
+        for _ in range(10):
+            with lock:
+                sec_ids.append(mint_next_step_id(state, slug="cluster-x1"))
+
+    t1 = threading.Thread(target=main_worker)
+    t2 = threading.Thread(target=sec_worker)
+    t1.start(); t2.start(); t1.join(); t2.join()
+    assert main_ids == [f"Step main-{i}" for i in range(1, 11)]
+    assert sec_ids == [f"Step cluster-x1-{i}" for i in range(1, 11)]

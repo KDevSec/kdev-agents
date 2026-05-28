@@ -122,3 +122,17 @@ def increment_counter(slug: str, state_dir: Path) -> int:
     finally:
         _flock_release(fd)
         os.close(fd)
+
+
+# ── Task 3: mint_next_step_id one-stop interface ──────────────────────────────
+
+
+def mint_next_step_id(state_dir: Path, slug: Optional[str] = None) -> str:
+    """一站式：算 slug（如未传）→ atomic 递增 counter → 返回格式化的 Step ID。
+
+    返回如 "Step main-9" / "Step cluster-x1-1"。
+    """
+    if slug is None:
+        slug = compute_branch_slug()
+    n = increment_counter(slug, state_dir)
+    return f"Step {slug}-{n}"
