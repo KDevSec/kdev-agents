@@ -1,4 +1,4 @@
-# kdev-step-recorder (prototype, R-001 试跑)
+# kdev-step-recorder (v0.2 — dogfood round-1 反馈合并版, R-001)
 
 Subagent prompt template for writing a single Step entry into `.kdev/memory/执行日志.md` from a structured summary supplied by the main session.
 
@@ -38,11 +38,20 @@ Reject (STATUS: NEEDS_CONTEXT) with the specific failing rule cited:
 5. `key_decisions` non-empty AND every entry matches generic phrases ("按既有规范", "按 plan", "无特殊决策", "见 commit") → REJECT ("decisions are water — be specific")
 6. `key_facts.tools_invoked_count` < 1 OR `key_facts.errors_hit` is negative → REJECT ("nonsensical facts")
 7. `about` is missing or doesn't match `project | feature/<name> | bugfix/<name>` → REJECT ("about must follow schema")
+8. **frontmatter-counter drift guard (v0.2)**: parse `当前状态.md` frontmatter's `current_step:` key (its value, e.g. `main-10` → suffix int = 10). Read `.kdev/memory/state/step-counter-<slug>.txt` (current value). If `counter < current_step_suffix` → REJECT with `STATUS: NEEDS_CONTEXT` reason `"frontmatter ahead of counter — manual reconciliation required (counter=<N>, current_step=<slug>-<M>, M>N)"`. **Do NOT silently fix either**; this signals user manually advanced state and the recorder shouldn't paper over it.
 
 For SHA validation, run from project root:
 ```bash
 for sha in <commit_shas>; do git cat-file -e "$sha" 2>/dev/null || echo "MISSING: $sha"; done
 ```
+
+### Frontmatter parsing rules (v0.2 — clarification)
+
+When reading `当前状态.md` frontmatter for the `current_step` value:
+
+- **ONLY** the YAML key line `current_step: <value>` is authoritative (the `value` is the field's content).
+- **IGNORE** YAML comment lines (lines starting with `#`). Users may add annotation comments like `# main-13: 6 人公司 v1.3 ...` for their own bookkeeping — these are notes, NOT state.
+- Robust parse: `grep -E "^current_step:" 当前状态.md | head -1 | sed 's/^current_step:\s*//'` (Python equivalent if preferred).
 
 ## Anti-laziness anchors
 
@@ -141,7 +150,21 @@ about: <about value>
 - n/a（Q-002 跳过用户评分）
 ```
 
-3. **Append to** `.kdev/memory/执行日志.md` (use Edit with old_string=last few lines of file, append the new entry after them; or use Bash `cat >>` if the heredoc preserves Chinese correctly — Edit is safer).
+3. **Append to** `.kdev/memory/执行日志.md` using **bash heredoc append (PREFERRED, v0.2)**:
+
+```bash
+cat >> .kdev/memory/执行日志.md << 'EOF'
+
+---
+
+## Step <ID>: <title>
+triggers: [<keywords>]
+日期：<today>
+... (full 4-section block as composed in step 2) ...
+EOF
+```
+
+**Why heredoc append over Edit (v0.2 reasoning)**: 执行日志.md has many highly repetitive `### 评分差异分析` / `### 模型自评` headers across historical entries, so Edit's old_string uniqueness requirement is fragile. Append-only file mutation is naturally safer via shell append — preserves all existing content, adds at end, no anchor-matching needed. Quote the heredoc delimiter (`<< 'EOF'`) to disable variable interpolation so YAML/Chinese content passes through verbatim.
 
 4. **Update** `.kdev/memory/当前状态.md` frontmatter: `current_step: <slug>-<N>` and `last_updated: <today>`.
 
