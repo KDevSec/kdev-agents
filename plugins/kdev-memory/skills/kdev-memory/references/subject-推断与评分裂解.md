@@ -144,7 +144,7 @@ subject_inferred_by: L1-显式提及
 subject_confidence: high
 type: 痛点
 verbatim: "主要是 kdev-memory 召回太吵打断了节奏"
-context: 在 Step N 评分时夹带反馈（评分裂解触发）
+context: 在 Step（无前缀或带前缀 `<branch-slug>-N`）评分时夹带反馈（评分裂解触发）
 diagnosis: triggers 关键词过宽或同主题重复召回
 desired: demote 机制 / 同 session 重复命中降权
 score: null

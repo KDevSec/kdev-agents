@@ -31,6 +31,7 @@ from migrate import kdev_memory_migrate  # noqa: E402
 from frontmatter import read_state_field  # noqa: E402
 from missing_summaries import list_missing_past_summaries  # noqa: E402
 from worktree_link import worktree_link_kdev  # noqa: E402
+from step_id import compute_branch_slug  # noqa: E402
 from promote_scan import scan_promote_candidates  # noqa: E402
 from distill_trigger import check_distill_trigger  # noqa: E402
 
@@ -302,6 +303,11 @@ def _build_brief(
         prog = ["📊 **今日进度**：", f"- 执行日志：{log_today}", f"- 每日汇总：{summary_today_status}"]
         if git_branch:
             prog.append(f"- 当前分支：{git_branch}")
+            try:
+                slug = compute_branch_slug()
+            except Exception:
+                slug = "unknown"
+            prog.append(f"- 本次 Step ID 前缀：`{slug}-`（下一个 Step 形如 `Step {slug}-N`）")
         parts.append("\n".join(prog))
 
         if state_phase or state_iter or state_step:

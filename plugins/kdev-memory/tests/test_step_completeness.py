@@ -298,3 +298,42 @@ class TestStrictModeShouldBlock(unittest.TestCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+# ---------------------------------------------------------------------------
+# Regression tests: prefix Step ID parsing (Q-003 task 6/13)
+# ---------------------------------------------------------------------------
+
+def test_parse_prefix_main_step():
+    log = """# 执行日志
+## Step main-9: 加分支前缀机制
+日期：2026-05-28
+"""
+    steps = step_completeness.parse_steps(log)
+    assert len(steps) == 1
+    assert steps[0]["label"] == "Step main-9"
+    assert steps[0]["title"] == "加分支前缀机制"
+    assert steps[0]["date"] == "2026-05-28"
+
+
+def test_parse_prefix_cluster_step():
+    log = """# 执行日志
+## Step cluster-x1-1: writing-plans 输出 X1 plan
+日期：2026-05-27
+"""
+    steps = step_completeness.parse_steps(log)
+    assert len(steps) == 1
+    assert steps[0]["label"] == "Step cluster-x1-1"
+
+
+def test_parse_mixed_legacy_and_prefix():
+    """历史无前缀 + 新带前缀混合解析。"""
+    log = """# 执行日志
+## Step 1: 历史无前缀（2026-05-24）
+日期：2026-05-24
+
+## Step main-9: 新带前缀
+日期：2026-05-28
+"""
+    steps = step_completeness.parse_steps(log)
+    assert [s["label"] for s in steps] == ["Step 1", "Step main-9"]

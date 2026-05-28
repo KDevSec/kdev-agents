@@ -1,5 +1,48 @@
 # kdev-memory CHANGELOG
 
+## [0.11.0] — 2026-05-28
+
+**Step ID 加分支前缀：解决 secondary worktree symlink 共享 `.kdev/` 架构下并发 ID 冲突。**
+
+经 Q-003 决策（[.kdev/memory/决策日志.md](../../.kdev/memory/决策日志.md)）+ 13 任务 plan 实施。新增 `hooks/lib/step_id.py`（slug + counter + mint 一站式接口），SessionStart brief 展示当前分支前缀，SKILL.md / references 全面对齐。
+
+### ✨ 新增功能
+
+- **`hooks/lib/step_id.py`** — slug + counter + mint 一站式接口：
+  - `compute_branch_slug()`：git rev-parse → 干净的 ASCII slug（`feature/X` / `feat/X` 去前缀；非法字符 sanitize；detached HEAD → `detached`；非 git → `unknown`）
+  - `read_counter(slug, state_dir)` / `increment_counter(slug, state_dir)`：每分支独立计数器，flock 保护 atomic 递增（POSIX `fcntl` / Windows `msvcrt`），committed 20 线程并发测试零冲突（reviewer 临时扩到 100 线程也零冲突，未入测试套）
+  - `mint_next_step_id(state_dir, slug=None)` → `"Step <slug>-<N>"`
+- **`SessionStart brief`** 在「今日进度」段加 `- 本次 Step ID 前缀：\`<slug>-\``，让智能体新会话立刻知道用什么前缀
+- **`step_completeness` regex 兼容性回归测试**：显式覆盖 `Step main-9` / `Step cluster-x1-1` / 历史无前缀混合解析
+
+### 🔄 变更
+
+- **Step ID 格式**：从 `Step N` 全局递增 → `Step <branch-slug>-N` 每分支独立递增
+- **`当前状态.md` frontmatter `current_step` 字段类型**：int → string（如 `main-9`）。`frontmatter.py:read_state_field` 已返回 str，reader 层无 breaking change
+- **SKILL.md / 六类记录-schema.md / triggers-写法.md / 切档与归档.md / subject-推断与评分裂解.md / README.md / 初始化-claude-md-模板.md** 全面更新示例 + 新增「多 worktree 并发场景」一节
+
+### 🔧 兼容性
+
+- **历史 Step 1~9 不迁移**：保持无前缀格式不动以保护既有锚点链接；`执行日志.md` 头部加 `<!-- step_id_prefix_since: 2026-05-28 -->` 注释标识切换点
+- **main 分支计数器初始化为历史最大 Step 编号**（本仓库为 9），下一条 = `Step main-10`，保持时间线连贯
+- **新建分支** 计数器从 0 起，下一条 = `Step <slug>-1`
+
+### 📋 升级指南
+
+升级到 v0.11.0 的项目需要执行一次性初始化：
+1. 在 `执行日志.md` header 段加 `<!-- step_id_prefix_since: YYYY-MM-DD -->`
+2. 计算历史最大 Step 编号 N，创建 `.kdev/memory/state/step-counter-<main-slug>.txt` 内容为 `N`（`echo N > .kdev/memory/state/step-counter-main.txt`）
+3. CLAUDE.md 添加 v0.11 新格式提醒（见模板 [`初始化-claude-md-模板.md`](skills/kdev-memory/references/初始化-claude-md-模板.md)）
+
+### ✅ 测试
+
+- `tests/test_step_id.py`：19 用例（8 slug + 7 counter + 4 mint）
+- `tests/test_session_start_brief_prefix.py`：2 用例
+- `tests/test_step_completeness.py`：+3 prefix 兼容回归
+- 完整测试套：200 通过 + 1 pre-existing 失败（`test_distill_trigger.py::test_old_distill_with_new_f_triggers`，与本变更无关）
+
+---
+
 ## [0.10.1] — 2026-05-27
 
 **Patch：修 Linux/macOS 上 hook 全线 "Permission denied" 报错。**
