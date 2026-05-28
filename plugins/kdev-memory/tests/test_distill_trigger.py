@@ -15,6 +15,7 @@ import sys
 import tempfile
 import time
 import unittest
+from datetime import datetime, timedelta
 from pathlib import Path
 from textwrap import dedent
 
@@ -200,11 +201,15 @@ class TestDistillTrigger(unittest.TestCase):
             os.utime(marker, (old_ts, old_ts))
 
             # 写 12 条 F 条目（超过默认阈值 10）
+            # R-002 修：日期动态计算为"5 天前"，保证晚于 .last-distill (10 天前)
+            # 避开 hardcode date drift（原来写死 2026-05-15 + .last-distill 10 天前导致
+            # 当 today 漂到 2026-05-26+ 时所有 entries 被日期过滤掉 → new_f=0 → 失败）
+            recent_date = (datetime.now() - timedelta(days=5)).strftime("%Y-%m-%d")
             f_entries = ["# Skill Feedback\n"]
             for i in range(1, 13):
                 f_entries.append(dedent(f"""\
                     ## F-{i:03d}
-                    日期：2026-05-15
+                    日期：{recent_date}
                     subject: plugin:test
                     verbatim: "test {i}"
                 """))
