@@ -84,6 +84,26 @@ touch .kdev/memory/strict
 ### 周总结
 > "/kdev-memory-weekly" —— 滚动 7 天周总结（汇报四段骨架：过程资产/经验总结/问题教训/开发进展）
 
+### v0.11+ 多 worktree 并发：Step ID 加分支前缀
+
+为支持 secondary worktree 通过 symlink 共享 `.kdev/` 的并发场景，Step ID 从 v0.11 起加分支前缀：
+
+```
+## Step main-9: 主分支第 9 条
+## Step cluster-x1-1: feature/cluster-x1 分支第 1 条
+```
+
+智能体落 Step 前调用：
+
+```python
+import sys; sys.path.insert(0, "plugins/kdev-memory/hooks/lib")
+from step_id import mint_next_step_id
+from pathlib import Path
+print(mint_next_step_id(Path(".kdev/memory/state")))  # → "Step main-10"
+```
+
+历史 Step 不迁移，由 `执行日志.md` 头部 `<!-- step_id_prefix_since: <date> -->` 注释标识切换点。详见 [SKILL.md](skills/kdev-memory/SKILL.md) 的「多 worktree 并发场景」一节和 [Q-003 决策](../../.kdev/memory/决策日志.md)。
+
 ## 七类记录
 
 | 触发时机 | 写入文件 | 编号 |
