@@ -1,10 +1,10 @@
 """kdev-memory v0.11 Step ID 加分支前缀机制。
 
 提供：
-- compute_branch_slug(): 把当前 git 分支名转成可放在文件名/Step ID 里的 slug
-- read_counter(slug, state_dir): 读取分支独立计数器（后续 task 实现）
-- increment_counter(slug, state_dir): atomic 递增（后续 task 实现）
-- mint_next_step_id(state_dir): 一站式（后续 task 实现）
+- compute_branch_slug(): git 当前分支名 → 可放在文件名/Step ID 里的 ASCII slug
+- read_counter(slug, state_dir): 读取分支独立计数器
+- increment_counter(slug, state_dir): flock 保护 atomic 递增，返回新值
+- mint_next_step_id(state_dir, slug=None): 一站式 slug + 递增 → "Step <slug>-<N>"
 
 被 SKILL.md 引用：模型在写 Step 条目前调用 mint_next_step_id() 拿 ID。
 """
