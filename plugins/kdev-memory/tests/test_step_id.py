@@ -85,3 +85,61 @@ def test_slug_sanitize_unicode(tmp_path, monkeypatch):
     slug = compute_branch_slug()
     assert "/" not in slug
     assert all(c.isascii() and (c.isalnum() or c in "-_") for c in slug)
+
+
+# ── Task 2: per-branch atomic counter ────────────────────────────────────────
+import threading
+
+from step_id import read_counter, increment_counter  # noqa: E402
+
+
+def test_counter_missing_file_returns_zero(tmp_path):
+    assert read_counter("main", tmp_path) == 0
+
+
+def test_counter_existing_file(tmp_path):
+    (tmp_path / "step-counter-main.txt").write_text("8\n", encoding="utf-8")
+    assert read_counter("main", tmp_path) == 8
+
+
+def test_increment_creates_file(tmp_path):
+    n = increment_counter("cluster-x1", tmp_path)
+    assert n == 1
+    assert (tmp_path / "step-counter-cluster-x1.txt").read_text(encoding="utf-8").strip() == "1"
+
+
+def test_increment_idempotent_growth(tmp_path):
+    assert increment_counter("main", tmp_path) == 1
+    assert increment_counter("main", tmp_path) == 2
+    assert increment_counter("main", tmp_path) == 3
+
+
+def test_increment_separate_slugs_independent(tmp_path):
+    assert increment_counter("main", tmp_path) == 1
+    assert increment_counter("cluster-x1", tmp_path) == 1
+    assert increment_counter("main", tmp_path) == 2
+    assert increment_counter("cluster-x1", tmp_path) == 2
+
+
+def test_increment_concurrent_no_collision(tmp_path):
+    """20 个线程并发 increment 同一 slug，结果必须是 {1, 2, ..., 20}（无重复、无丢失）。"""
+    results: list[int] = []
+    lock = threading.Lock()
+
+    def worker():
+        n = increment_counter("main", tmp_path)
+        with lock:
+            results.append(n)
+
+    threads = [threading.Thread(target=worker) for _ in range(20)]
+    for t in threads:
+        t.start()
+    for t in threads:
+        t.join()
+    assert sorted(results) == list(range(1, 21))
+
+
+def test_increment_initial_value_seed(tmp_path):
+    """预置 counter=8（模拟 main 分支历史 Step 1~8 切换），下一次应该返回 9。"""
+    (tmp_path / "step-counter-main.txt").write_text("8\n", encoding="utf-8")
+    assert increment_counter("main", tmp_path) == 9

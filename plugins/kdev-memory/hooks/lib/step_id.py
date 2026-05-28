@@ -11,8 +11,10 @@
 
 from __future__ import annotations
 
+import os
 import re
 import subprocess
+import sys
 from pathlib import Path
 from typing import Optional
 
@@ -51,3 +53,72 @@ def compute_branch_slug() -> str:
             branch = branch[len(prefix):]
             break
     return _sanitize_slug(branch)
+
+
+# ── Task 2: per-branch atomic counter ────────────────────────────────────────
+
+
+def _counter_path(slug: str, state_dir: Path) -> Path:
+    return state_dir / f"step-counter-{slug}.txt"
+
+
+def read_counter(slug: str, state_dir: Path) -> int:
+    """读 slug 的计数器值；不存在或损坏 → 0。"""
+    p = _counter_path(slug, state_dir)
+    if not p.is_file():
+        return 0
+    try:
+        text = p.read_text(encoding="utf-8").strip()
+        return int(text) if text else 0
+    except (OSError, ValueError):
+        return 0
+
+
+def _flock_exclusive(fd: int) -> None:
+    """跨平台 exclusive lock。POSIX: fcntl.flock；Windows: msvcrt.locking。"""
+    if sys.platform == "win32":
+        import msvcrt
+        msvcrt.locking(fd, msvcrt.LK_LOCK, 1)
+    else:
+        import fcntl
+        fcntl.flock(fd, fcntl.LOCK_EX)
+
+
+def _flock_release(fd: int) -> None:
+    if sys.platform == "win32":
+        import msvcrt
+        try:
+            msvcrt.locking(fd, msvcrt.LK_UNLCK, 1)
+        except OSError:
+            pass
+    else:
+        import fcntl
+        fcntl.flock(fd, fcntl.LOCK_UN)
+
+
+def increment_counter(slug: str, state_dir: Path) -> int:
+    """atomic 递增 slug 的计数器，返回新值。
+
+    锁策略：在 counter 文件上做 LOCK_EX，临界区里 read-modify-write。
+    并发安全：20 线程并发 increment 同一 slug 不丢失、不重复。
+    """
+    state_dir.mkdir(parents=True, exist_ok=True)
+    p = _counter_path(slug, state_dir)
+    fd = os.open(str(p), os.O_RDWR | os.O_CREAT, 0o644)
+    try:
+        _flock_exclusive(fd)
+        os.lseek(fd, 0, os.SEEK_SET)
+        raw = os.read(fd, 64).decode("utf-8", errors="replace").strip()
+        try:
+            cur = int(raw) if raw else 0
+        except ValueError:
+            cur = 0
+        new = cur + 1
+        os.lseek(fd, 0, os.SEEK_SET)
+        os.ftruncate(fd, 0)
+        os.write(fd, f"{new}\n".encode("utf-8"))
+        os.fsync(fd)
+        return new
+    finally:
+        _flock_release(fd)
+        os.close(fd)
