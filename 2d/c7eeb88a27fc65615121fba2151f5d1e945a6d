@@ -1,0 +1,20 @@
+plugins/kdev-memory/tests/test_distill_trigger.py
+  s_fece168c93654a::t_495d644c156664 18
+  s_fece168c93654a::t_6b9017e53b6490 204-207,212
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "2dc7eeb88a27fc65615121fba2151f5d1e945a6d",
+  "prompts": {},
+  "sessions": {
+    "s_fece168c93654a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "6fe183ce-25a4-4763-8fac-304107fed6b5",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
