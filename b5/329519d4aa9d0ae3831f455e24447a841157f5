@@ -1,0 +1,22 @@
+plugins/kdev-memory/tests/test_session_start_brief_prefix.py
+  s_fece168c93654a::t_0d2e1cd57d01c5 1-48
+plugins/kdev-memory/hooks/session-start-brief.py
+  s_fece168c93654a::t_74ff8c9ee88904 34
+  s_fece168c93654a::t_c7dee07f886cec 306-310
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "b5329519d4aa9d0ae3831f455e24447a841157f5",
+  "prompts": {},
+  "sessions": {
+    "s_fece168c93654a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "6fe183ce-25a4-4763-8fac-304107fed6b5",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
