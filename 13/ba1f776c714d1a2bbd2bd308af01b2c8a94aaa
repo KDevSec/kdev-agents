@@ -1,0 +1,19 @@
+plugins/kdev-memory/CHANGELOG.md
+  s_fece168c93654a::t_41cf52ad8697a5 13
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "13ba1f776c714d1a2bbd2bd308af01b2c8a94aaa",
+  "prompts": {},
+  "sessions": {
+    "s_fece168c93654a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "6fe183ce-25a4-4763-8fac-304107fed6b5",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
