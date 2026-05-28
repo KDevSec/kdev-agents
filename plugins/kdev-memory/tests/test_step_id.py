@@ -87,6 +87,25 @@ def test_slug_sanitize_unicode(tmp_path, monkeypatch):
     assert all(c.isascii() and (c.isalnum() or c in "-_") for c in slug)
 
 
+def test_slug_no_commit_repo(tmp_path, monkeypatch):
+    """R-003: git init -b main 但无 commit 时，rev-parse 失败，
+    应读 .git/HEAD 兜底拿到 main 而非 fallback unknown。"""
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    subprocess.run(["git", "init", "-q", "-b", "main"], cwd=repo, check=True)
+    monkeypatch.chdir(repo)
+    assert compute_branch_slug() == "main"
+
+
+def test_slug_no_commit_repo_feature_branch(tmp_path, monkeypatch):
+    """R-003: 无 commit 仓库 + 非 main 默认分支名，HEAD ref 解析应正确去 feature/ 前缀。"""
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    subprocess.run(["git", "init", "-q", "-b", "feature/draft"], cwd=repo, check=True)
+    monkeypatch.chdir(repo)
+    assert compute_branch_slug() == "draft"
+
+
 # ── Task 2: per-branch atomic counter ────────────────────────────────────────
 import threading
 

@@ -42,10 +42,17 @@ def _sanitize_slug(s: str) -> str:
 
 
 def compute_branch_slug() -> str:
-    """当前 git 分支 → slug。"""
+    """当前 git 分支 → slug。
+
+    无 commit 的新仓库（git init 后没 commit）`rev-parse --abbrev-ref HEAD` 退出码 128，
+    fallback 到读 `.git/HEAD` 的 `ref: refs/heads/<name>` 行（即便没 commit 也存在）。
+    见 R-003。
+    """
     branch = _git_query("rev-parse", "--abbrev-ref", "HEAD")
     if branch is None:
-        return "unknown"
+        branch = _branch_from_head_file()
+        if branch is None:
+            return "unknown"
     if branch == "HEAD":
         return "detached"
     for prefix in STRIPPED_PREFIXES:
@@ -53,6 +60,24 @@ def compute_branch_slug() -> str:
             branch = branch[len(prefix):]
             break
     return _sanitize_slug(branch)
+
+
+def _branch_from_head_file() -> Optional[str]:
+    """R-003 兜底：读 .git/HEAD 的 `ref: refs/heads/<name>` 拿分支名。"""
+    git_dir = _git_query("rev-parse", "--git-dir")
+    if not git_dir:
+        return None
+    head_file = Path(git_dir) / "HEAD"
+    if not head_file.is_file():
+        return None
+    try:
+        content = head_file.read_text(encoding="utf-8").strip()
+    except OSError:
+        return None
+    prefix = "ref: refs/heads/"
+    if content.startswith(prefix):
+        return content[len(prefix):]
+    return None
 
 
 # ── Task 2: per-branch atomic counter ────────────────────────────────────────
