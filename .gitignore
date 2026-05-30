@@ -48,6 +48,10 @@ docs/skills/kdev-code-graph/references/code-review-graph/
 docs/skills/kdev-code-graph/references/ops-codegraph-tool/
 # 允许 references 目录下的 .md 文档被提交
 !docs/skills/kdev-code-graph/references/*.md
+
+# framework/04-references: 同样的模式 (clone 不入库，分析 .md 入库)
+docs/framework/04-references/_repos/
+
 # 根目录 references 不提交 (使用 / 开头表示根目录)
 /references/
 
