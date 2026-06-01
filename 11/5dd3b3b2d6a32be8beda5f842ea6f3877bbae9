@@ -1,0 +1,19 @@
+docs/skills/kdev-memory/specs/2026-05-29-r-001-step-recorder-integration.md
+  s_fece168c93654a::t_4fd85d0e41dab8 1-400
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "115dd3b3b2d6a32be8beda5f842ea6f3877bbae9",
+  "prompts": {},
+  "sessions": {
+    "s_fece168c93654a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "6fe183ce-25a4-4763-8fac-304107fed6b5",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
