@@ -194,6 +194,13 @@ skill-feedback.md（F-NNN）的 `verbatim` 字段必须保留**用户原句**—
 
 > 触发信号、必问三件事、默认位置推荐、执行步骤见 **`references/规则升级流程.md`**。
 
+### 原料来源（v0.12+ 显式标注）
+
+R-NNN（项目内方法论反思）→ 累积 ≥ 2 次同主题 或 用户明确"升铁规" → 走升级流程
+（必问三件事见 `references/规则升级流程.md`）→ 落到 方法论铁规.md / 项目宪章 / ADR
+
+完整流程见 `references/规则升级流程.md`。
+
 ## 落盘路径：subagent 化两档（hybrid / inline）
 
 为了节省主会话上下文 token 并改善用户对话体验，kdev-memory 提供两档落盘路径配置（`.kdev/memory/config.yaml`）：
@@ -318,31 +325,20 @@ Step 4：更新 .kdev/memory/当前状态.md
 - **原始胜于提炼**：改进建议.md 是原料库，不是结论库。写入时保留用户原话、事实段、具体数字——未来 skill 作者看原始证据比看你的总结更有价值。
 - **项目内不强制执行就是对的**：不要因为 R-NNN 记了 5 条就回头试图"改造本项目的方法论"——这是 skill 滥用。除非用户明确说"加进铁规"，否则记录完就放那儿。
 
-## 下游：记录如何变成蒸馏原料 + 新 skill
+## 下游：知识蒸馏（markdown 切片包）
 
-本 skill 的下游消费分两条路：
-
-### 1. 改进建议（R-NNN）+ skill 反馈（F-NNN）→ review → 归纳 → 产出新 skill
-
-跨项目聚类反复出现的主题，凭原始证据驱动识别痛点：
-- **R-NNN**：项目内方法论反思 → 升铁规 / 升宪章 / 立 ADR
-- **F-NNN**：对外部 skill / 工具的反馈 → skill 维护方的 RFE backlog / 改进信号源
+通过 `/kdev-memory-distill` 命令按蒸馏目标 filter + sanitize 原 markdown 条目，
+产出三个独立 markdown 切片包：
+- `dataset-full/` — 全量记录（含 Step / G / Q / R / F），适合通用蒸馏
+- `dataset-misalignment/` — 评分差值 ≥ 2 的样本，适合 RLHF
+- `dataset-skill-feedback-by-subject/` — F-NNN 按 subject 路由
 
 F-NNN 的 `verbatim` 字段（用户原话）是最高价值的 RFE 信号源——保留情绪 / 强度 / 具体场景。
-
-### 2. markdown 切片包 → 知识蒸馏 / skill 自主优化
-
-通过 `/kdev-memory-distill` 命令按蒸馏目标 filter + sanitize 原 markdown 条目，产出三个独立 markdown 切片包：
-
-| 切片包 | 用途 |
-|---|---|
-| `dataset-full.md` | 全量条目按时间排，通用语料 / 项目知识图谱 |
-| `dataset-misalignment.md` | 差值 ≥ 1.5 的 Step——模型自评 vs 用户真实评分的 gap，**顶级对齐数据**（外面买不到的 RLHF/DPO 训练原料） |
-| `dataset-skill-feedback-by-subject/<subject>.md` | F-NNN 按 subject 切片，每 subject 一个独立 markdown，用于该 subject 的"自主优化训练集" |
 
 **架构决策**：**markdown 主存 + markdown 切片包导出，不引入 JSONL**——现代蒸馏管道（Axolotl / Unsloth / HuggingFace SFT trainer 等）直接吃 markdown，多一层中间格式徒增维护、丢失叙事（markdown body 里的因果链 reasoning trace 是顶级蒸馏样本）。
 
 > 三个切片包的筛选规则、sanitize 规则、实现路径、subagent 化建议见 **`references/markdown-切片导出.md`**。
+> 蒸馏触发机制（auto / manual 两档）见 **`references/蒸馏触发机制.md`**。
 
 ### 本 skill 的边界
 
