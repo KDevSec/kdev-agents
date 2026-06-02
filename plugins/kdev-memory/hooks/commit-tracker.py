@@ -32,15 +32,18 @@ _TASK_BATCH_RE = re.compile(r"\(.*?task\s+\d+/\d+.*?\)", re.IGNORECASE)
 
 
 def _is_git_commit(cmd: str) -> bool:
-    """识别 `git commit` 形式，允许前置 `-c k=v` 配置参数。"""
-    s = cmd.strip()
-    if not s.startswith("git"):
+    """识别 `git commit` 形式，允许前置 `-c k=v` / `-C <path>` 配置参数。
+
+    严格按 token 比对 `parts[0] == "git"`，杜绝 `gitlab commit` / `github-cli commit`
+    等前缀误判。
+    """
+    parts = cmd.strip().split()
+    if not parts or parts[0] != "git":
         return False
-    parts = s.split()
     i = 1  # skip 'git'
     while i < len(parts):
         tok = parts[i]
-        if tok == "-c" and i + 1 < len(parts):
+        if tok in ("-c", "-C") and i + 1 < len(parts):
             i += 2
             continue
         if tok.startswith("--"):

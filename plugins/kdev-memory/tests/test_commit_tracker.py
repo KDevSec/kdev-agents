@@ -88,6 +88,20 @@ def test_git_commit_with_extra_args(tmp_path):
     assert len(pending["commits"]) == 1
 
 
+def test_gitlab_prefix_does_not_match(tmp_path):
+    """`gitlab commit` / `github-cli commit` etc. must NOT match git commit."""
+    repo = _make_repo_with_commit(tmp_path, "normal")
+    _run_hook(repo, "gitlab commit -m fake")
+    assert _read_pending(repo)["commits"] == []
+
+
+def test_git_uppercase_C_flag_handled(tmp_path):
+    """`git -C <path> commit ...` must be recognized as git commit."""
+    repo = _make_repo_with_commit(tmp_path, "uppercase C arg test")
+    _run_hook(repo, f"git -C {repo} commit -m x")
+    assert len(_read_pending(repo)["commits"]) == 1
+
+
 def test_hook_resilient_to_missing_state_dir(tmp_path):
     """state dir doesn't exist yet → hook should auto-create via pending_commits.append."""
     repo = tmp_path / "repo"
