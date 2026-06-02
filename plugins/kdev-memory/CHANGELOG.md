@@ -1,5 +1,52 @@
 # kdev-memory CHANGELOG
 
+## [0.12.0] — 2026-06-02
+
+**R-001 集成：kdev-step-recorder dispatch 接入 SKILL.md / CLAUDE.md 主路径 + commit hook 兜底 + R-005 顺手。**
+
+按 R-001 v1 spec（[docs/skills/kdev-memory/specs/2026-05-29-r-001-step-recorder-integration.md](../../docs/skills/kdev-memory/specs/2026-05-29-r-001-step-recorder-integration.md)）+ 14 task plan 实施。
+
+### ✨ 新增
+
+- **`hooks/lib/pending_commits.py`** — pending-commits.json CRUD + threshold helpers (count 默认 ≥3 / age 默认 ≥30min)
+- **`hooks/lib/skill_version.py`** — SKILL.md SHA cache + drift detection (R-005)
+- **`hooks/commit-tracker.py`** — PostToolUse Bash hook 检测 git commit + 累积 pending。**suppress 规则**：commit message 含 `\(.*?task N/M.*?\)` 圆括号模式时视为 subagent-driven batch 不计入
+- **agents/kdev-step-recorder.md** YAML schema v0.3 加 `commits_batch_id` 字段（optional，不参与 hard-gate），action step 5 切到 `pending_commits.clear()` lib
+- **`SKILL.md §"用 kdev-step-recorder dispatch 落 step (v0.12+)"`** 新章节 ~50 行——主会话见此就知道用 dispatch
+- **`SKILL.md § 下游 拆分`** — R-NNN→升铁规 移到 § 规则升级流程 下作子§「原料来源」；§ 下游 改名"知识蒸馏"只讲蒸馏切片
+
+### 🔄 变更
+
+- **CLAUDE.md 第 1 条铁规重写**："实时落盘" → "实时 dispatch step-recorder 落盘"。模板同步。
+- **stop-check.py** 加 pending-commits 阈值软提醒 (rule 8)
+- **session-start-brief.py** 加 (a) pending-commits 状态展示 (b) SKILL.md SHA drift ⚠️ 提醒；`_read_source()` 返回 tuple (source, session_id)
+- **hooks.json** 注册新 PostToolUse Bash matcher 指向 commit-tracker.py
+
+### 🔧 兼容
+
+- 老历史 Step / 现有半残 Step 不迁移；新机制上线后逐步消化
+- `.kdev/memory/state/pending-commits.json` + `skill-version-cache-*.json` 是 session-local 状态，跟 step-counter-*.txt 共生（继承 `.kdev/` 现状 sync 策略）
+- agents/kdev-step-recorder.md v0.2 的 8 hard-gate 全保留；YAML schema 是向后兼容追加
+
+### 📋 升级
+
+升级到 v0.12.0：
+1. 拉取代码（plugin update）
+2. **重启所有运行中的 Claude Code 会话**（否则旧 session 不感知新 SKILL.md / hook；新机制 R-005 SHA drift 会在重启后 brief 提醒看到）
+3. CLAUDE.md 项目根的"实时落盘"段会被自动对齐到新模板
+
+### ✅ 测试
+
+- `tests/test_pending_commits.py`：11 用例
+- `tests/test_skill_version.py`：8 用例
+- `tests/test_commit_tracker.py`：10 用例（含 task N/M suppress 矩阵 + gitlab prefix + -C flag）
+- `tests/test_session_start_brief_prefix.py`：+2 用例（pending hint + SHA drift）
+- `tests/test_stop_check_pending.py`：2 用例
+- `tests/test_step_recorder_e2e.py`：1 e2e
+- 完整测试套：236 通过 + 1 known pre-existing 失败（[R-002](.kdev/memory/改进建议.md)）
+
+---
+
 ## [0.11.0] — 2026-05-28
 
 **Step ID 加分支前缀：解决 secondary worktree symlink 共享 `.kdev/` 架构下并发 ID 冲突。**

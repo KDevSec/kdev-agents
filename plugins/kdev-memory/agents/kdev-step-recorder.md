@@ -25,7 +25,10 @@ self_eval_score: 1-5
 self_eval_deduction: <ONE substantive line; rejection if empty/placeholder>
 triggers: [<keyword>, ...]                # ≥ 5 keywords for future recall
 references: [<F-NNN/G-NNN/Q-NNN/R-NNN> ...]  # optional but encouraged
+commits_batch_id: <str | null>   # subagent-driven batch 时设为 Q-NNN 或 plan slug；普通工作 null
 ```
+
+`commits_batch_id` (v0.3 新增, optional): 反向溯源信号。当 dispatch 由 plan-driven batch 触发（commit subject 含 `(Q-XXX task N/M)` 模式），设为 batch 标识；否则 null。不参与 hard-gate 校验。
 
 ## Hard-gate validation (reject before writing)
 
@@ -96,6 +99,7 @@ self_eval_score: 4
 self_eval_deduction: schema 校验从严倾向"宁错杀不放过"，docs-only step 可能被 rule 1（title generic）误伤；commit_shas=[] 的合法 step 暂无明确边界。
 triggers: [r-001, step-recorder, subagent, 落盘, 反偷懒, prototype, dogfood]
 references: [R-001, R-002, R-003]
+commits_batch_id: null
 ```
 
 ## Action sequence (after validation passes)
@@ -168,7 +172,18 @@ EOF
 
 4. **Update** `.kdev/memory/当前状态.md` frontmatter: `current_step: <slug>-<N>` and `last_updated: <today>`.
 
-5. **Clear pending-commits if it exists**: if `.kdev/memory/state/pending-commits.json` exists, write it as `[]` (or delete the file). This signals the soft-reminder loop "step is up to date".
+5. **Clear pending-commits.json**: regardless of whether it existed before, call
+
+   ```python
+   import sys; sys.path.insert(0, "plugins/kdev-memory/hooks/lib")
+   from pending_commits import clear
+   from pathlib import Path
+   import time
+   clear(Path(".kdev/memory/state"), "<minted_id>", int(time.time()))
+   ```
+
+   This signals the soft-reminder loop that step is up to date. `<minted_id>` is the
+   `Step <slug>-<N>` string you just minted in step 1.
 
 ## Return format
 

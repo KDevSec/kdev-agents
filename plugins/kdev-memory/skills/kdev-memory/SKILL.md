@@ -194,6 +194,13 @@ skill-feedback.md（F-NNN）的 `verbatim` 字段必须保留**用户原句**—
 
 > 触发信号、必问三件事、默认位置推荐、执行步骤见 **`references/规则升级流程.md`**。
 
+### 原料来源（v0.12+ 显式标注）
+
+R-NNN（项目内方法论反思）→ 累积 ≥ 2 次同主题 或 用户明确"升铁规" → 走升级流程
+（必问三件事见 `references/规则升级流程.md`）→ 落到 方法论铁规.md / 项目宪章 / ADR
+
+完整流程见 `references/规则升级流程.md`。
+
 ## 落盘路径：subagent 化两档（hybrid / inline）
 
 为了节省主会话上下文 token 并改善用户对话体验，kdev-memory 提供两档落盘路径配置（`.kdev/memory/config.yaml`）：
@@ -318,31 +325,20 @@ Step 4：更新 .kdev/memory/当前状态.md
 - **原始胜于提炼**：改进建议.md 是原料库，不是结论库。写入时保留用户原话、事实段、具体数字——未来 skill 作者看原始证据比看你的总结更有价值。
 - **项目内不强制执行就是对的**：不要因为 R-NNN 记了 5 条就回头试图"改造本项目的方法论"——这是 skill 滥用。除非用户明确说"加进铁规"，否则记录完就放那儿。
 
-## 下游：记录如何变成蒸馏原料 + 新 skill
+## 下游：知识蒸馏（markdown 切片包）
 
-本 skill 的下游消费分两条路：
-
-### 1. 改进建议（R-NNN）+ skill 反馈（F-NNN）→ review → 归纳 → 产出新 skill
-
-跨项目聚类反复出现的主题，凭原始证据驱动识别痛点：
-- **R-NNN**：项目内方法论反思 → 升铁规 / 升宪章 / 立 ADR
-- **F-NNN**：对外部 skill / 工具的反馈 → skill 维护方的 RFE backlog / 改进信号源
+通过 `/kdev-memory-distill` 命令按蒸馏目标 filter + sanitize 原 markdown 条目，
+产出三个独立 markdown 切片包：
+- `dataset-full/` — 全量记录（含 Step / G / Q / R / F），适合通用蒸馏
+- `dataset-misalignment/` — 评分差值 ≥ 2 的样本，适合 RLHF
+- `dataset-skill-feedback-by-subject/` — F-NNN 按 subject 路由
 
 F-NNN 的 `verbatim` 字段（用户原话）是最高价值的 RFE 信号源——保留情绪 / 强度 / 具体场景。
-
-### 2. markdown 切片包 → 知识蒸馏 / skill 自主优化
-
-通过 `/kdev-memory-distill` 命令按蒸馏目标 filter + sanitize 原 markdown 条目，产出三个独立 markdown 切片包：
-
-| 切片包 | 用途 |
-|---|---|
-| `dataset-full.md` | 全量条目按时间排，通用语料 / 项目知识图谱 |
-| `dataset-misalignment.md` | 差值 ≥ 1.5 的 Step——模型自评 vs 用户真实评分的 gap，**顶级对齐数据**（外面买不到的 RLHF/DPO 训练原料） |
-| `dataset-skill-feedback-by-subject/<subject>.md` | F-NNN 按 subject 切片，每 subject 一个独立 markdown，用于该 subject 的"自主优化训练集" |
 
 **架构决策**：**markdown 主存 + markdown 切片包导出，不引入 JSONL**——现代蒸馏管道（Axolotl / Unsloth / HuggingFace SFT trainer 等）直接吃 markdown，多一层中间格式徒增维护、丢失叙事（markdown body 里的因果链 reasoning trace 是顶级蒸馏样本）。
 
 > 三个切片包的筛选规则、sanitize 规则、实现路径、subagent 化建议见 **`references/markdown-切片导出.md`**。
+> 蒸馏触发机制（auto / manual 两档）见 **`references/蒸馏触发机制.md`**。
 
 ### 本 skill 的边界
 
@@ -407,3 +403,61 @@ triggers: [...]
 ### main 分支特殊性
 
 main 分支的计数器初始化为「历史 Step 1~N 的最大编号」（本仓库为 9 — 验证用 `grep -c "^## Step " .kdev/memory/执行日志.md`），让 main 上下一条新 Step = `Step main-10`，保持时间线连贯。**新建分支的计数器从 0 起**，下一条 = `Step <branch-slug>-1`。
+
+## 用 kdev-step-recorder dispatch 落 step（v0.12+）
+
+### 何时 dispatch
+
+每完成一个 step-worthy 工作单元（任务 / 决策 / 踩坑 / 用户评分），**主会话不要自己写 Step**——
+dispatch [kdev-step-recorder](../../agents/kdev-step-recorder.md) subagent 负责。
+
+判据（满足任一即 step-worthy）：
+- 至少 1 个 commit + 完成了一个独立工作单元
+- 或：一个 Q-NNN 决策推到拍板态
+- 或：一个 G-NNN 踩坑被发现 / 解决
+- 或：用户对一个工作单元给评分
+
+**hook 兜底**：若主会话遗忘，commit hook 会累积 pending-commits.json；SessionStart / Stop brief 会显示
+`🔔 pending step-recorder dispatch: N commit 累积`——看到提醒立刻 dispatch。
+
+### Dispatch 标准格式
+
+````python
+Agent({
+  subagent_type: "general-purpose",
+  model: "sonnet",
+  description: "Record Step <slug>-<N>",
+  prompt: """
+You are kdev-step-recorder. Read plugins/kdev-memory/agents/kdev-step-recorder.md
+for role + 8 hard-gates + action sequence. Work from <repo root>.
+
+## Input (YAML)
+```yaml
+title: <concrete verb + concrete object>
+about: project | feature/<name> | bugfix/<name>
+commit_shas: [...]
+files_touched: [...]
+key_decisions: [...]
+key_facts:
+  tools_invoked_count: <int>
+  errors_hit: <int>
+  detours: <int>
+  token_feel: light | medium | heavy
+self_eval_score: 1-5
+self_eval_deduction: <substantive — empty REJECTED>
+triggers: [...]   # ≥ 5
+references: [...]
+commits_batch_id: <Q-NNN or null>
+```
+"""
+})
+````
+
+完整 schema、8 hard-gate 规则、反例对照、action sequence 详见
+[agents/kdev-step-recorder.md](../../agents/kdev-step-recorder.md)。
+
+### 为什么 dispatch 而不是主会话自己写
+
+主会话被任务流吸住、自然停顿点被预期下一棒吞没——遗忘是常态（R-001 痛点：5/27 实测 75% under-reporting）。
+dispatch fire-and-forget = 主会话只付出 ~30 行 YAML 写作 + 立即继续，subagent 干 Read/算/Write/Edit。
+比"自己 Read 执行日志 + mint + Write 4 段 + Edit 当前状态" 轻 5-10x。
