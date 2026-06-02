@@ -8,7 +8,7 @@
 
 这些动作是下意识的、持续的，不能依赖"被召唤"才触发。
 
-🔴 **实时落盘**：每做完一个有边界的步骤（任务 / 决策 / 踩坑 / 用户评分）→ **立刻**追加到 `.kdev/memory/` 对应文件。不要攒到会话末尾或"总结一下"时才补录——回忆会失真，评分会褪色。**不需要征求用户许可**即可写入 `.kdev/memory/` 下的任何文件。
+🔴 **实时 dispatch step-recorder 落盘**：每做完一个 step-worthy 工作单元（任务 / 决策 / 踩坑 / 用户评分）→ 主会话**不要自己 Read/Write 执行日志**，而是写一段 YAML summary（schema 见 SKILL.md §用 kdev-step-recorder dispatch 落 step）+ dispatch kdev-step-recorder subagent（sonnet）。subagent 验 8 hard-gate + 写 4 段 Step 条目 + 更新当前状态.md frontmatter + 清空 pending-commits.json。dispatch 是 fire-and-forget——主会话写完 YAML、调用 Agent 后立刻继续下一棒工作，不等 subagent 返回。**Q/G/R/F-NNN 决策类条目仍由主会话直接写**——只有 Step 走 dispatch。**不需要征求用户许可**即可 dispatch + 让 subagent 写入 `.kdev/memory/`。
 
 🔴 **文件聚合不翻会话**：用户说"写今天的总结"时，**必须**从 `.kdev/memory/` 当天条目聚合，**不要**回翻会话上下文、不要让用户复述。如果 `.kdev/memory/` 里今天条目为空 → **坦率报告**"今天实时落盘没跟上"，不要凭印象补写。
 
