@@ -426,7 +426,7 @@ dispatch [kdev-step-recorder](../../agents/kdev-step-recorder.md) subagent 负�
 
 ### Dispatch 标准格式
 
-```python
+````python
 Agent({
   subagent_type: "general-purpose",
   model: "sonnet",
@@ -455,7 +455,7 @@ commits_batch_id: <Q-NNN or null>
 ```
 """
 })
-```
+````
 
 完整 schema、8 hard-gate 规则、反例对照、action sequence 详见
 [agents/kdev-step-recorder.md](../../agents/kdev-step-recorder.md)。
