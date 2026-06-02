@@ -22,6 +22,7 @@ import json
 import shlex
 import subprocess
 import sys
+import time
 from datetime import date
 from pathlib import Path
 from typing import List, Tuple
@@ -37,6 +38,7 @@ from migrate import kdev_memory_migrate  # noqa: E402
 from milestone import is_milestone_path  # noqa: E402
 from missing_summaries import list_missing_past_summaries  # noqa: E402
 from archive_hint import collect_archive_hints  # noqa: E402
+from pending_commits import format_brief_hint as pending_format_brief_hint  # noqa: E402
 
 
 def _read_stop_hook_active() -> bool:
@@ -207,6 +209,12 @@ def main() -> int:
     step_today_half, step_hint = _step_completeness_scan(log_file, today)
     if step_hint:
         reminders.append(step_hint)
+
+    # 8. pending-commits 阈值软提醒
+    state_dir = kdev_dir / "state"
+    pending_hint = pending_format_brief_hint(state_dir, now=int(time.time()))
+    if pending_hint:
+        reminders.append(pending_hint)
 
     # ---- 严格模式：阻塞 ----
     strict_flag = (kdev_dir / "strict").is_file()
