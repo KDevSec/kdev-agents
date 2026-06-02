@@ -179,7 +179,7 @@ EOF
    from pending_commits import clear
    from pathlib import Path
    import time
-   clear(Path(".kdev/memory/state"), <minted_id>, int(time.time()))
+   clear(Path(".kdev/memory/state"), "<minted_id>", int(time.time()))
    ```
 
    This signals the soft-reminder loop that step is up to date. `<minted_id>` is the
