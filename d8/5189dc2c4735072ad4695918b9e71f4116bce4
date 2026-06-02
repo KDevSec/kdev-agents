@@ -1,0 +1,19 @@
+plugins/kdev-memory/agents/kdev-step-recorder.md
+  s_fece168c93654a::t_b535beba42ddcd 182
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "d85189dc2c4735072ad4695918b9e71f4116bce4",
+  "prompts": {},
+  "sessions": {
+    "s_fece168c93654a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "6fe183ce-25a4-4763-8fac-304107fed6b5",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
