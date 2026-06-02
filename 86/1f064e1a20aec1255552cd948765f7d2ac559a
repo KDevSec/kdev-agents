@@ -1,0 +1,23 @@
+plugins/kdev-memory/tests/test_stop_check_pending.py
+  s_fece168c93654a::t_58ef98e0edd305 1-55
+plugins/kdev-memory/hooks/stop-check.py
+  s_fece168c93654a::t_f3e72f3620a9cc 41
+  s_fece168c93654a::t_8607c00b0b6d96 25
+  s_fece168c93654a::t_d5491ce1883714 213-218
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "861f064e1a20aec1255552cd948765f7d2ac559a",
+  "prompts": {},
+  "sessions": {
+    "s_fece168c93654a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "6fe183ce-25a4-4763-8fac-304107fed6b5",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
