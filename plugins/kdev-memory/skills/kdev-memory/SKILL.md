@@ -407,3 +407,61 @@ triggers: [...]
 ### main 分支特殊性
 
 main 分支的计数器初始化为「历史 Step 1~N 的最大编号」（本仓库为 9 — 验证用 `grep -c "^## Step " .kdev/memory/执行日志.md`），让 main 上下一条新 Step = `Step main-10`，保持时间线连贯。**新建分支的计数器从 0 起**，下一条 = `Step <branch-slug>-1`。
+
+## 用 kdev-step-recorder dispatch 落 step（v0.12+）
+
+### 何时 dispatch
+
+每完成一个 step-worthy 工作单元（任务 / 决策 / 踩坑 / 用户评分），**主会话不要自己写 Step**——
+dispatch [kdev-step-recorder](../../agents/kdev-step-recorder.md) subagent 负责。
+
+判据（满足任一即 step-worthy）：
+- 至少 1 个 commit + 完成了一个独立工作单元
+- 或：一个 Q-NNN 决策推到拍板态
+- 或：一个 G-NNN 踩坑被发现 / 解决
+- 或：用户对一个工作单元给评分
+
+**hook 兜底**：若主会话遗忘，commit hook 会累积 pending-commits.json；SessionStart / Stop brief 会显示
+`🔔 pending step-recorder dispatch: N commit 累积`——看到提醒立刻 dispatch。
+
+### Dispatch 标准格式
+
+```python
+Agent({
+  subagent_type: "general-purpose",
+  model: "sonnet",
+  description: "Record Step <slug>-<N>",
+  prompt: """
+You are kdev-step-recorder. Read plugins/kdev-memory/agents/kdev-step-recorder.md
+for role + 8 hard-gates + action sequence. Work from <repo root>.
+
+## Input (YAML)
+```yaml
+title: <concrete verb + concrete object>
+about: project | feature/<name> | bugfix/<name>
+commit_shas: [...]
+files_touched: [...]
+key_decisions: [...]
+key_facts:
+  tools_invoked_count: <int>
+  errors_hit: <int>
+  detours: <int>
+  token_feel: light | medium | heavy
+self_eval_score: 1-5
+self_eval_deduction: <substantive — empty REJECTED>
+triggers: [...]   # ≥ 5
+references: [...]
+commits_batch_id: <Q-NNN or null>
+```
+"""
+})
+```
+
+完整 schema、8 hard-gate 规则、反例对照、action sequence 详见
+[agents/kdev-step-recorder.md](../../agents/kdev-step-recorder.md)。
+
+### 为什么 dispatch 而不是主会话自己写
+
+主会话被任务流吸住、自然停顿点被预期下一棒吞没——遗忘是常态（R-001 痛点：5/27 实测 75% under-reporting）。
+dispatch fire-and-forget = 主会话只付出 ~30 行 YAML 写作 + 立即继续，subagent 干 Read/算/Write/Edit。
+比"自己 Read 执行日志 + mint + Write 4 段 + Edit 当前状态" 轻 5-10x。
