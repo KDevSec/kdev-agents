@@ -1,0 +1,19 @@
+plugins/kdev-memory/hooks/hooks.json
+  s_fece168c93654a::t_d816176107ddee 47-56
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "e9614157e125cbc84a0776aefd0fe4daf5d35dad",
+  "prompts": {},
+  "sessions": {
+    "s_fece168c93654a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "6fe183ce-25a4-4763-8fac-304107fed6b5",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
