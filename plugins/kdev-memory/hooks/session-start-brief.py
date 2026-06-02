@@ -16,9 +16,10 @@ import importlib.util
 import json
 import subprocess
 import sys
+import time
 from datetime import date
 from pathlib import Path
-from typing import List, Optional
+from typing import List, Optional, Tuple
 
 SCRIPT_DIR = Path(__file__).resolve().parent
 LIB_DIR = SCRIPT_DIR / "lib"
@@ -34,24 +35,29 @@ from worktree_link import worktree_link_kdev  # noqa: E402
 from step_id import compute_branch_slug  # noqa: E402
 from promote_scan import scan_promote_candidates  # noqa: E402
 from distill_trigger import check_distill_trigger  # noqa: E402
+from pending_commits import format_brief_hint as pending_format_brief_hint  # noqa: E402
+from skill_version import detect_drift as skill_detect_drift  # noqa: E402
 
 SUPPRESS = json.dumps({"continue": True, "suppressOutput": True})
 
 
-def _read_source() -> str:
+def _read_source() -> Tuple[str, str]:
+    """返回 (source, session_id)。"""
     if sys.stdin.isatty():
-        return "startup"
+        return "startup", "unknown"
     try:
         raw = sys.stdin.read()
     except OSError:
-        return "startup"
+        return "startup", "unknown"
     if not raw:
-        return "startup"
+        return "startup", "unknown"
     try:
         data = json.loads(raw)
     except (ValueError, TypeError):
-        return "startup"
-    return data.get("source") or "startup"
+        return "startup", "unknown"
+    source = data.get("source") or "startup"
+    session_id = str(data.get("session_id") or "unknown")
+    return source, session_id
 
 
 def _git_branch() -> str:
@@ -234,6 +240,8 @@ def _build_brief(
     recent_step: str,
     recent_q: str,
     recent_g: str,
+    pending_hint: str = "",
+    skill_drift_hint: str = "",
 ) -> str:
     """按 mode 组装 brief 文本。返回带换行的 markdown 字符串。"""
 
@@ -308,6 +316,10 @@ def _build_brief(
             except Exception:
                 slug = "unknown"
             prog.append(f"- 本次 Step ID 前缀：`{slug}-`（下一个 Step 形如 `Step {slug}-N`）")
+        if pending_hint:
+            prog.append(f"- {pending_hint}")
+        if skill_drift_hint:
+            prog.append(f"- {skill_drift_hint}")
         parts.append("\n".join(prog))
 
         if state_phase or state_iter or state_step:
@@ -359,7 +371,7 @@ def main() -> int:
         print(SUPPRESS)
         return 0
 
-    source = _read_source()
+    source, session_id = _read_source()
 
     # 数据收集
     warn_files = _glob_warn_files(kdev_dir)
@@ -384,6 +396,23 @@ def main() -> int:
     recent_q = _last_heading(kdev_dir / "决策日志.md", "## Q-")
     recent_g = _last_heading(kdev_dir / "踩坑日志.md", "## G-")
 
+    # pending-commits hint
+    pending_hint = pending_format_brief_hint(
+        kdev_dir / "state",
+        now=int(time.time()),
+    )
+
+    # R-005: SKILL.md SHA drift check
+    cached_sha, current_sha = skill_detect_drift(session_id, Path.cwd(), kdev_dir / "state")
+    if cached_sha is not None and current_sha is not None and cached_sha != current_sha:
+        skill_drift_hint = (
+            f"⚠️ SKILL.md 在你会话启动后被升级"
+            f"（cached={cached_sha[:7]} → current={current_sha[:7]}）— "
+            f"建议 /clear restart 加载新 skill"
+        )
+    else:
+        skill_drift_hint = ""
+
     brief = _build_brief(
         mode=source,
         today=today,
@@ -406,6 +435,8 @@ def main() -> int:
         recent_step=recent_step,
         recent_q=recent_q,
         recent_g=recent_g,
+        pending_hint=pending_hint or "",
+        skill_drift_hint=skill_drift_hint,
     )
 
     if not brief.strip():

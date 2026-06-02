@@ -46,3 +46,56 @@ def test_brief_shows_feature_branch_prefix(tmp_path):
     out = _run_hook(repo)
     ctx = out.get("hookSpecificOutput", {}).get("additionalContext", "")
     assert "cluster-x1-" in ctx
+
+
+import json as _json
+import time as _time
+
+
+def test_brief_shows_pending_commits_when_above_threshold(tmp_path):
+    repo = _init_repo_with_kdev(tmp_path, "main")
+    state = repo / ".kdev" / "memory" / "state"
+    state.mkdir(parents=True, exist_ok=True)
+    now = int(_time.time())
+    state.joinpath("pending-commits.json").write_text(_json.dumps({
+        "since_step_id": "main-15",
+        "since_ts": now - 60,
+        "commits": [
+            {"sha": "a"*40, "subject": "s1", "ts": now - 60},
+            {"sha": "b"*40, "subject": "s2", "ts": now - 30},
+            {"sha": "c"*40, "subject": "s3", "ts": now - 5},
+        ],
+    }), encoding="utf-8")
+    out = _run_hook(repo)
+    ctx = out.get("hookSpecificOutput", {}).get("additionalContext", "")
+    assert "pending step-recorder" in ctx
+    assert "3 commit" in ctx
+
+
+def test_brief_shows_drift_when_skill_sha_changes(tmp_path):
+    repo = _init_repo_with_kdev(tmp_path, "main")
+    # create a fake SKILL.md inside repo (we'll point detect_drift at it)
+    skill_dir = repo / "plugins" / "kdev-memory" / "skills" / "kdev-memory"
+    skill_dir.mkdir(parents=True)
+    skill_md = skill_dir / "SKILL.md"
+    skill_md.write_text("v1", encoding="utf-8")
+    subprocess.run(["git", "add", "."], cwd=repo, check=True)
+    subprocess.run(
+        ["git", "-c", "user.email=t@t", "-c", "user.name=t",
+         "commit", "-q", "-m", "add skill"],
+        cwd=repo, check=True,
+    )
+    # first run primes cache
+    _run_hook(repo)
+    # bump SKILL.md + commit
+    skill_md.write_text("v2", encoding="utf-8")
+    subprocess.run(["git", "add", "."], cwd=repo, check=True)
+    subprocess.run(
+        ["git", "-c", "user.email=t@t", "-c", "user.name=t",
+         "commit", "-q", "-m", "bump skill"],
+        cwd=repo, check=True,
+    )
+    # second run should detect drift
+    out = _run_hook(repo)
+    ctx = out.get("hookSpecificOutput", {}).get("additionalContext", "")
+    assert "SKILL.md 在你会话启动后被升级" in ctx
