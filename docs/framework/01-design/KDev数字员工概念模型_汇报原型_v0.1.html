@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KDev 数字员工架构 · 概念模型（汇报原型）</title>
+<style>
+  :root{
+    --navy:#1F4E79; --navyd:#1F3864; --red:#C00000; --bblue:#2E75B6;
+    --lt:#F2F6FB; --bd:#D9D9D9; --cell:#BFBFBF; --ink:#333; --mut:#666;
+    --okg:#2E7D32; --warn:#C55A11;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:#5a5a5a;font-family:"Microsoft YaHei","PingFang SC","微软雅黑",sans-serif;color:var(--ink)}
+  .slide{position:relative;width:1280px;height:720px;background:#fff;margin:26px auto;overflow:hidden}
+  .slide-footer{position:absolute;left:32px;right:32px;bottom:11px;display:flex;justify-content:space-between;font-size:11.5px;color:#9aa3ad;border-top:1px solid #e6e9ee;padding-top:5px}
+
+  .topbar{display:flex;align-items:center;gap:13px;padding:18px 32px 8px}
+  .badge{width:34px;height:34px;background:var(--navyd);color:#fff;font-size:21px;font-weight:bold;display:flex;align-items:center;justify-content:center;flex:0 0 auto}
+  .chaplabel{color:var(--red);font-size:17px;font-weight:bold;flex:0 0 auto}
+  .maintitle{color:var(--navy);font-size:23px;font-weight:bold;line-height:1.12}
+  .titlerule{height:3px;background:var(--navy);margin:0 32px}
+
+  .cols{display:flex;gap:13px;padding:10px 32px 0;align-items:flex-start}
+  .col{display:flex;flex-direction:column;gap:10px}
+  .panel{border:1px solid var(--bd)}
+  .ph{background:var(--navy);color:#fff;font-size:13.5px;font-weight:bold;padding:5px 11px}
+  .ph.red{background:var(--red)}
+  .pb{padding:8px 11px;font-size:12px;line-height:1.45}
+  .kr{color:var(--red);font-weight:bold} .kb{color:var(--navy);font-weight:bold}
+
+  /* 组织架构 */
+  .org{display:flex;flex-direction:column;align-items:center}
+  .obx{border:1px solid var(--bd);padding:3px 14px;text-align:center;font-size:12px}
+  .oceo{background:var(--navy);color:#fff;font-weight:bold;font-size:12.5px;padding:4px 14px}
+  .oceo small{font-weight:normal;opacity:.85;font-size:10px}
+  .vbar{width:2px;height:9px;background:var(--bd)}
+  .orow{display:flex;gap:10px;align-items:stretch;width:100%;justify-content:center}
+  .ocqo{background:var(--red);color:#fff;font-weight:bold;padding:7px 11px;text-align:center;font-size:12px;display:flex;flex-direction:column;justify-content:center}
+  .ocqo small{font-weight:normal;opacity:.9;font-size:9.5px;margin-top:2px}
+  .oemps{flex:1;border:1.5px dashed var(--bblue);padding:7px;display:flex;flex-direction:column;gap:5px}
+  .oemps .ttl{text-align:center;color:var(--navy);font-weight:bold;font-size:11px}
+  .delivery{display:flex;gap:6px;align-items:stretch}
+  .delivery .empgrid{flex:1;display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+  .emp{border:1px solid var(--bblue);background:var(--lt);padding:5px 3px;text-align:center}
+  .emp .en{color:var(--navy);font-weight:bold;font-size:11.5px}
+  .emp .ec{color:var(--mut);font-size:10px;margin-top:1px}
+  .rev{flex:0 0 92px;border:1.5px solid var(--navy);background:var(--navy);color:#fff;padding:5px 4px;text-align:center;display:flex;flex-direction:column;justify-content:center}
+  .rev .en{font-weight:bold;font-size:11.5px}
+  .rev .ec{font-size:9.5px;opacity:.9;margin-top:1px}
+  .collab{text-align:center;color:var(--mut);font-size:9.5px;margin-top:1px}
+  .sub-line{font-size:11px;margin-top:7px;line-height:1.4}
+  .sub-line b{color:var(--navy)}
+
+  /* 金字塔 */
+  .pyr{display:flex;flex-direction:column;align-items:center;gap:4px;padding:2px 0}
+  .pl{color:#fff;text-align:center;font-weight:bold;padding:7px 6px;line-height:1.2;font-size:11.5px}
+  .pl small{display:block;font-weight:normal;font-size:9.5px;opacity:.88;margin-top:1px}
+  .pyr-cap{text-align:center;color:var(--mut);font-size:10px;margin-top:4px}
+
+  .capx{display:grid;grid-template-columns:repeat(4,1fr);gap:6px}
+  .cbx{border:1.5px solid var(--bblue);padding:6px 3px;text-align:center;font-size:11.5px;color:var(--navy);font-weight:bold}
+  .cbx small{display:block;color:var(--mut);font-weight:normal;font-size:9px;margin-top:2px}
+
+  table.ft{width:100%;border-collapse:collapse;font-size:11px}
+  table.ft th{background:var(--navy);color:#fff;font-weight:bold;padding:4px 6px;text-align:left;border:1px solid var(--cell)}
+  table.ft td{padding:3px 6px;border:1px solid var(--cell);vertical-align:top;line-height:1.25}
+  table.ft tr:nth-child(even) td{background:var(--lt)}
+  td .lv{color:var(--navy);font-weight:bold}
+  .st-warn{color:var(--warn);font-weight:bold} .st-risk{color:var(--red);font-weight:bold}
+
+  .strip{margin:7px 0 0;background:var(--lt);border-left:4px solid var(--navy);padding:6px 10px;font-size:11px;line-height:1.4}
+  .strip.red{border-left-color:var(--red)}
+  .note-red{color:var(--red);font-size:10.5px;font-weight:bold;margin-top:5px}
+
+  .fly{display:flex;flex-direction:column;gap:5px}
+  .flyrow{display:flex;align-items:center;gap:8px;font-size:11.5px}
+  .flyrow .ic{width:19px;height:19px;background:var(--navy);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;flex:0 0 auto}
+
+  .cover{display:flex;flex-direction:column;justify-content:center;align-items:center;height:100%;position:relative}
+  .cband{position:absolute;left:0;right:0;height:14px;background:var(--navy)} .cband.t{top:92px} .cband.b{bottom:92px}
+  .cover .ttl{color:var(--navy);font-size:44px;font-weight:bold;text-align:center;line-height:1.25}
+  .cover .sub{color:var(--ink);font-size:19px;margin-top:18px;letter-spacing:1px}
+  .cover .meta{color:var(--mut);font-size:14px;margin-top:10px}
+  .closing{display:flex;flex-direction:column;justify-content:center;align-items:center;height:100%}
+  .closing .big{color:var(--navy);font-size:62px;font-weight:bold;letter-spacing:4px}
+  .closing .sm{color:var(--mut);font-size:15px;margin-top:16px}
+</style>
+</head>
+<body>
+
+<!-- 总览大页（唯一页） -->
+<section class="slide">
+  <div class="topbar"><div class="badge">1</div><div class="chaplabel">总览</div>
+    <div class="maintitle">KDev 数字员工 · 架构总览</div></div>
+  <div class="titlerule"></div>
+
+  <div class="cols">
+    <!-- 左栏 -->
+    <div class="col" style="flex:1.28">
+      <div class="panel"><div class="ph"> 数字员工 = 多能力 ＋ 编排 → 6 人 AI 团队（39 agent/能力）</div>
+        <div class="pb">
+          <div class="org">
+            <div class="obx">用户</div><div class="vbar"></div>
+            <div class="obx oceo">CEO 主控员 <small>对话/派单/决策/升级裁决</small></div><div class="vbar"></div>
+            <div class="orow">
+              <div class="ocqo">CQO 元监督<small>流程合规·有阻断权</small></div>
+              <div class="oemps"><div class="ttl">业务员工（每个 = 一个"数字员工"）＋ 评审专家收敛把关</div>
+                <div class="delivery">
+                  <div class="empgrid">
+                    <div class="emp"><div class="en">需求架构师</div><div class="ec">5 能力</div></div>
+                    <div class="emp"><div class="en">开发工程师</div><div class="ec">6 能力</div></div>
+                    <div class="emp"><div class="en">测试工程师</div><div class="ec">4 能力</div></div>
+                  </div>
+                  <div class="rev"><div class="en">评审专家</div><div class="ec">18 评审·收敛把关</div></div>
+                </div>
+                <div class="collab">↕ 3 交付员工编排间直接协作（不经 CEO）· 产出 → 评审专家收敛评审</div>
+              </div>
+            </div>
+          </div>
+          <div class="sub-line"><b>39 agent</b> = 1 CEO ＋ 1 CQO ＋ 4 编排 ＋ 15 业务 ＋ 18 评审　｜　<b>评审治理</b>：R→D→T→F（19 节点）· 双重通过门（总分≥阈值 且 阻断=0，3 次不过升 CEO）</div>
+        </div>
+      </div>
+
+      <div class="panel"><div class="ph">从底层技能到数字员工（金字塔）</div>
+        <div class="pb">
+          <div class="pyr">
+            <div class="pl" style="width:48%;background:#1F3864">数字员工<small>编排 + 多能力 → 端到端交付</small></div>
+            <div class="pl" style="width:66%;background:#1F4E79">能力（= 专用 agent）<small>某类活的专家</small></div>
+            <div class="pl" style="width:84%;background:#2E5C8A">底层技能：Skill ＋ 规范 ＋ 模板 ＋ 知识库</div>
+            <div class="pl" style="width:100%;background:#2E75B6">通用 Agent（底座 · 推理 + 工具/MCP + 模型选型）</div>
+          </div>
+          <div class="pyr-cap">自下而上逐层组装：底座 → 底层技能 → 能力 → 数字员工</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 右栏 -->
+    <div class="col" style="flex:1">
+      <div class="panel"><div class="ph">① 能力组成 ＋ 平台底座</div>
+        <div class="pb">
+          <div class="capx">
+            <div class="cbx">通用 Agent<small>推理+工具/MCP</small></div>
+            <div class="cbx">Skill<small>专业 know-how</small></div>
+            <div class="cbx">规范<small>质量约束</small></div>
+            <div class="cbx">模板<small>产出结构</small></div>
+          </div>
+          <div class="sub-line"><b>专用agent</b>：由上面四项组成专用Agent，比如测试用例 agent / 安全编码 agent</div>
+          <div class="sub-line"><b>平台底座</b>：kdev-staff / kdev-core / kdev-memory</div>
+        </div>
+      </div>
+      <div class="panel"><div class="ph">② 自主度分级</div>
+        <div class="pb">
+          <table class="ft">
+            <tr><th style="width:10%">级</th><th style="width:18%">名</th><th style="width:40%">人/机分工</th><th>按级长出</th></tr>
+            <tr><td><span class="lv">L1</span></td><td>助手</td><td>人驱动、执行单步</td><td>能力起步</td></tr>
+            <tr><td><span class="lv">L2</span></td><td>协同</td><td>员工做完整任务、人编排确认</td><td>＋编排＋记忆</td></tr>
+            <tr><td><span class="lv">L3</span></td><td>自主</td><td>端到端自跑、人管异常</td><td class="st-warn">＋协作＋第三方评审</td></tr>
+            <tr><td><span class="lv">L4</span></td><td>自治</td><td>自监督/自演进</td><td class="st-risk">＋元监督＋自演进</td></tr>
+          </table>
+          <div class="note-red">知识库/MCP 不在此轴（属组成与持续升级）。</div>
+        </div>
+      </div>
+      <div class="panel"><div class="ph red">③ 持续升级 · 复利飞轮</div>
+        <div class="pb">
+          <div class="fly">
+            <div class="flyrow"><span class="ic">1</span><div>数字员工干活（需求→验收）</div></div>
+            <div class="flyrow"><span class="ic">2</span><div>过程沉淀进 <b>专有知识库</b>（持续注入）</div></div>
+            <div class="flyrow"><span class="ic">3</span><div>知识 <b>反哺能力</b>（下次更准更快）</div></div>
+            <div class="flyrow"><span class="ic">4</span><div><span class="kr">越用越强（复利上升）</span> → 回到 1</div></div>
+          </div>
+          <div class="note-red">知识库 md·wiki 或 RAG 皆可、不分高低；是持续升级引擎，不挂级别。</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer"><span>KDev 数字员工架构 · 概念模型</span><span>01</span></div>
+</section>
+
+</body>
+</html>
