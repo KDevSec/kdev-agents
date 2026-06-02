@@ -1,0 +1,19 @@
+plugins/kdev-memory/tests/test_step_recorder_e2e.py
+  s_fece168c93654a::t_f2cb9917681a37 1-69
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "a4a2c66239b374858dc48330d76195ac4ff04dfb",
+  "prompts": {},
+  "sessions": {
+    "s_fece168c93654a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "6fe183ce-25a4-4763-8fac-304107fed6b5",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
