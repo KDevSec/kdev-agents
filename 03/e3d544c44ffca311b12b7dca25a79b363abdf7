@@ -1,0 +1,33 @@
+docs/framework/01-design/2026-06-03-01-kdev-core底座决策-OMC-vs-自建-vs-抽共性.md
+  s_c7c37810fe9dcc::t_c8ff5f65c0748c 1-105
+docs/framework/01-design/2026-05-28-02-KDev-staff-整体架构-v0.1.md
+  s_c7c37810fe9dcc::t_f2d0d364ccecb9 5
+  s_c7c37810fe9dcc::t_472eb40b2857b1 559-562
+  s_c7c37810fe9dcc::t_c7425f09b91474 535,537,539,541-545,547-548
+  s_c7c37810fe9dcc::t_523bcf4cf1354c 582-583
+  s_c7c37810fe9dcc::t_1b57f69591d099 507
+  s_c7c37810fe9dcc::t_5fe4037e2b1948 10-21
+docs/framework/01-design/2026-05-28-03-kdev-core-v0.1-详细设计.md
+  s_c7c37810fe9dcc::t_5c51376b5df15e 451-453
+  s_c7c37810fe9dcc::t_6a8438e0fb3e38 5
+  s_c7c37810fe9dcc::t_1dd4ca2c6b0bef 814-832
+  s_c7c37810fe9dcc::t_5d94bb1031580d 10-21
+  s_c7c37810fe9dcc::t_a2193e8ee948b7 875
+  s_c7c37810fe9dcc::t_70aa358b17ff1b 35-51
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "03e3d544c44ffca311b12b7dca25a79b363abdf7",
+  "prompts": {},
+  "sessions": {
+    "s_c7c37810fe9dcc": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c46e95e4-1921-44bc-8c97-713d2da0c24c",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
