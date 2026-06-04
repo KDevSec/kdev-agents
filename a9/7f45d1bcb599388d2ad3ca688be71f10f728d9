@@ -1,0 +1,22 @@
+docs/skills/kdev-code-graph/2026-05-21-讲解材料.md
+  s_604daa9a27f194::t_b2dc4b203e6790 77,80-83
+  s_604daa9a27f194::t_32f3e241b23249 4-6
+plugins/kdev-code-graph/README.md
+  s_604daa9a27f194::t_1d0c7223123962 16,18-21,24,26-31,33,38-39,42,44,46,50
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.0",
+  "base_commit_sha": "a97f45d1bcb599388d2ad3ca688be71f10f728d9",
+  "prompts": {},
+  "sessions": {
+    "s_604daa9a27f194": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a825b2bf-c0e0-4981-9f2f-64c679268c0a",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}

@@ -1,0 +1,28 @@
+plugins/kdev-code-graph/skills/kdev-codegraph-doc-sync/SKILL.md
+  s_4c902eb1423154::t_e4d91e6406e528 8-9
+  s_4c902eb1423154::t_b8190ebed8b633 40
+plugins/kdev-code-graph/references/conventions.md
+  s_4c902eb1423154::t_ae1fa2e4155b94 1-220
+plugins/kdev-code-graph/skills/kdev-codegraph-impact/SKILL.md
+  s_4c902eb1423154::t_1379482d0dc18c 8-9
+plugins/kdev-code-graph/skills/kdev-codegraph-build/SKILL.md
+  s_4c902eb1423154::t_365416418dd481 8-9
+plugins/kdev-code-graph/skills/kdev-codegraph-trace/SKILL.md
+  s_4c902eb1423154::t_7e1e7f7c821cbd 8-9,12
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.8",
+  "base_commit_sha": "82590362cfccbb5540fa68565286378bb7f3da3a",
+  "prompts": {},
+  "sessions": {
+    "s_4c902eb1423154": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5a4386c9-1d3d-4ad5-a727-15ea02304ca3",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}

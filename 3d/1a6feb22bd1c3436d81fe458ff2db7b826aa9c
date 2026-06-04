@@ -1,0 +1,21 @@
+plugins/kdev-cluster-x1/tools/tests/test_agent_ceshi_leader.py
+  s_c1d0e441c085b2::t_a75987247d63eb 1-10
+plugins/kdev-cluster-x1/agents/测试组长.md
+  s_c1d0e441c085b2::t_8ff6a37f1054d6 1-62
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "3d1a6feb22bd1c3436d81fe458ff2db7b826aa9c",
+  "prompts": {},
+  "sessions": {
+    "s_c1d0e441c085b2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "3abfbc17-3c68-4fed-9d79-9acbd73c9baf",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}

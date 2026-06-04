@@ -1,0 +1,19 @@
+docs/skills/kdev-code-graph/2026-05-22-spec-link设计.md
+  s_604daa9a27f194::t_82f0576ee44f0e 1-517
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.0",
+  "base_commit_sha": "8fb7774aa9acf1624d5760a71cc7818ce3e64d1b",
+  "prompts": {},
+  "sessions": {
+    "s_604daa9a27f194": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a825b2bf-c0e0-4981-9f2f-64c679268c0a",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}

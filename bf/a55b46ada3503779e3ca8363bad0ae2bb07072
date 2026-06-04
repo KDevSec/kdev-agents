@@ -1,0 +1,33 @@
+plugins/kdev-code-graph/.claude-plugin/plugin.json
+  s_d09eaec4ee3c61::t_952fa2f3f8f8bb 12
+plugins/kdev-code-graph/skills/kdev-codegraph-impact/SKILL.md
+  s_d09eaec4ee3c61::t_aaeb8788970571 19
+plugins/kdev-code-graph/install.ps1
+  s_d09eaec4ee3c61::t_a849363d952a2f 129
+plugins/kdev-code-graph/install.sh
+  s_d09eaec4ee3c61::t_6c41a147a44a06 74
+plugins/kdev-code-graph/skills/kdev-codegraph-build/SKILL.md
+  s_d09eaec4ee3c61::t_2354800b3f7655 26
+plugins/kdev-code-graph/README.md
+  s_d09eaec4ee3c61::t_c897834ee907d8 93
+plugins/kdev-code-graph/skills/kdev-codegraph-doc-sync/SKILL.md
+  s_d09eaec4ee3c61::t_e1f394c22be2b8 38
+plugins/kdev-code-graph/skills/kdev-codegraph-trace/SKILL.md
+  s_d09eaec4ee3c61::t_af1c3ffb9c3c27 8-18
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.4.9",
+  "base_commit_sha": "bfa55b46ada3503779e3ca8363bad0ae2bb07072",
+  "prompts": {},
+  "sessions": {
+    "s_d09eaec4ee3c61": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "060b5941-9396-46fd-88f6-796d07a4f6a5",
+        "model": "astron-code-latest"
+      },
+      "human_author": "liyong <ly1989abc@126.com>"
+    }
+  }
+}

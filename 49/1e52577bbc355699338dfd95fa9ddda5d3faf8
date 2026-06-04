@@ -1,0 +1,22 @@
+plugins/kdev-cluster-x1/tools/tests/test_handoffs_doc.py
+  s_c1d0e441c085b2::t_0e13cb54d224c6 1-17
+plugins/kdev-cluster-x1/standards/kdev-runtime-handoffs.md
+  s_c1d0e441c085b2::t_8177e6464df3f3 1-43,45,47-64
+  s_c1d0e441c085b2::t_e8610985f2694d 44,46
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "491e52577bbc355699338dfd95fa9ddda5d3faf8",
+  "prompts": {},
+  "sessions": {
+    "s_c1d0e441c085b2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "3abfbc17-3c68-4fed-9d79-9acbd73c9baf",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}

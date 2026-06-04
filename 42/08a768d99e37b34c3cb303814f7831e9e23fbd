@@ -1,0 +1,28 @@
+plugins/kdev-code-graph/ingestor/tests/fixtures/sample-docs/with-fr-table.md
+  s_604daa9a27f194::t_405d89717b7c49 1-12
+plugins/kdev-code-graph/ingestor/kdev_ingestor/intents.py
+  s_604daa9a27f194::t_2aac559e37fe12 1-70,74-140
+  s_604daa9a27f194::t_b071a35d9d7412 71-73
+plugins/kdev-code-graph/ingestor/tests/fixtures/sample-docs/no-headings.md
+  s_604daa9a27f194::t_1352a6739d7c8e 1-3
+plugins/kdev-code-graph/ingestor/tests/fixtures/sample-docs/simple.md
+  s_604daa9a27f194::t_879cc82ca10588 1-10
+plugins/kdev-code-graph/ingestor/tests/test_intents.py
+  s_604daa9a27f194::t_37ae6ca4c05dff 1-65
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.0",
+  "base_commit_sha": "4208a768d99e37b34c3cb303814f7831e9e23fbd",
+  "prompts": {},
+  "sessions": {
+    "s_604daa9a27f194": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a825b2bf-c0e0-4981-9f2f-64c679268c0a",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}

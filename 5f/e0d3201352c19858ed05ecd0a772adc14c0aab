@@ -1,0 +1,20 @@
+plugins/kdev-code-graph/skills/kdev-codegraph-build/SKILL.md
+  s_604daa9a27f194::t_19b382f1c31d15 3
+  s_604daa9a27f194::t_d0c5c8058f2ec7 145
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.0",
+  "base_commit_sha": "5fe0d3201352c19858ed05ecd0a772adc14c0aab",
+  "prompts": {},
+  "sessions": {
+    "s_604daa9a27f194": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a825b2bf-c0e0-4981-9f2f-64c679268c0a",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}

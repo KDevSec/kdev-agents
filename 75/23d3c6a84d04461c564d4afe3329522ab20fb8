@@ -1,0 +1,19 @@
+plugins/kdev-code-graph/ingestor/kdev_ingestor/cli.py
+  s_604daa9a27f194::t_b5de69a0135495 5
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.0",
+  "base_commit_sha": "7523d3c6a84d04461c564d4afe3329522ab20fb8",
+  "prompts": {},
+  "sessions": {
+    "s_604daa9a27f194": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a825b2bf-c0e0-4981-9f2f-64c679268c0a",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}

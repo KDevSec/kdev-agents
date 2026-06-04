@@ -1,0 +1,25 @@
+plugins/kdev-memory/skills/kdev-memory/references/切档与归档.md
+  s_fece168c93654a::t_5bc54ac1894168 80
+plugins/kdev-memory/skills/kdev-memory/references/六类记录-schema.md
+  s_fece168c93654a::t_2c8f61677927ff 407
+  s_fece168c93654a::t_4a581a0c789620 104
+  s_fece168c93654a::t_0e2a05f627b845 211-216
+plugins/kdev-memory/skills/kdev-memory/references/subject-推断与评分裂解.md
+  s_fece168c93654a::t_7426441b4cd766 147
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "a453c78d082cfcb759488319eaaf8e48017f2441",
+  "prompts": {},
+  "sessions": {
+    "s_fece168c93654a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "6fe183ce-25a4-4763-8fac-304107fed6b5",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}

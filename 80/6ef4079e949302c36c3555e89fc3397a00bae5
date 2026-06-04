@@ -1,0 +1,21 @@
+plugins/kdev-cluster-x1/skills/kdev-statusline.sh
+  s_c1d0e441c085b2::t_43e83b280344ef 1-33
+plugins/kdev-cluster-x1/tools/tests/test_statusline.bats
+  s_c1d0e441c085b2::t_5010902c2322d7 1-52
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "806ef4079e949302c36c3555e89fc3397a00bae5",
+  "prompts": {},
+  "sessions": {
+    "s_c1d0e441c085b2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "3abfbc17-3c68-4fed-9d79-9acbd73c9baf",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}

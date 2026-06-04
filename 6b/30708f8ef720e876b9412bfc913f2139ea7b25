@@ -1,0 +1,19 @@
+plugins/kdev-cluster-x1/agents/部署上线员.md
+  s_c1d0e441c085b2::t_c496ae9076a4c5 1-38
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "6b30708f8ef720e876b9412bfc913f2139ea7b25",
+  "prompts": {},
+  "sessions": {
+    "s_c1d0e441c085b2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "3abfbc17-3c68-4fed-9d79-9acbd73c9baf",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}

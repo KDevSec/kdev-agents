@@ -1,0 +1,22 @@
+plugins/kdev-cluster-x1/standards/prompt-template-leader.md
+  s_c1d0e441c085b2::t_ec48481a5bc1c4 1-7,9-73
+  s_c1d0e441c085b2::t_50c96fbe8210bc 8
+plugins/kdev-cluster-x1/tools/tests/test_prompt_template_leader.py
+  s_c1d0e441c085b2::t_6cc5df17a72407 1-28
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "3ae32506171f9170271a10c870af0528e260838c",
+  "prompts": {},
+  "sessions": {
+    "s_c1d0e441c085b2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "3abfbc17-3c68-4fed-9d79-9acbd73c9baf",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}

@@ -1,0 +1,19 @@
+plugins/kdev-cluster-x3/agents/主控员.md
+  s_6002f3dd225689::t_bc60fa7683da45 1-81
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "7d36a16b289f65e16163dbd4b80381ee3e2a3066",
+  "prompts": {},
+  "sessions": {
+    "s_6002f3dd225689": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5690e195-ed84-4553-a230-44db83a823b2",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}

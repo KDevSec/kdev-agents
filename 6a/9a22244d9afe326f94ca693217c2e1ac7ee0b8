@@ -1,0 +1,9 @@
+plugins/kdev-memory/skills/kdev-memory/references/六类记录-schema.md
+  ai_agent 213
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "6a9a22244d9afe326f94ca693217c2e1ac7ee0b8",
+  "prompts": {}
+}

@@ -1,0 +1,19 @@
+plugins/kdev-cluster-x1/agents/实施计划师.md
+  s_c1d0e441c085b2::t_47c5a4929033ef 1-39
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "2b9a2889d4560e3342c31f2c9749d3d233e233da",
+  "prompts": {},
+  "sessions": {
+    "s_c1d0e441c085b2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "3abfbc17-3c68-4fed-9d79-9acbd73c9baf",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}

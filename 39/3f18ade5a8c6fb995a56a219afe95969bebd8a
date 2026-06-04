@@ -1,0 +1,37 @@
+plugins/kdev-cluster-x3/agents/安全评审员.md
+  s_6002f3dd225689::t_516d4e62b47fac 1-26
+plugins/kdev-cluster-x3/agents/测试设计评审员.md
+  s_6002f3dd225689::t_b6881830275788 1-26
+plugins/kdev-cluster-x3/agents/代码评审员.md
+  s_6002f3dd225689::t_dac3b03e86a299 1-26
+plugins/kdev-cluster-x3/agents/SR评审员.md
+  s_6002f3dd225689::t_06e6696d3e695b 1-26
+plugins/kdev-cluster-x3/agents/质量评审员.md
+  s_6002f3dd225689::t_1d2a22908e2b3b 1-26
+plugins/kdev-cluster-x3/agents/架构评审员.md
+  s_6002f3dd225689::t_bf2d3b27e42801 1-26
+plugins/kdev-cluster-x3/agents/CEO视角评审员.md
+  s_6002f3dd225689::t_500d7b8381e235 1-26
+plugins/kdev-cluster-x3/agents/终审聚合员.md
+  s_6002f3dd225689::t_ce87113893ea0b 1-33
+plugins/kdev-cluster-x3/agents/原型评审员.md
+  s_6002f3dd225689::t_d9c55470bdda30 1-26
+plugins/kdev-cluster-x3/agents/方案设计评审员.md
+  s_6002f3dd225689::t_be449046a230ae 1-26
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "393f18ade5a8c6fb995a56a219afe95969bebd8a",
+  "prompts": {},
+  "sessions": {
+    "s_6002f3dd225689": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5690e195-ed84-4553-a230-44db83a823b2",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}

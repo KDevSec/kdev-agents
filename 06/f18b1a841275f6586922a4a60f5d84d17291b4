@@ -1,0 +1,25 @@
+plugins/kdev-cluster-x1/tools/tests/test_agent_lint.py
+  s_c1d0e441c085b2::t_24b8c167cc8ea2 1-21
+plugins/kdev-cluster-x1/tools/agent_lint.py
+  s_c1d0e441c085b2::t_8de9f532476329 1-96
+plugins/kdev-cluster-x1/tools/tests/fixtures/bad-missing-routing.md
+  s_c1d0e441c085b2::t_7c47dd99f110de 1-6
+plugins/kdev-cluster-x1/tools/tests/fixtures/good-worker-agent.md
+  s_c1d0e441c085b2::t_d91d338ac08355 1-17
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "06f18b1a841275f6586922a4a60f5d84d17291b4",
+  "prompts": {},
+  "sessions": {
+    "s_c1d0e441c085b2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "3abfbc17-3c68-4fed-9d79-9acbd73c9baf",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}

@@ -1,0 +1,26 @@
+plugins/kdev-cluster-x3/lib/slug.py
+  s_6002f3dd225689::t_80ce90f07107e4 1-25
+plugins/kdev-cluster-x3/tests/test_slug.py
+  s_6002f3dd225689::t_2c355c798176b4 1-22
+plugins/kdev-cluster-x3/tests/conftest.py
+  s_6002f3dd225689::t_1f8b57da5a5f9c 1-16
+plugins/kdev-cluster-x3/pyproject.toml
+  s_6002f3dd225689::t_19b5b4290c42d6 1-14,16-20
+  s_6002f3dd225689::t_3a66f0bd90687f 15
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "81b8f113f97d5dfbf40a9f7f93244aabe6e2b444",
+  "prompts": {},
+  "sessions": {
+    "s_6002f3dd225689": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5690e195-ed84-4553-a230-44db83a823b2",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}

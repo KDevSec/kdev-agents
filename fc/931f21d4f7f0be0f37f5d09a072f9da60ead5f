@@ -1,0 +1,22 @@
+plugins/kdev-code-graph/ingestor/tests/test_candidates.py
+  s_604daa9a27f194::t_7d933fd89cbb34 1-84
+plugins/kdev-code-graph/ingestor/kdev_ingestor/candidates.py
+  s_604daa9a27f194::t_07ba8084dfa46b 67,69-71
+  s_604daa9a27f194::t_e5ec5dbc3e6b52 1-66,68,72-78
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.0",
+  "base_commit_sha": "fc931f21d4f7f0be0f37f5d09a072f9da60ead5f",
+  "prompts": {},
+  "sessions": {
+    "s_604daa9a27f194": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a825b2bf-c0e0-4981-9f2f-64c679268c0a",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}

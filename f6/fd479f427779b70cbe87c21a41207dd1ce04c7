@@ -1,0 +1,27 @@
+plugins/kdev-code-graph/ingestor/kdev_ingestor/security_rules.py
+  s_604daa9a27f194::t_abab56b26685e6 68-83
+  s_604daa9a27f194::t_752e7b1e78669b 6
+  s_604daa9a27f194::t_d5e01d2e6bc846 43
+  s_604daa9a27f194::t_3e0c193b8ce43c 24-29
+  s_604daa9a27f194::t_43fa6aca0e0a01 104
+plugins/kdev-code-graph/ingestor/tests/fixtures/sample-rules/01-input-validation.md
+  s_604daa9a27f194::t_d8afa9827f8f62 11-13
+plugins/kdev-code-graph/ingestor/tests/test_security_rules.py
+  s_604daa9a27f194::t_59bb2fed9fb794 88-102
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.0",
+  "base_commit_sha": "f6fd479f427779b70cbe87c21a41207dd1ce04c7",
+  "prompts": {},
+  "sessions": {
+    "s_604daa9a27f194": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a825b2bf-c0e0-4981-9f2f-64c679268c0a",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}

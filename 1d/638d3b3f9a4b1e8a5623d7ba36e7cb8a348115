@@ -1,0 +1,24 @@
+plugins/kdev-code-graph/skills/kdev-codegraph-trace/SKILL.md
+  s_604daa9a27f194::t_e4f4d12b68e050 77
+  s_604daa9a27f194::t_858da1b2c8a640 57-64
+  s_604daa9a27f194::t_a81c6335deb58f 36
+plugins/kdev-code-graph/skills/kdev-codegraph-build/SKILL.md
+  s_604daa9a27f194::t_765765f9f1903f 105
+  s_604daa9a27f194::t_76ea19a2bb1512 58-78
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.0",
+  "base_commit_sha": "1d638d3b3f9a4b1e8a5623d7ba36e7cb8a348115",
+  "prompts": {},
+  "sessions": {
+    "s_604daa9a27f194": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a825b2bf-c0e0-4981-9f2f-64c679268c0a",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}

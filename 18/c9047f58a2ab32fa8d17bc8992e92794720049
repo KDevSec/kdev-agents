@@ -1,0 +1,27 @@
+plugins/kdev-cluster-x3/agents/需求拆解师.md
+  s_6002f3dd225689::t_d8825ff489fce7 1-40
+plugins/kdev-cluster-x3/agents/方案设计师.md
+  s_6002f3dd225689::t_3f629f92c70b04 1-33
+plugins/kdev-cluster-x3/agents/需求澄清师.md
+  s_6002f3dd225689::t_5cde377b720bb9 1-29
+plugins/kdev-cluster-x3/agents/需求规格师.md
+  s_6002f3dd225689::t_ab982597e98b07 1-40
+plugins/kdev-cluster-x3/agents/原型设计师.md
+  s_6002f3dd225689::t_15fe1522871698 1-37
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.2",
+  "base_commit_sha": "18c9047f58a2ab32fa8d17bc8992e92794720049",
+  "prompts": {},
+  "sessions": {
+    "s_6002f3dd225689": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5690e195-ed84-4553-a230-44db83a823b2",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
