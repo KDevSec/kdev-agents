@@ -1,0 +1,88 @@
+plugins/kdev-ui-autotest/README.md
+  s_32d7c686e43ef7::t_22053f36e3fbb1 1-86,88-103
+  s_5cea0e01a8c3ff::t_d0ab502380c780 87
+plugins/kdev-uicase-to-apicase/.claude-plugin/plugin.json
+  s_5cea0e01a8c3ff::t_c5c1048a30b776 3-4,9
+plugins/kdev-test-points/.claude-plugin/plugin.json
+  s_5cea0e01a8c3ff::t_d0ab502380c780 3
+  s_5cea0e01a8c3ff::t_2a062fe42ee306 1-2,4-10
+plugins/kdev-test-points/README.md
+  s_5cea0e01a8c3ff::t_2a062fe42ee306 1-4,6-47,49-82,84-95,97-113
+  s_5cea0e01a8c3ff::t_d0ab502380c780 5,48,83,96
+plugins/kdev-uicase-to-apicase/README.md
+  s_5cea0e01a8c3ff::t_d0ab502380c780 85
+  s_5cea0e01a8c3ff::t_cebf16384c6ffc 1-84,86-102
+plugins/kdev-ui-autotest/skills/kdev-ui-autotest/references/element-plus-pitfalls.md
+  s_e245b32f44fb46::t_b21dd175f0efed 270-404
+plugins/kdev-ui-autotest/.claude-plugin/plugin.json
+  s_32d7c686e43ef7::t_2f764d3445a9cf 4
+  s_32d7c686e43ef7::t_089ade44a88408 3
+  s_32d7c686e43ef7::t_25bf3245ce963d 9
+plugins/kdev-ui-autotest/CHANGELOG.md
+  s_5cea0e01a8c3ff::t_d0ab502380c780 18
+  s_32d7c686e43ef7::t_f6121f9c1419f3 1-17,19-113
+plugins/kdev-ui-autotest/skills/kdev-ui-autotest/README.md
+  s_5cea0e01a8c3ff::t_d0ab502380c780 62
+  s_32d7c686e43ef7::t_527939f74c59ae 3,5,7,9,11,13,16-17,20,24-32,34-55,59,61,63,69,72-73
+plugins/kdev-uicase-to-apicase/CHANGELOG.md
+  s_5cea0e01a8c3ff::t_e68959259b8faa 1-12,14-70
+  s_5cea0e01a8c3ff::t_7971e3df27c70d 13
+plugins/kdev-test-points/CHANGELOG.md
+  s_5cea0e01a8c3ff::t_d0ab502380c780 14,39,45,59-60
+  s_5cea0e01a8c3ff::t_2a062fe42ee306 1-13,15-38,40-44,46-58,61
+plugins/kdev-test-cases/CHANGELOG.md
+  s_5cea0e01a8c3ff::t_d0ab502380c780 1,14,47,50,54
+  s_5cea0e01a8c3ff::t_2a062fe42ee306 2-13,15-46,48-49,51-53,55-56
+plugins/kdev-ui-autotest/skills/kdev-ui-autotest/assets/test_case_doc_header.md.tpl
+  s_e245b32f44fb46::t_b21dd175f0efed 19
+plugins/kdev-uicase-to-apicase/skills/kdev-uicase-to-apicase/SKILL.md
+  s_5cea0e01a8c3ff::t_06b28e9ebfb506 3,23,37,95,103-104,119-120,122,146,152
+  s_5cea0e01a8c3ff::t_d06f7d6620b1aa 121
+plugins/kdev-test-cases/.claude-plugin/plugin.json
+  s_5cea0e01a8c3ff::t_d0ab502380c780 2-3
+  s_5cea0e01a8c3ff::t_2a062fe42ee306 1,4-10
+plugins/kdev-test-cases/README.md
+  s_5cea0e01a8c3ff::t_2a062fe42ee306 2-53,58-62,64-68,70-93,95-101
+  s_5cea0e01a8c3ff::t_d0ab502380c780 1,54-57,63,69,94
+plugins/kdev-ui-autotest/skills/kdev-ui-autotest/SKILL.md
+  s_e245b32f44fb46::t_b21dd175f0efed 5,18,134,136,146,148,150,259-262,264-277,279-293,325,329-339,349,353,361-363,365-370,376-379,381-382,428-430,432-434
+  s_5cea0e01a8c3ff::t_d0ab502380c780 263,278,380,431
+plugins/kdev-ui-autotest/skills/kdev-ui-autotest/references/infra-standards.md
+  s_e245b32f44fb46::t_b21dd175f0efed 38-62,65-91,93-134,156,180-194,202,210,217-231
+plugins/kdev-env-recon/skills/kdev-env-recon/references/case-diff-patch.md
+  s_5cea0e01a8c3ff::t_d0ab502380c780 255
+plugins/kdev-ui-autotest/skills/kdev-ui-autotest/references/env-recon-bootstrap.md
+  s_e245b32f44fb46::t_b21dd175f0efed 105
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.3",
+  "base_commit_sha": "1d9235643c3334a07bc31336b6e3e288729f8056",
+  "prompts": {},
+  "sessions": {
+    "s_32d7c686e43ef7": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "1e57d570-0af3-4e8b-b72c-acdc73253212",
+        "model": "deepseek-v4-pro"
+      },
+      "human_author": "doudoudou-dou <82752251@qq.com>"
+    },
+    "s_5cea0e01a8c3ff": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c0f9de3f-a22d-444e-8f81-48b54098b62b",
+        "model": "deepseek-v4-pro"
+      },
+      "human_author": "doudoudou-dou <82752251@qq.com>"
+    },
+    "s_e245b32f44fb46": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ee2965f7-26f6-47e8-8252-9145262c043d",
+        "model": "claude-opus-4-7"
+      },
+      "human_author": "doudoudou-dou <82752251@qq.com>"
+    }
+  }
+}
