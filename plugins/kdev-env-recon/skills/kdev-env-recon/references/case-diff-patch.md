@@ -252,4 +252,4 @@ recon/
 
 - 用户传 `--cases <path>` 但 `<path>` 不存在或不是 .md → 写日志 + 跳过，不报错
 - recon 阶段失败（如登录失败、菜单采空）→ 不写回写报告（因为对照基线不可信）
-- 用例 .md 完全不符合标准模板（没有 `TC-AR` 编号、没有"测试步骤"段）→ 输出 `case_diff.md` 写明"用例格式无法解析，跳过 diff；建议先用 `kdev-test-cases-v1` 渲染为标准 fielded 用例"
+- 用例 .md 完全不符合标准模板（没有 `TC-AR` 编号、没有"测试步骤"段）→ 输出 `case_diff.md` 写明"用例格式无法解析，跳过 diff；建议先用 `kdev-test-cases` 渲染为标准 fielded 用例"

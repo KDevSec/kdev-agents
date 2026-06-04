@@ -16,7 +16,7 @@
 | 登录后默认落地路由 | <落地 URL，如 /index> |
 | 顶部 toast 选择器 | `.el-message:has-text("xxx")` |
 | 二次确认按钮 | `.el-message-box__btns button:has-text("确 定")` |
-| 通用按钮文案空格 | RuoYi/Element-Plus 中文按钮文案常带空格：`登 录` / `确 定` / `取 消` / `保 存` / `搜 索`。下文用例为可读性写作【确定】【取消】【保存】【登录】，自动化定位时一律采用 `:text-matches("确\\s*定")` 这类容空格匹配 |
+| 通用按钮文案空格 | RuoYi/Element-Plus 中文按钮文案常带空格：`登 录` / `确 定` / `取 消` / `保 存` / `搜 索`。下文用例为可读性写作【确定】【取消】【保存】【登录】。**自动化定位用 `:has-text("确 定")` 把空格写进字面量**——实测 `:text-matches("确\\s*定")` count=0，Playwright text engine 不识 ASCII 空格（详见 element-plus-pitfalls.md §坑 10） |
 
 ### <一级模块名> N 个子页面菜单导航与路由
 

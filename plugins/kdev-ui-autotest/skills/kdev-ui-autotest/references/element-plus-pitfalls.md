@@ -267,6 +267,141 @@ assert len({v0, v1, v2}) > 1 or len({e0, e1, e2}) > 1
 
 ---
 
+## 坑 8 — 列表搜索区 + 弹窗"同名 label"是 EL 后台管理系统的常态
+
+**症状**：通用 form-item selector 找某个 label，全局 `count = 2`。strict-mode `.first` 走到第一个（搜索区），但搜索区点击路径与弹窗不同 → 等可见性 → 15s timeout。
+
+```python
+self.page.locator(
+    '.el-form-item:has(.el-form-item__label:text-is("上级产品线"))'
+).first    # count = 2 ⚠️
+```
+
+**根因**：典型 EL 后台管理页面同时有两个区域用相同字段 label：
+- 列表页搜索区：作为筛选条件
+- 新增/编辑弹窗：作为表单字段
+
+直接全局 selector + `.first` 必踩。
+
+**修复**——BasePage 沉淀**智能定位器**，自动按当前 visible dialog 限定：
+
+```python
+def _form_item_locator(self, label: str):
+    """有 .el-dialog:visible 时自动限定弹窗内，否则全局。"""
+    selector = (
+        f'.el-form-item:has(.el-form-item__label:text-matches('
+        f'"^{re.escape(label)}\\s*[：:]?\\s*$"))'
+    )
+    # 检查页面是否有可见 dialog
+    visible_dialog = self.page.locator('.el-dialog:visible')
+    if visible_dialog.count() > 0:
+        return visible_dialog.locator(selector).first
+    return self.page.locator(selector).first
+```
+
+所有 `fill_input_by_label / _open_select_dropdown / clear_select / get_field_error` 都走它，**禁止业务 PageObject 手写 `.el-form-item:has(...)` selector**。grep 出来一律改。
+
+**自检清单加一项**："这个 label 在列表搜索区会出现吗？如果会，弹窗操作必须 dialog-scoped"。
+
+**配套**：label 文本本身可能带尾随冒号（半角/全角），所以 selector 用 `:text-matches("^X\s*[：:]?\s*$")` 容错而不是 `:text-is`。
+
+---
+
+## 坑 9 — `keyboard.press("Escape")` 在 EL 2.x dialog 内是**破坏性**动作
+
+**症状**：模板 `_open_select_dropdown` 头两行做"防御性收下拉"：
+
+```python
+self.page.keyboard.press("Escape")   # 防御：先收回可能开着的别的下拉
+self.page.wait_for_timeout(120)
+self.page.locator(".el-select").click()
+```
+
+旧 EL 1.x dialog 不响应 Escape，无害。**新版 EL 2.x dialog 默认 `close-on-press-escape: true`** —— Escape **把整个弹窗关掉**，后续 `.el-dialog:visible` 空 → 一切超时。
+
+**规则**：
+
+| 场景 | Escape 安全吗 |
+|---|---|
+| 列表页（无 dialog）收某个下拉 | ✅ 安全 |
+| Dialog 内收下拉 | ❌ **关弹窗** |
+| 多选下拉收回（坑 1 变体）| ⚠️ 不在 dialog 内才用；在 dialog 内点 body 空白 |
+
+**修复**：dialog 内**改用点 body 空白处**收下拉：
+
+```python
+# dialog 内安全的"收下拉"做法
+self.page.locator('.el-dialog__body').first.click(position={'x': 1, 'y': 1})
+# 或者直接点 dialog 标题（不影响 form）
+self.page.locator('.el-dialog__header').first.click()
+```
+
+**审计动作**：接入新项目时 grep 所有 `keyboard.press("Escape")`，标注每处的触发上下文是否含可见 dialog。
+
+---
+
+## 坑 10 — Playwright `:text-matches("X\s*Y")` **不匹配**带 ASCII 空格的文案
+
+**症状**：中文按钮实测文案是「确 定」「取 消」「保 存」（中间带半角空格）。直觉写法：
+
+```python
+'.el-dialog__footer button:text-matches("取\\s*消")'   # count = 0 ❌
+'.el-dialog__footer button:has-text("取消")'           # count = 0 ❌（substring 不带空格不命中）
+'.el-dialog__footer button:has-text("取 消")'          # count = 1 ✅
+```
+
+**根因**：Playwright 的 `:text-matches` 不是纯 JS regex，背后有 text engine 归一化层。`\s*` **没按预期匹配 ASCII 空格** —— 这是反直觉的 quirk。
+
+**规则**：
+
+| 场景 | 推荐写法 |
+|---|---|
+| 中文带空格按钮（确 定 / 取 消 / 保 存 / 登 录 / 搜 索）| `:has-text("X Y")` **字面量写空格** |
+| label 加冒号容错（首尾锚定 `^X[：:]?$`）| `:text-matches(...)` ✅ 工作正常 |
+| 一般 substring 匹配 | `:has-text("X")` |
+
+**反例**——曾在 `references/env-recon-bootstrap.md` 推荐 `:text-matches("确\\s*定")`，实测发现不工作。已修正。
+
+**自检**：写 `:text-matches` 时如果正则里有 `\s` 或 `　`（全角空格），先用 `page.locator(...).count()` 验证 count > 0 再相信它。
+
+---
+
+## 附录 — Element-Plus 1.x → 2.x 废弃 class hook 速查
+
+跨大版本接入时，"以为稳定"的 class 可能整片消失。**初次接入新项目第一件事**是 dump 一个 form-item 的 `outerHTML`，跟模板假定 selector 比对。
+
+| 用途 | EL 1.x 写法（**已废弃**） | EL 2.x 推荐 |
+|---|---|---|
+| select 容器外层 | `.el-input` 内层（嵌在 select 里）| `.el-select__wrapper` 或直接稳定外层 `.el-select` |
+| select 内部 input | `.el-input__inner` | `.el-select__input` |
+| form-item 内容区 | `.el-form-item__content > input` | 同（保留） |
+| dropdown 选项 | `.el-select-dropdown__item` | 同（保留）|
+| cascader 节点 | `.el-cascader-node` | 同（保留）|
+| dialog 容器 | `.el-dialog` | 同（保留）|
+
+**实测命令**（dump 真值）：
+
+```python
+page.evaluate("""() => {
+    const dlg = [...document.querySelectorAll('.el-dialog')].find(d =>
+        getComputedStyle(d).display !== 'none');
+    return [...dlg.querySelectorAll('.el-form-item')].map(it => ({
+        label: it.querySelector('.el-form-item__label')?.textContent.trim(),
+        has_select: !!it.querySelector('.el-select'),
+        has_cascader: !!it.querySelector('.el-cascader'),
+        has_tree_select: !!it.querySelector('.el-tree-select'),
+        has_input_number: !!it.querySelector('.el-input-number'),
+        has_date: !!it.querySelector('.el-date-editor'),
+    }));
+}""")
+```
+
+输出"控件类型矩阵"，跟 `recon/menu_list.md §3` 的"控件类型"列做交叉校验。**冲突时以 DOM 真值为准**；同时**反向修 menu_list**。
+
+**真实踩坑记录**：spec 写「所属产品线 = el-select / el-tree-select」，实测是 `el-cascader` → 22 条 AR-05 用例 100% 失败。一字之差走 4 小时。
+
+---
+
 ## 附：发现新陷阱时的标准流程
 
 新版本 Element-Plus / 自研组件可能有新坑。按下面流程实证，**不要直接在 PageObject 里硬编码判断**：

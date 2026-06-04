@@ -2,7 +2,7 @@
 name: kdev-ui-autotest
 description: |
   **核心基座（第零原则）：测试脚本的目的是执行测试、发现 BUG，不是生成通过率高的 reports 报告。所有规范、约束、流程都服务于这一条——红是产出，不是失败；遇到冲突永远选这条。**
-  写 / 改 / 接入 Playwright + pytest + Element-Plus 自动化测试时使用本 skill。它把 playwrightmode 模板（D:\ClaudeCode\KDevSec\playwrightmode）从源项目反复打磨出来的 6 大类规范——**STEP 0 环境/菜单/弹窗实测前置**、登录复用、资源清理、四件产物归档、Element-Plus 三大坑、用例命名、失败诊断——固化为下游项目（KDevSec / Gen9 / 可信评估 / vfadmin 等）的强制实践。**用户提到下列任何关键词，都应主动加载：写 / 加 / 补 / 接入 / 优化测试用例、test_arNN、TC-NNN、PageObject、el-select 点不到 / 下拉、toast 抓不到、is_field_readonly、defects_<ts>.csv、recon_elements、recon_env_bootstrap、menu_list.md、probe_dom、用例为什么挂、登录复用、资源清理、Element-Plus 自动化测试、playwrightmode、playwrighttest、登录测试环境获取菜单、采集菜单结构、测试环境实测、UI 与 spec 对不上**。即使用户没明说"playwrightmode"四个字，只要项目里有 ``pages/base_page.py`` + ``conftest.auth_state`` + ``utils/cleanup_registry.py`` + ``tools/recon_elements.py`` 等模板特征文件，或者用户说"登录测试环境采菜单/写测试用例 .md/把 spec 与 UI 对齐"，都视为本 skill 适用范围。**第一动作恒为：检查 recon/menu_list.md 是否存在且新鲜——不存在/过期就先跑 STEP 0**。
+  写 / 改 / 接入 Playwright + pytest + Element-Plus 自动化测试时使用本 skill。它把 playwrightmode 模板（D:\ClaudeCode\KDevSec\playwrightmode）从源项目反复打磨出来的 6 大类规范——**STEP 0 环境/菜单/弹窗实测前置**、登录复用、资源清理、四件产物归档、Element-Plus 三大坑、用例命名、失败诊断——固化为下游项目（KDevSec / Gen9 / 可信评估 / vfadmin 等）的强制实践。**用户提到下列任何关键词，都应主动加载：写 / 加 / 补 / 接入 / 优化测试用例、test_arNN、TC-NNN、PageObject、el-select 点不到 / 下拉、toast 抓不到、is_field_readonly、defects_<ts>.csv、recon_elements、recon_env_bootstrap、menu_list.md、probe_dom、用例为什么挂、登录复用、资源清理、Element-Plus 自动化测试、playwrightmode、playwrighttest、登录测试环境获取菜单、采集菜单结构、测试环境实测、UI 与 spec 对不上**。即使用户没明说"playwrightmode"四个字，只要项目里有 ``pages/base_page.py`` + ``conftest.auth_state`` + ``utils/cleanup_registry.py`` + ``tools/recon_elements.py`` 等模板特征文件，或者用户说"登录测试环境采菜单/写测试用例 .md/把 spec 与 UI 对齐"，都视为本 skill 适用范围。**第一动作恒为：检查 recon/menu_list.md 是否存在且新鲜——不存在/过期就先调用独立 skill `kdev-env-recon` 完成 STEP 0**（STEP 0 标准动作已迁出到 `kdev-env-recon`；本 skill 仅在 `recon/menu_list.md` 就绪后走 STEP 1+。本 skill 的 `assets/recon_env_bootstrap.py` + `references/env-recon-bootstrap.md` 作为 fallback 保留）。
 ---
 
 # playwrightmode 自动化测试编写规范
@@ -15,7 +15,7 @@ description: |
 
 ## 第零原则（基座）— 测试脚本的目的：发现 BUG，不是刷通过率
 
-**所有 6 大规范、4 条约束、10 步流程，都是这一条基座原则的具体落地**：
+**所有 6 大规范、5 条约束、10 步流程，都是这一条基座原则的具体落地**：
 
 > **测试脚本的目的是执行测试、发现 BUG，而不是生成通过率高的 reports 报告。**
 > **当本原则与"让 reports 好看 / 让 CSV 干净 / 让用例都绿"冲突时，永远选本原则。**
@@ -131,9 +131,9 @@ skip 只允许两种情形：
 
 | 用户场景 | 第一时间读 |
 |---|---|
-| **首次接入测试环境 / 菜单可能变了 / `recon/menu_list.md` 不存在或过期** | **`references/env-recon-bootstrap.md` + `assets/recon_env_bootstrap.py`（STEP 0，必做）** |
+| **首次接入测试环境 / 菜单可能变了 / `recon/menu_list.md` 不存在或过期** | **调用独立 skill `kdev-env-recon`**（STEP 0 已迁出；本 skill `references/env-recon-bootstrap.md` + `assets/recon_env_bootstrap.py` 仅作 fallback）|
 | 新增一个测试模块（test_arNN_xxx.py）/ 接入新页面 | `references/case-skeleton.md` + `assets/test_arNN_skeleton.py` |
-| 写 / 优化测试用例 Markdown 文档（spec.md / 用例.md） | `references/env-recon-bootstrap.md` + `assets/test_case_doc_header.md.tpl` |
+| 写 / 优化测试用例 Markdown 文档（spec.md / 用例.md） | 先调用 `kdev-env-recon` 拿到 `recon/menu_list.md` → 再用 `assets/test_case_doc_header.md.tpl` 在用例文档头部插入"测试环境与导航约定"节 |
 | 写新的业务 PageObject / 改 BasePage | `references/element-plus-pitfalls.md` |
 | el-select 点不到 / toast 抓不到 / readonly 误判 / Tab 切换 flaky | `references/element-plus-pitfalls.md`（直接定位陷阱） |
 | 用例之间数据残留 / 清理失败 / 登录慢 / 报告路径乱 | `references/infra-standards.md` |
@@ -143,11 +143,11 @@ reference 文件都不超过 200 行，按需读完即用。
 
 ---
 
-## 四条不可妥协约束（即使你"看起来想到了更简单的写法"也不要破）
+## 五条不可妥协约束（即使你"看起来想到了更简单的写法"也不要破）
 
-> 这四条都是 **第零原则（基座）** 在不同场景的具体落地——本质都是为了让脚本"在真有 bug 时能红"，而不是"看起来都过"。读约束之前，先把第零原则那三条推论在心里过一遍。
+> 这五条都是 **第零原则（基座）** 在不同场景的具体落地——本质都是为了让脚本"在真有 bug 时能红"，而不是"看起来都过"。读约束之前，先把第零原则那三条推论在心里过一遍。
 
-这四条是源项目（KDevSec/playwrighttest）反复翻车后定下来的硬规则，写代码前先在心里过一遍：
+这五条是源项目（KDevSec/playwrighttest）反复翻车后定下来的硬规则，写代码前先在心里过一遍：
 
 ### 约束 1 — 不要绕过 BasePage 直接拼 Element-Plus 的 locator
 
@@ -256,6 +256,41 @@ def test_xxx(logged_page):
 **配合 webapp-testing 嵌套**：见下一节。任何"否定性 UI 注释"的实测复检都必须走嵌套
 webapp-testing，不允许自己拍脑袋判断。
 
+### 约束 5 — 用例池入口契约：只对 `是否UI自动化=是` 的用例写 UI 自动化脚本
+
+> **错误的迹象**：你正想直接拿一份测试用例 .md 就开始写 PageObject / pytest 脚本，没核对每条用例的「是否UI自动化」字段；或者只看了 TC 编号 / 用例名称就开工，没注意字段值是"否 / 待定 / 空白"。
+
+**来源**：上游 skill `kdev-test-cases` 渲染规约——`是否UI自动化` + `是否API自动化` 是用例 .md 每个 `【测试用例信息】` 块的 MANDATORY 字段，明确约定 "downstream pipelines split UI ↔ API automation lanes by grepping these two exact field names"。本 skill（UI 自动化下游）按这条契约硬 gate；并行的 `kdev-uicase-to-apicase` / API 自动化 skill 按 `是否API自动化=是` 分流，互不重叠。
+
+**第一动作**（写任何 PageObject / pytest 脚本之前）：
+
+```bash
+# 把 "是否UI自动化：是" 的用例切片为候选池（兼容全角/半角冒号 + 常见 yes 变体）
+grep -nE "是否UI自动化[：:][[:space:]]*(是|Y|yes|true|✓)" 测试用例.md
+```
+
+**对三种字段值的处理**：
+
+| 字段值（归一化后） | 动作 |
+|---|---|
+| `是 / Y / yes / true / ✓` | ✅ **唯一允许进入 UI 自动化编写通道**的用例 |
+| `否 / N / no / false` | ❌ **refuse 写 UI 脚本**——告知用户该用例分流通道：纯接口校验 → `kdev-uicase-to-apicase` + `kdev-api-test-scaffold`；性能 / 安全 / 日志审计 → 手写 / 其它专用通道 |
+| `待定 / TBD / 空白 / 字段缺失` | 🟡 **不在下游兜底**——告知用户先回 `kdev-test-cases` 把字段补齐，再回来调用本 skill；本 skill 不臆测、不放行 |
+
+**显式 override 通道**（保留正当例外，但要可审计）：
+
+某些 P1 关键路径用例按规约标了"否"（如："接口已覆盖即可"的核心业务流），业务实际仍要求 UI 兜底回归。此时**允许**用户在该用例的 `【测试用例信息】` 块内追加一行注释：
+
+```
+# override-ui-automation: <可审计理由，如"P1 核心登录流，接口已覆盖但需 UI 回归看门狗，PM 确认 2026-MM-DD">
+```
+
+带这条注释的用例可放行进入 UI 编写通道。**未带注释强行让我写 → refuse**。所有 override 用例必须在最终交付的 `RUN_SUMMARY.md` 加一段「override 清单」（用例编号 + 理由 + override 时间），方便评审追溯。
+
+**为什么是硬 gate 而不是 warn**：
+
+把 `是否UI自动化=否` 的用例（多为纯接口校验 / 后端事件断言 / 日志审计 / 性能 / SSO 单点 / 第三方回调）硬塞 UI 通道 → 不得不绕 UI 间接断言（"点了按钮没报错就当通过"）→ 断言被迫弱化 → 假绿。这违反 **第零原则** 和 **R3**。Warn-only 模式在 LLM 自驱场景下会被自己说服跳过——同类暗债沉淀路径已经在约束 4 "否定性 UI 假 SKIP"上踩过：写下时是真的、没人主动复检、注释→docstring→optimize→reason 四处复制成"共识"，最终 4 条 P2 用例假 SKIP 一整迭代。这次提前用硬 gate 拦截。
+
 ---
 
 ## 嵌套调用 /webapp-testing skill 的时机
@@ -287,9 +322,20 @@ Skill(skill="webapp-testing")
 
 ---
 
-## STEP 0 — 环境 / 菜单 / 弹窗实测前置（首次接入 OR 菜单可能变了，必做）
+## STEP 0 — 环境 / 菜单 / 弹窗实测前置（已迁出到独立 skill `kdev-env-recon`）
 
 > **来源**：vfadmin / KDevSec 实战经验。spec 文档常滞后于真实 UI——按钮叫「新增项目」实际只叫「新增」、对话框叫「新增产品线」实际叫「添加产品线」、工具栏「展开全部 / 折叠全部」实际是单按钮 toggle、spec 漏列必填字段。凭 spec 写出的脚本/用例第一跑就挂；先做 5 分钟 STEP 0 实测前置，省 5 小时调试 + 用例文档反复返工。
+
+### STEP 0 现在由独立 skill `kdev-env-recon` 承担
+
+`kdev-env-recon` 提供：
+- 4 阶段标准流程（登录 → 菜单全树 → 目标页探针 → 弹窗探针）
+- 自动渲染 `recon/menu_list.md` 权威文档（含 §6 差异表）
+- 可选回写模式（`--cases <path>` → propose 测试用例步骤修正补丁）
+
+**调用方式**（用户口语触发即可）：
+- "登录测试环境采一下菜单 / recon 一下 / 抓菜单 / 写脚本前先采一遍"
+- 或直接 `Skill(skill="kdev-env-recon")`
 
 ### 何时跳 STEP 0
 
@@ -300,24 +346,11 @@ Skill(skill="webapp-testing")
 - 用户明确说"菜单未变 / UI 未动"
 - 不涉及新接入页面 / 新写测试用例文档
 
-任一条件不成立 → 必跑 STEP 0。
-
-### STEP 0 标准动作
-
-1. **加载嵌套 skill**：`Skill(skill="webapp-testing")` —— 复用其 `sync_playwright` + 服务器生命周期管理
-2. **复制脚本起点**：把 `assets/recon_env_bootstrap.py` 复制到测试项目根，改顶部「配置区」（`BASE_URL` / `USER` / `PWD` / `TARGET_PAGES`）
-3. **执行**：`python3 recon_env_bootstrap.py`，输出落到 `./recon/`：
-   - `menu_tree.json`（左菜单全树）
-   - `pages_<page>.json`（每个目标页的 form labels / buttons / table headers / placeholders / tabs）
-   - `dialogs_<page>.json`（每个 `新增` 弹窗的 title / formLabels / requiredFields / buttons）
-   - `screenshots/*.png`（登录页 + 落地页 + 菜单展开 + 每页 + 每弹窗 全页截图）
-4. **读 4 类 JSON + 截图**，按 `references/env-recon-bootstrap.md §阶段 4` 渲染 **`recon/menu_list.md`**（人类可读权威文档；含 §6 「与既有 spec 差异」表）
-5. **回写测试用例文档**：用 `assets/test_case_doc_header.md.tpl` 在测试用例 `.md` 顶部插入「测试环境与导航约定」节（环境表 + 菜单导航表 + 弹窗标题表 + STEP_LOGIN / STEP_NAV_* 步骤宏 + 按钮空格约定）
-6. **按 §6 差异表**逐条修正测试用例 `.md` 中按钮名 / 弹窗名 / 列名 / 必填字段（这一步是本次 STEP 0 的最大 ROI——把 spec 的虚假断言全部替换成实测真值）
+任一条件不成立 → 调用 `kdev-env-recon` 重跑。
 
 ### STEP 0 与 STEP 1（`tools/recon_elements.py`）边界
 
-| 维度 | STEP 0 | STEP 1 |
+| 维度 | STEP 0（`kdev-env-recon`）| STEP 1（本 skill）|
 |---|---|---|
 | 范围 | 全菜单 + 多页面 + 弹窗 一次性采集 | **单页面**深度元素 dump |
 | 触发 | 接入新环境 / 长时间未跑 / 写新测试用例文档 | 写某个 PageObject 之前 |
@@ -325,13 +358,27 @@ Skill(skill="webapp-testing")
 | 谁是权威 | 全局菜单 / 跨页文案 / 弹窗标题 | 单页字段 disabled / readonly / 选项 |
 | 一次跑完管多久 | 一个 sprint（菜单未变即可复用） | 写一个 PageObject 一次 |
 
-**两者不重叠**：STEP 0 负责"导航 + 文案"，STEP 1 负责"字段 + 状态"。
+**两者不重叠**：STEP 0 负责"导航 + 文案"（独立 skill），STEP 1 负责"字段 + 状态"（本 skill）。
 
-详细操作流程 / 模板脚本 / 反例 / 与 webapp-testing 的协作方式：`references/env-recon-bootstrap.md`。
+### Fallback：本 skill 内置资产（如 `kdev-env-recon` 不可用）
+
+如果运行环境没装 `kdev-env-recon`，或者用户明确要求不嵌套调用其他 skill，**本 skill 仍保留可独立跑的 fallback**：
+
+- `assets/recon_env_bootstrap.py` —— 独立 Python + Playwright 一键脚本
+- `references/env-recon-bootstrap.md` —— 4 阶段流程详细说明 + selector 策略
+
+用法与 `kdev-env-recon` 相同（改 `BASE_URL` / `USER` / `PWD` / `TARGET_PAGES`，跑脚本，按 §阶段 4 渲染 `menu_list.md`）。**优先级**：`kdev-env-recon` > 本 skill fallback。
 
 ---
 
 ## 标准 10 步开发流程（STEP 0 完成后，接入新业务模块按顺序走）
+
+> **前置 GATE（约束 5 落地，先于 step ① 执行）**：在跑 recon 之前先把用例池过一遍 ——
+> `grep -nE "是否UI自动化[：:][[:space:]]*(是|Y|yes|true|✓)" 测试用例.md > candidates.txt`。
+> 候选数为 0 → 告知用户"本批无 UI 自动化用例，是否走 `kdev-uicase-to-apicase` 改派"；
+> 候选数 > 0 → **仅对候选用例**启动下面 10 步；
+> 字段空缺 / 待定 → 回 `kdev-test-cases` 补字段，不兜底；
+> override 用例 → 单列在 `RUN_SUMMARY.md` 「override 清单」段。
 
 ```
 ①  跑 tools/recon_elements.py 侦察目标页面（强制；不能跳）
@@ -378,8 +425,13 @@ Skill(skill="webapp-testing")
 
 如果用户的请求很具体（"给项目编辑页加 TC-022：项目名称超长应阻止保存"），按下面的顺序操作，**不要先写代码再补这些步骤**：
 
-0. **STEP 0 前置（强制）**：当前测试项目根目录有 `recon/menu_list.md` 吗？没有 / 过期 → 先按 `references/env-recon-bootstrap.md` 跑一次 `assets/recon_env_bootstrap.py`，把 `menu_list.md` 产出来，并把测试用例 `.md` 头部「测试环境与导航约定」节补上。**这一步在所有写代码 / 改用例文档动作之前**。
-1. **确认前提**：当前目录里有 `pages/base_page.py` 和 `tests/conftest.py` 吗？没有就提醒用户先 bootstrap 模板。
+0. **用例池入口过滤（约束 5，强制）**：该用例的 `是否UI自动化` 字段值是什么？
+   - `是` → 继续往下走
+   - `否` → **refuse**，告知用户走 `kdev-uicase-to-apicase` / 手写其它通道；不要因为"用户已经让我写"就放行
+   - `待定 / 空白` → 让用户先回 `kdev-test-cases` 补字段
+   - 用户带 `# override-ui-automation: <理由>` 注释强行要求 → 放行，但记到 `RUN_SUMMARY.md` 「override 清单」
+1. **STEP 0 前置（强制）**：当前测试项目根目录有 `recon/menu_list.md` 吗？没有 / 过期 → **调用独立 skill `kdev-env-recon`** 把 `menu_list.md` 产出来，并把测试用例 `.md` 头部「测试环境与导航约定」节补上（`assets/test_case_doc_header.md.tpl`）。如 `kdev-env-recon` 不可用，fallback 用本 skill 的 `assets/recon_env_bootstrap.py` + `references/env-recon-bootstrap.md`。**这一步在所有写代码 / 改用例文档动作之前**。
+2. **确认前提**：当前目录里有 `pages/base_page.py` 和 `tests/conftest.py` 吗？没有就提醒用户先 bootstrap 模板。
 2. **确认字段名**：用户给的字段名（"项目名称"）和 `recon/menu_list.md` + `tools/recon_dump.json` 一致吗？不一致以 recon 为准，并提醒用户。两份 recon 都跟用户说法都对不上时 → `Skill(skill="webapp-testing")` 现场访问页面再确认一遍 DOM。
 3. **确认 PageObject 已存在**：`pages/<biz>_page.py` 里有 `fill_<field>` 方法吗？没有就先在 PageObject 上加，再写用例。**新加 PageObject 方法前**先 `Skill(skill="webapp-testing")` 拿一次实时 selector，避免凭文档造方法。
 4. **拿骨架改字段**：从 `assets/test_arNN_skeleton.py` 复制对应类型（基本流 / 异常流），改 TC 编号、字段名、断言文案。

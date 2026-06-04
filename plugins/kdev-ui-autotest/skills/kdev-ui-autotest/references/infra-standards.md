@@ -35,11 +35,103 @@ def test_xxx(page):
 
 `logged_page` fixture 跳首页后检测到 `/login` 路径或密码框时**自动补登录**，cookies 失效不会让用例硬挂——所以下游项目无需手动处理"会话过期"边界情况。
 
+### §1.1 storage_state 落盘（可选；本地调试期省时）
+
+设 `APP_AUTH_STATE_FILE=.auth_state.json` 后（默认空，每次 session 走 UI 登录），`auth_state` fixture 会把 storage_state 持久化到该文件，下次启动若文件存在且未过期（`APP_AUTH_STATE_TTL` 秒，默认 1800）则**直接 load 跳过 UI 登录**。本地反复跑单条用例排查时省 5–10 秒/次。
+
+| 场景 | 推荐配置 |
+|---|---|
+| CI（每次 fresh） | 留空（默认） |
+| 本地反复跑单条用例 | `APP_AUTH_STATE_FILE=.auth_state.json` |
+
+⚠ **必须把该文件加到 `.gitignore`**——含 cookies/JWT 是敏感凭证。模板内置 `.gitignore` 已处理。
+
+### §1.2 page-level XSS / dialog 录制（默认装配）
+
+`conftest.page` fixture 默认挂 `page.on("dialog", ...)`：把所有 `alert()/confirm()/prompt()` 的消息记到 `request.node._xss_alerts`，自动 dismiss 避免阻塞。
+
+XSS 注入用例可一行断言：
+```python
+def test_xxx_xss(logged_page, request):
+    # ... 注入 payload 后 ...
+    alerts = request.node._xss_alerts
+    assert not alerts, f"XSS 触发了 alert：{alerts!r}"
+```
+
+即使不写 XSS 用例，挂着也无副作用（dialog 不来 → 列表恒空）。
+
 ---
 
-## §2 资源清理：function 级 + 仅清本用例新增
+## §2 资源清理：function 级 + 仅清本用例新增 — **双轨**
 
-### 工作机制
+模板提供两条等效轨道（两条共用 `utils/cleanup_registry.py` 的 LIFO + FK rank + 失败一次重试算法），按项目情况二选一或并存：
+
+| 轨道 | 触发方式 | 适用 | 性能 |
+|---|---|---|---|
+| **API 轨**（推荐） | 用例显式 `cleanup.add(rtype, id)` | 项目有后端 API（`api.add_xxx() → 返回 id`）| 毫秒级 |
+| **UI 轨**（兜底） | PageObject `save()` 触发 `_emit_resource_created("rtype", name)` | 项目无 API，只能列表页 → 搜索 → 点删除 | 秒级 |
+
+### §2.1 API 轨（推荐）
+
+#### 工作机制
+
+```
+test body
+   proj_id = api.add_project(...)
+       └─► cleanup.add("project", proj_id)   ← 紧跟创建后注册（不要插断言）
+              └─► CleanupRegistry._items append
+   ... 后续断言失败也清得到 ...
+
+teardown ─► CleanupRegistry.run_cleanup(logger)
+            │  - 类型内 LIFO + 类型间 FK rank 排序
+            │  - 第一遍删失败 → deferred，第一遍跑完后再试一次
+            └─► 仍失败 → warn + 不抛异常（避免 teardown 噪音）
+```
+
+#### 接入：在 `tests/conftest.py` override 根 `cleanup` fixture
+
+```python
+from utils.cleanup_registry import CleanupRegistry
+
+@pytest.fixture(scope="session")
+def api():
+    """业务 ApiClient session-scope 单例。"""
+    from utils.api import shared_api
+    from utils.my_api_client import MyApiClient   # 下游项目子类化 ApiClient
+    return shared_api(MyApiClient)
+
+
+@pytest.fixture
+def cleanup(api) -> CleanupRegistry:
+    reg = CleanupRegistry()
+    reg.register_deleter("version",
+        lambda vid: api.delete_version(int(vid), ignore_missing=True))
+    reg.register_deleter("project",
+        lambda pid: api.delete_project(int(pid), ignore_missing=True))
+    reg.register_deleter("productline",
+        lambda pid: api.delete_productline(int(pid), ignore_missing=True))
+    # FK 方向：子先删，父后删
+    reg.register_fk_rank("version", 0)
+    reg.register_fk_rank("project", 1)
+    reg.register_fk_rank("productline", 2)
+    yield reg
+    reg.run_cleanup(logger)
+```
+
+#### `ApiClient` 子类化的命名契约
+
+模板的 `utils/api.py::ApiClient` 是骨架——下游子类化后，**必须遵守命名契约**：
+
+- `add_<resource>(...) -> int`：创建并返回 id（业务接口可能返回的 body 不含 id 时自己 find 一下）
+- `delete_<resource>(id, *, ignore_missing=True) -> bool`：**幂等**（用例自删后再清也不抛）
+- `find_<resource>(...)`：返回 dict 或 None
+- `list_<resource>(...) -> list[dict]`
+
+这套契约让 `cleanup.register_deleter` 的 `lambda` 能直接接入。
+
+### §2.2 UI 轨（兜底）
+
+#### 工作机制
 
 ```
 setup ──► 注册 tracker callback 到 pages.base_page._RESOURCE_TRACKER
@@ -61,7 +153,7 @@ teardown ─► 遍历 created[] → 调 _CLEANUP_REGISTRY[rtype](page, name)
             └─► 必须在 page/context 关闭前执行
 ```
 
-### 接入新资源类型（在 tests/conftest.py）
+#### 接入新资源类型（在 tests/conftest.py）
 
 ```python
 from utils.cleanup_registry import register_cleanup
@@ -85,7 +177,21 @@ register_cleanup("<your>", _delete_<your>)
 
 注册后，PageObject 的 `save()` 在 `_emit_resource_created("<your>", name)` 时即可自动触发清理。
 
-### 三个反例（源项目踩过）
+### §2.3 哪条轨道？
+
+```
+项目有 ApiClient（可登录、可 add_xxx/delete_xxx）？
+  ├── 有 → 优先 API 轨（毫秒级、确定性，不受 UI 漂移影响）
+  │       └── R1 铁规天然落地：数据预制走 API，清理也走 API
+  └── 无 → 走 UI 轨，接受秒级耗时
+       └── 后续若接入了 API，逐资源类型迁移 — 两条轨道可并存
+
+混合场景 — 同一用例两条都用：
+  - 业务后端有 API → cleanup.add("project", pid)   走 API 轨
+  - UI-only 资源（无后端入口） → PageObject.save() emit   走 UI 轨
+```
+
+### §2.4 四个反例（源项目踩过的，两条轨道都适用）
 
 ❌ **session 级前缀清理**：
 ```python
@@ -93,7 +199,7 @@ register_cleanup("<your>", _delete_<your>)
 # → 误删手工录入的真实数据，损失工时
 ```
 
-❌ **edit 页面也登记资源**：
+❌ **edit 页面也登记资源**（UI 轨）：
 ```python
 def save(self):                        # form 在 /edit 时也调 _emit_resource_created
     self.click_button("保存")
@@ -101,12 +207,28 @@ def save(self):                        # form 在 /edit 时也调 _emit_resource
     # → 编辑别人的项目时被你的 cleanup 误删
 ```
 
-❌ **cleanup 死等 30s**：
+❌ **cleanup 死等 30s**（UI 轨）：
 ```python
 def _delete_xxx(page, name):
     page.wait_for_selector(f'.el-table__row:has-text("{name}")', timeout=30000)
     # → 用例自删了的话，每条 cleanup 等 30s
 ```
+
+❌ **`cleanup.add` 延迟到断言之后**（API 轨）：
+```python
+proj_id = api.add_project(...)
+assert ...                       # 中途断言失败 → 跳到 teardown
+cleanup.add("project", proj_id)  # ← 永远不会执行，资源泄漏
+```
+
+✅ **正：紧跟资源创建后注册**：
+```python
+proj_id = api.add_project(...)
+cleanup.add("project", proj_id)  # ← 紧跟创建后
+assert ...                       # 后续断言失败也能正常清理
+```
+
+源项目曾因这一漏洞累计孤儿数据 14 productlines + 5 projects。
 
 ### 三道关的实现（在 PageObject 的 save() 里）
 

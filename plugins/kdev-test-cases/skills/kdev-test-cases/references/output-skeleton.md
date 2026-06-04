@@ -9,7 +9,7 @@ This file shows the full output layout. SKILL.md §4 references this for the exa
 
 > 来源测试点：<absolute path-to-input-测试点.md>
 > 渲染模板：<absolute path-to-example>
-> 生成方式：kdev-test-cases-v1 — 1:1 renderer (no re-design)
+> 生成方式：kdev-test-cases — 1:1 renderer (no re-design)
 > 上游契约：用例名称 / 用例编号 / 用例类型 / 优先级 / 是否准入 / UI 自动化 / API 自动化 / 预期结果 均逐字透传，不再判
 > 仅生成：测试步骤 / 前置条件 / 测试数据（按 Playwright 接驳约定派生）
 
@@ -106,7 +106,7 @@ Copy the example's §七 self-check verbatim if present (do not paraphrase). If 
 When you find an issue you cannot fix (e.g. duplicate 测试点标题 within an AR — which would yield duplicate 用例名称, breaking downstream test-function-name hashing), append a "⚠️ 上游问题待回流" section at the end:
 
 ```
-## ⚠️ 上游问题待回流（renderer 不修，需要上游 kdev-test-points-v1 调整）
+## ⚠️ 上游问题待回流（renderer 不修，需要上游 kdev-test-points 调整）
 
 - 重复标题：AR-SATP-04.001.001 第 3 行与第 5 行的 测试点标题 完全一致 → 会生成同名 用例名称，downstream Playwright 函数名冲突。建议第 5 行加上区分性后缀（如 "（含子产品线）"）。
 - 优先级缺失：AR-SATP-05.001.002 第 2 行 优先级 字段为空 → 已透传为空，建议补 P0/P1/P2。

@@ -1,0 +1,10 @@
+{
+  "name": "kdev-test-points",
+  "description": "测试点 / 测试设计文档生成 skill：基于 ISO/IEC/IEEE 29119-4（EP / BVA / 决策表 / 状态迁移 / pairwise / MC/DC / error guessing）与 GB/T 25000.51 ≡ ISO/IEC 25051（三域覆盖 + 8×31 质量子特性 + 符合/部分符合/不符合 verdict）双标准，从 spec / PRD / API 契约 / RUSP / COTS 源生成可审计测试点。四种模式：feature-spec（默认内部 PRD）/ feature-spec-lite（自动当用户提供 SP15/xmind/SOP-测试点 示例时）/ api-contract（单端点或批量端点契约）/ full-conformity（RUSP / COTS / 25051 第三方测评）。kdev-test-points + kdev-test-cases 组合取代旧 kdev-test-case",
+  "version": "0.1.0",
+  "author": {
+    "name": "ly"
+  },
+  "license": "MIT",
+  "keywords": ["test-design", "test-points", "iso-29119", "gb-25000", "iso-25051", "boundary-analysis", "decision-table", "pairwise", "kdev"]
+}
