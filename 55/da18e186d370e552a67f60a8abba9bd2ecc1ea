@@ -1,0 +1,38 @@
+docs/framework/04-references/2026-05-30-05-数字员工架构补遗-多agent+自演进+跨IDE.md
+  ai_agent 1-471
+docs/framework/04-references/2026-05-30-06-kdev-memory-vs-OMC源码层对比.md
+  ai_agent 1-541
+docs/framework/04-references/2026-06-05-09-CrewAI架构借鉴点-员工记忆Scope+委派+事件总线.md
+  s_49bbd787a223b3::t_d2c82b5468537a 1-114
+docs/framework/04-references/2026-06-05-08-BMAD-Agent体系借鉴点-员工编排prompt骨架.md
+  s_49bbd787a223b3::t_48332101758321 1-99
+docs/framework/04-references/README.md
+  s_49bbd787a223b3::t_71b8a88b8b8fb6 30
+  s_ff2724678cba82::t_fecdc26fc54da0 103
+  s_ff2724678cba82::t_f5e32d496d4e44 28
+  s_49bbd787a223b3::t_5c90404d1088ff 29
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.3",
+  "base_commit_sha": "55da18e186d370e552a67f60a8abba9bd2ecc1ea",
+  "prompts": {},
+  "sessions": {
+    "s_49bbd787a223b3": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "8d600408-64c7-4ead-b584-9b4f58a95560",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    },
+    "s_ff2724678cba82": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "d056aeed-06d5-40c2-a0d4-62164219f313",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
