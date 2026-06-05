@@ -59,6 +59,8 @@ recall(scope="/staff/*", query=...)             # CEO/CQO 跨员工查询
 ```
 
 > 跟 kdev-memory 现状的关系：现有 `.kdev/memory/` 已是 markdown 主存，加 `shared/` + `staff/<员工>/` 两级目录即套上 scope 模式，零运行时引入。
+>
+> **采纳升级**：本 MemoryScope 范式已被 [记忆架构-分层+scope 拓扑 v0.1](../01-design/2026-06-05-02-数字员工记忆架构-分层+scope拓扑-v0.1.md) 采纳并**升级为引擎级**——scope 不止用于评审记忆，而是统一覆盖多用户/多员工/多分支；并分操作层 JSONL（token 轻）/ 叙事层 markdown（派生 rollup）两层。详见该文档。
 
 ---
 
