@@ -1,6 +1,6 @@
 # kdev-core 底座决策 — 采用 OMC vs 自建 vs 抽共性渐进
 
-> 🟡 **过程文档** — 已合并入 [底座设计总纲 v1.0](./2026-06-05-01-kdev-core底座设计总纲-v1.0.md)（实施依据看总纲；本份留作过程追溯）
+> 🟡 **过程文档** — 已合并入 [底座设计总纲 v1.0](../2026-06-05-01-kdev-core底座设计总纲-v1.0.md)（实施依据看总纲；本份留作过程追溯）
 
 | 项 | 值 |
 |---|---|
@@ -8,7 +8,7 @@
 | 日期 | 2026-06-03 |
 | 决策点 | 数字员工的「运行时底座」怎么来：① 采用 OMC ② 自建 lean kdev-core ③ 从现有 flows 抽共性渐进 |
 | 方法 | 用「现有 design-flow / coding-flow 实际需要底座提供什么」反推需求，再对照三选项 |
-| 关联 | [整体架构 v0.1](./2026-05-28-02-KDev-staff-整体架构-v0.1.md) · [kdev-core v0.1 详细设计](./2026-05-28-03-kdev-core-v0.1-详细设计.md) · [kdev-memory-vs-OMC 源码对比](../04-references/2026-05-30-06-kdev-memory-vs-OMC源码层对比.md) · [架构补遗](../04-references/2026-05-30-05-数字员工架构补遗-多agent+自演进+跨IDE.md) · [Q-004 从低等级起步](../../.kdev/memory/决策日志.md) |
+| 关联 | [整体架构 v0.1](../2026-05-28-02-KDev-staff-整体架构-v0.1.md) · [kdev-core v0.1 详细设计](../2026-05-28-03-kdev-core-v0.1-详细设计.md) · [kdev-memory-vs-OMC 源码对比](../../04-references/2026-05-30-06-kdev-memory-vs-OMC源码层对比.md) · [架构补遗](../../04-references/2026-05-30-05-数字员工架构补遗-多agent+自演进+跨IDE.md) · [Q-004 从低等级起步](../../../../.kdev/memory/决策日志.md) |
 
 ---
 
@@ -101,7 +101,7 @@
 ---
 
 ## 6. 引用
-- [kdev-memory-vs-OMC 源码对比](../04-references/2026-05-30-06-kdev-memory-vs-OMC源码层对比.md)（OMC 运行时能力清单）
-- [架构补遗](../04-references/2026-05-30-05-数字员工架构补遗-多agent+自演进+跨IDE.md)（OMC self-improve/team mode + Continue 跨 IDE = v2.x 范本）
+- [kdev-memory-vs-OMC 源码对比](../../04-references/2026-05-30-06-kdev-memory-vs-OMC源码层对比.md)（OMC 运行时能力清单）
+- [架构补遗](../../04-references/2026-05-30-05-数字员工架构补遗-多agent+自演进+跨IDE.md)（OMC self-improve/team mode + Continue 跨 IDE = v2.x 范本）
 - 现有 flows：`plugins/kdev-design-flow/`、`plugins/kdev-coding-flow/`
-- [概念模型 v0.5](./2026-06-02-01-KDev数字员工概念模型-双轴+等级阶梯-v0.1.md)（能力→数字员工→持续升级；当前 L2）
+- [概念模型 v0.5](../2026-06-02-01-KDev数字员工概念模型-双轴+等级阶梯-v0.1.md)（能力→数字员工→持续升级；当前 L2）

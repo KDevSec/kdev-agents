@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KDev 数字员工 · 从底座到自演进的 SOP 编排（演讲原型 v0.1）</title>
+<style>
+  :root{
+    --navy:#1F4E79; --navyd:#1F3864; --red:#C00000; --bblue:#2E75B6;
+    --lt:#F2F6FB; --bd:#D9D9D9; --cell:#BFBFBF; --ink:#333; --mut:#666;
+    --okg:#2E7D32; --warn:#C55A11; --code:#1b2733;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:#5a5a5a;font-family:"Microsoft YaHei","PingFang SC","微软雅黑",sans-serif;color:var(--ink)}
+  .slide{position:relative;width:1280px;height:720px;background:#fff;margin:26px auto;overflow:hidden}
+  .slide-footer{position:absolute;left:32px;right:32px;bottom:11px;display:flex;justify-content:space-between;font-size:11.5px;color:#9aa3ad;border-top:1px solid #e6e9ee;padding-top:5px}
+
+  .topbar{display:flex;align-items:center;gap:13px;padding:18px 32px 8px}
+  .badge{width:34px;height:34px;background:var(--navyd);color:#fff;font-size:21px;font-weight:bold;display:flex;align-items:center;justify-content:center;flex:0 0 auto}
+  .chaplabel{color:var(--red);font-size:17px;font-weight:bold;flex:0 0 auto}
+  .maintitle{color:var(--navy);font-size:23px;font-weight:bold;line-height:1.12}
+  .titlerule{height:3px;background:var(--navy);margin:0 32px}
+
+  .body{padding:14px 32px 0}
+  .cols{display:flex;gap:13px;padding:12px 32px 0;align-items:flex-start}
+  .col{display:flex;flex-direction:column;gap:11px}
+  .panel{border:1px solid var(--bd)}
+  .ph{background:var(--navy);color:#fff;font-size:13.5px;font-weight:bold;padding:5px 11px}
+  .ph.red{background:var(--red)}
+  .pb{padding:9px 11px;font-size:12px;line-height:1.5}
+  .kr{color:var(--red);font-weight:bold} .kb{color:var(--navy);font-weight:bold} .kg{color:var(--okg);font-weight:bold}
+
+  /* 钩子横幅 */
+  .hook{display:flex;gap:0;margin:4px 0 2px;border:2px solid var(--navy)}
+  .hook .hk{flex:1;padding:14px 16px;text-align:center;border-right:2px solid var(--navy)}
+  .hook .hk:last-child{border-right:0}
+  .hook .hk .q{color:var(--red);font-size:13px;font-weight:bold;letter-spacing:.5px}
+  .hook .hk .a{color:var(--navy);font-size:19px;font-weight:bold;margin-top:5px}
+  .hook .hk .d{color:var(--mut);font-size:11px;margin-top:4px}
+
+  /* 三栏卡片 */
+  .triad{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+  .tcard{border:1px solid var(--bd);border-top:4px solid var(--navy)}
+  .tcard .th{background:var(--lt);color:var(--navy);font-weight:bold;font-size:14px;padding:7px 11px;display:flex;align-items:center;gap:7px}
+  .tcard .th .n{width:22px;height:22px;background:var(--navy);color:#fff;border-radius:50%;font-size:12px;display:flex;align-items:center;justify-content:center;flex:0 0 auto}
+  .tcard .tb{padding:9px 11px;font-size:11.5px;line-height:1.5;color:var(--ink)}
+  .tcard.red{border-top-color:var(--red)} .tcard.red .th{color:var(--red)} .tcard.red .th .n{background:var(--red)}
+
+  /* agenda 导航 */
+  .agenda{display:grid;grid-template-columns:repeat(6,1fr);gap:8px;margin-top:4px}
+  .ag{border:1px solid var(--bblue);background:var(--lt);padding:8px 6px;text-align:center}
+  .ag .agn{color:var(--bblue);font-weight:bold;font-size:15px}
+  .ag .agt{color:var(--navy);font-weight:bold;font-size:11px;margin-top:3px;line-height:1.25}
+
+  /* 组织架构（复用 v0.1） */
+  .org{display:flex;flex-direction:column;align-items:center}
+  .obx{border:1px solid var(--bd);padding:3px 14px;text-align:center;font-size:12px}
+  .oceo{background:var(--navy);color:#fff;font-weight:bold;font-size:12.5px;padding:4px 14px}
+  .oceo small{font-weight:normal;opacity:.85;font-size:10px}
+  .vbar{width:2px;height:9px;background:var(--bd)}
+  .orow{display:flex;gap:10px;align-items:stretch;width:100%;justify-content:center}
+  .ocqo{background:var(--red);color:#fff;font-weight:bold;padding:7px 11px;text-align:center;font-size:12px;display:flex;flex-direction:column;justify-content:center}
+  .ocqo small{font-weight:normal;opacity:.9;font-size:9.5px;margin-top:2px}
+  .oemps{flex:1;border:1.5px dashed var(--bblue);padding:7px;display:flex;flex-direction:column;gap:5px}
+  .oemps .ttl{text-align:center;color:var(--navy);font-weight:bold;font-size:11px}
+  .delivery{display:flex;gap:6px;align-items:stretch}
+  .delivery .empgrid{flex:1;display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+  .emp{border:1px solid var(--bblue);background:var(--lt);padding:5px 3px;text-align:center}
+  .emp .en{color:var(--navy);font-weight:bold;font-size:11.5px}
+  .emp .ec{color:var(--mut);font-size:10px;margin-top:1px}
+  .rev{flex:0 0 92px;border:1.5px solid var(--navy);background:var(--navy);color:#fff;padding:5px 4px;text-align:center;display:flex;flex-direction:column;justify-content:center}
+  .rev .en{font-weight:bold;font-size:11.5px}
+  .rev .ec{font-size:9.5px;opacity:.9;margin-top:1px}
+  .collab{text-align:center;color:var(--mut);font-size:9.5px;margin-top:1px}
+  .sub-line{font-size:11px;margin-top:7px;line-height:1.4}
+  .sub-line b{color:var(--navy)}
+
+  /* 金字塔（复用 v0.1） */
+  .pyr{display:flex;flex-direction:column;align-items:center;gap:4px;padding:2px 0}
+  .pl{color:#fff;text-align:center;font-weight:bold;padding:7px 6px;line-height:1.2;font-size:11.5px}
+  .pl small{display:block;font-weight:normal;font-size:9.5px;opacity:.88;margin-top:1px}
+  .pyr-cap{text-align:center;color:var(--mut);font-size:10px;margin-top:4px}
+
+  .strip{margin:9px 0 0;background:var(--lt);border-left:4px solid var(--navy);padding:8px 12px;font-size:12px;line-height:1.45}
+  .strip.red{border-left-color:var(--red)} .strip.green{border-left-color:var(--okg)}
+  .note-red{color:var(--red);font-size:10.5px;font-weight:bold;margin-top:5px}
+
+  /* 大问号转折 */
+  .qgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:6px 0}
+  .qbx{border:1.5px solid var(--bd);border-top:3px solid var(--red);padding:11px 8px;text-align:center}
+  .qbx .qq{color:var(--red);font-size:22px;font-weight:bold}
+  .qbx .qt{color:var(--navy);font-size:13px;font-weight:bold;margin-top:5px}
+  .eq{margin:10px 0 0;background:var(--navyd);color:#fff;padding:13px 16px;text-align:center;font-size:16px;line-height:1.5}
+  .eq b{color:#ffd966}
+
+  /* 表格（复用 v0.1） */
+  table.ft{width:100%;border-collapse:collapse;font-size:11px}
+  table.ft th{background:var(--navy);color:#fff;font-weight:bold;padding:4px 7px;text-align:left;border:1px solid var(--cell)}
+  table.ft td{padding:4px 7px;border:1px solid var(--cell);vertical-align:top;line-height:1.3}
+  table.ft tr:nth-child(even) td{background:var(--lt)}
+  td .lv{color:var(--navy);font-weight:bold}
+  .tag{display:inline-block;font-size:9.5px;font-weight:bold;padding:1px 6px;border-radius:9px;color:#fff}
+  .tag.rev{background:var(--bblue)} .tag.dec{background:var(--warn)} .tag.acc{background:var(--okg)}
+
+  /* 代码块 */
+  .code{background:var(--code);color:#dfe7ef;font-family:"SF Mono",Consolas,Menlo,monospace;font-size:10.5px;line-height:1.5;padding:10px 13px;border-radius:3px;white-space:pre;overflow:hidden}
+  .code .c1{color:#7fa7c9} .code .c2{color:#9fd0a0} .code .c3{color:#e6b86b} .code .c4{color:#d98b8b}
+
+  /* 机制网格 */
+  .mgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:11px}
+  .mbx{border:1px solid var(--bd);border-left:4px solid var(--bblue);padding:9px 11px}
+  .mbx .mh{color:var(--navy);font-weight:bold;font-size:12.5px}
+  .mbx .md{color:var(--ink);font-size:11px;line-height:1.45;margin-top:4px}
+  .mbx.hi{border-left-color:var(--red)} .mbx.hi .mh{color:var(--red)}
+
+  /* SOP 四卡片 */
+  .sop4{display:grid;grid-template-columns:repeat(4,1fr);gap:11px}
+  .scard{border:1px solid var(--bd)}
+  .scard .sh{background:var(--navy);color:#fff;padding:7px 9px}
+  .scard .sh .st{font-weight:bold;font-size:13px} .scard .sh .ss{font-size:9.5px;opacity:.85;margin-top:1px}
+  .scard .sbd{padding:8px 9px;font-size:11px;line-height:1.5}
+  .nodechain{display:flex;flex-wrap:wrap;gap:3px;align-items:center;margin-bottom:6px}
+  .nd{background:var(--lt);border:1px solid var(--bblue);color:var(--navy);font-size:9.5px;font-weight:bold;padding:2px 5px}
+  .arr{color:var(--mut);font-size:10px}
+
+  /* 横向 flow 流转链 */
+  .flow{display:flex;align-items:center;gap:4px;flex-wrap:wrap;margin:8px 0}
+  .fnode{border:1.5px solid var(--bblue);background:var(--lt);color:var(--navy);font-weight:bold;font-size:11px;padding:7px 9px;text-align:center;min-width:74px}
+  .fnode small{display:block;font-weight:normal;color:var(--mut);font-size:9px;margin-top:1px}
+  .fgate{border:1.5px solid var(--warn);background:#fff;color:var(--warn);font-weight:bold;font-size:10.5px;padding:7px 8px;text-align:center;border-radius:18px;min-width:66px}
+  .fgate small{display:block;font-weight:normal;font-size:9px;margin-top:1px}
+  .fgate.acc{border-color:var(--okg);color:var(--okg)}
+  .fgate.rev{border-color:var(--bblue);color:var(--bblue)}
+  .fa{color:var(--navy);font-size:15px;font-weight:bold}
+  .fdone{border:1.5px solid var(--okg);background:var(--okg);color:#fff;font-weight:bold;font-size:11px;padding:7px 10px}
+  .reflow{display:flex;align-items:center;gap:6px;font-size:10.5px;color:var(--red);font-weight:bold;margin:2px 0 0 2px}
+
+  .histbar{margin-top:7px;background:#fff;border:1px solid var(--bd);padding:7px 10px;font-size:11px;font-family:"SF Mono",Consolas,monospace;line-height:1.7}
+  .histbar .hf{color:var(--red);font-weight:bold} .histbar .hp{color:var(--okg);font-weight:bold} .histbar .hk2{color:var(--navy)}
+
+  /* 飞轮 */
+  .fly{display:flex;flex-direction:column;gap:6px}
+  .flyrow{display:flex;align-items:center;gap:9px;font-size:12px}
+  .flyrow .ic{width:21px;height:21px;background:var(--navy);color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;flex:0 0 auto}
+  .flyrow.up .ic{background:var(--red)}
+
+  /* cover / closing */
+  .cover{display:flex;flex-direction:column;justify-content:center;align-items:center;height:100%;position:relative}
+  .cband{position:absolute;left:0;right:0;height:14px;background:var(--navy)} .cband.t{top:92px} .cband.b{bottom:92px}
+  .cover .ttl{color:var(--navy);font-size:46px;font-weight:bold;text-align:center;line-height:1.2}
+  .cover .sub{color:var(--ink);font-size:21px;margin-top:20px;letter-spacing:1px}
+  .cover .meta{color:var(--mut);font-size:14px;margin-top:12px}
+  .closing{display:flex;flex-direction:column;justify-content:center;align-items:center;height:100%}
+  .closing .big{color:var(--navy);font-size:40px;font-weight:bold;letter-spacing:2px;text-align:center;line-height:1.3}
+  .closing .big .ar{color:var(--red);margin:0 14px}
+  .closing .sm{color:var(--mut);font-size:15px;margin-top:22px;text-align:center;line-height:1.7}
+</style>
+</head>
+<body>
+
+<!-- ============ P1 封面 ============ -->
+<section class="slide">
+  <div class="cover">
+    <div class="cband t"></div><div class="cband b"></div>
+    <div class="ttl">KDev 数字员工</div>
+    <div class="sub">从底座到自演进的 SOP 编排</div>
+    <div class="meta">同行技术分享 · 2026-06　|　底座管「怎么跑」· SOP 管「跑什么」· 员工管「自己优化怎么跑」</div>
+  </div>
+  <div class="slide-footer"><span>KDev 数字员工 · SOP 编排</span><span>01 / 11</span></div>
+</section>
+
+<!-- ============ P2 核心主张 + 全篇地图 ============ -->
+<section class="slide">
+  <div class="topbar"><div class="badge">2</div><div class="chaplabel">主张</div>
+    <div class="maintitle">核心主张 · 一张地图看全场</div></div>
+  <div class="titlerule"></div>
+  <div class="body">
+    <div class="hook">
+      <div class="hk"><div class="q">底座</div><div class="a">怎么跑</div><div class="d">数字员工架构 = 端到端交付的 AI 团队</div></div>
+      <div class="hk"><div class="q">SOP</div><div class="a">跑什么</div><div class="d">节点表 + gates 的可编排流程</div></div>
+      <div class="hk"><div class="q">员工</div><div class="a">自己优化怎么跑</div><div class="d">复利飞轮反哺 SOP 本身（自演进）</div></div>
+    </div>
+
+    <div class="triad" style="margin-top:14px">
+      <div class="tcard"><div class="th"><span class="n">1</span>底座</div>
+        <div class="tb">数字员工架构：能力 → 数字员工 → 6 人 AI 团队（28 agent）。<b>一支能端到端交付的 AI 团队</b>。</div></div>
+      <div class="tcard"><div class="th"><span class="n">2</span>SOP</div>
+        <div class="tb">底座之上「跑什么、怎么把关、哪里停」。<b>SOP = 节点表 + gates</b>，不写死、可编排。</div></div>
+      <div class="tcard red"><div class="th"><span class="n">3</span>自演进</div>
+        <div class="tb">把复利飞轮从「反哺能力」延伸到<b>「反哺 SOP 本身」</b>。从人编排 SOP → 员工自优化 SOP。</div></div>
+    </div>
+
+    <div class="agenda">
+      <div class="ag"><div class="agn">①</div><div class="agt">底座<br>数字员工架构</div></div>
+      <div class="ag"><div class="agn">②</div><div class="agt">为什么<br>要 SOP</div></div>
+      <div class="ag"><div class="agn">③</div><div class="agt">harness 核心<br>R1/R2/R3</div></div>
+      <div class="ag"><div class="agn">④</div><div class="agt">harness 韧性<br>人机协同</div></div>
+      <div class="ag"><div class="agn">⑤</div><div class="agt">内置这版<br>SOP 展示</div></div>
+      <div class="ag"><div class="agn">⑥</div><div class="agt">任意编排<br>+ 自演进</div></div>
+    </div>
+  </div>
+  <div class="slide-footer"><span>KDev 数字员工 · SOP 编排</span><span>02 / 11</span></div>
+</section>
+
+<!-- ============ P3 底座①数字员工架构 ============ -->
+<section class="slide">
+  <div class="topbar"><div class="badge">3</div><div class="chaplabel">底座 ①</div>
+    <div class="maintitle">数字员工架构 —— 一支能端到端交付的 AI 团队</div></div>
+  <div class="titlerule"></div>
+
+  <div class="cols">
+    <div class="col" style="flex:1.3">
+      <div class="panel"><div class="ph">数字员工 = 多能力 ＋ 编排 → 6 人 AI 团队（28 agent）</div>
+        <div class="pb">
+          <div class="org">
+            <div class="obx">用户</div><div class="vbar"></div>
+            <div class="obx oceo">CEO 主控员 <small>对话/派单/决策/升级裁决</small></div><div class="vbar"></div>
+            <div class="orow">
+              <div class="ocqo">CQO 元监督<small>流程合规·有阻断权</small></div>
+              <div class="oemps"><div class="ttl">业务员工（每个 = 一个"数字员工"）＋ 评审专家收敛把关</div>
+                <div class="delivery">
+                  <div class="empgrid">
+                    <div class="emp"><div class="en">需求架构师</div><div class="ec">5 能力</div></div>
+                    <div class="emp"><div class="en">开发工程师</div><div class="ec">6 能力</div></div>
+                    <div class="emp"><div class="en">测试工程师</div><div class="ec">4 能力</div></div>
+                  </div>
+                  <div class="rev"><div class="en">评审专家</div><div class="ec">7 评审·收敛把关</div></div>
+                </div>
+                <div class="collab">↕ 3 交付员工编排间直接协作（不经 CEO）· 产出 → 评审专家收敛评审</div>
+              </div>
+            </div>
+          </div>
+          <div class="sub-line"><b>28 agent</b> = 1 CEO ＋ 1 CQO ＋ 4 编排 ＋ 15 业务 ＋ 7 评审（需求/方案/代码/质量/安全/测试/终审）</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="col" style="flex:1">
+      <div class="panel"><div class="ph">从底层技能到数字员工（金字塔）</div>
+        <div class="pb">
+          <div class="pyr">
+            <div class="pl" style="width:48%;background:#1F3864">数字员工<small>编排 + 多能力 → 端到端交付</small></div>
+            <div class="pl" style="width:66%;background:#1F4E79">能力（= 专用 agent）<small>某类活的专家</small></div>
+            <div class="pl" style="width:84%;background:#2E5C8A">底层技能：Skill ＋ 规范 ＋ 模板 ＋ 知识库</div>
+            <div class="pl" style="width:100%;background:#2E75B6">通用 Agent（底座 · 推理 + 工具/MCP + 模型选型）</div>
+          </div>
+          <div class="pyr-cap">自下而上逐层组装：底座 → 底层技能 → 能力 → 数字员工</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="strip red" style="margin:11px 32px 0">底座给了我们一支能端到端交付的 AI 团队 —— <b class="kr">但「按什么流程交付」还没定</b>。这正是下一步：SOP。</div>
+  <div class="slide-footer"><span>KDev 数字员工 · SOP 编排</span><span>03 / 11</span></div>
+</section>
+
+<!-- ============ P4 转折：要 SOP ============ -->
+<section class="slide">
+  <div class="topbar"><div class="badge">4</div><div class="chaplabel">为什么要 SOP</div>
+    <div class="maintitle">光有员工不够 —— 要 SOP 把活儿编排起来</div></div>
+  <div class="titlerule"></div>
+  <div class="body">
+    <div class="strip">数字员工<b>会干活</b>，但四个问题悬空 —— 这四个问题的答案，就是一条 <b class="kb">SOP（标准作业流程）</b>：</div>
+    <div class="qgrid">
+      <div class="qbx"><div class="qq">?</div><div class="qt">按什么流程</div></div>
+      <div class="qbx"><div class="qq">?</div><div class="qt">什么顺序</div></div>
+      <div class="qbx"><div class="qq">?</div><div class="qt">哪里把关</div></div>
+      <div class="qbx"><div class="qq">?</div><div class="qt">哪里停 / 交还人</div></div>
+    </div>
+    <div class="eq">SOP ＝ <b>节点表</b>（做什么 · 什么顺序）　＋　<b>gates</b>（哪里把关 · 过不过怎么办）</div>
+    <div class="strip red" style="margin-top:13px">如果这套「节点表 + gates」<b>写死</b>，一个底座就只能跑<b>一种</b>活。<br>要让<b class="kr">同一个底座跑任意业务</b> → 需要 <b class="kr">harness 工程</b>让它<b class="kr">可编排</b>。↓</div>
+  </div>
+  <div class="slide-footer"><span>KDev 数字员工 · SOP 编排</span><span>04 / 11</span></div>
+</section>
+
+<!-- ============ P5 harness 核心 R1/R2/R3 ============ -->
+<section class="slide">
+  <div class="topbar"><div class="badge">5</div><div class="chaplabel">harness · 核心</div>
+    <div class="maintitle">让 SOP 可编排的底座机制 —— kdev-core lean（R1 / R2 / R3）</div></div>
+  <div class="titlerule"></div>
+
+  <div class="cols">
+    <div class="col" style="flex:1.05">
+      <div class="panel"><div class="ph">R1 · flow-state 状态机</div>
+        <div class="pb">每个 flow 一份 <b>flow-state.json</b>：原子写（tmp + os.replace）＋ <b>history 流水</b>。<br>→ <b class="kg">白捡 resume</b>（断点续跑，coding-flow 接上就有）。</div>
+      </div>
+      <div class="panel"><div class="ph">R2 · 通用 n 节点机</div>
+        <div class="pb">节点表由 flow <b>自己声明</b>（不写死段数：design 4 / coding 13）。<br>底座只提供<b>流转引擎</b>：<b class="kb">顺进</b>（gate PASS → 下一节点）/ <b class="kr">回流</b>（gate FAIL → on_fail）。</div>
+      </div>
+      <div class="panel"><div class="ph red">R3 · 三类 gate 统一抽象（核心难点 = 卖点）</div>
+        <div class="pb" style="padding-bottom:7px">
+          <table class="ft">
+            <tr><th style="width:30%">kind</th><th style="width:30%">谁评 → verdict</th><th>不过怎么办</th></tr>
+            <tr><td><span class="tag rev">review</span> 评审重试</td><td>ai/both/human → PASS/FAIL</td><td>改 → 重试（max N）</td></tr>
+            <tr><td><span class="tag dec">decision</span> 路线判断</td><td>ai 默认 / human 可接管 → 分支</td><td>选分支即流转（无重试）</td></tr>
+            <tr><td><span class="tag acc">acceptance</span> 验收</td><td>test 自动跑 → PASS/FAIL</td><td>回流 fix 节点</td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="col" style="flex:1">
+      <div class="panel"><div class="ph">三类共用一套解析（record_gate）</div>
+        <div class="pb" style="padding:9px">
+<div class="code"><span class="c1"># GateResult：flow 执行完喂给底座</span>
+{ <span class="c3">"gate"</span>:"g-c-e2e", <span class="c3">"kind"</span>:<span class="c2">"acceptance"</span>,
+  <span class="c3">"iter"</span>:2, <span class="c3">"verdict"</span>:<span class="c2">"PASS"</span>, <span class="c3">"by"</span>:<span class="c2">"test"</span> }
+
+<span class="c1"># 三类靠 kind 区分，共用 history + 流转</span>
+record_gate(result):
+  state.history.append(result)
+  match gate.kind:
+    review | acceptance:
+      <span class="c4">if</span> PASS:  next = on_pass
+      <span class="c4">elif</span> iter &gt;= max_retries: <span class="c4">ESCALATE</span>
+      <span class="c4">else</span>:     next = on_fail   <span class="c1"># 回流</span>
+    decision:
+      next = branches[verdict].next  <span class="c1"># 分支</span>
+  advance(resolve(next))</div>
+        </div>
+      </div>
+      <div class="strip red"><b class="kr">铁律：底座只记账、不判断本身。</b><br>AI 评审 / E2E 跑测 / 路线决策都在 <b>flow 侧</b>执行，结果喂回底座记录 + 解析下一节点 → 底座 lean、<b class="kr">语言模型无关</b>。</div>
+    </div>
+  </div>
+  <div class="slide-footer"><span>KDev 数字员工 · SOP 编排</span><span>05 / 11</span></div>
+</section>
+
+<!-- ============ P6 harness 韧性与人机协同 ============ -->
+<section class="slide">
+  <div class="topbar"><div class="badge">6</div><div class="chaplabel">harness · 韧性</div>
+    <div class="maintitle">韧性与人机协同 —— 工程的「工程」质感</div></div>
+  <div class="titlerule"></div>
+  <div class="body">
+    <div class="mgrid">
+      <div class="mbx"><div class="mh">retry 断路</div><div class="md">同一 gate 连续 <b>max_retries（默认 3）</b>不过 → 升级人工 / CEO，不无限打转。</div></div>
+      <div class="mbx"><div class="mh">reviewer 锁定 + tier 升级</div><div class="md">重试时<b>同一 reviewer</b> 不漂移；复杂度涨了升模型 tier（sonnet→opus）。</div></div>
+      <div class="mbx hi"><div class="mh">decider 旋钮</div><div class="md">每类 gate「谁来判」<b>默认 AI/自动</b>，编排可改 <b>human 接管岔路口</b> —— 人有最终决定权、默认不挡路。</div></div>
+      <div class="mbx hi"><div class="mh">Auto Mode 停靠</div><div class="md">自主推进时<b>只在 decider: human 的 gate 停</b>，其余 AI 自己过 —— 哪里停由<b>编排</b>决定。</div></div>
+      <div class="mbx"><div class="mh">Worker Preamble</div><div class="md">员工执行任务<b>不套娃 sub-agent</b>（6 员工 × 多能力，防 token 爆炸）。</div></div>
+      <div class="mbx"><div class="mh">memory scope</div><div class="md"><b>shared/</b>（全员共享）+ <b>staff/&lt;员工&gt;/</b>（私有），路径前缀隔离，CEO/CQO 可跨员工查。</div></div>
+    </div>
+    <div class="strip" style="margin-top:14px">「谁来判」是一个<b class="kb">统一旋钮</b>：低自主默认多挂 human、高自主（L4 自治）默认全 AI —— <b class="kb">harness 把人机分工做成可配置参数，而非写死在流程里</b>。</div>
+  </div>
+  <div class="slide-footer"><span>KDev 数字员工 · SOP 编排</span><span>06 / 11</span></div>
+</section>
+
+<!-- ============ P7 内置这版 SOP：4 条 kdev flow ============ -->
+<section class="slide">
+  <div class="topbar"><div class="badge">7</div><div class="chaplabel">内置 SOP</div>
+    <div class="maintitle">内置这版 SOP —— 4 条 kdev flow（开箱即用）</div></div>
+  <div class="titlerule"></div>
+  <div class="body">
+    <div class="sop4">
+      <div class="scard"><div class="sh"><div class="st">需求设计</div><div class="ss">kdev-design-flow</div></div>
+        <div class="sbd">
+          <div class="nodechain"><span class="nd">SR 需求</span><span class="arr">→</span><span class="nd">AR 拆解</span><span class="arr">→</span><span class="nd">高保真原型</span><span class="arr">→</span><span class="nd">概要+详设</span></div>
+          关键 gate：<b>4 评审闸门</b><br><span class="tag rev">review</span> ai / both / human
+        </div></div>
+      <div class="scard"><div class="sh"><div class="st">编码开发</div><div class="ss">kdev-coding-flow</div></div>
+        <div class="sbd">
+          <div class="nodechain"><span class="nd">13 节点</span><span class="arr">…</span><span class="nd">TDD</span><span class="arr">…</span><span class="nd">E2E</span></div>
+          Gate-A 关联度 <span class="tag dec">decision</span><br>Gate-B 复杂度 <span class="tag dec">decision</span><br>Gate-C E2E ＋ Per-Increment <span class="tag acc">acceptance</span>
+        </div></div>
+      <div class="scard"><div class="sh"><div class="st">测试设计</div><div class="ss">kdev-test-design</div></div>
+        <div class="sbd">
+          <div class="nodechain"><span class="nd">用例设计</span><span class="arr">→</span><span class="nd">覆盖评审</span></div>
+          关键 gate：用例评审<br><span class="tag rev">review</span> ai / human
+        </div></div>
+      <div class="scard"><div class="sh"><div class="st">测试执行</div><div class="ss">kdev-test-run</div></div>
+        <div class="sbd">
+          <div class="nodechain"><span class="nd">E2E 跑测</span><span class="arr">→</span><span class="nd">验收</span></div>
+          关键 gate：通行证<br><span class="tag acc">acceptance</span> test 自动跑
+        </div></div>
+    </div>
+    <div class="strip green" style="margin-top:14px"><b class="kg">这四条 flow 的所有 gate，都装进 R3 三类抽象</b>（review / decision / acceptance）—— 这就是「统一抽象成立」的证据，也是同一底座能跑多条 SOP 的根。</div>
+  </div>
+  <div class="slide-footer"><span>KDev 数字员工 · SOP 编排</span><span>07 / 11</span></div>
+</section>
+
+<!-- ============ P8 一条 flow 端到端走通 ============ -->
+<section class="slide">
+  <div class="topbar"><div class="badge">8</div><div class="chaplabel">走通一条</div>
+    <div class="maintitle">一条 SOP 端到端走通 —— coding-flow（流程 · 把关 · 留痕）</div></div>
+  <div class="titlerule"></div>
+  <div class="body">
+    <div class="flow">
+      <div class="fnode">n1 关联度<small>action</small></div>
+      <span class="fa">→</span>
+      <div class="fgate dec">Gate-A<small style="color:var(--warn)">decision</small></div>
+      <span class="fa">→</span>
+      <div class="fnode">n2 分支<small>高→单 / 低→worktree</small></div>
+      <span class="fa">→</span>
+      <div class="fnode">n7 TDD<small>action</small></div>
+      <span class="fa">→</span>
+      <div class="fgate acc">Gate-C E2E<small style="color:var(--okg)">acceptance</small></div>
+      <span class="fa">→</span>
+      <div class="fdone">completed</div>
+    </div>
+    <div class="reflow">↑ Gate-C FAIL → 回流 n7-tdd 修 → 重跑 E2E（最多 3 次，超限升级人工）</div>
+
+    <div class="triad" style="margin-top:14px">
+      <div class="tcard"><div class="th" style="font-size:13px"><span class="n">顺</span>顺进</div><div class="tb">action 产出 → gate PASS → current_node 移到下一节点。</div></div>
+      <div class="tcard"><div class="th" style="font-size:13px"><span class="n">岔</span>分支</div><div class="tb">decision gate（关联度高/低）→ 走不同节点路径（单分支 / worktree 隔离）。</div></div>
+      <div class="tcard red"><div class="th" style="font-size:13px"><span class="n">回</span>回流</div><div class="tb">acceptance FAIL → 回 fix 节点修 → 重跑，全程进 history。</div></div>
+    </div>
+
+    <div class="histbar">
+      history 流水（可审计留痕）：<br>
+      { gate:<span class="hk2">g-c-e2e</span> iter:1 verdict:<span class="hf">FAIL</span> by:test }　→　回流 n7-tdd　→　{ gate:<span class="hk2">g-c-e2e</span> iter:2 verdict:<span class="hp">PASS</span> by:test }　→　status:<span class="hp">completed</span>
+    </div>
+  </div>
+  <div class="slide-footer"><span>KDev 数字员工 · SOP 编排</span><span>08 / 11</span></div>
+</section>
+
+<!-- ============ P9 任意 SOP 可编排：三层 ============ -->
+<section class="slide">
+  <div class="topbar"><div class="badge">9</div><div class="chaplabel">任意编排</div>
+    <div class="maintitle">同一套底座，跑任意业务 SOP —— 三层编排覆盖</div></div>
+  <div class="titlerule"></div>
+  <div class="body">
+    <table class="ft" style="font-size:12px">
+      <tr><th style="width:16%">层</th><th style="width:18%">谁编排</th><th style="width:26%">位置</th><th>改什么</th></tr>
+      <tr><td><span class="lv">L0 默认</span></td><td>flow 作者（我们）</td><td><code>node-table.yml</code></td><td>默认 SOP（节点表 + gates）—— 即第 7 页这四条</td></tr>
+      <tr><td><span class="lv">L1 用户编排</span></td><td>用户</td><td><code>orchestration.yml</code></td><td>开关 gate · decider ai↔human · retry 数 · 跳过 / 重排节点</td></tr>
+      <tr><td><span class="lv" style="color:var(--red)">L2 自主编排</span></td><td>数字员工自己</td><td>同上（employee 写）</td><td class="st-risk" style="color:var(--red)">基于经验提议 SOP 优化（未来 · 见第 10 页）</td></tr>
+    </table>
+    <div class="eq" style="font-size:15px;margin-top:14px">底座加载的有效 SOP ＝ <b>merge</b>( L0 默认 , L1 用户 , [ L2 自主 ] )</div>
+    <div class="strip" style="margin-top:13px">配套<b class="kb">编排指南文档</b>：每条 flow 说明 <code>orchestration.yml</code> 能改什么 / 怎么改 / 关了某 gate 的风险。<br><b class="kr">L1 当下即可落地、可演示</b> —— 用户改一份 yml 就换一套 SOP，底座 R2/R3 直接吃合并后的配置。</div>
+  </div>
+  <div class="slide-footer"><span>KDev 数字员工 · SOP 编排</span><span>09 / 11</span></div>
+</section>
+
+<!-- ============ P10 未来：自演进 SOP ============ -->
+<section class="slide">
+  <div class="topbar"><div class="badge">10</div><div class="chaplabel">未来展望</div>
+    <div class="maintitle">数字员工自演进 SOP —— 复利飞轮反哺「流程本身」</div></div>
+  <div class="titlerule"></div>
+
+  <div class="cols">
+    <div class="col" style="flex:1.05">
+      <div class="panel"><div class="ph red">复利飞轮 · 升级版</div>
+        <div class="pb">
+          <div class="fly">
+            <div class="flyrow"><span class="ic">1</span><div>数字员工干活（需求 → 验收）</div></div>
+            <div class="flyrow"><span class="ic">2</span><div>过程沉淀进 <b>专有知识库</b></div></div>
+            <div class="flyrow"><span class="ic">3</span><div>知识 <b>反哺能力</b>（下次更准更快）</div></div>
+            <div class="flyrow up"><span class="ic">3+</span><div><span class="kr">新增：也反哺「SOP 本身」</span> —— 发现某 gate 总白过 / 某节点顺序更优 → <b>提议改 SOP</b></div></div>
+            <div class="flyrow"><span class="ic">4</span><div><span class="kr">越用越强（复利上升）</span> → 回到 1</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col" style="flex:1">
+      <div class="panel"><div class="ph">守护栏：人有最终决定权</div>
+        <div class="pb">
+<div class="code"><span class="c1"># orchestration.yml 每项留来源标记</span>
+- gate: g-b-complexity
+  decider: ai
+  <span class="c3">source</span>: <span class="c2">self</span>   <span class="c1"># default | user | self</span>
+  <span class="c4">requires_human_confirm</span>: true</div>
+          <div class="sub-line"><b>self</b> 变更需<b>人确认</b>才生效 —— 员工可提议、不可擅改。当前 <b>L2 不实施，只预留挂钩</b>。</div>
+        </div>
+      </div>
+      <div class="panel"><div class="ph">挂自主度阶梯</div>
+        <div class="pb" style="padding-bottom:7px">
+          <table class="ft">
+            <tr><th>级</th><th>SOP 谁来编排</th></tr>
+            <tr><td><span class="lv">L1–L2</span></td><td>人配（默认 + 用户 orchestration.yml）</td></tr>
+            <tr><td><span class="lv" style="color:var(--red)">L3–L4</span></td><td class="st-risk" style="color:var(--red)">数字员工自主编排 / 优化（自演进）</td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="strip red" style="margin:11px 32px 0">从「<b>人编排 SOP</b>」走向「<b class="kr">员工自优化 SOP</b>」—— 复利飞轮不止让能力越用越强，也让<b class="kr">流程越用越优</b>。</div>
+  <div class="slide-footer"><span>KDev 数字员工 · SOP 编排</span><span>10 / 11</span></div>
+</section>
+
+<!-- ============ P11 收尾 ============ -->
+<section class="slide">
+  <div class="closing">
+    <div class="big">从 人编排 SOP <span class="ar">→</span> 员工自优化 SOP</div>
+    <div class="sm">
+      底座（怎么跑）已落地　·　SOP（跑什么）可编排　·　自演进（自己优化怎么跑）在路上<br>
+      kdev-core lean 底座　|　R1 状态机 · R2 节点机 · R3 三类 gate　|　4 条内置 kdev flow
+    </div>
+  </div>
+  <div class="slide-footer"><span>KDev 数字员工 · SOP 编排</span><span>11 / 11</span></div>
+</section>
+
+</body>
+</html>
