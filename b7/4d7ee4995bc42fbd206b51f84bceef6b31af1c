@@ -1,0 +1,24 @@
+docs/framework/04-references/2026-06-05-09-CrewAI架构借鉴点-员工记忆Scope+委派+事件总线.md
+  s_ff2724678cba82::t_95d2e150f826ad 62-63
+docs/framework/01-design/2026-06-05-02-数字员工记忆架构-分层+scope拓扑-v0.1.md
+  s_ff2724678cba82::t_a964991a954bc5 134,136-172,175,177
+  s_ff2724678cba82::t_3f164bea39d894 1-133,135,173-174,176,178-193
+docs/framework/01-design/2026-05-28-02-KDev-staff-整体架构-v0.1.md
+  s_ff2724678cba82::t_c48692d0c61111 303-310
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.3",
+  "base_commit_sha": "b74d7ee4995bc42fbd206b51f84bceef6b31af1c",
+  "prompts": {},
+  "sessions": {
+    "s_ff2724678cba82": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "d056aeed-06d5-40c2-a0d4-62164219f313",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
