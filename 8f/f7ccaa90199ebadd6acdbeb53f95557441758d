@@ -1,0 +1,67 @@
+docs/framework/01-design/_process/2026-06-03-02-底座R1-R7现状盘点-flows差异表.md
+  s_c7c37810fe9dcc::t_0ac0d1c1d6c3b8 10
+  s_c7c37810fe9dcc::t_99af0455fb9e5f 3
+docs/framework/01-design/2026-06-05-01-kdev-core底座设计总纲-v1.0.md
+  s_c7c37810fe9dcc::t_99af0455fb9e5f 9
+  s_c7c37810fe9dcc::t_0ac0d1c1d6c3b8 10
+docs/framework/01-design/_process/2026-06-04-01-kdev-core-lean底座设计-R1R2R3.md
+  s_c7c37810fe9dcc::t_0ac0d1c1d6c3b8 11
+  s_c7c37810fe9dcc::t_99af0455fb9e5f 3
+docs/framework/01-design/_process/2026-06-04-02-数字员工SOP编排演讲-PPT大纲-v0.1.md
+  s_c7c37810fe9dcc::t_b717a5002e5f7a 1-142
+docs/framework/01-design/_process/2026-06-04-02-kdev-core底座组成-状态编排记忆边界.md
+  s_c7c37810fe9dcc::t_0ac0d1c1d6c3b8 10
+  s_c7c37810fe9dcc::t_99af0455fb9e5f 3,117-118
+docs/framework/01-design/2026-06-02-01-KDev数字员工概念模型-双轴+等级阶梯-v0.1.md
+  s_c7c37810fe9dcc::t_0ac0d1c1d6c3b8 9
+docs/framework/01-design/_archive/2026-05-27-02-KDev多智能体集群-X1群组-vs-X3矩阵对比.md
+  s_c7c37810fe9dcc::t_0ac0d1c1d6c3b8 4
+docs/framework/01-design/2026-05-28-03-kdev-core-v0.1-详细设计.md
+  s_c7c37810fe9dcc::t_0ac0d1c1d6c3b8 5,11
+docs/framework/01-design/build_数字员工总览_pptx.py
+  s_c7c37810fe9dcc::t_15cda81a3f27a0 1,4-20,22-25,27-37,39,41-49,56-59,63-70,85-86,95,103-104,106,108,112,114,118-119,125,128-132,135-140,142,144-146,148,150,153-156,158,165-171
+  s_c7c37810fe9dcc::t_42168dc8e0d4a9 50-55
+  s_c7c37810fe9dcc::t_56e031213477c1 2-3,21,26,38,40,60-62,71-84,87-94,96-102,105,107,109-111,113,115-117,120-124,126-127,133-134,141,143,147,149,151-152,157,159-164,172
+docs/framework/01-design/_archive/2026-04-08-03-KDev融合架构设计.md
+  s_c7c37810fe9dcc::t_b717a5002e5f7a 84,166,191,754,858,876
+docs/framework/01-design/_process/2026-06-04-03-OMC源码借鉴对照-底座R1-R7.md
+  s_c7c37810fe9dcc::t_b717a5002e5f7a 3
+  s_c7c37810fe9dcc::t_0ac0d1c1d6c3b8 10
+docs/framework/01-design/KDev数字员工SOP编排_演讲原型_v0.1.html
+  s_4155b73624bfbb::t_b5163e4f32ee48 131
+  s_4155b73624bfbb::t_5ebe0c88e306a4 1-130,132-491
+docs/framework/01-design/2026-05-30-01-kdev-memory-记录元数据增强-工作草案.md
+  s_c7c37810fe9dcc::t_99af0455fb9e5f 278-280
+docs/framework/01-design/2026-05-28-01-KDev数字员工架构-员工能力专项-v1.5.md
+  s_c7c37810fe9dcc::t_99af0455fb9e5f 7,544-545
+docs/framework/01-design/2026-05-28-02-KDev-staff-整体架构-v0.1.md
+  s_c7c37810fe9dcc::t_0ac0d1c1d6c3b8 5,11
+  s_c7c37810fe9dcc::t_99af0455fb9e5f 573
+docs/framework/01-design/_process/2026-06-03-01-kdev-core底座决策-OMC-vs-自建-vs-抽共性.md
+  s_c7c37810fe9dcc::t_99af0455fb9e5f 3,104-105,107
+  s_c7c37810fe9dcc::t_0ac0d1c1d6c3b8 11
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.3",
+  "base_commit_sha": "8ff7ccaa90199ebadd6acdbeb53f95557441758d",
+  "prompts": {},
+  "sessions": {
+    "s_4155b73624bfbb": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "76e5a1a5-0a5e-4e4a-bc7f-77c57bad949d",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    },
+    "s_c7c37810fe9dcc": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c46e95e4-1921-44bc-8c97-713d2da0c24c",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
