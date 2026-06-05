@@ -1,0 +1,24 @@
+README.md
+  s_68351e828faeb4::t_c32c9f9012cb6a 19
+  s_68351e828faeb4::t_f12339a40eaa57 16
+  s_68351e828faeb4::t_549d71b6909f7a 35-36
+  s_68351e828faeb4::t_244287c3a192ed 177,179,183,185
+  s_68351e828faeb4::t_4ecd5cbaec96a4 63-64
+  s_68351e828faeb4::t_8f18f2f07ab4c9 17
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.3",
+  "base_commit_sha": "01eac4b0255b5b8ebc48fecf957169bec4af37fa",
+  "prompts": {},
+  "sessions": {
+    "s_68351e828faeb4": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "24a62330-e28b-49c7-a925-52ddc767457a",
+        "model": "deepseek-v4-pro"
+      },
+      "human_author": "doudoudou-dou <82752251@qq.com>"
+    }
+  }
+}
