@@ -1,7 +1,7 @@
 ---
-name: kdev-test-points-v1
+name: kdev-test-points
 description: |
-  Design auditable TEST POINTS / test conditions / coverage items / 测试设计文档 from a spec, PRD, API contract, or RUSP/COTS source — the judgment-heavy upstream half of the test workshop. Modes — feature-spec (default internal PRD), feature-spec-lite (auto when an SP15/xmind/SOP-测试点 example is provided), api-contract (single or batched endpoint contracts), full-conformity (RUSP / COTS / 25051 第三方测评). Built on ISO/IEC/IEEE 29119-4 (test design techniques — EP, BVA, decision tables, state transition, pairwise, MC/DC, error guessing) and GB/T 25000.51 ≡ ISO/IEC 25051 (three-domain coverage + 8×31 quality sub-characteristics + 符合/部分符合/不符合 conformity verdict). Use whenever the user asks to "generate test points", "design test points for this spec/feature/API/state machine", "create test design document", "boundary tests", "decision table tests", "pairwise combinations", "regression coverage", "什么测试点", "梳理测试点", "测试点编写", "测试设计文档", "GB 25000 测试", "25051 测试", "软件产品测评", "就绪可用软件产品测试", "质量特性测试", "符合性测试", "用户文档测试", "产品说明测试" — even when the user only pastes a spec, API contract, or state diagram and says "测一下". Trigger on the artifact, not just the keyword. DO NOT use when the input is already a 测试点 .md and the user wants to render fielded test cases for Playwright — that is kdev-test-cases-v1's job.
+  Design auditable TEST POINTS / test conditions / coverage items / 测试设计文档 from a spec, PRD, API contract, or RUSP/COTS source — the judgment-heavy upstream half of the test workshop. Modes — feature-spec (default internal PRD), feature-spec-lite (auto when an SP15/xmind/SOP-测试点 example is provided), api-contract (single or batched endpoint contracts), full-conformity (RUSP / COTS / 25051 第三方测评). Built on ISO/IEC/IEEE 29119-4 (test design techniques — EP, BVA, decision tables, state transition, pairwise, MC/DC, error guessing) and GB/T 25000.51 ≡ ISO/IEC 25051 (three-domain coverage + 8×31 quality sub-characteristics + 符合/部分符合/不符合 conformity verdict). Use whenever the user asks to "generate test points", "design test points for this spec/feature/API/state machine", "create test design document", "boundary tests", "decision table tests", "pairwise combinations", "regression coverage", "什么测试点", "梳理测试点", "测试点编写", "测试设计文档", "GB 25000 测试", "25051 测试", "软件产品测评", "就绪可用软件产品测试", "质量特性测试", "符合性测试", "用户文档测试", "产品说明测试" — even when the user only pastes a spec, API contract, or state diagram and says "测一下". Trigger on the artifact, not just the keyword. DO NOT use when the input is already a 测试点 .md and the user wants to render fielded test cases for Playwright — that is kdev-test-cases's job.
 allowed-tools: Read, Write, Glob, Grep, Bash
 ---
 
@@ -14,7 +14,7 @@ Senior QA test analyst working to a dual standard:
 
 Without 29119-4 your tests are ad-hoc. Without 25000.51 you only test functions and miss the non-functional half. Use both. Every output must be auditable on both axes.
 
-This skill produces the **测试点 / test-design** artifact. If you need to then render those test points as Playwright-handoff fielded test cases (1:1 mapping, byte-equality contract), hand the output to `kdev-test-cases-v1`.
+This skill produces the **测试点 / test-design** artifact. If you need to then render those test points as Playwright-handoff fielded test cases (1:1 mapping, byte-equality contract), hand the output to `kdev-test-cases`.
 
 ---
 
@@ -33,9 +33,9 @@ The volume of ceremony depends on **why** the user wants tests. Don't apply thir
 
 `--lite` further compresses any mode by writing only Header + Conditions + TC core + RTM. Use when the user wants a sketch.
 
-**Audit companion default = OFF (v2.2 change)**: across all non-`full-conformity` modes, the audit companion is **not generated** unless the user passes `--audit`. Rationale: in real internal pipelines (SP15 → xmind → kdev-test-cases-v1 → Playwright), the 25051 audit ceremony (8×31 matrix, COND/CI tables, conformity verdicts, bidirectional RTM) is dead weight — the main file's short RTM + Risk + self-check already closes the loop. The audit material is meant for third-party certification scenarios; if you need that, either use `--audit` explicitly or use `full-conformity` mode (which inlines everything). Do **not** generate the companion file proactively "to be safe" — users who want it will say so.
+**Audit companion default = OFF (v2.2 change)**: across all non-`full-conformity` modes, the audit companion is **not generated** unless the user passes `--audit`. Rationale: in real internal pipelines (SP15 → xmind → kdev-test-cases → Playwright), the 25051 audit ceremony (8×31 matrix, COND/CI tables, conformity verdicts, bidirectional RTM) is dead weight — the main file's short RTM + Risk + self-check already closes the loop. The audit material is meant for third-party certification scenarios; if you need that, either use `--audit` explicitly or use `full-conformity` mode (which inlines everything). Do **not** generate the companion file proactively "to be safe" — users who want it will say so.
 
-> **Out of scope for this skill**: rendering an already-existing 测试点 .md as Playwright-friendly fielded test cases (用例编号 / 用例名称 / fielded code blocks). That is a pure 1:1 renderer with a byte-equality contract — qualitatively different from test design — and lives in `kdev-test-cases-v1`. If `--input` resolves to a markdown file that already contains `### AR-[A-Z]+-\d{2}\.\d{3}\.\d{3}` headers with numbered table rows shaped `| # | 测试点标题 | 预期结果 | ...`, stop and tell the user: "This looks like an upstream 测试点 .md — hand it to `kdev-test-cases-v1` for fielded rendering, not to this skill."
+> **Out of scope for this skill**: rendering an already-existing 测试点 .md as Playwright-friendly fielded test cases (用例编号 / 用例名称 / fielded code blocks). That is a pure 1:1 renderer with a byte-equality contract — qualitatively different from test design — and lives in `kdev-test-cases`. If `--input` resolves to a markdown file that already contains `### AR-[A-Z]+-\d{2}\.\d{3}\.\d{3}` headers with numbered table rows shaped `| # | 测试点标题 | 预期结果 | ...`, stop and tell the user: "This looks like an upstream 测试点 .md — hand it to `kdev-test-cases` for fielded rendering, not to this skill."
 
 ### 1.1 SP15-style example auto-detection
 
@@ -52,7 +52,7 @@ When detected, **prefer the example's own self-check / RTM / 残余风险 sectio
 ## 2. Arguments
 
 ```
-/kdev-test-points-v1 [--input <path>]
+/kdev-test-points [--input <path>]
                      [--example <path>]
                      [--output <path>]
                      [--mode feature-spec|api-contract|full-conformity]
@@ -85,7 +85,7 @@ When the user gives `--example <template>`, **the example replaces only the §6.
 | `api-contract` | main file with Header + COND + CI + TC + Coverage Summary + RTM (single file) | also emit companion `<stem>-audit.md` with Quality Matrix + Conformity light |
 | `full-conformity` | inline in main (single auditable document, §6.1–§6.11 in one file) | unchanged — flag has no effect |
 
-Why audit-OFF by default for the first three modes (v2.2 rationale): SP15 / SOP 测试点 templates feed directly into xmind / xlsx / playwrightmode / `kdev-test-cases-v1` → Playwright. Internal-pipeline users delete the companion immediately ~100% of the time — it's dead weight for their workflow. Conformity ceremony is appropriate for third-party assessors, internal compliance reviews, or when the user is preparing to defend the test design upstream. **Do not generate the companion proactively** "in case the user wants it" — that's the failure mode v2.2 is fixing. If the user wants it, they'll pass `--audit` or ask for "审计材料" / "25051 矩阵" / etc.
+Why audit-OFF by default for the first three modes (v2.2 rationale): SP15 / SOP 测试点 templates feed directly into xmind / xlsx / playwrightmode / `kdev-test-cases` → Playwright. Internal-pipeline users delete the companion immediately ~100% of the time — it's dead weight for their workflow. Conformity ceremony is appropriate for third-party assessors, internal compliance reviews, or when the user is preparing to defend the test design upstream. **Do not generate the companion proactively** "in case the user wants it" — that's the failure mode v2.2 is fixing. If the user wants it, they'll pass `--audit` or ask for "审计材料" / "25051 矩阵" / etc.
 
 ### 3.1 Column contract — do not extend the example's row schema
 
@@ -197,7 +197,7 @@ Use the floor as a budget, not a target. For a 23-FR spec expect roughly 100–1
 ## 7. Workflow
 
 1. **Read** `--input` files and any referenced sub-files (Read/Glob/Grep). If the basis lacks both quantitative claims and procedural steps, warn before continuing.
-2. **Sanity check input shape** — if `--input` already contains `### AR-[A-Z]+-\d{2}\.\d{3}\.\d{3}` headers + numbered table rows shaped `| # | 测试点标题 | 预期结果 | ...`, **stop**: the user gave an upstream 测试点 .md, not a test basis. Tell them to use `kdev-test-cases-v1` for fielded rendering.
+2. **Sanity check input shape** — if `--input` already contains `### AR-[A-Z]+-\d{2}\.\d{3}\.\d{3}` headers + numbered table rows shaped `| # | 测试点标题 | 预期结果 | ...`, **stop**: the user gave an upstream 测试点 .md, not a test basis. Tell them to use `kdev-test-cases` for fielded rendering.
 3. **Decide mode + audit policy** (§1 / §2). Announce both: `Mode: feature-spec-lite (SP15 example detected); audit companion: off (no --audit)`. **Never silently generate the companion** — if the user wants it, they pass `--audit` or explicitly ask for "审计材料" / "25051 矩阵".
 4. **Declare scope** (3 domains, §6.1) — internally for routing; surface in main file only at the level §4 prescribes for the mode.
 5. **Decide which audit artifacts to compute**: in `feature-spec-lite` without `--audit`, compute the Quality Matrix / COND / CI mentally to drive technique selection (§5), but **do not emit** them — they only ship if `--audit` opens the companion. In other modes follow §4 default-emission rules.
@@ -222,7 +222,7 @@ For a 1-FR end-to-end walk-through (Test Basis → COND → CI → TC → RTM), 
 - [ ] If `--audit` was passed: companion file `<stem>-audit.md` exists next to main; main file's preamble has a single `> 审计材料: <stem>-audit.md` cross-reference line?
 - [ ] If `--example` given: §6.5 follows the example; FR linkage surfaces via AR headers / short RTM (not via extra columns in §6.5)?
 - [ ] If example columns ≤ 9: main §6.5 column count == example column count (no `覆盖CI/质量子特性/测试技术` injected as extra columns)?
-- [ ] Input was raw spec / PRD / API contract — not an upstream 测试点 .md? (If it was, you should have stopped at workflow step 2 and redirected to `kdev-test-cases-v1`.)
+- [ ] Input was raw spec / PRD / API contract — not an upstream 测试点 .md? (If it was, you should have stopped at workflow step 2 and redirected to `kdev-test-cases`.)
 
 **Naming + role + structure locks (§3.2)**
 
@@ -260,7 +260,7 @@ For a 1-FR end-to-end walk-through (Test Basis → COND → CI → TC → RTM), 
 
 **Downstream handoff**
 
-- [ ] If the output is meant to feed `kdev-test-cases-v1` for Playwright rendering: 测试点标题 are written as full natural sentences (e.g. `超级管理员登录，项目管理-产品线管理，新增顶级产品线（接口主路径）`) — not abbreviations — because the downstream renderer copies them verbatim and they will become test-function names?
+- [ ] If the output is meant to feed `kdev-test-cases` for Playwright rendering: 测试点标题 are written as full natural sentences (e.g. `超级管理员登录，项目管理-产品线管理，新增顶级产品线（接口主路径）`) — not abbreviations — because the downstream renderer copies them verbatim and they will become test-function names?
 
 Any No → fix and re-emit. Don't ship a partial dual-standard document.
 

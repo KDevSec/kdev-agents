@@ -1,31 +1,31 @@
 {
-  "skill_name": "kdev-test-cases-v1",
+  "skill_name": "kdev-test-cases",
   "evals": [
     {
       "id": 1,
       "name": "happy-path-1-to-1-render",
-      "prompt": "/kdev-test-cases-v1 --input /home/sec/project/ClaudeCodeTest/SOP_测试点_PVM.md --example /home/sec/project/ClaudeCodeTest/SOP_测试用例MOD.md --output /tmp/eval-1-cases.md\n\n把这份上游已生成的测试点 .md 按 SOP_测试用例MOD 的 fielded-block 模板渲染成测试用例 .md，1:1 映射，逐行落块。",
+      "prompt": "/kdev-test-cases --input /home/sec/project/ClaudeCodeTest/SOP_测试点_PVM.md --example /home/sec/project/ClaudeCodeTest/SOP_测试用例MOD.md --output /tmp/eval-1-cases.md\n\n把这份上游已生成的测试点 .md 按 SOP_测试用例MOD 的 fielded-block 模板渲染成测试用例 .md，1:1 映射，逐行落块。",
       "expected_output": "输出 /tmp/eval-1-cases.md 含 N 个 fielded code 块，N 等于输入中所有 AR 表格的编号行总数（grep -c \"^- 用例编号：\" == 输入行总数）。每个块的字段顺序与 example §二 一致；用例编号符合 ^TC-AR\\d{8}-\\d{3}$ 正则；用例名称与对应输入行 测试点标题 列字节一致（含 \"超级管理员登录，\" 前缀和括号备注）；用例类型/优先级/是否准入/UI 自动化/API 自动化 字段从源透传未改判；预期结果 numbered list 与源同序、异常流缺失时仅 append \"平台数据保持不变\" 一条；测试步骤 用 【菜单】/\"按钮\" 约定。文件末尾含统计表（AR 数 / TC 数 / 准入数 / 基本流 / 异常流 / UI 自动化候选 / API 自动化候选）和 example §七 自检清单（如有）。",
       "files": []
     },
     {
       "id": 2,
       "name": "rejects-raw-spec-input",
-      "prompt": "/kdev-test-cases-v1 --input /home/sec/project/SOP_test/specs/001-pl-project-version-mgmt/spec.md --example /home/sec/project/ClaudeCodeTest/SOP_测试用例MOD.md --output /tmp/eval-2-cases.md\n\n把这份 spec 直接渲染成测试用例 .md。",
-      "expected_output": "Skill 应在 §1 pre-flight 识别 --input 是 raw spec（不含 ### AR-...-NN.NNN.ZZZ 头 + 编号表格行），停止生成并提示用户改用 kdev-test-points-v1 先设计测试点，再回流到本 skill 渲染。绝不能尝试生成 fielded 块（因为没有 1:1 的 测试点 行可映射），也绝不能 fallback 到 kdev-test-points-v1 的设计流程（那是另一个 skill 的职责）。",
+      "prompt": "/kdev-test-cases --input /home/sec/project/SOP_test/specs/001-pl-project-version-mgmt/spec.md --example /home/sec/project/ClaudeCodeTest/SOP_测试用例MOD.md --output /tmp/eval-2-cases.md\n\n把这份 spec 直接渲染成测试用例 .md。",
+      "expected_output": "Skill 应在 §1 pre-flight 识别 --input 是 raw spec（不含 ### AR-...-NN.NNN.ZZZ 头 + 编号表格行），停止生成并提示用户改用 kdev-test-points 先设计测试点，再回流到本 skill 渲染。绝不能尝试生成 fielded 块（因为没有 1:1 的 测试点 行可映射），也绝不能 fallback 到 kdev-test-points 的设计流程（那是另一个 skill 的职责）。",
       "files": []
     },
     {
       "id": 3,
       "name": "title-with-prefix-preserved-verbatim",
-      "prompt": "/kdev-test-cases-v1 --input /tmp/synthetic-testpoints-prefix.md --example /home/sec/project/ClaudeCodeTest/SOP_测试用例MOD.md --output /tmp/eval-3-cases.md\n\n注意：上游 测试点 标题统一以 \"超级管理员登录，\" 开头，这是项目约定（用于统一登录 setup），不要在渲染时省略前缀。",
+      "prompt": "/kdev-test-cases --input /tmp/synthetic-testpoints-prefix.md --example /home/sec/project/ClaudeCodeTest/SOP_测试用例MOD.md --output /tmp/eval-3-cases.md\n\n注意：上游 测试点 标题统一以 \"超级管理员登录，\" 开头，这是项目约定（用于统一登录 setup），不要在渲染时省略前缀。",
       "expected_output": "Skill 应把所有 用例名称 与对应 测试点标题 byte-equal 渲染，包括 \"超级管理员登录，\" 前缀。绝不能省略前缀（即使 LLM 直觉是 \"简洁优先\"），因为下游 Playwright 生成器会用 用例名称 哈希出 test_xxx 函数名，省前缀会破坏跨用例的命名一致性。如果 skill 还要在自检中报告 \"已确认 N 行用例名称含前缀 \\\"超级管理员登录，\\\" 透传\" 则更好。",
       "files": []
     },
     {
       "id": 4,
       "name": "id-derivation-determinism",
-      "prompt": "/kdev-test-cases-v1 --input /tmp/synthetic-testpoints-multi-ar.md --example /home/sec/project/ClaudeCodeTest/SOP_测试用例MOD.md --output /tmp/eval-4-cases.md\n\n上游 测试点 含 3 个 AR：AR-SATP-04.001.001（5 行）、AR-SATP-04.001.002（8 行）、AR-SATP-99.001.003（2 行）。验证 用例编号 派生是否确定性。",
+      "prompt": "/kdev-test-cases --input /tmp/synthetic-testpoints-multi-ar.md --example /home/sec/project/ClaudeCodeTest/SOP_测试用例MOD.md --output /tmp/eval-4-cases.md\n\n上游 测试点 含 3 个 AR：AR-SATP-04.001.001（5 行）、AR-SATP-04.001.002（8 行）、AR-SATP-99.001.003（2 行）。验证 用例编号 派生是否确定性。",
       "expected_output": "Skill 应生成 5+8+2 = 15 个块，用例编号 严格按 TC-AR<AR 数字串联>-<行号 zero-pad 3 位> 规则：AR-SATP-04.001.001 行 5 → TC-AR04001001-005；AR-SATP-04.001.002 行 1 → TC-AR04001002-001；AR-SATP-99.001.003 行 2 → TC-AR99001003-002。再次执行 skill 应该产出 byte-identical 的用例编号（确定性 — 测试可在 CI 里跑 diff）。",
       "files": []
     }

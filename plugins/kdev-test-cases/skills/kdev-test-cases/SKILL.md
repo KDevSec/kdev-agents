@@ -1,13 +1,13 @@
 ---
-name: kdev-test-cases-v1
+name: kdev-test-cases
 description: |
-  Pure 1:1 RENDERER that converts an upstream 测试点 .md (typically produced by `kdev-test-points-v1`'s feature-spec-lite mode, or any SP15/SOP-测试点-formatted markdown) into Playwright-friendly fielded TEST CASES — code-block blocks shaped `- 用例编号：TC-AR...` / `- 用例名称：...` / `- 需求编号：...` / `- 前置条件：...` / `- 测试步骤：1...2...3...` / `- 测试数据：...` / `- 预期结果：...` plus pass-through fields (用例类型 / 优先级 / 是否准入 / UI 自动化 / API 自动化). Governed by a strict byte-equality + arithmetic-equality contract — 用例名称 == 测试点标题 verbatim (no paraphrase, no prefix drop, no typo "fix"); 用例编号 == deterministic `TC-AR<8-digit AR concat>-<3-digit row>`; 用例类型/优先级/准入/UI/API automation flags copied as-is; 预期结果 numbered list preserved same-order, append-only for 异常流 "平台数据保持不变". Only 测试步骤 + 前置条件 + 测试数据 are generative — and only inferred from 测试点 标题 + 预期 following Playwright handoff conventions (【菜单】 for menu items, ""按钮 for buttons, default admin/admin123 + business params named in the title). Use whenever the user says "把测试点写成测试用例", "render test points as test cases", "测试用例编写", "test points to fielded cases", "把 测试点.md 渲染成 Playwright 用例", "SOP_测试用例MOD-style fielded blocks", "生成 fielded 用例 / 给我 Playwright 用例骨架 / 把 ARs 一行一行变成代码块", "把 测试点 .md 落成测试用例 .md" — or whenever the user provides BOTH an upstream 测试点 .md (with `### AR-[A-Z]+-\d{2}\.\d{3}\.\d{3}` headers + numbered table rows) AND a fielded-block-style example template. DO NOT use when the input is a raw spec / PRD / API contract / 原型 / 需求文档 — that is `kdev-test-points-v1`'s job (test-point design upstream). This skill never re-designs, re-judges, or re-prioritizes; it renders.
+  Pure 1:1 RENDERER that converts an upstream 测试点 .md (typically produced by `kdev-test-points`'s feature-spec-lite mode, or any SP15/SOP-测试点-formatted markdown) into Playwright-friendly fielded TEST CASES — code-block blocks shaped `- 用例编号：TC-AR...` / `- 用例名称：...` / `- 需求编号：...` / `- 前置条件：...` / `- 测试步骤：1...2...3...` / `- 测试数据：...` / `- 预期结果：...` plus pass-through fields (用例类型 / 优先级 / 是否准入 / UI 自动化 / API 自动化). Governed by a strict byte-equality + arithmetic-equality contract — 用例名称 == 测试点标题 verbatim (no paraphrase, no prefix drop, no typo "fix"); 用例编号 == deterministic `TC-AR<8-digit AR concat>-<3-digit row>`; 用例类型/优先级/准入/UI/API automation flags copied as-is; 预期结果 numbered list preserved same-order, append-only for 异常流 "平台数据保持不变". Only 测试步骤 + 前置条件 + 测试数据 are generative — and only inferred from 测试点 标题 + 预期 following Playwright handoff conventions (【菜单】 for menu items, ""按钮 for buttons, default admin/admin123 + business params named in the title). Use whenever the user says "把测试点写成测试用例", "render test points as test cases", "测试用例编写", "test points to fielded cases", "把 测试点.md 渲染成 Playwright 用例", "SOP_测试用例MOD-style fielded blocks", "生成 fielded 用例 / 给我 Playwright 用例骨架 / 把 ARs 一行一行变成代码块", "把 测试点 .md 落成测试用例 .md" — or whenever the user provides BOTH an upstream 测试点 .md (with `### AR-[A-Z]+-\d{2}\.\d{3}\.\d{3}` headers + numbered table rows) AND a fielded-block-style example template. DO NOT use when the input is a raw spec / PRD / API contract / 原型 / 需求文档 — that is `kdev-test-points`'s job (test-point design upstream). This skill never re-designs, re-judges, or re-prioritizes; it renders.
 allowed-tools: Read, Write, Glob, Grep, Bash
 ---
 
 # Test Case Renderer — 测试点 → Playwright-Handoff Fielded Test Cases
 
-This skill is **a renderer, not a designer**. It takes a 测试点 .md that's already been through 29119-4 + 25000.51 design (typically the output of `kdev-test-points-v1` in `feature-spec-lite` mode) and emits fielded code-block test cases that downstream Playwright generators consume.
+This skill is **a renderer, not a designer**. It takes a 测试点 .md that's already been through 29119-4 + 25000.51 design (typically the output of `kdev-test-points` in `feature-spec-lite` mode) and emits fielded code-block test cases that downstream Playwright generators consume.
 
 The byte-equality contract is the entire reason this skill exists as a separate skill. Other test-case tools generate from spec and have judgment latitude — they decide what to test, how to phrase it, how to prioritize. This skill explicitly **does not** make those decisions. Its only judgment is filling in 测试步骤 + 前置条件 + 测试数据 from the source row, under tight constraints. Everything else is a verbatim copy or a deterministic derivation.
 
@@ -21,7 +21,7 @@ Before doing anything else, **verify the input shape**. Reject and redirect earl
 
 | Check | If true | If false |
 |---|---|---|
-| `--input` resolves to a markdown file containing both `### AR-[A-Z]+-\d{2}\.\d{3}\.\d{3}` headers and numbered table rows shaped `\| # \| 测试点标题 \| 预期结果 \| ...` | Continue | Stop. Tell user: "This looks like a raw spec / PRD / API contract — use `kdev-test-points-v1` to design test points first, then feed the resulting 测试点 .md back into this skill." |
+| `--input` resolves to a markdown file containing both `### AR-[A-Z]+-\d{2}\.\d{3}\.\d{3}` headers and numbered table rows shaped `\| # \| 测试点标题 \| 预期结果 \| ...` | Continue | Stop. Tell user: "This looks like a raw spec / PRD / API contract — use `kdev-test-points` to design test points first, then feed the resulting 测试点 .md back into this skill." |
 | `--example` resolves to a markdown file whose §二 / §样例 contains a fielded code block with `用例编号` / `用例名称` / `需求编号` lines (e.g. `SOP_测试用例MOD`-style) | Continue | Stop. Tell user: "Need an `--example` pointing at a fielded-block template (e.g. `SOP_测试用例MOD.md`) so the rendering layout is anchored." |
 | `--input` and `--example` are clearly distinct artifacts — input has numbered table rows, example has fielded blocks | Continue | Stop. Likely user passed the wrong file as `--input`. |
 
@@ -32,13 +32,13 @@ If all three pass, announce: `Mode: testpoints-to-cases (pure renderer) — inpu
 ## 2. Arguments
 
 ```
-/kdev-test-cases-v1 [--input <path-to-测试点.md>]      # required
+/kdev-test-cases [--input <path-to-测试点.md>]      # required
                     [--example <path-to-fielded-template.md>]  # required
                     [--output <path>]                  # if absent, return inline
                     [free-form prompt]
 ```
 
-- `--input <path>` — the upstream 测试点 .md (typically `kdev-test-points-v1` output).
+- `--input <path>` — the upstream 测试点 .md (typically `kdev-test-points` output).
 - `--example <path>` — fielded-block template (e.g. `SOP_测试用例MOD.md`). The §二 / §样例 code block layout is what every output block must follow byte-faithfully.
 - `--output <path>` — output file. If absent, return inline.
 
@@ -132,7 +132,7 @@ This skill **does not emit**:
 - §6.9 RTM (full)
 - §6.11 Risk segment
 
-The 测试点 .md and its `<stem>-audit.md` companion already carry that ceremony upstream. Regenerating it here would (a) bloat the output for no benefit, (b) risk drifting from the upstream judgment, (c) violate the single-responsibility split between this skill and `kdev-test-points-v1`.
+The 测试点 .md and its `<stem>-audit.md` companion already carry that ceremony upstream. Regenerating it here would (a) bloat the output for no benefit, (b) risk drifting from the upstream judgment, (c) violate the single-responsibility split between this skill and `kdev-test-points`.
 
 The output's *only* non-block content is: section headers grouped by AR (一/二/三/...), a final "用例集合统计" table, and the 自检清单.
 
@@ -145,7 +145,7 @@ The output's *only* non-block content is: section headers grouped by AR (一/二
 
 > 来源测试点：<path-to-input-测试点.md>
 > 渲染模板：<path-to-example>
-> 生成方式：kdev-test-cases-v1 — 1:1 renderer (no re-design)
+> 生成方式：kdev-test-cases — 1:1 renderer (no re-design)
 
 ## 一、AR-SATP-04.001.001 — <AR 标题原文>
 

@@ -13,10 +13,10 @@ KDev 系列 Claude Code 插件集合 —— 工程记忆、流程辅助、代码
 | [kdev-design-flow](plugins/kdev-design-flow) | 需求-原型-设计流程编排：串联 spec-kit + frontend-design，加 3 个评审闸门（Claude 自评/人工/混合三档可选），把"原始需求 → SR 文档 → AR 用户故事 → 高保真原型 → 概要+详细设计"链路固化为一个可复跑 skill。**v0.1 实验版**：boot sequence 已验证，主循环依赖 spec-kit 安装环境验收 |
 | [kdev-env-recon](plugins/kdev-env-recon) | 测试环境实测前置 skill：登录测试环境 → 实测抓取左菜单全树 / Tab / 按钮 / 字段 / 弹窗 → 持久化为 `recon/menu_list.md` + 4 类 JSON + 截图，作为后续测试用例 .md 与 PageObject 的 UI 文案权威源；可选反向 diff 已有用例并 propose 修正补丁。
 | [kdev-ui-autotest](plugins/kdev-ui-autotest) | Playwright + pytest + Element-Plus UI 自动化测试规范固化 skill
-| [kdev-test-points-v1](plugins/kdev-test-points-v1) | 测试点 / 测试设计文档生成 skill
-| [kdev-test-cases-v1](plugins/kdev-test-cases-v1) | 测试用例生成 skill：根据上游 测试点 .md 生成测试用例
+| [kdev-test-points](plugins/kdev-test-points) | 测试点 / 测试设计文档生成 skill
+| [kdev-test-cases](plugins/kdev-test-cases) | 测试用例生成 skill：根据上游 测试点 .md 生成测试用例
 | [kdev-uicase-to-apicase](plugins/kdev-uicase-to-apicase) | UI→API 测试用例转换 skill：把已有 UI/Playwright 测试用例 .md批量改写为同结构的 API 测试用例 .md
-| [kdev-bugfix](plugins/kdev-bugfix) | Bug 修复 8 步流程 skill + `/kdev-bugfix` 斜杠命令：禅道双源 + OpenSpec 深集成 + 三档评审（AI/multi/human/both，P0/鉴权强制升级 multi）+ `--dry-run` 演练 + 统一三段交付摘要（【根因分析】/【影响范围】/【修复方案】）跨禅道 comment / 会话报告 / 产物文档 / commit 共享。8 个 core eval 首跑 8/8 PASS
+| [kdev-bugfix](plugins/kdev-bugfix) | Bug 修复 8 步流程 skill + `/kdev-bugfix` 斜杠命令：禅道双源 + OpenSpec 深集成 + 三档评审（AI/multi/human/both，P0/鉴权强制升级 multi）+ `--dry-run` 演练 + 统一三段交付摘要（【根因分析】/【影响范围】/【修复方案】）。8 个 core eval 首跑 8/8 PASS
 
 ## 安装方式
 
@@ -32,8 +32,8 @@ claude plugin install kdev-code-graph@kdev-agents
 claude plugin install kdev-design-flow@kdev-agents   # v0.1 实验版，需先装 spec-kit
 claude plugin install kdev-env-recon@kdev-agents
 claude plugin install kdev-ui-autotest@kdev-agents
-claude plugin install kdev-test-points-v1@kdev-agents
-claude plugin install kdev-test-cases-v1@kdev-agents
+claude plugin install kdev-test-points@kdev-agents
+claude plugin install kdev-test-cases@kdev-agents
 claude plugin install kdev-uicase-to-apicase@kdev-agents
 claude plugin install kdev-bugfix@kdev-agents
 ```
@@ -60,8 +60,8 @@ Claude Code 对官方 Anthropic marketplace 默认启用 auto-update，但对第
 /plugin update kdev-design-flow@kdev-agents
 /plugin update kdev-env-recon@kdev-agents
 /plugin update kdev-ui-autotest@kdev-agents
-/plugin update kdev-test-points-v1@kdev-agents
-/plugin update kdev-test-cases-v1@kdev-agents
+/plugin update kdev-test-points@kdev-agents
+/plugin update kdev-test-cases@kdev-agents
 /plugin update kdev-uicase-to-apicase@kdev-agents
 /plugin update kdev-bugfix@kdev-agents
 ```
@@ -174,15 +174,15 @@ kdev-agents/
     │       ├── references/               # env-recon-bootstrap / element-plus-pitfalls / case-skeleton / infra-standards / failure-diagnosis
     │       ├── assets/                   # recon_env_bootstrap.py + test_arNN_skeleton.py + 用例 .md 头模板
     │       └── evals/evals.json
-    ├── kdev-test-points-v1/              # 测试点 / 测试设计文档生成插件（29119-4 + 25051 双标准）
+    ├── kdev-test-points/                 # 测试点 / 测试设计文档生成插件（29119-4 + 25051 双标准）
     │   ├── .claude-plugin/plugin.json
-    │   └── skills/kdev-test-points-v1/
+    │   └── skills/kdev-test-points/
     │       ├── SKILL.md                  # 四模式：feature-spec / feature-spec-lite / api-contract / full-conformity
     │       ├── references/               # quality-characteristics / output-templates / template-override / example-walkthrough
     │       └── evals/evals.json
-    ├── kdev-test-cases-v1/               # 测试用例渲染插件（测试点 .md → Playwright fielded 用例代码块）
+    ├── kdev-test-cases/                  # 测试用例渲染插件（测试点 .md → Playwright fielded 用例代码块）
     │   ├── .claude-plugin/plugin.json
-    │   └── skills/kdev-test-cases-v1/
+    │   └── skills/kdev-test-cases/
     │       ├── SKILL.md                  # byte-equality + arithmetic-equality 渲染契约
     │       ├── references/               # output-skeleton / playwright-handoff
     │       └── evals/evals.json

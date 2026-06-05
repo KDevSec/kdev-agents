@@ -102,7 +102,7 @@ dlg_info = {
 > **关键判别**：
 > - 弹窗标题常与 spec 文档差异最大（添加 vs 新增、修改 vs 编辑）——不要假设"按钮叫新增 → 弹窗叫新增 XXX"
 > - 必填字段以 `is-required` class 为准，spec 漏列必填的情况很常见
-> - 按钮文案带空格：`确 定` / `取 消` / `保 存`，PageObject 定位用 `:text-matches("确\\s*定")`
+> - 按钮文案带空格：`确 定` / `取 消` / `保 存` — **必须用 `:has-text("确 定")` 精确匹配（带空格写进字面量）**；曾经推荐的 `:text-matches("确\\s*定")` 实测 count=0（详见 element-plus-pitfalls.md §坑 10）。带空格的"宽容正则匹配"在 Playwright text engine 里**不工作**
 
 ### 阶段 4 — 生成 `menu_list.md`（人类可读权威文档）
 

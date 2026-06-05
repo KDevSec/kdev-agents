@@ -1,10 +1,10 @@
 {
   "name": "kdev-ui-autotest",
-  "description": "Playwright + pytest + Element-Plus UI 自动化测试规范固化 skill：把 6 大类规范（STEP 0 环境/菜单/弹窗实测前置、登录复用、资源清理、四件产物归档、Element-Plus 三大坑、用例命名、失败诊断）作为下游项目（KDevSec / Gen9 / 可信评估 / vfadmin 等）的强制实践。第零原则：测试脚本目的是发现 BUG，不是刷通过率",
-  "version": "0.1.0",
+  "description": "Playwright + pytest + Element-Plus UI 自动化测试规范固化 skill：把 6 大类规范（STEP 0 已迁出到 kdev-env-recon、登录复用、资源清理双轨 API+UI、四件产物归档、Element-Plus 十大坑含 1.x→2.x 迁移附录、用例命名、失败诊断）作为下游项目（KDevSec / Gen9 / 可信评估 / vfadmin 等）的强制实践。第零原则：测试脚本目的是发现 BUG，不是刷通过率。5 条不可妥协约束（含新增约束 5 用例池入口硬 gate）",
+  "version": "0.2.0",
   "author": {
     "name": "ly"
   },
   "license": "MIT",
-  "keywords": ["playwright", "pytest", "element-plus", "ui-automation", "test-author", "recon", "kdev"]
+  "keywords": ["playwright", "pytest", "element-plus", "ui-automation", "test-author", "recon", "cleanup-registry", "dual-track", "defect-triage", "kdev"]
 }
