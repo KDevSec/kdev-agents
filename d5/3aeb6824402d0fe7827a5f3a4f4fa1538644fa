@@ -1,0 +1,26 @@
+docs/framework/01-design/2026-06-04-01-kdev-core-lean底座设计-R1R2R3.md
+  s_c7c37810fe9dcc::t_2d249b80a606f2 97-99
+  s_c7c37810fe9dcc::t_4e7a66db2c7337 166
+  s_c7c37810fe9dcc::t_3f6d0baeb51bb7 33
+  s_c7c37810fe9dcc::t_aaab40a6eea008 247
+docs/framework/01-design/2026-06-04-02-kdev-core底座组成-状态编排记忆边界.md
+  s_c7c37810fe9dcc::t_f040bcc035b6d2 1-116
+docs/framework/01-design/2026-06-04-03-OMC源码借鉴对照-底座R1-R7.md
+  s_c7c37810fe9dcc::t_bcc923a7656e41 1-110
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.3",
+  "base_commit_sha": "d53aeb6824402d0fe7827a5f3a4f4fa1538644fa",
+  "prompts": {},
+  "sessions": {
+    "s_c7c37810fe9dcc": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c46e95e4-1921-44bc-8c97-713d2da0c24c",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
