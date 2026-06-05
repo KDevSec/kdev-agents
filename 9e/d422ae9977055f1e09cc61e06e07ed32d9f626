@@ -1,0 +1,29 @@
+docs/framework/01-design/2026-06-03-02-底座R1-R7现状盘点-flows差异表.md
+  s_c7c37810fe9dcc::t_6eae3247238ef1 3-4
+docs/framework/01-design/2026-06-04-01-kdev-core-lean底座设计-R1R2R3.md
+  s_c7c37810fe9dcc::t_f6dc67c1da7c8b 3-4
+docs/framework/01-design/2026-06-04-03-OMC源码借鉴对照-底座R1-R7.md
+  s_c7c37810fe9dcc::t_d9155444be046a 3-4
+docs/framework/01-design/2026-06-03-01-kdev-core底座决策-OMC-vs-自建-vs-抽共性.md
+  s_c7c37810fe9dcc::t_12144b76c867d6 3-4
+docs/framework/01-design/2026-06-04-02-kdev-core底座组成-状态编排记忆边界.md
+  s_c7c37810fe9dcc::t_8938430bdc7ddb 3-4
+docs/framework/01-design/2026-06-05-01-kdev-core底座设计总纲-v1.0.md
+  s_c7c37810fe9dcc::t_71bcd5ce130a7e 1-173
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.3",
+  "base_commit_sha": "9ed422ae9977055f1e09cc61e06e07ed32d9f626",
+  "prompts": {},
+  "sessions": {
+    "s_c7c37810fe9dcc": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c46e95e4-1921-44bc-8c97-713d2da0c24c",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
