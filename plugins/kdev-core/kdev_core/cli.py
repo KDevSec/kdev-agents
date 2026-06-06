@@ -49,6 +49,11 @@ def cmd_init(args):
     return 0
 
 
+def cmd_resume(args):
+    _print_state(flow_state.resume_state(args.workspace, args.flow, args.slug))
+    return 0
+
+
 def _common(sub, name):
     """A subparser with the shared --workspace + flow/slug positionals."""
     sp = sub.add_parser(name)
@@ -72,6 +77,9 @@ def build_parser():
     pi.add_argument("--auto-mode", action="store_true")
     pi.add_argument("--initial-node", default=None)
     pi.set_defaults(func=cmd_init)
+
+    pr = _common(sub, "resume")
+    pr.set_defaults(func=cmd_resume)
 
     return p
 
