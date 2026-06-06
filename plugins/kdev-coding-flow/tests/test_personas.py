@@ -24,3 +24,15 @@ def test_orchestrator_critical_action_mentions_cli():
     text = (PERSONA_DIR / "开发工程师-编排.md").read_text(encoding="utf-8")
     # 编排纪律：每过节点/gate 必调 CLI（补 CLI 靠自觉短板）
     assert "kdev_core" in text and "record-gate" in text
+
+
+SKILL = (Path(__file__).resolve().parents[1]
+         / "skills/kdev-coding-flow/SKILL.md")
+
+
+def test_skill_has_kdev_core_entry_section():
+    text = SKILL.read_text(encoding="utf-8")
+    assert "接 kdev-core 底座入口" in text
+    assert "orchestration/node-table.yml" in text
+    assert "python -m kdev_core" in text
+    assert "personas/" in text

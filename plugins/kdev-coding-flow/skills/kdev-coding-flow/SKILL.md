@@ -328,3 +328,17 @@ skill 必须支持"完全自主"模式：
 > "用 13 节点 SOP 自主完成这个需求"
 > "实施这个 plan，端到端"
 > "auto mode 跑完这个 feature"
+
+## 接 kdev-core 底座入口（v2 编排）
+
+本 SOP 的 13 节点编排可由 **kdev-core 引擎**显式驱动（替代纯 prose 编排），让状态可持久化、可 resume、gate 结构化。
+
+- **编排者**：`personas/开发工程师-编排.md`（subagent_type=开发工程师-编排），读 `orchestration/node-table.yml` 驱动。
+- **引擎调用**（薄 CLI，harness-中立）：
+  - `python -m kdev_core init coding-flow <slug> --display-name ... [--auto-mode] --initial-node n0-env`
+  - 动作节点完成 → `python -m kdev_core advance coding-flow <slug> <to_node> --table orchestration/node-table.yml --reason ...`
+  - gate 判完 → `python -m kdev_core record-gate coding-flow <slug> --gate g-xxx --kind review|decision|acceptance --verdict ... --request-id ... --table orchestration/node-table.yml`
+  - 断点续跑 → `python -m kdev_core resume coding-flow <slug>`
+- **业务能力 Agent**：`personas/{环境准备,实施计划,前端实现,E2E视觉验收,部署上线,安全扫描}.md`，由编排在对应节点内嵌派单。
+- **gate reviewer 绑定**：`self`=开发工程师自评（节点 8/9b/12）；`reviewer-expert`=评审专家第三方（节点 4/9a/10），**阶段1 `stage1: deferred`**（编排记 PASS 并标 `--by deferred:阶段3-评审专家`，不冒充第三方）。
+- **Auto Mode**：node-table 驱动与 `auto_mode` 正交——auto_mode=true 时 gate 自决续跑、不停等人；false 时 gate 停靠等主控确认（L2）。
