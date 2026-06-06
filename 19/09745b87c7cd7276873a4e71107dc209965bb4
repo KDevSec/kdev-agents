@@ -1,0 +1,21 @@
+plugins/kdev-coding-flow/tests/test_personas.py
+  s_c0b10adaf45bcc::t_fba0b12362ac04 27-38
+plugins/kdev-coding-flow/skills/kdev-coding-flow/SKILL.md
+  s_c0b10adaf45bcc::t_501eb78df5ad41 331-344
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.3",
+  "base_commit_sha": "1909745b87c7cd7276873a4e71107dc209965bb4",
+  "prompts": {},
+  "sessions": {
+    "s_c0b10adaf45bcc": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f06cd928-27f5-4d74-8ee7-80a61dfad0c4",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
