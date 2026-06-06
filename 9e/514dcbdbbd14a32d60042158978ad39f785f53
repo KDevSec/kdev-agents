@@ -1,0 +1,45 @@
+docs/framework/01-design/2026-06-05-01-kdev-core底座设计总纲-v1.0.md
+  s_ff2724678cba82::t_3eee9c39e7deaa 162
+  s_ff2724678cba82::t_560537c0e06570 50-51
+  s_ff2724678cba82::t_0805b96737eaed 125
+docs/framework/01-design/2026-05-28-01-KDev数字员工架构-员工能力专项-v1.5.md
+  s_ff2724678cba82::t_9b677e578d24ce 70
+  s_ff2724678cba82::t_730c787d379a45 306
+  s_ff2724678cba82::t_98d69e8feacc37 469
+  s_ff2724678cba82::t_30cf56d2b9697e 229
+  s_ff2724678cba82::t_23b49d0cc6f896 485
+docs/framework/01-design/2026-05-28-02-KDev-staff-整体架构-v0.1.md
+  s_ff2724678cba82::t_9063f6114da4a1 80-81
+  s_ff2724678cba82::t_7b83f2eee7890d 300
+  s_ff2724678cba82::t_c406a35bafdb51 63-65
+  s_ff2724678cba82::t_a18e4609aad19e 37-38,41,44-47
+  s_ff2724678cba82::t_403b18cbd8eb61 193-195
+  s_ff2724678cba82::t_d991ad940cb185 138,142,147
+  s_ff2724678cba82::t_d0869225c4efcf 248
+docs/framework/01-design/2026-06-05-02-数字员工记忆架构-分层+scope拓扑-v0.1.md
+  s_ff2724678cba82::t_8735ea497dcc6c 47
+  s_ff2724678cba82::t_4784c7d46243bd 49
+  s_ff2724678cba82::t_d3e5f85c5f6eb3 85
+docs/framework/01-design/2026-06-02-01-KDev数字员工概念模型-双轴+等级阶梯-v0.1.md
+  s_ff2724678cba82::t_9e2364b635c17f 8
+  s_ff2724678cba82::t_55bc1287c63c92 81
+  s_ff2724678cba82::t_4b78eb7a10790c 145
+  s_ff2724678cba82::t_e3841b51d21cdf 152
+  s_ff2724678cba82::t_e0f520eae0847d 131-132
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.3",
+  "base_commit_sha": "9e514dcbdbbd14a32d60042158978ad39f785f53",
+  "prompts": {},
+  "sessions": {
+    "s_ff2724678cba82": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "d056aeed-06d5-40c2-a0d4-62164219f313",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
