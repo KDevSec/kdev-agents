@@ -1,0 +1,19 @@
+docs/framework/01-design/2026-06-05-02-数字员工记忆架构-分层+scope拓扑-v0.1.md
+  s_ff2724678cba82::t_dfbd4308f0a5b9 61,63-65,68-90
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.3",
+  "base_commit_sha": "c309cb7fcc678f6e1a567f15c4298175345d92df",
+  "prompts": {},
+  "sessions": {
+    "s_ff2724678cba82": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "d056aeed-06d5-40c2-a0d4-62164219f313",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
