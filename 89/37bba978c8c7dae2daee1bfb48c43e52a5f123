@@ -1,0 +1,23 @@
+plugins/kdev-core/kdev_core/cli.py
+  s_c0b10adaf45bcc::t_34668a552e0372 1-73
+plugins/kdev-core/kdev_core/__main__.py
+  s_c0b10adaf45bcc::t_3a71af585789c5 1-6
+plugins/kdev-core/tests/test_cli.py
+  s_c0b10adaf45bcc::t_c4855284f11bdd 1-15
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.3",
+  "base_commit_sha": "8937bba978c8c7dae2daee1bfb48c43e52a5f123",
+  "prompts": {},
+  "sessions": {
+    "s_c0b10adaf45bcc": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f06cd928-27f5-4d74-8ee7-80a61dfad0c4",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
