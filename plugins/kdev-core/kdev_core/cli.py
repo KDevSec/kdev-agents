@@ -39,6 +39,16 @@ def cmd_show(args):
     return 0
 
 
+def cmd_init(args):
+    flow_state.init_state(args.workspace, args.flow, args.slug,
+                          display_name=args.display_name,
+                          review_mode=args.review_mode,
+                          auto_mode=args.auto_mode,
+                          initial_node=args.initial_node)
+    _print_state(flow_state.read_state(args.workspace, args.flow, args.slug))
+    return 0
+
+
 def _common(sub, name):
     """A subparser with the shared --workspace + flow/slug positionals."""
     sp = sub.add_parser(name)
@@ -55,6 +65,13 @@ def build_parser():
 
     ps = _common(sub, "show")
     ps.set_defaults(func=cmd_show)
+
+    pi = _common(sub, "init")
+    pi.add_argument("--display-name", required=True)
+    pi.add_argument("--review-mode", default="ai", choices=["ai", "both", "human"])
+    pi.add_argument("--auto-mode", action="store_true")
+    pi.add_argument("--initial-node", default=None)
+    pi.set_defaults(func=cmd_init)
 
     return p
 
