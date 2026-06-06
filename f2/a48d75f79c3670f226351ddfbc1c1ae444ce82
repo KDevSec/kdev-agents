@@ -1,0 +1,20 @@
+docs/superpowers/plans/2026-06-06-kdev-core-R3-gates.md
+  s_e78473ae79ebbe::t_ff28ebf7bd3e55 524
+  s_e78473ae79ebbe::t_322eca46403c84 1-523,525-547
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.3",
+  "base_commit_sha": "f2a48d75f79c3670f226351ddfbc1c1ae444ce82",
+  "prompts": {},
+  "sessions": {
+    "s_e78473ae79ebbe": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "46f03329-5618-4b8d-aa71-c5a2f34e2843",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
