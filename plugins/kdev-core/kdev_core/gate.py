@@ -115,3 +115,15 @@ def record_gate(state, gate_result, *, table, gate_specs, max_retries=None):
         return advance(new, branches[verdict], table=table, reason=f"{gid} decision={verdict}")
 
     raise GateError(f"unknown gate kind {kind!r} for gate {gid!r}")
+
+
+def record_gate_persist(workspace, flow, slug, gate_result, *, table, gate_specs,
+                        max_retries=None, step_id=None):
+    """record_gate() + persist via R1 flow_state.write_state. Returns the persisted state."""
+    from kdev_core import flow_state
+
+    state = flow_state.read_state(workspace, flow, slug)
+    new_state = record_gate(state, gate_result, table=table, gate_specs=gate_specs,
+                            max_retries=max_retries)
+    flow_state.write_state(workspace, flow, slug, new_state, step_id=step_id)
+    return flow_state.read_state(workspace, flow, slug)
