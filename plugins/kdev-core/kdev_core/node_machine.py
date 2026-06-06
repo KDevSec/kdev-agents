@@ -87,3 +87,39 @@ def load_node_table(table):
         "nodes": nodes,
         "adjacency": {nid: list(n["next"]) for nid, n in nodes.items()},
     }
+
+
+def advance(state, to_node, *, table, guard=None, reason=None):
+    """Pure transition: returns a NEW state dict, or raises NodeMachineError.
+
+    Three steps (OMC pattern):
+      1. adjacency: to_node must be in adjacency[current_node] (else raise).
+      2. guard: if given, guard(state, to_node) -> str|None; non-None -> raise(reason).
+      3. immutable update: new current_node + append a phase_history entry.
+    """
+    current = state.get("current_node")
+    if current is None:
+        raise NodeMachineError("cannot advance: state has no current_node")
+    adjacency = table["adjacency"]
+    if current not in adjacency:
+        raise NodeMachineError(f"current_node {current!r} is not in the node-table")
+    if to_node not in adjacency[current]:
+        raise NodeMachineError(f"illegal transition: {current!r} -> {to_node!r}")
+
+    if guard is not None:
+        greason = guard(state, to_node)
+        if greason is not None:
+            raise NodeMachineError(f"guard rejected {current!r} -> {to_node!r}: {greason}")
+
+    new_state = dict(state)
+    new_state["current_node"] = to_node
+    entry = {
+        "from": current,
+        "to": to_node,
+        "reflow": False,
+        "forced_fail": False,
+        "reason": reason,
+        "entered_at": _now_iso(),
+    }
+    new_state["phase_history"] = [*state.get("phase_history", []), entry]
+    return new_state
