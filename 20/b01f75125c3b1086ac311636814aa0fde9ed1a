@@ -1,0 +1,19 @@
+plugins/kdev-core/tests/test_smoke_lifecycle.py
+  s_e78473ae79ebbe::t_fa82eb36adc97b 1-38
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.3",
+  "base_commit_sha": "20b01f75125c3b1086ac311636814aa0fde9ed1a",
+  "prompts": {},
+  "sessions": {
+    "s_e78473ae79ebbe": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "46f03329-5618-4b8d-aa71-c5a2f34e2843",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
