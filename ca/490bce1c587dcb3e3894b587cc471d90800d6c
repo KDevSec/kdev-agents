@@ -1,0 +1,33 @@
+plugins/kdev-coding-flow/skills/kdev-coding-flow/personas/部署上线.md
+  s_c0b10adaf45bcc::t_a5dec9efad0912 1-19
+plugins/kdev-coding-flow/skills/kdev-coding-flow/personas/环境准备.md
+  s_c0b10adaf45bcc::t_e9401e2af5f016 1-17
+plugins/kdev-coding-flow/skills/kdev-coding-flow/personas/安全扫描.md
+  s_c0b10adaf45bcc::t_df4a2bd7f88e10 1-19
+plugins/kdev-coding-flow/tests/test_personas.py
+  s_c0b10adaf45bcc::t_1cfc38245a11bc 1-26
+plugins/kdev-coding-flow/skills/kdev-coding-flow/personas/E2E视觉验收.md
+  s_c0b10adaf45bcc::t_64e4462b044651 1-22
+plugins/kdev-coding-flow/skills/kdev-coding-flow/personas/实施计划.md
+  s_c0b10adaf45bcc::t_be012e5e46a588 1-20
+plugins/kdev-coding-flow/skills/kdev-coding-flow/personas/开发工程师-编排.md
+  s_c0b10adaf45bcc::t_a32f1140e135d5 1-25
+plugins/kdev-coding-flow/skills/kdev-coding-flow/personas/前端实现.md
+  s_c0b10adaf45bcc::t_5bb3d12cbf2153 1-22
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.3",
+  "base_commit_sha": "ca490bce1c587dcb3e3894b587cc471d90800d6c",
+  "prompts": {},
+  "sessions": {
+    "s_c0b10adaf45bcc": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f06cd928-27f5-4d74-8ee7-80a61dfad0c4",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
