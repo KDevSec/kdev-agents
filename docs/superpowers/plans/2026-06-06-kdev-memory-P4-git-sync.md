@@ -444,7 +444,7 @@ def sync_push(repo_root, message="chore(kdev-memory): session sync"):
 - [ ] **Step 4: Run to verify they pass**
 
 Run: `python3 -m pytest plugins/kdev-memory/tests/test_kdev_sync.py -q`
-Expected: 16 passed (9 + 7).
+Expected: 15 passed (9 + 6). (As-built note: `clone`/`init` also set `core.quotepath false` and `clone` uses `-b <branch>` — env-correctness fixes for the bare-remote default-branch + Chinese filenames.)
 
 - [ ] **Step 5: Commit**
 
@@ -612,7 +612,7 @@ git -c user.name=ly-AI -c user.email=ly1989abc@126.com commit -m "feat(kdev-memo
 
 ## Done criteria
 
-- `python3 -m pytest plugins/kdev-memory/tests/test_kdev_sync.py -q` → 16 passed (config 5 + decide 4 + integration 7).
+- `python3 -m pytest plugins/kdev-memory/tests/test_kdev_sync.py -q` → 15 passed (config 5 + decide 4 + integration 6).
 - `init` writes `.kdev/.gitignore` excluding machine-local (`state/`/`checkpoints/`/`hud.md`/`dataset/`) so counters are never pushed to the shared memory repo.
 - `kdev_sync.py` exposes: `read_sync_config`, `decide_action`, `reminder_text`, `bootstrap`, `sync_push` (+ `_git` helper). Stdlib-only; `bootstrap`/`sync_push` never raise.
 - `decide_action` matrix: has_git→pull; empty+remote→clone; content+remote→init; no remote→remind.
