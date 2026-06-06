@@ -54,6 +54,15 @@ def cmd_resume(args):
     return 0
 
 
+def cmd_advance(args):
+    table, _ = _load_table(args.table)
+    state = node_machine.advance_persist(
+        args.workspace, args.flow, args.slug, args.to_node,
+        table=table, reflow=args.reflow, reason=args.reason)
+    _print_state(state)
+    return 0
+
+
 def _common(sub, name):
     """A subparser with the shared --workspace + flow/slug positionals."""
     sp = sub.add_parser(name)
@@ -80,6 +89,13 @@ def build_parser():
 
     pr = _common(sub, "resume")
     pr.set_defaults(func=cmd_resume)
+
+    pa = _common(sub, "advance")
+    pa.add_argument("to_node")
+    pa.add_argument("--table", required=True)
+    pa.add_argument("--reflow", action="store_true")
+    pa.add_argument("--reason", default=None)
+    pa.set_defaults(func=cmd_advance)
 
     return p
 
