@@ -1,0 +1,24 @@
+plugins/kdev-memory/hooks/lib/kdev_sync.py
+  s_e78473ae79ebbe::t_c7a5d1308e6795 118-120
+  s_e78473ae79ebbe::t_172060e60c5899 114-117
+  s_e78473ae79ebbe::t_d6ceaa60737ad5 129-130
+  s_e78473ae79ebbe::t_1870ee526bc563 59-113,121-128,131-158
+plugins/kdev-memory/tests/test_kdev_sync.py
+  s_e78473ae79ebbe::t_20057899f32929 62-157
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.3",
+  "base_commit_sha": "d921ca7caea0fb0ba774c5d970f8a9bcbf35d53d",
+  "prompts": {},
+  "sessions": {
+    "s_e78473ae79ebbe": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "46f03329-5618-4b8d-aa71-c5a2f34e2843",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
