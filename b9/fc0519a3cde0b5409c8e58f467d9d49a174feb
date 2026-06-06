@@ -1,0 +1,19 @@
+plugins/kdev-core/tests/test_cli_smoke.py
+  s_c0b10adaf45bcc::t_84cd17a601e808 1-70
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.3",
+  "base_commit_sha": "b9fc0519a3cde0b5409c8e58f467d9d49a174feb",
+  "prompts": {},
+  "sessions": {
+    "s_c0b10adaf45bcc": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f06cd928-27f5-4d74-8ee7-80a61dfad0c4",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
