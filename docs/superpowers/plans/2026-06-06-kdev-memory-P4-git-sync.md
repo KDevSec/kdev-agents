@@ -322,6 +322,20 @@ def test_sync_push_skips_when_untracked(tmp_path):
     (tmp_path / ".kdev").mkdir()
     res = kdev_sync.sync_push(tmp_path)
     assert res["ok"] and res["pushed"] is False  # no .kdev/.git -> skip
+
+
+def test_init_writes_gitignore_and_excludes_machine_local(tmp_path):
+    bare = _bare_remote(tmp_path)
+    repo = tmp_path / "A"
+    (repo / ".kdev" / "memory" / "state").mkdir(parents=True)
+    (repo / ".kdev" / "memory" / "state" / "counter.txt").write_text("7", encoding="utf-8")
+    (repo / ".kdev" / "memory" / "执行日志.md").write_text("step 1\n", encoding="utf-8")
+    _write_yml(repo, str(bare))
+    assert kdev_sync.bootstrap(repo)["ok"]
+    assert (repo / ".kdev" / ".gitignore").exists()
+    tracked = _git(["ls-files"], cwd=repo / ".kdev").stdout
+    assert "执行日志.md" in tracked
+    assert "counter.txt" not in tracked   # machine-local state/ excluded from the hosted repo
 ```
 
 > **Note for the implementer:** git needs a committer identity. In CI/sandboxes `user.name`/`user.email` may be unset. The `_git` wrapper in `kdev_sync.py` MUST pass `-c user.name=... -c user.email=...` (or `-c commit.gpgsign=false` + a default identity) on `init`/commit operations so these tests are hermetic. Use a fixed bootstrap identity like `kdev-memory <kdev@local>` for the nested repo's own commits.
@@ -339,6 +353,23 @@ Append to `plugins/kdev-memory/hooks/lib/kdev_sync.py`:
 # Fixed identity for the nested memory repo's own commits (hermetic; the code repo's
 # AI/human identity is separate and set elsewhere).
 _GIT_ID = ["-c", "user.name=kdev-memory", "-c", "user.email=kdev@local", "-c", "commit.gpgsign=false"]
+
+# Machine-local memory (NOT hosted to the shared memory repo) — kdev-memory §5.3 #13/#14/#15/#16.
+# Bare names (no internal slash) match at any depth, covering both the flat layout
+# (.kdev/memory/state/) and the scoped layout (.kdev/state/).
+_MACHINE_LOCAL_GITIGNORE = """# kdev-memory nested repo — machine-local, not hosted (§5.3)
+state/
+checkpoints/
+hud.md
+dataset/
+"""
+
+
+def _ensure_machine_local_gitignore(kdev):
+    """Write .kdev/.gitignore excluding machine-local dirs if absent (counters/checkpoints/hud/dataset)."""
+    gi = Path(kdev) / ".gitignore"
+    if not gi.exists():
+        gi.write_text(_MACHINE_LOCAL_GITIGNORE, encoding="utf-8")
 
 
 def _git(args, cwd, *, identity=False):
@@ -376,6 +407,7 @@ def bootstrap(repo_root):
                 "message": (r.stderr or r.stdout).strip()}
 
     # action == "init": convert existing local .kdev/ into the nested repo + first push
+    _ensure_machine_local_gitignore(kdev)   # don't push machine-local counters/checkpoints (§5.3)
     msgs = []
     for args, ident, tolerate in [
         (["init", "-b", branch], True, False),
@@ -412,7 +444,7 @@ def sync_push(repo_root, message="chore(kdev-memory): session sync"):
 - [ ] **Step 4: Run to verify they pass**
 
 Run: `python3 -m pytest plugins/kdev-memory/tests/test_kdev_sync.py -q`
-Expected: 15 passed (9 + 6).
+Expected: 16 passed (9 + 7).
 
 - [ ] **Step 5: Commit**
 
@@ -580,7 +612,8 @@ git -c user.name=ly-AI -c user.email=ly1989abc@126.com commit -m "feat(kdev-memo
 
 ## Done criteria
 
-- `python3 -m pytest plugins/kdev-memory/tests/test_kdev_sync.py -q` → 15 passed (config 5 + decide 4 + integration 6).
+- `python3 -m pytest plugins/kdev-memory/tests/test_kdev_sync.py -q` → 16 passed (config 5 + decide 4 + integration 7).
+- `init` writes `.kdev/.gitignore` excluding machine-local (`state/`/`checkpoints/`/`hud.md`/`dataset/`) so counters are never pushed to the shared memory repo.
 - `kdev_sync.py` exposes: `read_sync_config`, `decide_action`, `reminder_text`, `bootstrap`, `sync_push` (+ `_git` helper). Stdlib-only; `bootstrap`/`sync_push` never raise.
 - `decide_action` matrix: has_git→pull; empty+remote→clone; content+remote→init; no remote→remind.
 - Integration: init→push (machine A) → clone (machine B) → A sync_push → B pull propagates; sync_push is a no-op with no changes and skips when `.kdev/.git` absent.
