@@ -1,0 +1,6 @@
+# kdev-memory git 托管配置 (Q-009)
+# 把本文件复制为 kdev-sync.yml 并填入"记忆仓"地址（独立 nested repo 的 remote）。
+# 代码仓 .gitignore 忽略 /.kdev/；本文件 tracked，随 clone 到任何机器，
+# SessionStart hook 据此自动 clone/pull 记忆仓（换机不丢记忆）。
+memory_repo:        # 例: git@github.com:KDevSec/kdev-agents-memory.git  （留空则只本地、SessionStart 会中文提醒）
+branch: main
