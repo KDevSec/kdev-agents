@@ -1,0 +1,23 @@
+plugins/kdev-coding-flow/skills/kdev-coding-flow/orchestration/node-table.yml
+  s_c0b10adaf45bcc::t_80bec7ed3a15b7 1-33
+plugins/kdev-coding-flow/tests/conftest.py
+  s_c0b10adaf45bcc::t_7e5a958705b557 1-6
+plugins/kdev-coding-flow/tests/test_orchestration_config.py
+  s_c0b10adaf45bcc::t_2bd1d8e6b7215a 1-50
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.3",
+  "base_commit_sha": "c35d27295e71ecf6734912c8a31f217efdfda4b7",
+  "prompts": {},
+  "sessions": {
+    "s_c0b10adaf45bcc": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f06cd928-27f5-4d74-8ee7-80a61dfad0c4",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
