@@ -1,0 +1,22 @@
+plugins/kdev-core/tests/test_flow_state.py
+  s_e78473ae79ebbe::t_0ad3d765bb330c 4
+  s_e78473ae79ebbe::t_4ed5de3454771d 104-118
+plugins/kdev-core/tests/test_flow_lifecycle.py
+  s_e78473ae79ebbe::t_a173c4ee153137 43-52
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.3",
+  "base_commit_sha": "0baa3097d945e92737557ff412e5524004dc8b4c",
+  "prompts": {},
+  "sessions": {
+    "s_e78473ae79ebbe": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "46f03329-5618-4b8d-aa71-c5a2f34e2843",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
