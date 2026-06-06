@@ -12,7 +12,7 @@
 
 ## 0. 定位
 
-CrewAI 是 KDev「6 人 AI 公司」隐喻**概念上 1:1 对齐**的同类框架（crew = 公司、agent = 员工、manager-agent = CEO、Process = 编排模式），所以它的价值在**多员工怎么共享/隔离记忆 + CEO 怎么委派 + 怎么审计事件**这三块——恰好补 OMC（编排底座）和 BMAD（单 agent 创作）都没覆盖的「多员工记忆拓扑」。
+CrewAI 是 KDev「6 人 AI 团队」隐喻**概念上 1:1 对齐**的同类框架（crew = 团队、agent = 员工、manager-agent = CEO、Process = 编排模式），所以它的价值在**多员工怎么共享/隔离记忆 + CEO 怎么委派 + 怎么审计事件**这三块——恰好补 OMC（编排底座）和 BMAD（单 agent 创作）都没覆盖的「多员工记忆拓扑」。
 
 **借鉴边界**：只借**设计范式**（MemoryScope 路径前缀 / Process 模式 / agents-as-tools 委派 / Event Bus 事件分类），**不引入 CrewAI Python 运行时**——守 KDev markdown 主存哲学，记忆查询包成 thin layer over markdown grep。
 
