@@ -1,0 +1,21 @@
+plugins/kdev-core/tests/test_gate_smoke.py
+  s_e78473ae79ebbe::t_eb654876ad2c2c 1-54
+plugins/kdev-core/kdev_core/gate.py
+  s_e78473ae79ebbe::t_4ea74ffc568092 118-129
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.3",
+  "base_commit_sha": "efce420d803db1989898870ea3d22c732f4f26c2",
+  "prompts": {},
+  "sessions": {
+    "s_e78473ae79ebbe": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "46f03329-5618-4b8d-aa71-c5a2f34e2843",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
