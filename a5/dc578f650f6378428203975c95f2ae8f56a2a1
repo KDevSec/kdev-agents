@@ -1,0 +1,28 @@
+plugins/kdev-coding-flow/skills/kdev-coding-flow/orchestration/node-table.yml
+  s_c0b10adaf45bcc::t_e016dcf62c1879 23
+plugins/kdev-coding-flow/skills/kdev-coding-flow/personas/开发工程师-编排.md
+  s_c0b10adaf45bcc::t_131b9f8b97e179 15
+plugins/kdev-core/tests/test_cli.py
+  s_c0b10adaf45bcc::t_f4ee26c67a8910 149-162
+plugins/kdev-core/kdev_core/cli.py
+  s_c0b10adaf45bcc::t_129a5980d69323 79-85
+  s_c0b10adaf45bcc::t_2d8667940b6189 133-137
+plugins/kdev-coding-flow/skills/kdev-coding-flow/SKILL.md
+  s_c0b10adaf45bcc::t_f465b883d2424c 340,342
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.3",
+  "base_commit_sha": "a5dc578f650f6378428203975c95f2ae8f56a2a1",
+  "prompts": {},
+  "sessions": {
+    "s_c0b10adaf45bcc": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f06cd928-27f5-4d74-8ee7-80a61dfad0c4",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
