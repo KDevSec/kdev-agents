@@ -1,0 +1,5 @@
+# kdev-memory git 托管配置 (Q-009)
+# 记忆仓 = 独立 nested repo（私有，含 verbatim 用户原话）。代码仓 .gitignore 忽略 /.kdev/；
+# 本文件 tracked，随 clone 到任何机器，SessionStart hook 据此自动 clone/pull（换机不丢记忆）。
+memory_repo: https://github.com/KDevSec/kdev-agents-memory.git
+branch: main
