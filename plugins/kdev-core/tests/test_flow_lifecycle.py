@@ -40,3 +40,13 @@ def test_resume_completed_raises(tmp_workspace):
     mark_inactive(tmp_workspace, FLOW, "f", status="completed")
     with pytest.raises(FlowStateError, match="not resumable"):
         resume_state(tmp_workspace, FLOW, "f")
+
+
+def test_mark_inactive_missing_raises(tmp_workspace):
+    with pytest.raises(FlowStateError, match="no flow-state.json"):
+        mark_inactive(tmp_workspace, FLOW, "ghost")
+
+
+def test_resume_missing_raises(tmp_workspace):
+    with pytest.raises(FlowStateError, match="no flow-state.json"):
+        resume_state(tmp_workspace, FLOW, "ghost")

@@ -1,6 +1,7 @@
 """Tests for kdev_core.flow_state — R1 flow-state store (CRUD + schema + atomic + _meta)."""
 import json
 from pathlib import Path
+from unittest import mock
 
 import pytest
 
@@ -100,3 +101,18 @@ def test_two_flows_same_slug_isolated(tmp_workspace):
     init_state(tmp_workspace, "design-flow", "feat-x", display_name="X")
     assert read_state(tmp_workspace, "coding-flow", "feat-x")["flow"] == "coding-flow"
     assert read_state(tmp_workspace, "design-flow", "feat-x")["flow"] == "design-flow"
+
+
+def test_write_failure_leaves_original_intact(tmp_workspace):
+    """A crash mid-write leaves the prior good file intact + no .tmp leftover (the atomicity guarantee)."""
+    init_state(tmp_workspace, FLOW, "feat-x", display_name="X", initial_node="n1")
+    f = _state_file(tmp_workspace, FLOW, "feat-x")
+    before = f.read_text(encoding="utf-8")
+    st = read_state(tmp_workspace, FLOW, "feat-x")
+    st["current_node"] = "n2"
+    with mock.patch("kdev_core.flow_state.json.dump", side_effect=RuntimeError("disk full")):
+        with pytest.raises(RuntimeError, match="disk full"):
+            write_state(tmp_workspace, FLOW, "feat-x", st)
+    # no tempfile leftover (including dotfile tempfiles) + original byte-for-byte intact
+    assert [p.name for p in f.parent.iterdir()] == ["flow-state.json"]
+    assert f.read_text(encoding="utf-8") == before
