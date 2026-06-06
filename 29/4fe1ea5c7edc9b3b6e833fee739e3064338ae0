@@ -1,0 +1,21 @@
+docs/superpowers/specs/2026-06-06-阶段1-coding-flow接底座-design.md
+  s_c0b10adaf45bcc::t_cacfa5b5ec891e 1-115,122,126-216
+  s_c0b10adaf45bcc::t_d15eff6582387b 116-121
+  s_c0b10adaf45bcc::t_f6e4fa9deef681 123-125
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.3",
+  "base_commit_sha": "294fe1ea5c7edc9b3b6e833fee739e3064338ae0",
+  "prompts": {},
+  "sessions": {
+    "s_c0b10adaf45bcc": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f06cd928-27f5-4d74-8ee7-80a61dfad0c4",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
