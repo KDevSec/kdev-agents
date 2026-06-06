@@ -62,3 +62,56 @@ def make_gate_result(gate, kind, *, node, verdict, request_id,
         "revisions": list(revisions or []),
         "ts": ts or _now_iso(),
     }
+
+
+def record_gate(state, gate_result, *, table, gate_specs, max_retries=None):
+    """Record a GateResult and apply the resulting transition. Pure (state -> new state).
+
+    Appends the GateResult to state["history"] (R1's field), bumps the double counters
+    (per-gate gate_iters + flow-total gate_calls), then dispatches by the gate's kind:
+      review/acceptance: PASS -> advance(on_pass) + reset iter; FAIL within cap ->
+        advance(on_reflow); FAIL at/over cap -> escalate (status="blocked", no advance).
+      decision: advance(branches[verdict]).
+    advance() is always called with reflow=False — R3 owns the review bound via gate_iters,
+    distinct from R2's mechanical reflow->terminal_fail.
+    """
+    gid = gate_result["gate"]
+    spec = gate_specs.get(gid)
+    if spec is None:
+        raise GateError(f"no gate spec for gate {gid!r}")
+    kind = spec["kind"]
+    cap = max_retries if max_retries is not None else table["max_retries"]
+
+    new = dict(state)
+    new["history"] = [*state.get("history", []), gate_result]
+    new["gate_calls"] = state.get("gate_calls", 0) + 1
+    gate_iters = dict(state.get("gate_iters", {}))
+
+    verdict = gate_result["verdict"]
+
+    if kind in ("review", "acceptance"):
+        if verdict == "PASS":
+            gate_iters[gid] = 0
+            new["gate_iters"] = gate_iters
+            return advance(new, spec["on_pass"], table=table, reason=f"{gid} PASS")
+        if verdict == "FAIL":
+            gate_iters[gid] = gate_iters.get(gid, 0) + 1
+            new["gate_iters"] = gate_iters
+            if gate_iters[gid] >= cap:
+                new["status"] = "blocked"
+                new["blocked_reason"] = (
+                    f"{gid} failed {gate_iters[gid]}x (>= {cap}); escalate to human"
+                )
+                return new
+            return advance(new, spec["on_reflow"], table=table,
+                           reason=f"{gid} FAIL reflow#{gate_iters[gid]}")
+        raise GateError(f"{kind} verdict must be PASS/FAIL, got {verdict!r}")
+
+    if kind == "decision":
+        branches = spec.get("branches", {})
+        if verdict not in branches:
+            raise GateError(f"decision {gid!r} verdict {verdict!r} not in branches {sorted(branches)}")
+        new["gate_iters"] = gate_iters
+        return advance(new, branches[verdict], table=table, reason=f"{gid} decision={verdict}")
+
+    raise GateError(f"unknown gate kind {kind!r} for gate {gid!r}")
