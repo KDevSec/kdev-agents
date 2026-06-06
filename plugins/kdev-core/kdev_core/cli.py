@@ -63,6 +63,19 @@ def cmd_advance(args):
     return 0
 
 
+def cmd_record_gate(args):
+    table, gate_specs = _load_table(args.table)
+    gr = gate.make_gate_result(
+        args.gate, args.kind, node=args.node, verdict=args.verdict,
+        request_id=args.request_id, by=args.by, iter=args.iter,
+        issues=args.issues or [])
+    state = gate.record_gate_persist(
+        args.workspace, args.flow, args.slug, gr,
+        table=table, gate_specs=gate_specs)
+    _print_state(state)
+    return 0
+
+
 def _common(sub, name):
     """A subparser with the shared --workspace + flow/slug positionals."""
     sp = sub.add_parser(name)
@@ -96,6 +109,19 @@ def build_parser():
     pa.add_argument("--reflow", action="store_true")
     pa.add_argument("--reason", default=None)
     pa.set_defaults(func=cmd_advance)
+
+    pg = _common(sub, "record-gate")
+    pg.add_argument("--table", required=True)
+    pg.add_argument("--gate", required=True)
+    pg.add_argument("--kind", required=True,
+                    choices=["review", "decision", "acceptance"])
+    pg.add_argument("--verdict", required=True)
+    pg.add_argument("--node", default=None)
+    pg.add_argument("--request-id", required=True)
+    pg.add_argument("--by", default="ai")
+    pg.add_argument("--iter", type=int, default=1)
+    pg.add_argument("--issues", action="append")
+    pg.set_defaults(func=cmd_record_gate)
 
     return p
 

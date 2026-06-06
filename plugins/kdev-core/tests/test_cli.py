@@ -92,3 +92,57 @@ def test_advance_reflow_overflow_forces_terminal_fail(tmp_workspace, capsys):
               "--workspace", str(tmp_workspace)])
     out = json.loads(capsys.readouterr().out)
     assert out["current_node"] == "n-fail"
+
+
+def _write_gate_table(tmp_workspace):
+    table_path = tmp_workspace / "gt.yml"
+    table_path.write_text(
+        "flow: coding-flow\n"
+        "max_retries: 3\n"
+        "nodes:\n"
+        "  - {id: n-impl, kind: action, next: [n-rev]}\n"
+        "  - {id: n-rev, kind: gate, gate: g-rev, next: [n-acc, n-impl]}\n"
+        "  - {id: n-acc, kind: gate, gate: g-acc, next: [n-done, n-impl]}\n"
+        "  - {id: n-done, kind: terminal, next: []}\n"
+        "gate_specs:\n"
+        "  g-rev: {kind: review, on_pass: n-acc, on_reflow: n-impl, reviewer: self}\n"
+        "  g-acc: {kind: acceptance, on_pass: n-done, on_reflow: n-impl, reviewer: self}\n",
+        encoding="utf-8")
+    return str(table_path)
+
+
+def _init_at(tmp_workspace, node):
+    flow_state.init_state(tmp_workspace, FLOW, "g",
+                          display_name="G", initial_node=node)
+
+
+def test_record_gate_review_pass_advances(tmp_workspace, capsys):
+    _init_at(tmp_workspace, "n-rev")
+    t = _write_gate_table(tmp_workspace)
+    rc = cli.main(["record-gate", FLOW, "g", "--gate", "g-rev", "--kind", "review",
+                   "--verdict", "PASS", "--request-id", "r1",
+                   "--table", t, "--workspace", str(tmp_workspace)])
+    out = json.loads(capsys.readouterr().out)
+    assert rc == 0
+    assert out["current_node"] == "n-acc"
+    assert out["history_len"] == 1
+
+
+def test_record_gate_review_fail_reflows_then_escalates(tmp_workspace, capsys):
+    _init_at(tmp_workspace, "n-rev")
+    t = _write_gate_table(tmp_workspace)
+    # FAIL #1,#2 -> reflow 回 n-impl（每次回前要先回到 n-rev）
+    for i in (1, 2):
+        cli.main(["record-gate", FLOW, "g", "--gate", "g-rev", "--kind", "review",
+                  "--verdict", "FAIL", "--request-id", f"r{i}",
+                  "--table", t, "--workspace", str(tmp_workspace)])
+        cli.main(["advance", FLOW, "g", "n-rev", "--table", t,
+                  "--workspace", str(tmp_workspace)])
+    capsys.readouterr()
+    # FAIL #3 >= max_retries(3) -> escalate blocked，不 advance、不 force-accept
+    cli.main(["record-gate", FLOW, "g", "--gate", "g-rev", "--kind", "review",
+              "--verdict", "FAIL", "--request-id", "r3",
+              "--table", t, "--workspace", str(tmp_workspace)])
+    out = json.loads(capsys.readouterr().out)
+    assert out["status"] == "blocked"
+    assert out["current_node"] == "n-rev"  # 没 force 过闸
