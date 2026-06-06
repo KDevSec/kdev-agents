@@ -1,0 +1,23 @@
+docs/superpowers/plans/2026-06-06-kdev-memory-P4-git-sync.md
+  s_e78473ae79ebbe::t_287762abafefad 615-616
+  s_e78473ae79ebbe::t_d47d991d2ecbb1 410
+  s_e78473ae79ebbe::t_8fe2ea4f23567e 325-338
+  s_e78473ae79ebbe::t_4f4e841bd98153 357-373
+  s_e78473ae79ebbe::t_765212079f3519 447
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.3",
+  "base_commit_sha": "d658b504ecf2545e68b82ae6419cfba548732993",
+  "prompts": {},
+  "sessions": {
+    "s_e78473ae79ebbe": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "46f03329-5618-4b8d-aa71-c5a2f34e2843",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
