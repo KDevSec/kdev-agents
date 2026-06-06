@@ -39,3 +39,20 @@ def read_sync_config(repo_root):
 def reminder_text():
     """The 中文 托管提醒 (记忆架构 §9.4)."""
     return REMINDER
+
+
+def decide_action(*, has_git, kdev_nonempty, remote):
+    """Pure SessionStart bootstrap decision.
+
+    Returns one of:
+      'pull'   — .kdev/ is already a repo (fetch latest).
+      'clone'  — no repo, .kdev/ empty/absent, a remote is configured (new machine).
+      'init'   — no repo, .kdev/ already has local content, a remote is configured
+                 (convert this machine's existing memory into the nested repo + first push).
+      'remind' — no remote configured (emit the 中文 托管提醒; do nothing destructive).
+    """
+    if has_git:
+        return "pull"
+    if remote:
+        return "init" if kdev_nonempty else "clone"
+    return "remind"

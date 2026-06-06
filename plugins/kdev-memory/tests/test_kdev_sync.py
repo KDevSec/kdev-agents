@@ -40,3 +40,22 @@ def test_read_config_blank_repo_is_none(tmp_path):
 def test_reminder_text_is_chinese_and_mentions_nested_repo():
     t = kdev_sync.reminder_text()
     assert "记忆仓" in t and "nested repo" in t
+
+
+def test_decide_pull_when_has_git():
+    # .kdev/.git present -> always pull (uses .kdev's own remote), regardless of yml remote.
+    assert kdev_sync.decide_action(has_git=True, kdev_nonempty=True, remote=None) == "pull"
+    assert kdev_sync.decide_action(has_git=True, kdev_nonempty=True, remote="r") == "pull"
+
+
+def test_decide_clone_when_empty_and_remote():
+    assert kdev_sync.decide_action(has_git=False, kdev_nonempty=False, remote="r") == "clone"
+
+
+def test_decide_init_when_existing_content_and_remote():
+    assert kdev_sync.decide_action(has_git=False, kdev_nonempty=True, remote="r") == "init"
+
+
+def test_decide_remind_when_no_remote():
+    assert kdev_sync.decide_action(has_git=False, kdev_nonempty=True, remote=None) == "remind"
+    assert kdev_sync.decide_action(has_git=False, kdev_nonempty=False, remote=None) == "remind"
