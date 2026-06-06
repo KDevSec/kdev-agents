@@ -20,7 +20,7 @@ nodes:
   - {id: n11-merge,          name: 合并主分支,           kind: action,   next: [n12-deploy]}
   - {id: n12-deploy,         name: 部署+金丝雀验收,       kind: gate,     gate: g-deploy, next: [n13-done, n6b-impl-subagent]}
   - {id: n13-done,           name: 产出清点+提炼,         kind: terminal, next: []}
-  - {id: n-fail,             name: 升级人工(escalate 落点), kind: terminal, next: []}
+  - {id: n-fail,             name: reflow 溢出终止(R2 有界回流 sink；R3 escalate 走 status=blocked 留原地不到此), kind: terminal, next: []}
 
 gate_specs:
   g-relevance:   {kind: decision, branches: {high: n3-plan, low: n2-worktree}, reviewer: self}

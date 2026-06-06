@@ -76,6 +76,13 @@ def cmd_record_gate(args):
     return 0
 
 
+def cmd_complete(args):
+    state = flow_state.mark_inactive(args.workspace, args.flow, args.slug,
+                                     status=args.status)
+    _print_state(state)
+    return 0
+
+
 def _common(sub, name):
     """A subparser with the shared --workspace + flow/slug positionals."""
     sp = sub.add_parser(name)
@@ -122,6 +129,11 @@ def build_parser():
     pg.add_argument("--iter", type=int, default=1)
     pg.add_argument("--issues", action="append")
     pg.set_defaults(func=cmd_record_gate)
+
+    pc = _common(sub, "complete")
+    pc.add_argument("--status", default="completed",
+                    choices=["completed", "aborted"])
+    pc.set_defaults(func=cmd_complete)
 
     return p
 

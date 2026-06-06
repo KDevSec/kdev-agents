@@ -146,3 +146,17 @@ def test_record_gate_review_fail_reflows_then_escalates(tmp_workspace, capsys):
     out = json.loads(capsys.readouterr().out)
     assert out["status"] == "blocked"
     assert out["current_node"] == "n-rev"  # 没 force 过闸
+
+
+def test_complete_marks_completed_and_blocks_resume(tmp_workspace, capsys):
+    flow_state.init_state(tmp_workspace, FLOW, "fin",
+                          display_name="Fin", initial_node="n13-done")
+    rc = cli.main(["complete", FLOW, "fin", "--workspace", str(tmp_workspace)])
+    out = json.loads(capsys.readouterr().out)
+    assert rc == 0
+    assert out["status"] == "completed"
+    assert out["active"] is False
+    # 完成后不再可 resume（守 §8.3：终结后状态正确，resume 拒绝）
+    rc2 = cli.main(["resume", FLOW, "fin", "--workspace", str(tmp_workspace)])
+    assert rc2 == 1
+    assert "not resumable" in capsys.readouterr().err

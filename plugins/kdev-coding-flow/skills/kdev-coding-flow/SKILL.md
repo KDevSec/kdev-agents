@@ -337,8 +337,9 @@ skill 必须支持"完全自主"模式：
 - **引擎调用**（薄 CLI，harness-中立）：
   - `python -m kdev_core init coding-flow <slug> --display-name ... [--auto-mode] --initial-node n0-env`
   - 动作节点完成 → `python -m kdev_core advance coding-flow <slug> <to_node> --table orchestration/node-table.yml --reason ...`
-  - gate 判完 → `python -m kdev_core record-gate coding-flow <slug> --gate g-xxx --kind review|decision|acceptance --verdict ... --request-id ... --table orchestration/node-table.yml`
+  - gate 判完 → `python -m kdev_core record-gate coding-flow <slug> --gate g-xxx --kind review|decision|acceptance --verdict ... --request-id ... --table orchestration/node-table.yml`（decision 的 `--verdict` 取 gate_specs.branches 的 key：g-relevance=high|low、g-complexity=simple|complex；review/acceptance 用 PASS|FAIL）
   - 断点续跑 → `python -m kdev_core resume coding-flow <slug>`
+  - 终结（terminal 节点）→ `python -m kdev_core complete coding-flow <slug>`（status=completed；终结后 resume 拒绝，守状态正确）
 - **业务能力 Agent**：`personas/{环境准备,实施计划,前端实现,E2E视觉验收,部署上线,安全扫描}.md`，由编排在对应节点内嵌派单。
 - **gate reviewer 绑定**：`self`=开发工程师自评（节点 8/9b/12）；`reviewer-expert`=评审专家第三方（节点 4/9a/10），**阶段1 `stage1: deferred`**（编排记 PASS 并标 `--by deferred:阶段3-评审专家`，不冒充第三方）。
 - **Auto Mode**：node-table 驱动与 `auto_mode` 正交——auto_mode=true 时 gate 自决续跑、不停等人；false 时 gate 停靠等主控确认（L2）。
