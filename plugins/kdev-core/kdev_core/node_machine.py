@@ -1,0 +1,89 @@
+"""kdev-core R2 — node machine (node-table + advance: adjacency/guard/bounded-reflow).
+
+Builds on R1 (kdev_core.flow_state). A node-table is a flow's SOP: nodes + allowed
+transitions. `advance` is a PURE function (state dict -> new state dict, or raises);
+it does not touch the filesystem. `advance_persist` wraps it with flow_state.write_state.
+
+Borrows OMC Team Pipeline (src/hooks/team-pipeline/transitions.ts): an adjacency map
+separated from a guard(state, next)->str|None, plus an immutable update appending a
+phase_history entry. Adds bounded reflow (retry++ on a gate->action loop) with a forced
+terminal-fail on overflow — the [OMC-avoid] "never loop forever" rule.
+
+R2 adds two state fields: `phase_history` (transition log) and `retries` (per-node reflow
+counter). It never touches R1's `history` field (reserved for R3 GateResults).
+"""
+from datetime import datetime, timezone
+
+NODE_KINDS = {"action", "gate", "terminal"}
+DEFAULT_MAX_RETRIES = 3
+
+
+class NodeMachineError(Exception):
+    """Malformed node-table, illegal transition, or guard failure."""
+
+
+def _now_iso():
+    return datetime.now(timezone.utc).isoformat(timespec="seconds")
+
+
+def load_node_table(table):
+    """Validate + normalize a node-table dict.
+
+    Returns {flow, max_retries, terminal_fail, nodes: {id: node}, adjacency: {id: [next_ids]}}.
+    """
+    if not isinstance(table, dict) or "nodes" not in table:
+        raise NodeMachineError("node-table must be a dict with a 'nodes' list")
+    nodes_list = table["nodes"]
+    if not isinstance(nodes_list, list) or not nodes_list:
+        raise NodeMachineError("node-table 'nodes' must be a non-empty list")
+
+    nodes = {}
+    for n in nodes_list:
+        nid = n.get("id")
+        if not nid:
+            raise NodeMachineError(f"node missing 'id': {n!r}")
+        if nid in nodes:
+            raise NodeMachineError(f"duplicate node id: {nid!r}")
+        kind = n.get("kind", "action")
+        if kind not in NODE_KINDS:
+            raise NodeMachineError(
+                f"node {nid!r} has invalid kind {kind!r} (must be one of {sorted(NODE_KINDS)})"
+            )
+        nxt = n.get("next", [])
+        if not isinstance(nxt, list):
+            raise NodeMachineError(f"node {nid!r} 'next' must be a list")
+        nodes[nid] = {
+            "id": nid,
+            "name": n.get("name", nid),
+            "kind": kind,
+            "gate": n.get("gate"),
+            "next": list(nxt),
+        }
+
+    for nid, n in nodes.items():
+        for tgt in n["next"]:
+            if tgt not in nodes:
+                raise NodeMachineError(f"node {nid!r} points to unknown node {tgt!r}")
+        if n["kind"] == "terminal" and n["next"]:
+            raise NodeMachineError(
+                f"terminal node {nid!r} must have empty 'next', got {n['next']!r}"
+            )
+
+    terminal_fail = table.get("terminal_fail")
+    if terminal_fail is not None:
+        if terminal_fail not in nodes:
+            raise NodeMachineError(f"terminal_fail {terminal_fail!r} is not a node")
+        if nodes[terminal_fail]["kind"] != "terminal":
+            raise NodeMachineError(f"terminal_fail {terminal_fail!r} must be a terminal node")
+
+    max_retries = table.get("max_retries", DEFAULT_MAX_RETRIES)
+    if not isinstance(max_retries, int) or isinstance(max_retries, bool) or max_retries < 0:
+        raise NodeMachineError(f"max_retries must be a non-negative int, got {max_retries!r}")
+
+    return {
+        "flow": table.get("flow"),
+        "max_retries": max_retries,
+        "terminal_fail": terminal_fail,
+        "nodes": nodes,
+        "adjacency": {nid: list(n["next"]) for nid, n in nodes.items()},
+    }
