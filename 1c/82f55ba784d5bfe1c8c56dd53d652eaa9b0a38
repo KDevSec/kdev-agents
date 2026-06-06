@@ -1,0 +1,21 @@
+plugins/kdev-core/kdev_core/gate.py
+  s_e78473ae79ebbe::t_f740b1e83e18f1 1-64
+plugins/kdev-core/tests/test_gate_result.py
+  s_e78473ae79ebbe::t_ddfc39fd1e08ae 1-55
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.3",
+  "base_commit_sha": "1c82f55ba784d5bfe1c8c56dd53d652eaa9b0a38",
+  "prompts": {},
+  "sessions": {
+    "s_e78473ae79ebbe": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "46f03329-5618-4b8d-aa71-c5a2f34e2843",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
