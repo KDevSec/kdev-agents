@@ -144,3 +144,14 @@ def advance(state, to_node, *, table, guard=None, reflow=False, reason=None):
     }
     new_state["phase_history"] = [*state.get("phase_history", []), entry]
     return new_state
+
+
+def advance_persist(workspace, flow, slug, to_node, *, table, guard=None,
+                    reflow=False, reason=None, step_id=None):
+    """advance() + persist via R1 flow_state.write_state. Returns the persisted state."""
+    from kdev_core import flow_state
+
+    state = flow_state.read_state(workspace, flow, slug)
+    new_state = advance(state, to_node, table=table, guard=guard, reflow=reflow, reason=reason)
+    flow_state.write_state(workspace, flow, slug, new_state, step_id=step_id)
+    return flow_state.read_state(workspace, flow, slug)
