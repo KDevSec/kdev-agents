@@ -102,3 +102,30 @@ def write_state(workspace, flow, slug, state, *, step_id=None):
         if os.path.exists(tmp_path):
             os.unlink(tmp_path)
         raise
+
+
+def mark_inactive(workspace, flow, slug, *, status="aborted", step_id=None):
+    """Cleanly stop a flow: active=False + terminal status (completed | aborted)."""
+    if status not in {"completed", "aborted"}:
+        raise ValueError(
+            f"mark_inactive status must be 'completed' or 'aborted', got {status!r}"
+        )
+    state = read_state(workspace, flow, slug)
+    state["active"] = False
+    state["status"] = status
+    write_state(workspace, flow, slug, state, step_id=step_id)
+    return read_state(workspace, flow, slug)
+
+
+def resume_state(workspace, flow, slug):
+    """Return the state if it is resumable (status == in_progress), else raise.
+
+    A left-behind in_progress state (active still True after a crash) is exactly
+    the resumable case — the caller picks up at `current_node`.
+    """
+    state = read_state(workspace, flow, slug)
+    if state["status"] != "in_progress":
+        raise FlowStateError(
+            f"flow {flow}/{slug!r} not resumable: status={state['status']!r}"
+        )
+    return state
