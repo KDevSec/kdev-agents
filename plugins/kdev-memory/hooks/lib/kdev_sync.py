@@ -56,3 +56,103 @@ def decide_action(*, has_git, kdev_nonempty, remote):
     if remote:
         return "init" if kdev_nonempty else "clone"
     return "remind"
+
+
+# Fixed identity for the nested memory repo's own commits (hermetic; the code repo's
+# AI/human identity is separate and set elsewhere).
+_GIT_ID = ["-c", "user.name=kdev-memory", "-c", "user.email=kdev@local", "-c", "commit.gpgsign=false"]
+
+# Machine-local memory (NOT hosted to the shared memory repo) — §5.3 #13/#14/#15/#16.
+# Bare names (no internal slash) match at any depth: covers flat (.kdev/memory/state/)
+# and scoped (.kdev/state/) layouts.
+_MACHINE_LOCAL_GITIGNORE = """# kdev-memory nested repo — machine-local, not hosted (§5.3)
+state/
+checkpoints/
+hud.md
+dataset/
+"""
+
+
+def _ensure_machine_local_gitignore(kdev):
+    """Write .kdev/.gitignore excluding machine-local dirs if absent."""
+    gi = Path(kdev) / ".gitignore"
+    if not gi.exists():
+        gi.write_text(_MACHINE_LOCAL_GITIGNORE, encoding="utf-8")
+
+
+def _git(args, cwd, *, identity=False):
+    pre = _GIT_ID if identity else []
+    return subprocess.run(["git", *pre, *args], cwd=str(cwd),
+                          capture_output=True, text=True)
+
+
+def _kdev_dir(repo_root):
+    return Path(repo_root) / ".kdev"
+
+
+def bootstrap(repo_root):
+    """SessionStart bootstrap. Returns {'action', 'ok', 'message'}. Never raises."""
+    repo_root = Path(repo_root)
+    kdev = _kdev_dir(repo_root)
+    has_git = (kdev / ".git").exists()
+    kdev_nonempty = kdev.exists() and any(kdev.iterdir())
+    cfg = read_sync_config(repo_root)
+    remote = cfg["memory_repo"]
+    branch = cfg["branch"]
+    action = decide_action(has_git=has_git, kdev_nonempty=kdev_nonempty, remote=remote)
+
+    if action == "remind":
+        return {"action": "remind", "ok": True, "message": reminder_text()}
+
+    if action == "pull":
+        r = _git(["pull", "--ff-only"], cwd=kdev)
+        return {"action": "pull", "ok": r.returncode == 0,
+                "message": (r.stderr or r.stdout).strip()}
+
+    if action == "clone":
+        kdev.parent.mkdir(parents=True, exist_ok=True)
+        # -b <branch>: the freshly-bootstrapped memory remote's HEAD may still point at the
+        # host git's default branch (e.g. master) rather than our configured branch, which
+        # would make a plain clone check out nothing. Clone the configured branch explicitly.
+        r = _git(["clone", "-b", branch, remote, str(kdev)], cwd=repo_root, identity=True)
+        if r.returncode == 0:
+            # Chinese memory filenames must show as UTF-8 (not octal-escaped) in git output.
+            _git(["config", "core.quotepath", "false"], cwd=kdev)
+        return {"action": "clone", "ok": r.returncode == 0,
+                "message": (r.stderr or r.stdout).strip()}
+
+    # action == "init": convert existing local .kdev/ into the nested repo + first push
+    _ensure_machine_local_gitignore(kdev)   # don't push machine-local counters/checkpoints (§5.3)
+    msgs = []
+    for args, ident, tolerate in [
+        (["init", "-b", branch], True, False),
+        # Chinese memory filenames must show as UTF-8 (not octal-escaped) in git output.
+        (["config", "core.quotepath", "false"], False, False),
+        (["remote", "add", "origin", remote], False, True),   # tolerate "already exists"
+        (["add", "-A"], False, False),
+        (["commit", "-m", "chore(kdev-memory): bootstrap nested memory repo"], True, False),
+        (["push", "-u", "origin", branch], True, False),
+    ]:
+        r = _git(args, cwd=kdev, identity=ident)
+        msgs.append(f"git {args[0]}: rc={r.returncode}")
+        if r.returncode != 0 and not tolerate:
+            return {"action": "init", "ok": False,
+                    "message": "; ".join(msgs) + " :: " + (r.stderr or "").strip()}
+    return {"action": "init", "ok": True, "message": "; ".join(msgs)}
+
+
+def sync_push(repo_root, message="chore(kdev-memory): session sync"):
+    """SessionEnd/rollup: commit + push .kdev/. Returns {'ok', 'pushed', 'message'}. Never raises."""
+    kdev = _kdev_dir(repo_root)
+    if not (kdev / ".git").exists():
+        return {"ok": True, "pushed": False, "message": "no .kdev/.git; skip (untracked memory)"}
+    _git(["add", "-A"], cwd=kdev)
+    status = _git(["status", "--porcelain"], cwd=kdev)
+    if not status.stdout.strip():
+        return {"ok": True, "pushed": False, "message": "nothing to commit"}
+    c = _git(["commit", "-m", message], cwd=kdev, identity=True)
+    if c.returncode != 0:
+        return {"ok": False, "pushed": False, "message": (c.stderr or c.stdout).strip()}
+    p = _git(["push"], cwd=kdev)
+    return {"ok": p.returncode == 0, "pushed": p.returncode == 0,
+            "message": (p.stderr or p.stdout).strip()}
