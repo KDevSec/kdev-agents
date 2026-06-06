@@ -59,3 +59,50 @@ def test_guard_rejection_raises_with_reason():
         return "artifacts missing"
     with pytest.raises(NodeMachineError, match="guard rejected.*artifacts missing"):
         advance(_state("g1"), "n2", table=TABLE, guard=guard)
+
+
+def _state_r(current, retries=None):
+    return {"current_node": current, "phase_history": [], "retries": dict(retries or {})}
+
+
+def test_reflow_increments_retry_counter():
+    out = advance(_state_r("g1"), "n1", table=TABLE, reflow=True)
+    assert out["current_node"] == "n1"
+    assert out["retries"]["n1"] == 1
+    assert out["phase_history"][0]["reflow"] is True
+
+
+def test_reflow_within_cap_allowed():
+    # max_retries=2; existing 1 -> becomes 2, which is NOT > 2, so still a normal reflow.
+    out = advance(_state_r("g1", {"n1": 1}), "n1", table=TABLE, reflow=True)
+    assert out["current_node"] == "n1"
+    assert out["retries"]["n1"] == 2
+    assert out["phase_history"][0]["forced_fail"] is False
+
+
+def test_reflow_overflow_forces_terminal_fail():
+    # existing 2 -> becomes 3, which IS > 2 -> redirect to terminal_fail.
+    out = advance(_state_r("g1", {"n1": 2}), "n1", table=TABLE, reflow=True)
+    assert out["current_node"] == "failed"
+    assert out["retries"]["n1"] == 3
+    e = out["phase_history"][0]
+    assert e["to"] == "failed"
+    assert e["forced_fail"] is True
+
+
+def test_forward_advance_does_not_increment_retries():
+    out = advance(_state_r("n1", {"n1": 1}), "g1", table=TABLE)  # reflow defaults False
+    assert out["retries"] == {"n1": 1}  # unchanged (idempotent exemption)
+
+
+def test_reflow_overflow_without_terminal_fail_raises():
+    table_no_fail = load_node_table({
+        "max_retries": 1,
+        "nodes": [
+            {"id": "a", "kind": "action", "next": ["g"]},
+            {"id": "g", "kind": "gate", "next": ["a"]},
+        ],
+    })
+    with pytest.raises(NodeMachineError, match="retry overflow"):
+        advance({"current_node": "g", "phase_history": [], "retries": {"a": 1}},
+                "a", table=table_no_fail, reflow=True)

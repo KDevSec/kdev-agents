@@ -89,13 +89,18 @@ def load_node_table(table):
     }
 
 
-def advance(state, to_node, *, table, guard=None, reason=None):
+def advance(state, to_node, *, table, guard=None, reflow=False, reason=None):
     """Pure transition: returns a NEW state dict, or raises NodeMachineError.
 
     Three steps (OMC pattern):
       1. adjacency: to_node must be in adjacency[current_node] (else raise).
       2. guard: if given, guard(state, to_node) -> str|None; non-None -> raise(reason).
       3. immutable update: new current_node + append a phase_history entry.
+
+    Bounded reflow: reflow=True (a gate->action retry) increments retries[to_node];
+    if it exceeds table["max_retries"], the transition is forced to table["terminal_fail"]
+    (or raises if no terminal_fail is configured). Forward advances (reflow=False) never
+    touch the retry counter — the idempotent exemption.
     """
     current = state.get("current_node")
     if current is None:
@@ -111,13 +116,29 @@ def advance(state, to_node, *, table, guard=None, reason=None):
         if greason is not None:
             raise NodeMachineError(f"guard rejected {current!r} -> {to_node!r}: {greason}")
 
+    retries = dict(state.get("retries", {}))
+    target = to_node
+    forced_fail = False
+    if reflow:
+        retries[to_node] = retries.get(to_node, 0) + 1
+        if retries[to_node] > table["max_retries"]:
+            tf = table.get("terminal_fail")
+            if tf is None:
+                raise NodeMachineError(
+                    f"retry overflow at {to_node!r} (> {table['max_retries']}) "
+                    f"and no terminal_fail configured"
+                )
+            target = tf
+            forced_fail = True
+
     new_state = dict(state)
-    new_state["current_node"] = to_node
+    new_state["current_node"] = target
+    new_state["retries"] = retries
     entry = {
         "from": current,
-        "to": to_node,
-        "reflow": False,
-        "forced_fail": False,
+        "to": target,
+        "reflow": bool(reflow),
+        "forced_fail": forced_fail,
         "reason": reason,
         "entered_at": _now_iso(),
     }
