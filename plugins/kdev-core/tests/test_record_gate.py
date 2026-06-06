@@ -70,3 +70,41 @@ def test_unknown_gate_spec_raises():
     r = make_gate_result("g-ghost", "review", node="g1", verdict="PASS", request_id="r1")
     with pytest.raises(GateError, match="no gate spec"):
         record_gate(_state(), r, table=TABLE, gate_specs=SPECS)
+
+
+# A decision gate at "d1": branches choose between two actions.
+DTABLE = load_node_table({
+    "flow": "toy2",
+    "nodes": [
+        {"id": "start", "kind": "action", "next": ["d1"]},
+        {"id": "d1", "kind": "gate", "next": ["go", "plan"]},
+        {"id": "go", "kind": "action", "next": ["end"]},
+        {"id": "plan", "kind": "action", "next": ["d1"]},
+        {"id": "end", "kind": "terminal", "next": []},
+    ],
+})
+DSPECS = {"d1": {"kind": "decision", "branches": {"approve": "go", "rework": "plan"}}}
+
+
+def _dstate():
+    return {"current_node": "d1", "status": "in_progress", "history": [], "phase_history": []}
+
+
+def test_decision_advances_to_chosen_branch():
+    r = make_gate_result("d1", "decision", node="d1", verdict="approve", request_id="r1")
+    out = record_gate(_dstate(), r, table=DTABLE, gate_specs=DSPECS)
+    assert out["current_node"] == "go"
+    assert out["gate_calls"] == 1
+    assert out["history"][-1]["verdict"] == "approve"
+
+
+def test_decision_other_branch():
+    r = make_gate_result("d1", "decision", node="d1", verdict="rework", request_id="r1")
+    out = record_gate(_dstate(), r, table=DTABLE, gate_specs=DSPECS)
+    assert out["current_node"] == "plan"
+
+
+def test_decision_unknown_verdict_raises():
+    r = make_gate_result("d1", "decision", node="d1", verdict="ship-it", request_id="r1")
+    with pytest.raises(GateError, match="not in branches"):
+        record_gate(_dstate(), r, table=DTABLE, gate_specs=DSPECS)
