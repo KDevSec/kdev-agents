@@ -1,5 +1,24 @@
 # kdev-memory CHANGELOG
 
+## [0.13.0] — 2026-06-06
+
+**P4 git 托管自举（Q-009）：`.kdev/` 独立 nested 记忆仓 + SessionStart 自举 + SessionEnd 推送。**
+
+### ✨ 新增
+
+- **`hooks/lib/kdev_sync.py`** — git 托管自举核心：`decide_action`（pull/clone/init/remind 纯决策）+ `bootstrap`（无 `.kdev/.git` 且本机已有记忆 → init+首推）+ `sync_push`（SessionEnd commit+push）。stdlib-only。
+- **`hooks/kdev-sync-bootstrap.py`** — SessionStart hook：无 `.kdev/.git` 有本机记忆 → init+首推；有 → pull；无 remote → 中文托管提醒。best-effort 不阻塞 session。
+- **`hooks/kdev-sync-push.py`** — SessionEnd hook：commit+push `.kdev/`（machine-local 的 `state/ checkpoints/ hud.md dataset/` 经 `.kdev/.gitignore` 排除）。
+- **`kdev-sync.yml`（仓根 tracked）** — 记忆仓 remote 登记，随 clone 到任何机器。
+
+### 🔄 变更
+
+- **hooks.json** SessionStart 加 `kdev-sync-bootstrap`（在 brief 前）；SessionEnd 加 `kdev-sync-push`。
+
+### ⚠️ 重要（为何本版必须 bump version）
+
+- `plugin.json` version 自 **0.10.1**（2026-05-27 cache）起**未随源码 bump**——Claude Code 插件 cache **按 version 键控**，导致 0.11/0.12（R-001 step-recorder hooks）+ P4（本版 git 托管 hooks）**全部静默未生效**（cache 一直跑 stale 0.10.1）。本次 `0.10.1 → 0.13.0` 触发 cache 重抽取，激活累积的 hook 层。**用户侧需刷新 marketplace（`/plugin` 更新/重装）+ 重启 session** 才生效。详见踩坑日志 G-004。
+
 ## [0.12.0] — 2026-06-02
 
 **R-001 集成：kdev-step-recorder dispatch 接入 SKILL.md / CLAUDE.md 主路径 + commit hook 兜底 + R-005 顺手。**
