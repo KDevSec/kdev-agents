@@ -1,0 +1,23 @@
+plugins/kdev-team/tests/test_skill_slimmed.py
+  s_850749b1797bf7::t_08e5f4b4c7eece 1-20
+plugins/kdev-coding-flow/skills/kdev-coding-flow/SKILL.md
+  s_850749b1797bf7::t_727f6a11bdabb4 332-336
+plugins/kdev-team/agents/dev-engineer-orchestrator.md
+  s_850749b1797bf7::t_9943c152d272dd 19-26,31-36
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.3",
+  "base_commit_sha": "0a9976ea206de5ac902f7fdb5ce8da6a73dee491",
+  "prompts": {},
+  "sessions": {
+    "s_850749b1797bf7": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c4038413-0dbe-4c71-b8b8-91d5e2713564",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
