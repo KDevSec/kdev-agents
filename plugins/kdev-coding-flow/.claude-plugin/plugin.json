@@ -1,0 +1,9 @@
+{
+  "name": "kdev-coding-flow",
+  "description": "编码阶段 13 节点 SOP skill + /kdev-coding-flow 斜杠命令：把 spec.md + plan.md + prototype 三件套端到端跑到部署 + E2E 全绿。强制 TDD、Per-Increment E2E Gate、Phase 0 环境对齐、业务关键入口金丝雀；3 个人工判断 Gate（关联度 / 复杂度 / E2E 通行证），其余下放 subagent；按 CLAUDE.md 二档分工派单（sonnet 编码 / opus 评审与高复杂度）；4-shot review 上限。技术栈无关——栈通用约定（PEP8/gofmt/路由顺序）依赖模型自带，项目特定规则走 <repo>/docs/rules.md 外置",
+  "version": "0.2.0",
+  "author": {
+    "name": "ly"
+  },
+  "license": "MIT"
+}
