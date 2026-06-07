@@ -1,0 +1,35 @@
+plugins/kdev-team/agents/dev-engineer-orchestrator.md
+  s_850749b1797bf7::t_a072d752d0d639 1-5
+plugins/kdev-team/agents/dev-engineer-frontend.md
+  s_850749b1797bf7::t_3b59ede41fe2d1 1-5
+plugins/kdev-team/agents/dev-engineer-plan.md
+  s_850749b1797bf7::t_280ccea9e25039 1-5
+plugins/kdev-team/agents/dev-engineer-env.md
+  s_850749b1797bf7::t_5cb338f75de66a 1-5
+plugins/kdev-team/agents/dev-engineer-deploy.md
+  s_850749b1797bf7::t_095afd38fb074b 1-5
+plugins/kdev-team/agents/dev-engineer-e2e.md
+  s_850749b1797bf7::t_0298ca2076c71a 1-5
+plugins/kdev-team/agents/dev-engineer-sec.md
+  s_850749b1797bf7::t_75112031b008e2 1-5
+plugins/kdev-team/tests/test_agents.py
+  s_850749b1797bf7::t_f666104fa8a0bd 1-38
+plugins/kdev-team/tests/conftest.py
+  s_850749b1797bf7::t_3e02bd1c7e07e7 1-5
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.3",
+  "base_commit_sha": "cf3eb346bfbb664e246b27f22723a1a103e7b401",
+  "prompts": {},
+  "sessions": {
+    "s_850749b1797bf7": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c4038413-0dbe-4c71-b8b8-91d5e2713564",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
