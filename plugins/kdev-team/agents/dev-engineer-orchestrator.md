@@ -15,16 +15,22 @@ model: opus
 - 业务能力只对自家编排（硬规5），不外联其他员工。
 
 ## Critical Actions
-- 启动：`python -m kdev_core resume <flow> <slug>` 探断点；无则 `init`。
-- **每过一个节点/gate，必须调 CLI 落账**：动作节点完成 → `python -m kdev_core advance <flow> <slug> <to_node> --table <node-table.yml> --reason ...`；gate 判完 → `python -m kdev_core record-gate <flow> <slug> --gate g-xxx --kind ... --verdict ... --request-id ... --table <node-table.yml>`。
-- 终点（terminal 节点）：`python -m kdev_core complete <flow> <slug>`（status=completed，置 active=False，终结后不可再 resume）。BLOCKED → 出报告升主控。
+
+flow=`coding-flow`，table=`orchestration/dev-engineer.node-table.yml`。每过一个节点/gate **必须**调 CLI 落账（薄 CLI，harness-中立）：
+
+- **启动**：先 `python -m kdev_core resume coding-flow <slug>` 探断点；无则 `python -m kdev_core init coding-flow <slug> --display-name ... [--auto-mode] --initial-node n0-env`。
+- **动作节点完成** → `python -m kdev_core advance coding-flow <slug> <to_node> --table orchestration/dev-engineer.node-table.yml --reason ...`。
+- **gate 判完** → `python -m kdev_core record-gate coding-flow <slug> --gate g-xxx --kind review|decision|acceptance --verdict ... --request-id ... --table orchestration/dev-engineer.node-table.yml`。decision 的 `--verdict` 取 gate_specs.branches 的 key：`g-relevance=high|low`、`g-complexity=simple|complex`；review/acceptance 用 `PASS|FAIL`。
+- **终结（terminal 节点）** → `python -m kdev_core complete coding-flow <slug>`（status=completed，置 active=False，终结后 resume 拒绝，守状态正确）。BLOCKED → 出报告升主控。
+- **gate reviewer 绑定**：`self`=自评（节点 8/9b/12），自己判；`reviewer-expert`=第三方评审（节点 4/9a/10），**阶段1 deferred**——记 PASS 并标 `--by deferred:阶段3-评审专家`，不冒充第三方。
+- **Auto Mode 正交**：node-table 驱动与 `auto_mode` 正交——auto_mode=true 时 gate 自决续跑、不停等人；false 时 gate 停靠等主控确认（L2）。
 
 ## Capabilities
 | 节点 | 派哪个业务 Agent（subagent_type）| 干什么 |
 |---|---|---|
-| n0-env | 环境准备 | clone/栈对齐/rules.md |
-| n3-plan | 实施计划 | PLAN.md |
-| n6a/n6b | 前端实现 | 改 src（视觉改造）|
-| n8/n9b/n12 | E2E视觉验收 | build+视觉diff+冒烟 |
-| n10-sec | 安全扫描 | 轻量 security.md |
-| n11-merge | 部署上线 | 合并+起环境 |
+| n0-env | `dev-engineer-env`（环境准备）| clone/栈对齐/rules.md |
+| n3-plan | `dev-engineer-plan`（实施计划）| PLAN.md |
+| n6a/n6b | `dev-engineer-frontend`（前端实现）| 改 src（视觉改造）|
+| n8/n9b/n12 | `dev-engineer-e2e`（E2E视觉验收）| build+视觉diff+冒烟 |
+| n10-sec | `dev-engineer-sec`（安全扫描）| 轻量 security.md |
+| n11-merge | `dev-engineer-deploy`（部署上线）| 合并+起环境 |
