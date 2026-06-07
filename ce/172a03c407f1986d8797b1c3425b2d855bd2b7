@@ -1,0 +1,25 @@
+plugins/kdev-team/tests/test_plugin_manifest.py
+  s_850749b1797bf7::t_d86dd9f5759624 1-19
+.claude-plugin/marketplace.json
+  s_850749b1797bf7::t_1225d37d05ffb7 81-86
+plugins/kdev-team/.claude-plugin/plugin.json
+  s_850749b1797bf7::t_83494a7f97e989 1-8
+plugins/kdev-team/README.md
+  s_850749b1797bf7::t_cb22975ae6ed22 1-17
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.3",
+  "base_commit_sha": "ce172a03c407f1986d8797b1c3425b2d855bd2b7",
+  "prompts": {},
+  "sessions": {
+    "s_850749b1797bf7": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c4038413-0dbe-4c71-b8b8-91d5e2713564",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
