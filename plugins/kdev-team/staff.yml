@@ -1,0 +1,17 @@
+# kdev-team 花名册：canonical id → 中文 display + flow-skill 方法论 + 编排 node-table + 运行时模型
+# 守 spec §0.5 命名规范。运行时模型阶段1 暂统一 opus，可改二档。
+employees:
+  dev-engineer:
+    display: 开发工程师
+    flow_skill: kdev-coding-flow          # 方法论参考（非编排器）
+    node_table: orchestration/dev-engineer.node-table.yml
+    runtime_model: opus
+    agents:
+      - dev-engineer-orchestrator
+      - dev-engineer-env
+      - dev-engineer-plan
+      - dev-engineer-frontend
+      - dev-engineer-e2e
+      - dev-engineer-deploy
+      - dev-engineer-sec
+  # req-architect 阶段2 P-A 追加
