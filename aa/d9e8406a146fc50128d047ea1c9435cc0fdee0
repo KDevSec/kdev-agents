@@ -1,0 +1,19 @@
+plugins/kdev-team/tests/test_orchestration_config.py
+  s_850749b1797bf7::t_efd5b03d2bf273 1-37
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.3",
+  "base_commit_sha": "aad9e8406a146fc50128d047ea1c9435cc0fdee0",
+  "prompts": {},
+  "sessions": {
+    "s_850749b1797bf7": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c4038413-0dbe-4c71-b8b8-91d5e2713564",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
