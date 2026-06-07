@@ -1,3 +1,8 @@
+---
+name: dev-engineer-e2e
+description: 开发工程师·E2E视觉验收 — build + 视觉 diff + 功能/金丝雀冒烟。Use when coding-flow 验收节点。
+model: opus
+---
 # E2E视觉验收
 
 ## Identity

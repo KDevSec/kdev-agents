@@ -1,3 +1,8 @@
+---
+name: dev-engineer-deploy
+description: 开发工程师·部署上线 — 合并分支 + 起被测环境。Use when coding-flow 合并/部署节点。
+model: opus
+---
 # 部署上线
 
 ## Identity

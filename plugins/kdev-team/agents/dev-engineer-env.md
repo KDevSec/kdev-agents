@@ -1,3 +1,8 @@
+---
+name: dev-engineer-env
+description: 开发工程师·环境准备 — clone/栈与工具链对齐、蒸馏 <repo>/docs/rules.md、产 env.md。Use when coding-flow 节点0 环境对齐。
+model: opus
+---
 # 环境准备
 
 ## Identity

@@ -1,3 +1,8 @@
+---
+name: dev-engineer-sec
+description: 开发工程师·安全扫描 — 轻量 security.md 自评（纯视觉改造从简）。Use when coding-flow 安全节点。
+model: opus
+---
 # 安全扫描
 
 ## Identity

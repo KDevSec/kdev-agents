@@ -1,3 +1,8 @@
+---
+name: dev-engineer-frontend
+description: 开发工程师·前端实现 — 按 PLAN 改 src（含视觉改造），守 token/8px/字体白名单等。Use when coding-flow 实现节点。
+model: opus
+---
 # 前端实现
 
 ## Identity

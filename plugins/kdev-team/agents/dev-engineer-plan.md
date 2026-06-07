@@ -1,3 +1,8 @@
+---
+name: dev-engineer-plan
+description: 开发工程师·实施计划 — Gate-A/B 输入 + 写 PLAN.md/implementation-plan。Use when coding-flow 节点3 起实施计划。
+model: opus
+---
 # 实施计划
 
 ## Identity
