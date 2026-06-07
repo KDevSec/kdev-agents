@@ -1,0 +1,19 @@
+docs/superpowers/specs/2026-06-07-阶段2-第二员工+记忆scope-design.md
+  s_c0b10adaf45bcc::t_70a445a33268e9 1-146
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.3",
+  "base_commit_sha": "8835eb0f8a9f3820ad68e31cfa854f4fbb8a92b7",
+  "prompts": {},
+  "sessions": {
+    "s_c0b10adaf45bcc": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "f06cd928-27f5-4d74-8ee7-80a61dfad0c4",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
