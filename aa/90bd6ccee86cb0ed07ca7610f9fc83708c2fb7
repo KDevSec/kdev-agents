@@ -1,0 +1,20 @@
+docs/framework/01-design/2026-06-06-01-数字员工集群-起步roadmap-Q004细化-v0.1.md
+  s_850749b1797bf7::t_d70485b5bd3e53 45
+  s_850749b1797bf7::t_7bef662f901111 34,36
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.3",
+  "base_commit_sha": "aa90bd6ccee86cb0ed07ca7610f9fc83708c2fb7",
+  "prompts": {},
+  "sessions": {
+    "s_850749b1797bf7": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c4038413-0dbe-4c71-b8b8-91d5e2713564",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
