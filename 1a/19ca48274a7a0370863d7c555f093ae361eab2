@@ -1,0 +1,25 @@
+plugins/kdev-team/skills/kdev-flow-driver/references/gate-decision-logic.md
+  s_0335fce08a4b6e::t_fca1f237274821 1-111
+plugins/kdev-team/skills/kdev-flow-driver/SKILL.md
+  s_0335fce08a4b6e::t_a3362b45a25e20 1-307
+plugins/kdev-team/commands/kdev-flow-driver.md
+  s_0335fce08a4b6e::t_a67f003f253893 1-37
+plugins/kdev-team/skills/kdev-flow-driver/references/node-agent-routing.md
+  s_0335fce08a4b6e::t_a3e4fb18be85c0 1-51
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "1a19ca48274a7a0370863d7c555f093ae361eab2",
+  "prompts": {},
+  "sessions": {
+    "s_0335fce08a4b6e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "20a2d636-246b-4d52-b657-20f81a9ae261",
+        "model": "astron-code-latest"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
