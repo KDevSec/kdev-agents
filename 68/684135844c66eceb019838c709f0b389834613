@@ -1,0 +1,29 @@
+plugins/kdev-core/kdev_core/node_machine.py
+  s_0335fce08a4b6e::t_99d0fdcf09675c 149-224
+plugins/kdev-core/kdev_core/cli.py
+  s_0335fce08a4b6e::t_37e0dc65d14806 92-105
+  s_0335fce08a4b6e::t_db3351b363a2cd 106-144
+  s_0335fce08a4b6e::t_dc5e2fc4570235 197-200
+  s_0335fce08a4b6e::t_1a665e7e5c7592 201-213
+  s_0335fce08a4b6e::t_9a1ef24b5b3415 26,30,34,37-39
+plugins/kdev-core/kdev_core/flow_state.py
+  s_0335fce08a4b6e::t_cb85b8f332166e 132-178
+plugins/kdev-core/tests/test_new_cli.py
+  s_0335fce08a4b6e::t_21820058d09bf6 1-222
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "68684135844c66eceb019838c709f0b389834613",
+  "prompts": {},
+  "sessions": {
+    "s_0335fce08a4b6e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "20a2d636-246b-4d52-b657-20f81a9ae261",
+        "model": "astron-code-latest"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
