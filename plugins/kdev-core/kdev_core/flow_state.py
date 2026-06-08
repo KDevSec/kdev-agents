@@ -129,3 +129,50 @@ def resume_state(workspace, flow, slug):
             f"flow {flow}/{slug!r} not resumable: status={state['status']!r}"
         )
     return state
+
+
+def unblock_state(workspace, flow, slug, *, to_node):
+    """Clear a blocked flow: reset status to in_progress, clear blocked_reason,
+    and optionally move current_node to to_node. Returns the updated state."""
+    state = read_state(workspace, flow, slug)
+    if state["status"] != "blocked":
+        raise FlowStateError(
+            f"flow {flow}/{slug!r} is not blocked (status={state['status']!r})"
+        )
+    state["status"] = "in_progress"
+    state["blocked_reason"] = None
+    if to_node is not None:
+        state["current_node"] = to_node
+    write_state(workspace, flow, slug, state)
+    return read_state(workspace, flow, slug)
+
+
+def list_flows(workspace):
+    """List all flows in the workspace's .kdev/flows/ directory.
+
+    Returns a list of dicts: {flow, slug, status, active, current_node}.
+    """
+    flows_dir = Path(workspace) / ".kdev" / "flows"
+    if not flows_dir.exists():
+        return []
+    result = []
+    for flow_dir in sorted(flows_dir.iterdir()):
+        if not flow_dir.is_dir():
+            continue
+        for slug_dir in sorted(flow_dir.iterdir()):
+            state_path = slug_dir / "flow-state.json"
+            if not state_path.exists():
+                continue
+            try:
+                data = json.loads(state_path.read_text(encoding="utf-8"))
+                data.pop("_meta", None)
+                result.append({
+                    "flow": data.get("flow"),
+                    "slug": data.get("slug"),
+                    "status": data.get("status"),
+                    "active": data.get("active"),
+                    "current_node": data.get("current_node"),
+                })
+            except (json.JSONDecodeError, KeyError):
+                continue  # skip corrupt files
+    return result

@@ -146,6 +146,82 @@ def advance(state, to_node, *, table, guard=None, reflow=False, reason=None):
     return new_state
 
 
+def get_next_actions(state, table, gate_specs):
+    """Return what the orchestrator should do next at the current node.
+
+    Returns a dict:
+      {
+        "current_node": str | None,
+        "node_kind": str,          # "action"|"gate"|"terminal"|None
+        "node_name": str | None,
+        "next_actions": [{"to_node": str, "label": str}],
+        "gate_spec": dict | None,  # gate_specs entry for the current gate node
+        "is_blocked": bool,
+        "blocked_reason": str | None,
+      }
+    """
+    current = state.get("current_node")
+    nodes = table["nodes"]
+    adjacency = table["adjacency"]
+    is_blocked = state.get("status") == "blocked"
+    blocked_reason = state.get("blocked_reason")
+
+    result = {
+        "current_node": current,
+        "node_kind": None,
+        "node_name": None,
+        "next_actions": [],
+        "gate_spec": None,
+        "is_blocked": is_blocked,
+        "blocked_reason": blocked_reason,
+    }
+
+    if current is None or current not in nodes:
+        # Not yet advanced or unknown node — return bare info
+        return result
+
+    node = nodes[current]
+    result["node_kind"] = node["kind"]
+    result["node_name"] = node["name"]
+
+    # Terminal nodes have no next actions
+    if node["kind"] == "terminal":
+        return result
+
+    # If blocked, no valid actions until unblocked
+    if is_blocked:
+        return result
+
+    next_ids = adjacency.get(current, [])
+    gate_id = node.get("gate")
+
+    if node["kind"] == "gate" and gate_id and gate_id in gate_specs:
+        spec = gate_specs[gate_id]
+        # Build gate_spec for orchestrator decision-making
+        gs = dict(spec)
+        gs["gate"] = gate_id
+        gs["current_iter"] = state.get("gate_iters", {}).get(gate_id, 0)
+        gs["max_retries"] = table.get("max_retries", DEFAULT_MAX_RETRIES)
+        result["gate_spec"] = gs
+
+        # Derive next_actions from gate_spec
+        if spec["kind"] == "decision":
+            branches = spec.get("branches", {})
+            for verdict_key, target in branches.items():
+                result["next_actions"].append({"to_node": target, "label": verdict_key})
+        elif spec["kind"] in ("review", "acceptance"):
+            result["next_actions"].append({"to_node": spec["on_pass"], "label": "PASS"})
+            result["next_actions"].append({"to_node": spec["on_reflow"], "label": "FAIL"})
+    else:
+        # Action node: next_actions from adjacency
+        for nid in next_ids:
+            target_node = nodes.get(nid)
+            label = target_node["name"] if target_node else nid
+            result["next_actions"].append({"to_node": nid, "label": label})
+
+    return result
+
+
 def advance_persist(workspace, flow, slug, to_node, *, table, guard=None,
                     reflow=False, reason=None, step_id=None):
     """advance() + persist via R1 flow_state.write_state. Returns the persisted state."""

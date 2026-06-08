@@ -23,14 +23,20 @@ def _load_table(path):
 
 
 def _print_state(state):
+    """Print enriched state JSON for orchestrator consumption."""
     print(json.dumps({
         "flow": state["flow"],
         "slug": state["slug"],
+        "display_name": state.get("display_name"),
         "status": state["status"],
         "active": state["active"],
         "current_node": state["current_node"],
+        "config": state.get("config"),
         "gate_calls": state.get("gate_calls", 0),
         "history_len": len(state.get("history", [])),
+        "blocked_reason": state.get("blocked_reason"),
+        "gate_iters": state.get("gate_iters", {}),
+        "phase_history": state.get("phase_history", [])[-5:],
     }, ensure_ascii=False, indent=2))
 
 
@@ -80,6 +86,59 @@ def cmd_complete(args):
     state = flow_state.mark_inactive(args.workspace, args.flow, args.slug,
                                      status=args.status)
     _print_state(state)
+    return 0
+
+
+def cmd_next_step(args):
+    table, gate_specs = _load_table(args.table)
+    state = flow_state.read_state(args.workspace, args.flow, args.slug)
+    result = node_machine.get_next_actions(state, table, gate_specs)
+    # Enrich with display-level info
+    nodes = table["nodes"]
+    current = result.get("current_node")
+    node_info = nodes.get(current) if current else None
+    result["node_kind"] = node_info["kind"] if node_info else result.get("node_kind")
+    result["node_name"] = node_info["name"] if node_info else result.get("node_name")
+    print(json.dumps(result, ensure_ascii=False, indent=2))
+    return 0
+
+
+def cmd_gate_lookup(args):
+    table, gate_specs = _load_table(args.table)
+    state = flow_state.read_state(args.workspace, args.flow, args.slug)
+    current = state.get("current_node")
+    nodes = table["nodes"]
+    node_info = nodes.get(current) if current else None
+    if not node_info:
+        print(json.dumps({"error": f"unknown node {current!r}"}, indent=2))
+        return 1
+    gate_id = node_info.get("gate")
+    if not gate_id:
+        print(json.dumps({"error": f"node {current!r} is not a gate"}, indent=2))
+        return 1
+    spec = gate_specs.get(gate_id)
+    if not spec:
+        print(json.dumps({"error": f"gate {gate_id!r} not found in specs"}, indent=2))
+        return 1
+    result = dict(spec)
+    result["gate"] = gate_id
+    result["current_iter"] = state.get("gate_iters", {}).get(gate_id, 0)
+    result["max_retries"] = table.get("max_retries", node_machine.DEFAULT_MAX_RETRIES)
+    print(json.dumps(result, ensure_ascii=False, indent=2))
+    return 0
+
+
+def cmd_unblock(args):
+    to_node = getattr(args, "to_node", None)
+    state = flow_state.unblock_state(args.workspace, args.flow, args.slug,
+                                    to_node=to_node)
+    _print_state(state)
+    return 0
+
+
+def cmd_list_flows(args):
+    flows = flow_state.list_flows(args.workspace)
+    print(json.dumps(flows, ensure_ascii=False, indent=2))
     return 0
 
 
@@ -134,6 +193,23 @@ def build_parser():
     pc.add_argument("--status", default="completed",
                     choices=["completed", "aborted"])
     pc.set_defaults(func=cmd_complete)
+
+    pn = _common(sub, "next-step")
+    pn.add_argument("--table", required=True)
+    pn.set_defaults(func=cmd_next_step)
+
+    pg_lk = _common(sub, "gate-lookup")
+    pg_lk.add_argument("--table", required=True)
+    pg_lk.set_defaults(func=cmd_gate_lookup)
+
+    pu = _common(sub, "unblock")
+    pu.add_argument("--to-node", default=None,
+                    help="node to move current_node to after unblocking")
+    pu.set_defaults(func=cmd_unblock)
+
+    plf = sub.add_parser("list-flows")
+    plf.add_argument("--workspace", default=".", help="workspace root (default: cwd)")
+    plf.set_defaults(func=cmd_list_flows)
 
     return p
 
