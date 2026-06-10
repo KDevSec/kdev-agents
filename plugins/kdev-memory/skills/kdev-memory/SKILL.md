@@ -123,7 +123,7 @@ skill-feedback.md（F-NNN）的 `verbatim` 字段必须保留**用户原句**—
 
 **初始化时必须问用户一个决策（走 Q-001）**：Step 编号用全局递增还是迭代内递增？默认倾向全局递增。
 
-**v0.11+ 升级**：全局递增的基础上**加分支前缀**——`Step <branch-slug>-N` 格式。原因：多 worktree symlink 共享 `.kdev/` 架构下，两个 session 并发独立递增会产生 ID 冲突。新格式让每个分支有独立计数器，互不干扰。详见 §「多 worktree 并发场景」。
+**v0.11+ 升级**：全局递增的基础上**加 scope 前缀**——`Step <scope-slug>-N` 格式（v0.11 起为分支 slug，v0.14 起员工 scope 用 canonical id）。原因：多 worktree symlink 共享 `.kdev/` 架构下，两个 session 并发独立递增会产生 ID 冲突；多员工 scoped 布局下各员工需独立计数器。新格式让每个 scope 有独立计数器，互不干扰。详见 §「多 worktree / 多 scope 并发」。
 
 **关键授权**：这些文件**不需要向用户请示即可写入**——在 CLAUDE.md 里显式授权一次，后续智能体自动维护。
 
@@ -135,7 +135,7 @@ skill-feedback.md（F-NNN）的 `verbatim` 字段必须保留**用户原句**—
 |---------|---------|------|------------|
 | 需要人做决策（有歧义、多选项、不可逆） | 决策日志.md | Q-NNN | `references/六类记录-schema.md` §1 |
 | 踩坑 / 绕路 / 报错 / 命令失败 | 踩坑日志.md | G-NNN | §2 |
-| 每步/每里程碑完成 | 执行日志.md（双评分） | `Step <branch-slug>-N` | §3 |
+| 每步/每里程碑完成 | 执行日志.md（双评分） | `Step <scope-slug>-N`（shared→分支 slug，员工→canonical id） | §3 |
 | 用户当场反馈体验/规则 | 执行日志.md 的评估区 | — | §3 |
 | 会话结束前 | 每日汇总/YYYY-MM-DD.md | — | §4 |
 | 评分差值 ≥ 2 或反复出现的感受信号（项目内方法论） | 改进建议.md | R-NNN | §5 |
@@ -344,7 +344,7 @@ F-NNN 的 `verbatim` 字段（用户原话）是最高价值的 RFE 信号源—
 
 只负责**把料备好**：写记录、推断 subject、采集 verbatim、产出切片包。**下游训练管道、聚类归纳、产出新 skill 是别的 skill 或人工要做的事。** 本 skill 不管训练、不管 fine-tuning、不管 RM/DPO 实际配置——只管原料的采集、归属和导出。
 
-## 多 worktree 并发场景：Step ID 加分支前缀（v0.11+）
+## 多 worktree / 多 scope 并发：Step ID 加 scope 前缀（v0.11 分支 / v0.14 员工 scope）
 
 ### 何时触发
 
@@ -352,15 +352,24 @@ F-NNN 的 `verbatim` 字段（用户原话）是最高价值的 RFE 信号源—
 - secondary worktree（通过 [worktree_link.py](../../hooks/lib/worktree_link.py) 自动 symlink）
 - 多终端开同一仓库
 - 主仓库 + 镜像/挂载点同时 Claude 会话
+- 多员工 scoped 布局下，各员工有独立的 `staff/<canonical-id>/` scope（v0.14+，见§记忆 scope 分离）
 
-### 新 ID 格式
+### 新 ID 格式（v0.11+）
 
-`Step <branch-slug>-N`，例：
-- `Step main-9`（主分支第 9 条）
+`Step <scope-slug>-N`，其中 **scope-slug** 取值规则：
+- **shared / 主线**（flat 默认 或 scoped 布局的 shared/ scope）→ 分支 slug（`main`、`cluster-x1` 等），由 `step_id.compute_branch_slug()` 计算
+- **员工 scope**（scoped 布局 `staff/<canonical-id>/` 下的执行 rollup）→ 该员工的 canonical id（如 `dev-engineer`、`req-architect`）
+
+**slug 由 `scope.resolve_step_slug(scope)` 统一选取**；底层仍调用 `step_id.mint_next_step_id(state_dir, slug=...)`；计数器文件 `step-counter-<slug>.txt` 天然按 slug 命名空间，互不干扰。
+
+举例：
+- `Step main-9`（主线 / shared scope，主分支第 9 条）
 - `Step cluster-x1-1`（feature/cluster-x1 分支第 1 条）
 - `Step bugfix-issue-42-3`（bugfix/issue-42 分支第 3 条）
+- `Step dev-engineer-1`（开发工程师员工 scope 第 1 条）
+- `Step req-architect-3`（需求架构师员工 scope 第 3 条）
 
-### Slug 规则（由 [step_id.compute_branch_slug()](../../hooks/lib/step_id.py) 实现，不手算）
+### Slug 规则（分支 slug 由 [step_id.compute_branch_slug()](../../hooks/lib/step_id.py) 实现，不手算）
 
 - `main` / `master` → 原样
 - `feature/X` / `feat/X` → 去前缀
@@ -368,6 +377,8 @@ F-NNN 的 `verbatim` 字段（用户原话）是最高价值的 RFE 信号源—
 - 非 ASCII / 特殊字符 → sanitize 成 `[a-zA-Z0-9\-_]+`
 - 不在 git → `unknown`
 - detached HEAD → `detached`
+
+员工 scope slug 直接取 canonical id（已经是合法标识符，不需要额外 sanitize）。
 
 ### 智能体落 Step 时的标准流程
 
@@ -377,7 +388,8 @@ sys.path.insert(0, "plugins/kdev-memory/hooks/lib")
 from step_id import mint_next_step_id
 from pathlib import Path
 step_id = mint_next_step_id(Path(".kdev/memory/state"))
-# step_id = "Step main-9"
+# step_id = "Step main-9"（主线）
+# 员工 scope 时：mint_next_step_id(state_dir, slug="dev-engineer") → "Step dev-engineer-1"
 ```
 
 然后用这个 ID 作为 Step 条目的标题：
@@ -402,7 +414,57 @@ triggers: [...]
 
 ### main 分支特殊性
 
-main 分支的计数器初始化为「历史 Step 1~N 的最大编号」（本仓库为 9 — 验证用 `grep -c "^## Step " .kdev/memory/执行日志.md`），让 main 上下一条新 Step = `Step main-10`，保持时间线连贯。**新建分支的计数器从 0 起**，下一条 = `Step <branch-slug>-1`。
+main 分支的计数器初始化为「历史 Step 1~N 的最大编号」（本仓库为 9 — 验证用 `grep -c "^## Step " .kdev/memory/执行日志.md`），让 main 上下一条新 Step = `Step main-10`，保持时间线连贯。**新建分支的计数器从 0 起**，下一条 = `Step <scope-slug>-1`。
+
+## 记忆 scope 分离（v0.14, P-C1）
+
+### Opt-in 布局
+
+kdev-memory 支持两种物理布局，**flat 为默认，scoped 需手动迁移**：
+
+| 布局 | 目录结构 | 适用场景 |
+|---|---|---|
+| **flat（默认）** | `.kdev/memory/{执行日志.md, 决策日志.md, ...}` | 单人 / 主控单轨项目（现状不变） |
+| **scoped** | `.kdev/memory/{shared/<markdown>, staff/<canonical-id>/<markdown>}` | 多员工数字员工 dogfood |
+
+### 检测方式
+
+**`shared/` 目录存在 = scoped 布局**（`scope.is_scoped` 检测）。
+
+**迁移命令**（手动、幂等）：
+```bash
+python3 plugins/kdev-memory/hooks/lib/migrate_scope.py --staff dev-engineer,req-architect
+```
+创建 `shared/`、各 `staff/<canonical-id>/` 目录，并将现有 flat 文件迁移进 `shared/`。
+
+### shared/ — 项目时间线（所有员工共享）
+
+存放项目级公共记录：
+- 决策日志.md / 踩坑日志.md / skill-feedback.md / 当前状态.md
+- 执行日志.md（主线 / shared scope 的 Step rollup）
+- 改进建议.md / 方法论铁规.md / 每日汇总/
+
+### staff/\<canonical-id\>/ — 员工专属执行 rollup
+
+每位员工有独立目录（如 `staff/dev-engineer/`、`staff/req-architect/`），存放：
+- 执行日志.md（该员工的 Step rollup，ID = `Step <canonical-id>-N`，如 `Step dev-engineer-1`）
+
+### plumbing 留 root（不 scoped）
+
+机器本地管道文件始终保留在 `.kdev/memory/` 根目录，不跟随 scope 迁移：
+- `state/`（计数器、pending-commits）
+- `checkpoints/`（PreCompact 快照）
+- `dataset/`（蒸馏切片包）
+- `config.yaml`
+- `.last-*`（蒸馏时间戳标记）
+
+### 召回 / brief / rollup 聚合
+
+brief、recall、每日汇总等机制**自动跨 shared + 所有 staff scope 聚合**，并在输出中标注来源（`[shared]` / `[staff/dev-engineer]` 等），让主控一眼分辨。
+
+### 框架仓保持 flat
+
+kdev-agents 框架仓（主控单轨）**始终保持 flat 布局**。只有多员工 dogfood 项目才迁移到 scoped。
 
 ## 用 kdev-step-recorder dispatch 落 step（v0.12+）
 
@@ -435,6 +497,7 @@ for role + 8 hard-gates + action sequence. Work from <repo root>.
 ```yaml
 title: <concrete verb + concrete object>
 about: project | feature/<name> | bugfix/<name>
+scope: shared                 # shared（缺省）| <canonical-id>（员工 scope，如 dev-engineer）
 commit_shas: [...]
 files_touched: [...]
 key_decisions: [...]
@@ -452,6 +515,12 @@ commits_batch_id: <Q-NNN or null>
 """
 })
 ````
+
+**`scope` 字段说明**：
+- 缺省 / `shared`：主线活动，Step 写入 `shared/执行日志.md`（flat 布局则写根目录执行日志.md）
+- `<canonical-id>`（如 `dev-engineer`）：员工活动，Step 写入 `staff/<canonical-id>/执行日志.md`
+
+主控 dispatch 员工 step 时，将 `scope` 设为该员工的 canonical id；主线活动留空或填 `shared`。kdev-step-recorder agent 读取该字段决定落盘路径和 slug（详见 [agents/kdev-step-recorder.md](../../agents/kdev-step-recorder.md)）。
 
 完整 schema、8 hard-gate 规则、反例对照、action sequence 详见
 [agents/kdev-step-recorder.md](../../agents/kdev-step-recorder.md)。
