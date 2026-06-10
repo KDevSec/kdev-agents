@@ -35,7 +35,7 @@ git -c user.name=ly-AI -c user.email=ly1989abc@126.com commit -m "..."
 - Modify `plugins/kdev-coding-flow/skills/kdev-coding-flow/SKILL.md` — 加「接 kdev-core 底座入口」节。
 
 **文档回写**
-- Modify `docs/framework/01-design/2026-06-06-01-数字员工集群-起步roadmap-Q004细化-v0.1.md` §1.5 — P5 框架侧 done。
+- Modify `docs/framework/01-design/2026-06-06-01-数字员工整体设计路线图roadmap-v1.0.md` §1.5 — P5 框架侧 done。
 
 ---
 
@@ -911,7 +911,7 @@ git -c user.name=ly-AI -c user.email=ly1989abc@126.com commit -m "feat(kdev-codi
 ## Task 10: 回写 roadmap §1.5（P5 框架侧 done）
 
 **Files:**
-- Modify: `docs/framework/01-design/2026-06-06-01-数字员工集群-起步roadmap-Q004细化-v0.1.md`
+- Modify: `docs/framework/01-design/2026-06-06-01-数字员工整体设计路线图roadmap-v1.0.md`
 
 - [ ] **Step 1: 更新 §1.5 阶段1 行**
 
@@ -920,7 +920,7 @@ git -c user.name=ly-AI -c user.email=ly1989abc@126.com commit -m "feat(kdev-codi
 - [ ] **Step 2: Commit**
 
 ```bash
-git add "docs/framework/01-design/2026-06-06-01-数字员工集群-起步roadmap-Q004细化-v0.1.md"
+git add "docs/framework/01-design/2026-06-06-01-数字员工整体设计路线图roadmap-v1.0.md"
 git -c user.name=ly-AI -c user.email=ly1989abc@126.com commit -m "docs(framework): roadmap §1.5 回写 — 阶段1 框架侧 done（P5 coding-flow接底座）"
 ```
 

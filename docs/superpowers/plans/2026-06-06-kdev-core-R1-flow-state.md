@@ -11,7 +11,7 @@
 **Source of truth:**
 - Golden seed (generalize from): [plugins/kdev-design-flow/lib/flow_state.py](../../../plugins/kdev-design-flow/lib/flow_state.py) + [its tests](../../../plugins/kdev-design-flow/tests/test_flow_state.py)
 - Target schema: [底座设计总纲 §4.1](../../framework/01-design/2026-06-05-01-kdev-core底座设计总纲-v1.0.md)
-- Roadmap context: [起步 roadmap §3.1 阶段0](../../framework/01-design/2026-06-06-01-数字员工集群-起步roadmap-Q004细化-v0.1.md)
+- Roadmap context: [起步 roadmap §3.1 阶段0](../../framework/01-design/2026-06-06-01-数字员工整体设计路线图roadmap-v1.0.md)
 
 **Acceptance (maps to roadmap §4.3 #1 + §3.1 R1):** atomic write (no `.tmp` leftover) · corrupt-file recovery raises cleanly · resume returns last `current_node` (not from scratch) · multi-flow path isolation.
 

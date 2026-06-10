@@ -7,7 +7,7 @@
 | 日期 | 2026-06-07 |
 | 范围 | 阶段2 = ① P-0 员工集中 kdev-team(agents 合规) ② P-C1 记忆 scope 分离 ③ P-A 需求架构师接底座 ④ P-B 跨员工 handoff。**defer**：P-C2 JSONL 操作层 / P-C3 并发写锁 / 完整编码重跑 / kdev-agents 自身记忆迁移 / 评审专家(阶段3) |
 | 承 | [Q-004 walking-skeleton](../../../.kdev/memory/决策日志.md) · [Q-007 抽共性](../../../.kdev/memory/决策日志.md) · [Q-008 状态/记忆分离](../../../.kdev/memory/决策日志.md) · [Q-009 git托管](../../../.kdev/memory/决策日志.md) · [Q-010 接入打法](../../../.kdev/memory/决策日志.md) |
-| 配套 | [起步 roadmap §5](../../framework/01-design/2026-06-06-01-数字员工集群-起步roadmap-Q004细化-v0.1.md) · [记忆架构 §3/§4/§5/§9.6](../../framework/01-design/2026-06-05-02-数字员工记忆架构-分层+scope拓扑-v0.1.md) · [员工能力专项 v1.5 §2.3](../../framework/01-design/2026-05-28-01-KDev数字员工架构-员工能力专项-v1.5.md) · [阶段1 接入设计](./2026-06-06-阶段1-coding-flow接底座-design.md) |
+| 配套 | [起步 roadmap §5](../../framework/01-design/2026-06-06-01-数字员工整体设计路线图roadmap-v1.0.md) · [记忆架构 §3/§4/§5/§9.6](../../framework/01-design/2026-06-05-02-数字员工记忆架构-分层+scope拓扑-v0.1.md) · [员工能力专项 v1.5 §2.3](../../framework/01-design/2026-05-28-01-KDev数字员工架构-员工能力专项-v1.5.md) · [阶段1 接入设计](./2026-06-06-阶段1-coding-flow接底座-design.md) |
 | 复用 | 阶段1 已验证：kdev-core 底座(R1/R2/R3 + CLI) + 接入打法(node-table + persona + CLI 驱动)；M1 首次实测跑通 |
 
 ---

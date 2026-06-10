@@ -8,7 +8,7 @@
 | 范围 | 阶段1 = 开发工程师 coding-flow（13 节点 SOP）接 kdev-core lean 底座（R1/R2/R3）+ UED 6.0 改造 dogfood 首测。**本稿定接入设计的全部架构决策**，writing-plans 据此起 P5 实施计划 |
 | Pass1 范围 | **T0 全局主题 + T1 登录页**（验底座端到端、不追分）|
 | 关联决策 | [Q-004 起步 roadmap](../../../.kdev/memory/决策日志.md) · [Q-007 抽共性底座](../../../.kdev/memory/决策日志.md) · [Q-008 结构进底座/执行留flow](../../../.kdev/memory/决策日志.md) · [Q-009 git 托管](../../../.kdev/memory/决策日志.md) |
-| 配套 | [起步 roadmap v0.1 §4](../../framework/01-design/2026-06-06-01-数字员工集群-起步roadmap-Q004细化-v0.1.md) · [底座设计总纲 v1.0](../../framework/01-design/2026-06-05-01-kdev-core底座设计总纲-v1.0.md) · [员工能力专项 v1.5 §2.3/§3.2](../../framework/01-design/2026-05-28-01-KDev数字员工架构-员工能力专项-v1.5.md) · [BMAD Agent 借鉴点](../../framework/04-references/2026-06-05-08-BMAD-Agent体系借鉴点-员工编排prompt骨架.md) |
+| 配套 | [起步 roadmap v0.1 §4](../../framework/01-design/2026-06-06-01-数字员工整体设计路线图roadmap-v1.0.md) · [底座设计总纲 v1.0](../../framework/01-design/2026-06-05-01-kdev-core底座设计总纲-v1.0.md) · [员工能力专项 v1.5 §2.3/§3.2](../../framework/01-design/2026-05-28-01-KDev数字员工架构-员工能力专项-v1.5.md) · [BMAD Agent 借鉴点](../../framework/04-references/2026-06-05-08-BMAD-Agent体系借鉴点-员工编排prompt骨架.md) |
 | 引擎现状 | `plugins/kdev-core/kdev_core/`：R1 flow_state · R2 node_machine · R3 gate（66 测试绿，main 已 push）|
 | 被接对象 | `plugins/kdev-coding-flow/skills/kdev-coding-flow/SKILL.md`（13 节点 SOP，现纯 prompt、无状态机）|
 | dogfood 题 | `测试题目/EXAM-PROMPT.md` + `01-pic/`（3 原型）+ `02-ued6.0/`（UED 硬约束+§10 自检）|
