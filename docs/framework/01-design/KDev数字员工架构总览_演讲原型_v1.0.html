@@ -111,6 +111,29 @@
   /* 计数条 */
   .countbar{margin-top:9px;border:1px dashed var(--line);border-radius:7px;padding:8px 12px;text-align:center;color:var(--ink);font-size:12.5px;background:rgba(74,158,255,.05)}
 
+  /* 员工能力列（v1.5 密集风格） */
+  .teamgrid{display:flex;gap:10px;align-items:stretch;margin-top:9px}
+  .cqocol{flex:0 0 152px;background:linear-gradient(160deg,#6e2230,#7e2738);border:1px solid var(--red);border-radius:8px;color:var(--white);padding:11px 10px;display:flex;flex-direction:column;gap:6px}
+  .cqocol .ct{font-weight:bold;font-size:13.5px;text-align:center}
+  .cqocol .cs{font-size:10px;color:#ffc8ce;line-height:1.45;text-align:center}
+  .cqocol .cmeta{margin-top:auto;border-top:1px solid rgba(255,255,255,.2);padding-top:8px;font-size:10px;color:#ffd9de;line-height:1.7}
+  .empwrap{flex:1;border:1.5px dashed var(--teal);border-radius:9px;background:rgba(46,197,182,.05);padding:9px;display:flex;flex-direction:column;gap:7px}
+  .empwrap .wlbl{text-align:center;color:var(--teal);font-size:10.5px;font-weight:bold}
+  .empcols{display:flex;gap:9px;align-items:stretch}
+  .ecol{flex:1;border:1px solid var(--line);border-radius:7px;overflow:hidden;background:var(--panel);display:flex;flex-direction:column}
+  .ecol.review{flex:0 0 156px;border-color:var(--gold)}
+  .ecol .ehd{padding:6px 8px;text-align:center;border-bottom:1px solid var(--line);background:rgba(46,197,182,.12)}
+  .ecol .ehd .en{color:var(--white);font-weight:bold;font-size:12.5px}
+  .ecol .ehd .ecnt{color:var(--teal);font-size:9.5px;margin-top:1px}
+  .ecol.review .ehd{background:rgba(245,183,64,.14)} .ecol.review .ehd .en{color:var(--gold)} .ecol.review .ehd .ecnt{color:var(--ink)}
+  .caprow{display:flex;justify-content:space-between;align-items:baseline;gap:6px;padding:4px 8px;border-bottom:1px solid rgba(255,255,255,.045)}
+  .caprow:last-child{border-bottom:0}
+  .caprow .cn{color:var(--ink);font-size:10.5px;font-weight:600;white-space:nowrap}
+  .caprow .cd{color:var(--mut);font-size:9px;text-align:right;line-height:1.25}
+  .caprow.orch{background:rgba(74,158,255,.13)}
+  .caprow.orch .cn{color:var(--blue)}
+  .ecol.review .caprow.orch{background:rgba(245,183,64,.15)} .ecol.review .caprow.orch .cn{color:var(--gold)}
+
   /* 三件套关卡 */
   .three{display:grid;grid-template-columns:repeat(3,1fr);gap:13px}
   .gatecard{border:1px solid var(--line);background:var(--panel);border-radius:8px;border-left:4px solid var(--blue)}
@@ -248,52 +271,72 @@
   <div class="slide-footer"><span>KDev 数字员工 · 架构与进展总览</span><span>02 / 09</span></div>
 </section>
 
-<!-- ============ 3 团队全景架构图（centerpiece） ============ -->
+<!-- ============ 3 团队全景架构图（centerpiece · v1.5 能力清单风格） ============ -->
 <section class="slide">
   <div class="topbar">
     <div class="badge">3</div><div class="chaplabel">全景</div>
-    <div class="maintitle">这支团队长什么样 —— 6 名员工，28 个 AI 工作单元</div>
+    <div class="maintitle">这支团队长什么样 —— 6 名员工 · 每人的具体能力清单</div>
   </div>
   <div class="titlerule"></div>
-  <div class="body" style="padding-top:14px">
-    <div class="pills" style="margin-bottom:14px;justify-content:center">
-      <span class="pill b">1 名总指挥</span>
-      <span class="pill r">1 名质量总监</span>
-      <span class="pill t">3 名交付员工</span>
-      <span class="pill y">1 名评审专家</span>
-      <span class="pill">＝ 6 名员工 / 28 个 AI 工作单元</span>
-    </div>
-    <div class="org">
+  <div class="body" style="padding-top:12px">
+    <div class="org" style="gap:0">
       <div class="user">👤 用户（只跟「总指挥」对话）</div>
       <div class="vbar"></div>
-      <div class="ceo">CEO 总指挥<small>对话 · 派活 · 决策 · 拍板兜底</small></div>
-      <div class="vbar"></div>
-      <div class="midrow">
-        <div class="cqo">CQO 质量总监<small>盯流程合规<br>有「叫停」权</small></div>
-        <div class="empzone">
-          <div class="zttl">↔ 三名交付员工：各自从头干到尾，彼此可直接对接（不必都过总指挥）</div>
-          <div class="delivery">
-            <div class="empgrid">
-              <div class="emp"><div class="en">需求架构师</div><div class="ec">5 项能力 + 调度</div><div class="es">澄清需求 → 拆方案<br>→ 原型 → 详细设计</div></div>
-              <div class="emp"><div class="en">开发工程师</div><div class="ec">6 项能力 + 调度</div><div class="es">环境 → 计划 → 编码<br>→ 验收 → 部署</div></div>
-              <div class="emp"><div class="en">测试工程师</div><div class="ec">4 项能力 + 调度</div><div class="es">用例设计 → 执行<br>→ 覆盖评审</div></div>
-            </div>
-            <div class="rev">
-              <div class="en">评审专家</div>
-              <div class="ec">资深质检官<br>7 类核心评审<br>收敛把关</div>
-            </div>
+      <div class="ceo" style="width:auto;padding:9px 30px">CEO 总指挥（主控员）<small>6 项能力：顶层约束 · 用户对话 · 派活 · 决策 · 阶段聚合 · 评审升级裁决</small></div>
+    </div>
+    <div class="teamgrid">
+      <div class="cqocol">
+        <div class="ct">CQO 质量总监</div>
+        <div class="cs">元监督 · 只读不写<br>有「叫停」权</div>
+        <div class="cmeta">4 项职责：<br>① 后台抽查产物<br>② 维护评审标准<br>③ 阶段合规聚合<br>④ 异常时应急</div>
+      </div>
+      <div class="empwrap">
+        <div class="wlbl">↔ 业务员工层 —— 每名员工 ＝ 多项业务能力 ＋ 1 项「调度能力」(编排)；员工之间可直接协作，不必都过总指挥</div>
+        <div class="empcols">
+          <div class="ecol">
+            <div class="ehd"><div class="en">需求架构师</div><div class="ecnt">5 业务能力 + 1 调度</div></div>
+            <div class="caprow orch"><span class="cn">编排</span><span class="cd">内部调度·协作</span></div>
+            <div class="caprow"><span class="cn">需求澄清</span><span class="cd">澄清原始需求</span></div>
+            <div class="caprow"><span class="cn">需求计划</span><span class="cd">写需求规格</span></div>
+            <div class="caprow"><span class="cn">需求拆解</span><span class="cd">拆可验收单元</span></div>
+            <div class="caprow"><span class="cn">原型设计</span><span class="cd">高保真原型</span></div>
+            <div class="caprow"><span class="cn">方案设计</span><span class="cd">技术方案</span></div>
+          </div>
+          <div class="ecol">
+            <div class="ehd"><div class="en">开发工程师</div><div class="ecnt">6 业务能力 + 1 调度</div></div>
+            <div class="caprow orch"><span class="cn">编排</span><span class="cd">内部调度·协作</span></div>
+            <div class="caprow"><span class="cn">环境准备</span><span class="cd">栈/工具链</span></div>
+            <div class="caprow"><span class="cn">实施计划</span><span class="cd">计划+复杂度</span></div>
+            <div class="caprow"><span class="cn">编码实现</span><span class="cd">测试驱动开发</span></div>
+            <div class="caprow"><span class="cn">端到端验收</span><span class="cd">验收通行证</span></div>
+            <div class="caprow"><span class="cn">安全扫描</span><span class="cd">安全清单</span></div>
+            <div class="caprow"><span class="cn">部署上线</span><span class="cd">合并/部署</span></div>
+          </div>
+          <div class="ecol">
+            <div class="ehd"><div class="en">测试工程师</div><div class="ecnt">4 业务能力 + 1 调度</div></div>
+            <div class="caprow orch"><span class="cn">编排</span><span class="cd">内部调度·协作</span></div>
+            <div class="caprow"><span class="cn">测试点设计</span><span class="cd">国标 29119</span></div>
+            <div class="caprow"><span class="cn">用例渲染</span><span class="cd">字段化用例</span></div>
+            <div class="caprow"><span class="cn">界面自动化</span><span class="cd">UI 脚本执行</span></div>
+            <div class="caprow"><span class="cn">接口自动化</span><span class="cd">API 用例执行</span></div>
+          </div>
+          <div class="ecol review">
+            <div class="ehd"><div class="en">评审专家</div><div class="ecnt">7 评审 + 1 调度</div></div>
+            <div class="caprow orch"><span class="cn">编排</span><span class="cd">调度+仲裁</span></div>
+            <div class="caprow"><span class="cn">需求评审</span></div>
+            <div class="caprow"><span class="cn">方案评审</span></div>
+            <div class="caprow"><span class="cn">代码评审</span></div>
+            <div class="caprow"><span class="cn">质量评审</span></div>
+            <div class="caprow"><span class="cn">安全评审</span></div>
+            <div class="caprow"><span class="cn">测试评审</span></div>
+            <div class="caprow"><span class="cn">终审聚合</span></div>
           </div>
         </div>
       </div>
     </div>
     <div class="countbar">
-      28 个 AI 工作单元 ＝ <b class="kb">1 总指挥</b> ＋ <b class="kr">1 质量总监</b> ＋ <b class="kt">4 调度</b> ＋ <b class="kt">15 业务能力</b>（需求5 + 开发6 + 测试4）＋ <b class="ky">7 评审能力</b>
-      <span class="mut">｜ 完整形态可拆到 39 个（评审专家展开成 18 个视角）</span>
-    </div>
-    <div class="platform">
-      <div class="pcard team"><div class="pn">kdev-team · 员工层</div><div class="pd">6 名员工的实际业务实现（开发工程师已落地）</div></div>
-      <div class="pcard core"><div class="pn">kdev-core · 编排底座</div><div class="pd">让员工「按流程跑起来」的统一引擎</div></div>
-      <div class="pcard mem"><div class="pn">kdev-memory · 记忆底座</div><div class="pd">让员工「记得住、越用越强」的工程记忆</div></div>
+      合计 <b>6 名员工 / 28 个 AI 工作单元</b> ＝ <b class="kb">1 总指挥</b> ＋ <b class="kr">1 质量总监</b> ＋ <b class="kt">4 调度</b> ＋ <b class="kt">15 业务能力</b>（需求5 + 开发6 + 测试4）＋ <b class="ky">7 评审能力</b>
+      <span class="mut">｜ 评审专家完整态可展开成 18 个视角 → 39 个工作单元</span>
     </div>
   </div>
   <div class="slide-footer"><span>KDev 数字员工 · 架构与进展总览</span><span>03 / 09</span></div>
