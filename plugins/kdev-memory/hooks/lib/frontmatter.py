@@ -11,18 +11,25 @@
 from __future__ import annotations
 
 import re
+import sys
 from pathlib import Path
 from typing import Optional
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from scope import shared_dir  # noqa: E402
 
 
 _FM_RE = re.compile(r"^---\s*\n(.*?)\n---\s*\n", re.DOTALL)
 
 
 def _resolve_state_file() -> Optional[Path]:
-    """主路径 .kdev/memory/当前状态.md，fallback 到 0.2.0 遗留位置。"""
-    p = Path(".kdev/memory/当前状态.md")
-    if p.is_file():
-        return p
+    """scoped → shared/当前状态.md；flat → .kdev/memory/当前状态.md；再 fallback 0.2.0 遗留。"""
+    scoped = shared_dir(Path(".kdev/memory")) / "当前状态.md"
+    if scoped.is_file():
+        return scoped
+    flat = Path(".kdev/memory/当前状态.md")
+    if flat.is_file():
+        return flat
     legacy = Path(".kdev/当前状态.md")
     if legacy.is_file():
         return legacy
