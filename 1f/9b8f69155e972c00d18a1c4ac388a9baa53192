@@ -1,0 +1,21 @@
+plugins/kdev-memory/skills/kdev-memory/SKILL.md
+  s_7b636477e90575::t_230ccec89ba02c 458
+  s_7b636477e90575::t_3fb196b878dab3 381
+  s_7b636477e90575::t_842023e6121f5b 445
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "1f9b8f69155e972c00d18a1c4ac388a9baa53192",
+  "prompts": {},
+  "sessions": {
+    "s_7b636477e90575": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "09506019-0b23-44a4-9cd3-a7ae5f45c360",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
