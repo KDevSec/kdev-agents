@@ -1,0 +1,19 @@
+plugins/kdev-memory/tests/test_recorder_scope_helpers.py
+  s_7b636477e90575::t_549c2250fe238b 32-33
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "def4528c53d838ddb29475300ccab039e8652bdf",
+  "prompts": {},
+  "sessions": {
+    "s_7b636477e90575": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "09506019-0b23-44a4-9cd3-a7ae5f45c360",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
