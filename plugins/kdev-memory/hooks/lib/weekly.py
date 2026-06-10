@@ -29,6 +29,8 @@ from _utf8 import force_utf8_stdio  # noqa: E402
 
 force_utf8_stdio()
 
+from scope import shared_dir, staff_log_files  # noqa: E402
+
 
 def in_range(s: str | None, d_from: date, d_to: date) -> bool:
     if not s:
@@ -74,10 +76,19 @@ def render(kdev: Path, d_from: date, d_to: date) -> None:
     """读 kdev_dir 内核心文件 + 按四段骨架打印 markdown。"""
     in_range_fn = lambda s: in_range(s, d_from, d_to)  # noqa: E731
 
-    steps = [s for s in parse_entries(kdev / "执行日志.md", r"^##\s+Step\s+\S+.*$") if in_range_fn(s["date"])]
-    ques = [q for q in parse_entries(kdev / "决策日志.md", r"^##\s+Q-\d+.*$") if in_range_fn(q["date"])]
-    gotchas = [g for g in parse_entries(kdev / "踩坑日志.md", r"^##\s+G-\d+.*$") if in_range_fn(g["date"])]
-    rules = [r for r in parse_entries(kdev / "改进建议.md", r"^##\s+(?:R-\d+|建议\s*#?\s*\d+).*$") if in_range_fn(r["date"])]
+    base = shared_dir(kdev)
+    steps = [s for s in parse_entries(base / "执行日志.md", r"^##\s+Step\s+\S+.*$") if in_range_fn(s["date"])]
+    # per-员工 scope Step 也计入（flat 下 staff_log_files 返回 []）
+    staff_step_counts: dict[str, int] = {}
+    for scope_id, path in staff_log_files("执行日志.md", kdev):
+        scoped = [s for s in parse_entries(path, r"^##\s+Step\s+\S+.*$") if in_range_fn(s["date"])]
+        for s in scoped:
+            s["scope"] = scope_id
+        steps.extend(scoped)
+        staff_step_counts[scope_id] = len(scoped)
+    ques = [q for q in parse_entries(base / "决策日志.md", r"^##\s+Q-\d+.*$") if in_range_fn(q["date"])]
+    gotchas = [g for g in parse_entries(base / "踩坑日志.md", r"^##\s+G-\d+.*$") if in_range_fn(g["date"])]
+    rules = [r for r in parse_entries(base / "改进建议.md", r"^##\s+(?:R-\d+|建议\s*#?\s*\d+).*$") if in_range_fn(r["date"])]
 
     high_score = [s for s in steps if (user_score(s["body"]) or 0) >= 4.5]
     high_diff = [s for s in steps if (diff_score(s["body"]) or 0) >= 1.5]
@@ -86,7 +97,7 @@ def render(kdev: Path, d_from: date, d_to: date) -> None:
     scored = [user_score(s["body"]) for s in steps if user_score(s["body"]) is not None]
     avg_score = round(sum(scored) / len(scored), 2) if scored else None
 
-    daily = kdev / "每日汇总"
+    daily = base / "每日汇总"
     covered = 0
     total_days = (d_to - d_from).days + 1
     if daily.is_dir():
@@ -107,6 +118,9 @@ def render(kdev: Path, d_from: date, d_to: date) -> None:
     print(f"- **改进信号 R-NNN / 建议**：{len(rules)} 条")
     print(f"- **每日汇总覆盖率**：{covered}/{total_days} 天")
     print(f"- **平均用户评分**：{avg_score if avg_score else '—'}/5\n")
+    if staff_step_counts:
+        print("- **per-员工 scope Step**：" + "；".join(
+            f"{sid} {n} 条" for sid, n in sorted(staff_step_counts.items())))
     if steps:
         print("条目索引（最多 10 条）：")
         for s in steps[:10]:
@@ -162,7 +176,7 @@ def render(kdev: Path, d_from: date, d_to: date) -> None:
     # --- 4. 开发进展 ---
     print("## 🚀 开发进展（Progress）\n")
     print("> 本期实际业务推进、里程碑完成、下期计划。\n")
-    state = kdev / "当前状态.md"
+    state = base / "当前状态.md"
     state_body = state.read_text(encoding="utf-8") if state.exists() else ""
 
     if state_body:
