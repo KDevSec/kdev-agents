@@ -191,8 +191,8 @@ def check_distill_trigger(kdev_dir: Path | str = ".kdev/memory") -> TriggerCheck
         days_since = int((now - last_ts) // 86400)
 
     # 数据增长统计
-    new_f = _count_entries_after(kdev / "skill-feedback.md", r"^##\s+F-\d+", last_ts)
-    new_r = _count_entries_after(kdev / "改进建议.md", r"^##\s+R-\d+", last_ts)
+    new_f = _count_entries_after(shared_dir(kdev) / "skill-feedback.md", r"^##\s+F-\d+", last_ts)
+    new_r = _count_entries_after(shared_dir(kdev) / "改进建议.md", r"^##\s+R-\d+", last_ts)
     new_misalign = _count_misalign_after(shared_dir(kdev) / "执行日志.md", last_ts)
 
     reasons: list[str] = []
