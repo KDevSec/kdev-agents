@@ -1,0 +1,43 @@
+plugins/kdev-memory/hooks/lib/missing_summaries.py
+  s_7b636477e90575::t_23873adf2ea2ed 41
+  s_7b636477e90575::t_b70afb677b3c58 19,24-25
+plugins/kdev-memory/hooks/lib/archive_hint.py
+  s_7b636477e90575::t_ab3535ffd904f9 92
+  s_7b636477e90575::t_338209a779f755 20,25-26
+plugins/kdev-memory/hooks/lib/milestone.py
+  s_7b636477e90575::t_a35ca9e5aef23e 30
+plugins/kdev-memory/hooks/stop-check.py
+  s_7b636477e90575::t_2de2fa18db2207 42
+  s_7b636477e90575::t_ab2eca92863106 176
+  s_7b636477e90575::t_5526d24c928672 138,140
+  s_7b636477e90575::t_2501740388512a 160
+plugins/kdev-memory/hooks/pre-compact-check.py
+  s_7b636477e90575::t_33483758e66273 147
+  s_7b636477e90575::t_72076505b49a3e 133
+  s_7b636477e90575::t_e7ed26d8f1d335 32
+  s_7b636477e90575::t_e326956020cfa4 80,90
+plugins/kdev-memory/hooks/session-end-check.py
+  s_7b636477e90575::t_2ca09f432c4349 92,94
+  s_7b636477e90575::t_a074ea48ac8422 22
+plugins/kdev-memory/hooks/lib/promote_scan.py
+  s_7b636477e90575::t_4392c4448e6ebc 90-91,94-95,106-108
+  s_7b636477e90575::t_96eb0b0cae7503 18,25-26
+plugins/kdev-memory/tests/test_tier_a_scope.py
+  s_7b636477e90575::t_b0e6a974703470 1-52
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "62228303b57abb5a2cb4a267ffd905404b2cb4f5",
+  "prompts": {},
+  "sessions": {
+    "s_7b636477e90575": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "09506019-0b23-44a4-9cd3-a7ae5f45c360",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
