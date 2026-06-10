@@ -41,6 +41,11 @@ def _sanitize_slug(s: str) -> str:
     return s or "unknown"
 
 
+def sanitize_slug(s: str) -> str:
+    """Public wrapper for slug sanitization (reused by scope.resolve_step_slug)."""
+    return _sanitize_slug(s)
+
+
 def compute_branch_slug() -> str:
     """当前 git 分支 → slug。
 
