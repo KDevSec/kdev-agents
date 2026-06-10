@@ -1,0 +1,22 @@
+plugins/kdev-memory/hooks/lib/scope.py
+  s_7b636477e90575::t_9917636350e2c5 84-87
+  s_7b636477e90575::t_cd1668a577ab53 41,46-47
+plugins/kdev-memory/tests/test_scope.py
+  s_7b636477e90575::t_ff22ac5c9d3e07 104-119
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "13db3306102ae39359488bb322ebaa961c8d3bd9",
+  "prompts": {},
+  "sessions": {
+    "s_7b636477e90575": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "09506019-0b23-44a4-9cd3-a7ae5f45c360",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
