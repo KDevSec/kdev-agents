@@ -1,5 +1,29 @@
 # kdev-memory CHANGELOG
 
+## [0.14.0] — 2026-06-10
+
+**P-C1 记忆 scope 分离（数字员工集群 阶段2）：kdev-memory scope-aware，opt-in 向后兼容。**
+
+### ✨ 新增
+
+- **`hooks/lib/scope.py`** — scope 解析单一真相源：`is_scoped`（`shared/` 存在即 scoped）/ `shared_dir`（flat 下 == root，字节级不变量）/ `staff_root` / `staff_dir` / `list_staff` / `staff_log_files` / `state_dir`（永远 root）/ `resolve_step_slug`（shared→分支 slug，员工→canonical id）/ `recorder_target_log`。
+- **`hooks/lib/migrate_scope.py`** — flat → scoped 一次性幂等迁移 CLI（手动调用，不自动跑、不在框架仓跑）：markdown 进 `shared/`，建 `staff/<canonical-id>/`，plumbing 留 root，复用 kdev_sync 写 `.kdev/.gitignore`，部分失败显式追踪+告警。
+
+### 🔄 变更
+
+- **scope-aware 改造**（opt-in，flat 行为字节级不变）：`trigger-match`（召回 shared + staff Step，标 scope；铁规走 shared）/ `session-start-brief`（shared 解析 + 👥 员工 scope 进度 block）/ `weekly`（rollup 聚合 staff Step + per-scope 盘点）/ `distill`+`distill_trigger`（dataset 收 staff Step；执行日志/skill-feedback/改进建议 走 shared）/ `frontmatter` `missing_summaries` `archive_hint` `promote_scan` `milestone` `stop-check` `pre-compact-check` `session-end-check`（markdown 走 `shared_dir`，markers/state 留 root）。
+- **`step_id.py`** 导出 public `sanitize_slug`；per-scope Step counter 复用现有 slug 机制（`Step <scope-slug>-N`）。
+- **`agents/kdev-step-recorder.md`** — dispatch YAML 加 `scope` 字段（缺省 shared）；员工 scope 落 `staff/<id>/执行日志.md` 用 canonical id slug，跳过 shared frontmatter 更新 + drift guard（hard-gate #8 仅对 shared）。
+- **`skills/kdev-memory/SKILL.md`** — scoped 布局文档 + Step ID scope 泛化（`Step <scope-slug>-N`）+ dispatch scope 字段 + P-C1b transcript 扩展注记。
+
+### 🧱 向后兼容 / 约束
+
+- **opt-in**：无 `shared/`（无 staff 注册）= flat 默认 = 现状，路径+行为完全不变；现有用户零影响。core 不变量 `shared_dir(root)==root`（flat）保证字节级一致。
+- **框架仓 `.kdev` 保持 flat**（主控单轨），`migrate_scope.py` 不自动跑、不在框架仓跑。
+- **right-size**：只建 shared + 2 员工（dev-engineer / req-architect）最小机制；P-C2 JSONL 操作层 / P-C3 并发写锁 defer。
+- **测试**：新增 scope/frontmatter/trigger/brief/weekly/distill/tier-a/migrate/recorder/集成 共 10 个测试文件；全量 291 passed。
+- **G-004 提醒**：本版 bump `0.13.0 → 0.14.0`，用户侧需刷 marketplace（`/plugin` 更新/重装）+ 重启 session 才生效。
+
 ## [0.13.0] — 2026-06-06
 
 **P4 git 托管自举（Q-009）：`.kdev/` 独立 nested 记忆仓 + SessionStart 自举 + SessionEnd 推送。**
