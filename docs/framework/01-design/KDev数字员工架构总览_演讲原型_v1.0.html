@@ -133,6 +133,10 @@
   .caprow.orch{background:rgba(74,158,255,.13)}
   .caprow.orch .cn{color:var(--blue)}
   .ecol.review .caprow.orch{background:rgba(245,183,64,.15)} .ecol.review .caprow.orch .cn{color:var(--gold)}
+  .revgrid2{display:grid;grid-template-columns:1fr 1fr;gap:3px;padding:6px}
+  .revgrid2 span{font-size:9px;color:var(--ink);background:rgba(245,183,64,.08);border:1px solid rgba(245,183,64,.2);border-radius:4px;padding:3px 2px;text-align:center;line-height:1.15}
+  .revext{font-size:8.5px;color:var(--mut);padding:3px 7px 7px;line-height:1.45;border-top:1px solid rgba(255,255,255,.05)}
+  .revext b{color:var(--gold)}
 
   /* 三件套关卡 */
   .three{display:grid;grid-template-columns:repeat(3,1fr);gap:13px}
@@ -198,6 +202,161 @@
   .endbig .ehl{color:var(--gold)}
   .endbig .es{color:var(--mut);font-size:16px;line-height:1.9}
   .endbig .erow{display:flex;gap:14px;margin-top:6px}
+
+  /* ===== HUD 驾驶舱 slide 专用样式(合并自 HUD 示意) ===== */
+.maintitle small{display:block;color:var(--mut);font-size:12px;font-weight:normal;margin-top:2px}
+  
+
+  .stage{padding:12px 34px 0}
+
+  /* 通道标签 */
+  .chlbl{display:inline-flex;align-items:center;gap:6px;font-size:11px;font-weight:bold;color:var(--blue);margin-bottom:5px}
+  .chlbl .num{width:18px;height:18px;border-radius:50%;background:var(--blue);color:#06203f;font-size:11px;display:flex;align-items:center;justify-content:center}
+  .chlbl.t2{color:var(--teal)} .chlbl.t2 .num{background:var(--teal);color:#053a35}
+  .chlbl.t3{color:var(--gold)} .chlbl.t3 .num{background:var(--gold);color:#3a2c05}
+
+  /* 通道① 命令行状态栏 */
+  .statusbar{display:flex;align-items:center;gap:0;background:#0b1a2c;border:1px solid var(--line);border-radius:7px;font-family:var(--mono);font-size:13px;overflow:hidden;box-shadow:inset 0 0 0 1px rgba(74,158,255,.06)}
+  .statusbar .seg{padding:9px 14px;display:flex;align-items:center;gap:7px;border-right:1px solid rgba(255,255,255,.07);white-space:nowrap}
+  .statusbar .seg:last-child{border-right:0}
+  .statusbar .brand{color:var(--blue);font-weight:bold}
+  .statusbar .node{color:var(--white)}
+  .statusbar .ed{color:var(--gold);font-weight:bold}
+  .statusbar .busy{color:var(--teal)}
+  .statusbar .warn{color:var(--gold);margin-left:auto;background:rgba(245,183,64,.12)}
+  .blink{animation:bl 1.1s steps(1) infinite}
+  @keyframes bl{50%{opacity:.25}}
+
+  .grid2{display:flex;gap:14px;margin-top:6px;align-items:stretch}
+  .colL{flex:1.42;display:flex;flex-direction:column}
+  .colR{flex:1;display:flex;flex-direction:column;gap:12px}
+
+  /* 编辑器窗口（hud.md 预览） */
+  .win{border:1px solid var(--line);border-radius:9px;overflow:hidden;background:#0e1c2f;display:flex;flex-direction:column;flex:1}
+  .wbar{display:flex;align-items:center;gap:9px;padding:8px 12px;background:#13243c;border-bottom:1px solid var(--line)}
+  .dots{display:flex;gap:6px}.dots i{width:11px;height:11px;border-radius:50%;display:block}
+  .dots .r{background:#ff5f57}.dots .y{background:#febc2e}.dots .g{background:#28c840}
+  .wfile{font-family:var(--mono);font-size:12px;color:var(--ink)}
+  .wfile b{color:var(--teal)}
+  .wtag{margin-left:auto;font-size:10px;color:var(--mut);font-style:italic}
+  .wbody{padding:12px 15px;display:flex;flex-direction:column;gap:11px;overflow:hidden}
+
+  .hsec{}
+  .hh{display:flex;align-items:center;gap:7px;color:var(--white);font-size:12.5px;font-weight:bold;border-left:3px solid var(--blue);padding-left:8px;margin-bottom:6px}
+  .hh.t{border-left-color:var(--teal)} .hh.y{border-left-color:var(--gold)} .hh.p{border-left-color:var(--purple)}
+
+  .prog{display:flex;align-items:center;gap:10px;font-size:12px}
+  .prog .pl{color:var(--ink)}
+  .progbar{flex:1;height:9px;background:rgba(255,255,255,.07);border-radius:5px;overflow:hidden}
+  .progbar i{display:block;height:100%;width:62%;background:linear-gradient(90deg,var(--teal),var(--blue));border-radius:5px}
+  .prog .pp{color:var(--teal);font-weight:bold;font-family:var(--mono);font-size:11px}
+
+  .staff{display:flex;flex-wrap:wrap;gap:8px}
+  .stf{display:flex;align-items:center;gap:6px;font-size:11px;border:1px solid var(--line);border-radius:16px;padding:3px 10px;color:var(--ink)}
+  .stf .d{width:8px;height:8px;border-radius:50%}
+  .stf .busy{background:var(--green);box-shadow:0 0 7px var(--green)} .stf.busy{border-color:rgba(67,221,139,.5)}
+  .stf .idle{background:#56708c}
+
+  .revgrid{display:flex;flex-wrap:wrap;gap:6px}
+  .rv{display:inline-flex;align-items:center;gap:5px;font-size:11px;padding:4px 9px;border-radius:6px;border:1px solid var(--line);background:var(--panel)}
+  .rv .sc{font-family:var(--mono);font-size:10px;color:var(--mut)}
+  .rv.ok{border-color:rgba(67,221,139,.4)} .rv.ok .ic{color:var(--green)} .rv.ok .sc{color:var(--green)}
+  .rv.now{border-color:var(--gold);background:rgba(245,183,64,.12)} .rv.now .ic{color:var(--gold)} .rv.now .sc{color:var(--gold);font-weight:bold}
+  .rv.wait{opacity:.55} .rv.wait .ic{color:var(--mut)}
+
+  
+  .cqo .ok{color:var(--green)} .cqo .warn{color:var(--gold)}
+
+  .events{font-family:var(--mono);font-size:10.5px;display:flex;flex-direction:column;gap:4px}
+  .ev{display:flex;gap:9px;align-items:baseline;color:var(--ink)}
+  .ev .ts{color:var(--mut);flex:0 0 58px}
+  .ev .ek{flex:0 0 64px;font-weight:bold}
+  .ev .pass{color:var(--green)} .ev .score{color:var(--gold)} .ev .collab{color:var(--blue)} .ev .done2{color:var(--teal)}
+
+  /* 通道② 网页仪表盘（HTML 版） */
+  .dash{border:1px solid var(--line);border-radius:9px;overflow:hidden;background:#0c1a2c;display:flex;flex-direction:column;flex:1}
+  .dbar{display:flex;align-items:center;gap:9px;padding:7px 12px;background:#13243c;border-bottom:1px solid var(--line)}
+  .addr{flex:1;display:flex;align-items:center;gap:7px;background:#0a1626;border:1px solid var(--line);border-radius:6px;padding:4px 10px;font-family:var(--mono);font-size:11px;color:var(--mut)}
+  .addr b{color:var(--teal)}
+  .live{display:inline-flex;align-items:center;gap:5px;font-size:10.5px;font-weight:bold;color:var(--green)}
+  .live i{width:8px;height:8px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green);animation:pulse 1.4s infinite}
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+  .dbody{padding:11px 14px;display:flex;flex-direction:column;gap:8px}
+  .tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:9px}
+  .tile{border:1px solid var(--line);border-radius:8px;padding:8px 11px;background:var(--panel);border-left:3px solid var(--blue)}
+  .tile .tlab{font-size:10px;color:var(--mut)}
+  .tile .tval{font-size:21px;font-weight:bold;color:var(--white);font-family:var(--mono);line-height:1.15;margin-top:1px}
+  .tile .tsub{font-size:9.5px;color:var(--mut);margin-top:1px}
+  .tile.g{border-left-color:var(--green)} .tile.g .tval{color:var(--green)}
+  .tile.y{border-left-color:var(--gold)} .tile.y .tval{color:var(--gold)}
+  .tile.t{border-left-color:var(--teal)} .tile.t .tval{color:var(--teal)}
+  .pipe{display:flex;gap:3px;align-items:stretch}
+  .pseg{flex:1;border-radius:5px;padding:6px 3px;text-align:center;font-size:9.5px;line-height:1.3;border:1px solid var(--line);background:var(--panel);color:var(--mut)}
+  .pseg .pscore{display:block;font-family:var(--mono);font-size:9px;margin-top:2px}
+  .pseg.done{background:rgba(67,221,139,.13);border-color:rgba(67,221,139,.4);color:var(--ink)} .pseg.done .pscore{color:var(--green)}
+  .pseg.now{background:rgba(245,183,64,.2);border-color:var(--gold);color:var(--white)} .pseg.now .pscore{color:var(--gold);font-weight:bold}
+  .cqobanner{display:flex;align-items:center;gap:10px;flex-wrap:wrap;border:1px solid rgba(245,183,64,.35);background:rgba(245,183,64,.08);border-radius:7px;padding:7px 11px;font-size:11px}
+  .cqobanner .ci{color:var(--purple);font-weight:bold}
+  .cqobanner .cok{color:var(--green)}
+  .cqobanner .cwarn{color:var(--gold)}
+
+  /* 员工实时活动卡 */
+  .actgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+  .act{border:1px solid var(--line);border-radius:8px;padding:8px 9px;background:var(--panel);display:flex;flex-direction:column;gap:4px}
+  .act.busy{border-color:rgba(67,221,139,.42);background:rgba(67,221,139,.06)}
+  .act .ahd{display:flex;align-items:center;justify-content:space-between;gap:6px}
+  .act .anm{color:var(--white);font-weight:bold;font-size:11px;display:flex;align-items:center;gap:5px}
+  .act .dot{width:7px;height:7px;border-radius:50%;flex:0 0 auto}
+  .act.busy .dot{background:var(--green);box-shadow:0 0 7px var(--green);animation:pulse 1.4s infinite}
+  .act.idle .dot{background:#56708c}
+  .act .ast{font-size:9px;font-weight:bold;padding:1px 7px;border-radius:10px;white-space:nowrap}
+  .act.busy .ast{color:var(--green);background:rgba(67,221,139,.16)}
+  .act.idle .ast{color:var(--mut);background:rgba(255,255,255,.05)}
+  .act .now{font-size:10px;color:var(--ink);line-height:1.4;min-height:27px}
+  .act .now b{color:var(--teal)}
+  .act.idle .now{color:var(--mut)}
+  .act .ameta{font-size:9px;color:var(--mut);font-family:var(--mono);border-top:1px solid rgba(255,255,255,.05);padding-top:4px}
+
+  /* 派发需求 · 用户故事完成度 */
+  .reqbar{display:flex;height:14px;border-radius:7px;overflow:hidden;border:1px solid var(--line);background:rgba(255,255,255,.05)}
+  .reqbar div{height:100%}
+  .reqbar .done{background:linear-gradient(90deg,#2fb86f,var(--green))}
+  .reqbar .prog{background:linear-gradient(90deg,var(--gold),#e0a52e);background-image:repeating-linear-gradient(45deg,rgba(255,255,255,.18) 0 5px,transparent 5px 10px),linear-gradient(90deg,var(--gold),#e0a52e)}
+  .reqbar .pend{background:transparent}
+  .reqlbl{display:flex;align-items:center;gap:9px;font-size:10.5px;margin-top:6px}
+  .arunits{display:grid;grid-template-columns:repeat(5,1fr);gap:7px;margin-top:6px}
+  .aru{border:1px solid var(--line);border-top:3px solid #3a5575;border-radius:7px;padding:7px 9px;background:var(--panel)}
+  .aru .arn{font-size:11px;color:var(--white);font-weight:bold;display:flex;align-items:center;gap:5px}
+  .aru .arc{color:var(--mut);font-size:12px}
+  .aru .arstat{font-size:9.5px;margin-top:6px;font-weight:bold;color:var(--mut)}
+  .aru.done{border-top-color:var(--green)} .aru.done .arstat{color:var(--green)}
+  .aru.now{border-top-color:var(--gold);background:rgba(245,183,64,.08)} .aru.now .arstat{color:var(--gold)} .aru.now .arc{color:var(--gold)}
+  .aru.wait{opacity:.6}
+
+  /* 通道③ 对话流 */
+  .chat{border:1px solid var(--line);border-radius:9px;background:#0e1c2f;padding:13px 14px}
+  .chatrow{display:flex;gap:10px;align-items:flex-start}
+  .ava{width:34px;height:34px;border-radius:9px;background:linear-gradient(135deg,var(--blue),#2f6fc0);color:#06203f;font-weight:bold;font-size:12px;display:flex;align-items:center;justify-content:center;flex:0 0 auto}
+  .bubble{flex:1;background:var(--panel2);border:1px solid var(--line);border-radius:4px 11px 11px 11px;padding:11px 13px}
+  .bubble .bt{color:var(--white);font-weight:bold;font-size:13px;margin-bottom:7px}
+  .bubble ul{list-style:none;display:flex;flex-direction:column;gap:5px;font-size:11.5px}
+  .bubble li{display:flex;justify-content:space-between;color:var(--ink)}
+  .bubble li b{font-family:var(--mono)}
+  .bubble .ask{margin-top:9px;padding-top:8px;border-top:1px solid var(--line);font-size:12px;color:var(--gold);font-weight:bold}
+  .yn{display:inline-flex;gap:6px;margin-left:6px}
+  .yn span{border:1px solid var(--gold);border-radius:5px;padding:1px 9px;font-size:11px;color:var(--gold)}
+
+  /* 三通道说明 */
+  .legend{border:1px solid var(--line);border-radius:9px;background:var(--panel);padding:11px 13px}
+  .lgh{color:var(--white);font-weight:bold;font-size:12.5px;margin-bottom:8px}
+  .lgrow{display:flex;gap:9px;align-items:flex-start;font-size:11px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.05)}
+  .lgrow:last-child{border-bottom:0}
+  .lgrow .ln{width:18px;height:18px;border-radius:50%;font-size:11px;font-weight:bold;display:flex;align-items:center;justify-content:center;flex:0 0 auto}
+  .lgrow.c1 .ln{background:var(--blue);color:#06203f} .lgrow.c2 .ln{background:var(--teal);color:#053a35} .lgrow.c3 .ln{background:var(--gold);color:#3a2c05}
+  .lgrow .lc b{color:var(--white)} .lgrow .lc{color:var(--mut);line-height:1.45}
+
+  .foot-note{margin-top:7px;font-size:11px;color:var(--mut);text-align:center}
+  .foot-note b{color:var(--gold)}
 </style>
 </head>
 <body>
@@ -215,7 +374,7 @@
     </div>
     <div class="meta">同行技术分享 · 2026-06　|　概念 · 整体架构 · 最新落地进展</div>
   </div>
-  <div class="slide-footer"><span>KDev 数字员工 · 架构与进展总览</span><span>01 / 09</span></div>
+  <div class="slide-footer"><span>KDev 数字员工 · 架构与进展总览</span><span>01 / 10</span></div>
 </section>
 
 <!-- ============ 2 概念 ============ -->
@@ -268,7 +427,7 @@
       </div>
     </div>
   </div>
-  <div class="slide-footer"><span>KDev 数字员工 · 架构与进展总览</span><span>02 / 09</span></div>
+  <div class="slide-footer"><span>KDev 数字员工 · 架构与进展总览</span><span>02 / 10</span></div>
 </section>
 
 <!-- ============ 3 团队全景架构图（centerpiece · v1.5 能力清单风格） ============ -->
@@ -298,7 +457,7 @@
             <div class="caprow orch"><span class="cn">编排</span><span class="cd">内部调度·协作</span></div>
             <div class="caprow"><span class="cn">需求澄清</span><span class="cd">澄清原始需求</span></div>
             <div class="caprow"><span class="cn">需求计划</span><span class="cd">写需求规格</span></div>
-            <div class="caprow"><span class="cn">需求拆解</span><span class="cd">拆可验收单元</span></div>
+            <div class="caprow"><span class="cn">需求拆解</span><span class="cd">迭代+用户故事</span></div>
             <div class="caprow"><span class="cn">原型设计</span><span class="cd">高保真原型</span></div>
             <div class="caprow"><span class="cn">方案设计</span><span class="cd">技术方案</span></div>
           </div>
@@ -308,7 +467,7 @@
             <div class="caprow"><span class="cn">环境准备</span><span class="cd">栈/工具链</span></div>
             <div class="caprow"><span class="cn">实施计划</span><span class="cd">计划+复杂度</span></div>
             <div class="caprow"><span class="cn">编码实现</span><span class="cd">测试驱动开发</span></div>
-            <div class="caprow"><span class="cn">端到端验收</span><span class="cd">验收通行证</span></div>
+            <div class="caprow"><span class="cn">端到端自测</span><span class="cd">自测跑通</span></div>
             <div class="caprow"><span class="cn">安全扫描</span><span class="cd">安全清单</span></div>
             <div class="caprow"><span class="cn">部署上线</span><span class="cd">合并/部署</span></div>
           </div>
@@ -316,37 +475,38 @@
             <div class="ehd"><div class="en">测试工程师</div><div class="ecnt">4 业务能力 + 1 调度</div></div>
             <div class="caprow orch"><span class="cn">编排</span><span class="cd">内部调度·协作</span></div>
             <div class="caprow"><span class="cn">测试点设计</span><span class="cd">国标 29119</span></div>
-            <div class="caprow"><span class="cn">用例渲染</span><span class="cd">字段化用例</span></div>
+            <div class="caprow"><span class="cn">用例开发</span><span class="cd">字段化用例</span></div>
             <div class="caprow"><span class="cn">界面自动化</span><span class="cd">UI 脚本执行</span></div>
             <div class="caprow"><span class="cn">接口自动化</span><span class="cd">API 用例执行</span></div>
           </div>
           <div class="ecol review">
-            <div class="ehd"><div class="en">评审专家</div><div class="ecnt">7 评审 + 1 调度</div></div>
-            <div class="caprow orch"><span class="cn">编排</span><span class="cd">调度+仲裁</span></div>
-            <div class="caprow"><span class="cn">需求评审</span></div>
-            <div class="caprow"><span class="cn">方案评审</span></div>
-            <div class="caprow"><span class="cn">代码评审</span></div>
-            <div class="caprow"><span class="cn">质量评审</span></div>
-            <div class="caprow"><span class="cn">安全评审</span></div>
-            <div class="caprow"><span class="cn">测试评审</span></div>
-            <div class="caprow"><span class="cn">终审聚合</span></div>
+            <div class="ehd"><div class="en">评审专家</div><div class="ecnt">10 核心 + 6 扩展 + 1 调度</div></div>
+            <div class="caprow orch"><span class="cn">编排</span><span class="cd">调度·仲裁·终审聚合</span></div>
+            <div class="revgrid2">
+              <span>需求方向</span><span>SR</span>
+              <span>迭代拆分</span><span>用户故事</span>
+              <span>原型</span><span>方案+架构</span>
+              <span>代码+质量</span><span>安全</span>
+              <span>测试设计</span><span>测试执行</span>
+            </div>
+            <div class="revext">+6 按需扩展：<b>部署检查·性能·文档·合规·可观测·可访问</b></div>
           </div>
         </div>
       </div>
     </div>
     <div class="countbar">
-      合计 <b>6 名员工 / 28 个 AI 工作单元</b> ＝ <b class="kb">1 总指挥</b> ＋ <b class="kr">1 质量总监</b> ＋ <b class="kt">4 调度</b> ＋ <b class="kt">15 业务能力</b>（需求5 + 开发6 + 测试4）＋ <b class="ky">7 评审能力</b>
-      <span class="mut">｜ 评审专家完整态可展开成 18 个视角 → 39 个工作单元</span>
+      合计 <b>6 名员工 / 默认 31 个 AI 工作单元</b> ＝ <b class="kb">1 总指挥</b> ＋ <b class="kr">1 质量总监</b> ＋ <b class="kt">4 调度</b> ＋ <b class="kt">15 业务能力</b>（需求5 + 开发6 + 测试4）＋ <b class="ky">10 核心评审</b>
+      <span class="mut">｜ 再开 6 项按需扩展评审 → 全开 37（终审聚合隐藏，不单列）</span>
     </div>
   </div>
-  <div class="slide-footer"><span>KDev 数字员工 · 架构与进展总览</span><span>03 / 09</span></div>
+  <div class="slide-footer"><span>KDev 数字员工 · 架构与进展总览</span><span>03 / 10</span></div>
 </section>
 
 <!-- ============ 4 三个插件分工 ============ -->
 <section class="slide">
   <div class="topbar">
     <div class="badge">4</div><div class="chaplabel">整体架构</div>
-    <div class="maintitle">三个组件，各管一摊 —— 谁干活、谁调度、谁记忆</div>
+    <div class="maintitle">四个组件，各管一摊 —— 干活 / 调度 / 记忆 / 观测</div>
   </div>
   <div class="titlerule"></div>
   <div class="cols">
@@ -373,6 +533,12 @@
           <span class="mut">员工层「硬依赖」它；它单独装也能用（给个人开发者做跨会话续航）。</span>
         </div>
       </div>
+      <div class="panel">
+        <div class="ph" style="background:#185f57">④ kdev-hud —— 观测层（谁看进度）<span style="font-weight:normal;opacity:.85;font-size:11px">· 阶段3</span></div>
+        <div class="pb">
+          把底座的账本变成<b class="kt">实时驾驶舱</b>：命令行状态栏 + 网页仪表盘。<span class="mut">纯只读消费、不记账不判断；不装照跑、装了更直观。</span>
+        </div>
+      </div>
     </div>
     <div class="col" style="flex:.92">
       <div class="panel">
@@ -390,17 +556,21 @@
             </div>
             <div style="color:var(--mut);font-size:11px;margin:7px 0">↓ 都依赖记忆底料</div>
             <div style="border:1px solid var(--purple);background:rgba(155,140,255,.1);border-radius:8px;padding:10px 16px;text-align:center;width:96%">
-              <b style="color:var(--purple)">kdev-memory 记忆底座</b><br><span class="mut" style="font-size:11px">三层记忆 · 多分区 · 跨会话续航</span>
+              <b style="color:var(--purple)">kdev-memory 记忆底座</b><br><span class="mut" style="font-size:11px">叙事层(提炼+加料) · 全团队共享 · 跨会话续航</span>
+            </div>
+            <div style="color:var(--mut);font-size:11px;margin:7px 0">底座旁挂 · 只读 →</div>
+            <div style="border:1px dashed var(--teal);background:rgba(46,197,182,.06);border-radius:8px;padding:8px 16px;text-align:center;width:72%">
+              <b class="kt">kdev-hud 观测</b><br><span class="mut" style="font-size:11px">只读 events/state · 阶段3</span>
             </div>
           </div>
         </div>
       </div>
       <div class="note" style="margin-top:0">
-        <b class="ky">为什么要拆三层？</b> 干活、调度、记忆是三件不同的事。拆开后：底座能被别的产品复用、记忆能单独装、员工层能独立演进——各自迭代不互相拖累。
+        <b class="ky">为什么拆成四件？</b> 干活、调度、记忆、观测是四件不同的事。拆开后：底座能被别的产品复用、记忆/观测能单独装、员工层能独立演进——各自迭代不互相拖累。
       </div>
     </div>
   </div>
-  <div class="slide-footer"><span>KDev 数字员工 · 架构与进展总览</span><span>04 / 09</span></div>
+  <div class="slide-footer"><span>KDev 数字员工 · 架构与进展总览</span><span>04 / 10</span></div>
 </section>
 
 <!-- ============ 5 底座三件套 ============ -->
@@ -413,10 +583,10 @@
   <div class="body" style="padding-top:14px">
     <div class="three">
       <div class="gatecard">
-        <div class="gh"><div class="gn">① 状态记录</div><div class="gs">每条流程一份进度档案</div></div>
+        <div class="gh"><div class="gn">① 记两本机器账</div><div class="gs">控制态 + 事实流水</div></div>
         <div class="gb">
-          员工干到哪一步、每个关卡的结果，全程<b class="kb">原子化写进一份档案</b>。<br><br>
-          <b class="kg">最大好处：断点续跑</b>——中途断电、被打断，再起来能从上次那一步接着干，不用从头来。
+          <b class="kb">控制态</b>「我在哪一步」+ <b class="kb">事实流水</b>「发生了啥」，全程<b class="kb">原子化落盘</b>。<span class="mut">（记忆层就从这本流水提炼，见第 6 页）</span><br><br>
+          <b class="kg">最大好处：断点续跑</b>——中途断电、被打断，再起来从上次那步接着干。
         </div>
       </div>
       <div class="gatecard g2">
@@ -449,37 +619,39 @@
       </div>
     </div>
   </div>
-  <div class="slide-footer"><span>KDev 数字员工 · 架构与进展总览</span><span>05 / 09</span></div>
+  <div class="slide-footer"><span>KDev 数字员工 · 架构与进展总览</span><span>05 / 10</span></div>
 </section>
 
 <!-- ============ 6 记忆 + 飞轮 ============ -->
 <section class="slide">
   <div class="topbar">
     <div class="badge">6</div><div class="chaplabel">记忆底座</div>
-    <div class="maintitle">记忆怎么分层 —— 既省成本，又让员工越用越强</div>
+    <div class="maintitle">记忆 = 从机器到人的「提炼 + 加料」，不重复造账</div>
   </div>
   <div class="titlerule"></div>
   <div class="cols">
     <div class="col" style="flex:1.15">
       <div class="panel">
-        <div class="ph">三层记忆 —— 各记各的，不互相挤占</div>
-        <div class="pb" style="padding:11px 13px">
-          <div style="display:flex;flex-direction:column;gap:9px">
-            <div style="border:1px solid var(--teal);border-radius:7px;padding:9px 11px;background:rgba(46,197,182,.07)">
-              <b class="kt">操作层 · 轻流水</b>　<span class="mut" style="font-size:11px">员工高频用</span><br>
-              <span style="font-size:11.5px">一行一条「做了啥 / 要做啥」，极省。员工干活全程只碰这层。</span>
+        <div class="ph">底座记机器账，记忆把它提炼成人能读的工程记忆</div>
+        <div class="pb" style="padding:12px 13px">
+          <div style="display:flex;align-items:stretch;gap:10px">
+            <div style="flex:0 0 auto;width:128px;border:1px dashed var(--blue);border-radius:8px;padding:9px 10px;background:rgba(74,158,255,.06)">
+              <div style="color:var(--blue);font-weight:bold;font-size:11.5px;margin-bottom:5px">底座两本机器账</div>
+              <div style="font-size:10.5px;line-height:1.5"><b class="kb">控制态</b> 我在哪步<br><b class="kb">事实流水</b> 发生了啥<br><span class="mut" style="font-size:9.5px">（见第 5 页·kdev-core 写）</span></div>
             </div>
-            <div style="border:1px solid var(--gold);border-radius:7px;padding:9px 11px;background:rgba(245,183,64,.07)">
-              <b class="ky">叙事层 · 工程记忆</b>　<span class="mut" style="font-size:11px">人读 + 续航用</span><br>
-              <span style="font-size:11.5px">完整的步骤记录、决策、踩坑。不每次都写，而是<b>阶段性从流水汇总一次</b>。</span>
+            <div style="flex:0 0 auto;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--gold);font-size:10px;font-weight:bold">
+              <div>蒸馏</div><div style="font-size:18px">→</div><div>+加料</div>
             </div>
-            <div style="border:1px solid var(--blue);border-radius:7px;padding:9px 11px;background:rgba(74,158,255,.07)">
-              <b class="kb">状态层 · 当前进度</b>　<span class="mut" style="font-size:11px">实时</span><br>
-              <span style="font-size:11.5px">「现在在哪一步、下一步去哪」，就是底座那份进度档案。</span>
+            <div style="flex:1;border:1px solid var(--gold);border-radius:8px;padding:9px 11px;background:rgba(245,183,64,.08)">
+              <div style="color:var(--gold);font-weight:bold;font-size:11.5px;margin-bottom:5px">kdev-memory · 叙事层（人读）</div>
+              <div style="font-size:10.5px;line-height:1.55">步骤记录 · 决策 · 踩坑<br><b class="ky">+ 自评 / 用户评分</b>（机器给不了的那一维）<br><span class="mut" style="font-size:9.5px">阶段性从流水汇总一次，不每动作写</span></div>
             </div>
           </div>
-          <div style="margin-top:10px;font-size:11px;color:var(--mut)">
-            <b>记忆分区</b>：共享区（全员的决策 / 踩坑）+ 每名员工的私有区，按路径前缀隔离；总指挥和质量总监可跨区查。整套记忆用 Git 托管，自动同步。
+          <div style="margin-top:11px;font-size:11px;color:var(--ink);border-left:3px solid var(--gold);padding-left:9px;background:rgba(245,183,64,.05);border-radius:4px;padding:6px 9px">
+            <b class="ky">一条原则</b>：记忆只加「机器给不了的那一维」(评价/经验/叙事)；凡是镜像机器原始态的，让位给底座——<b>不造第二本账</b>。
+          </div>
+          <div style="margin-top:9px;font-size:10.5px;color:var(--mut)">
+            <b class="kt">全团队的记忆底座，不是 CEO 私有</b>：共享区(决策/踩坑/CEO 续航) + 每员工私有区 + <b class="ky">评审经验→喂飞轮</b>。多个消费者:CEO 续航 · 评审专家越评越准 · 各员工记自己的账。整套 Git 托管自动同步。
           </div>
         </div>
       </div>
@@ -502,7 +674,146 @@
       </div>
     </div>
   </div>
-  <div class="slide-footer"><span>KDev 数字员工 · 架构与进展总览</span><span>06 / 09</span></div>
+  <div class="slide-footer"><span>KDev 数字员工 · 架构与进展总览</span><span>06 / 10</span></div>
+</section>
+
+<section class="slide">
+  <div class="topbar">
+    <div class="badge">★</div><div class="chaplabel">HUD 驾驶舱</div>
+    <div class="maintitle">进度随时可见 —— 三个通道把 6 名员工的实时状态推到你眼前
+      <small>独立 plugin <b style="color:var(--teal)">kdev-hud</b> 观测层（阶段3）｜ 底座只记账，HUD 只读消费这些账、渲染成「实时仪表盘」——三通道全部从事件流自动派生，只读、不可手改，永远与实际进度一致</small>
+    </div>
+  </div>
+  <div class="titlerule"></div>
+
+  <div class="stage">
+    <!-- 通道① -->
+    <div class="chlbl"><span class="num">1</span>命令行状态栏 —— 每次发言刷新，一行速览「我在哪」</div>
+    <div class="statusbar">
+      <div class="seg brand">🏢 KDev 团队</div>
+      <div class="seg node">需求「用户管理模块」<span class="ed">48% ✏️</span> · 开发·代码评审 第2轮<span class="blink">▋</span></div>
+      <div class="seg busy">👤 开发 忙 · 评审 忙</div>
+      <div class="seg warn">⚠ 待处理 1</div>
+    </div>
+
+    <div class="grid2">
+      <!-- 通道② 网页实时仪表盘（HTML 版） -->
+      <div class="colL">
+        <div class="chlbl t2"><span class="num">2</span>网页实时仪表盘 —— 自包含 HTML，事件触发热刷新，一屏全景驾驶舱</div>
+        <div class="dash">
+          <div class="dbar">
+            <div class="dots"><i class="r"></i><i class="y"></i><i class="g"></i></div>
+            <div class="addr">🔒 <b>localhost:7890</b>/hud　·　KDev 实时驾驶舱</div>
+            <div class="live"><i></i>LIVE</div>
+          </div>
+          <div class="dbody">
+            <div class="tiles">
+              <div class="tile t"><div class="tlab">需求完成度</div><div class="tval">48%</div><div class="tsub">按用户故事加权</div></div>
+              <div class="tile g"><div class="tlab">用户故事</div><div class="tval">2<span style="font-size:13px;color:var(--mut)">/5</span></div><div class="tsub">进行中 1 · 待开 2</div></div>
+              <div class="tile t"><div class="tlab">当前阶段</div><div class="tval">3/4</div><div class="tsub">开发 · 代码评审</div></div>
+              <div class="tile y"><div class="tlab">待处理告警</div><div class="tval">1</div><div class="tsub">CQO 复评建议</div></div>
+            </div>
+
+            <div class="hsec">
+              <div class="hh y">📋 派发需求「用户管理模块改造」—— 拆成 5 个用户故事，按交付推进<span style="color:var(--mut);font-weight:normal;font-size:9.5px">　·　队列还有 1 个需求待排</span></div>
+              <div class="reqbar">
+                <div class="done" style="width:40%"></div>
+                <div class="prog" style="width:8%"></div>
+                <div class="pend" style="width:52%"></div>
+              </div>
+              <div class="reqlbl">
+                <span class="kg">✅ 2 完成</span><span class="ky">🟡 1 进行中</span><span class="mut">⏳ 2 待开发</span>
+                <span style="margin-left:auto;color:var(--gold);font-weight:bold;font-family:var(--mono)">完成度 48%</span>
+              </div>
+              <div class="arunits">
+                <div class="aru done"><div class="arn"><span class="arc">①</span>用户列表</div><div class="arstat">✅ 完成 (88)</div></div>
+                <div class="aru done"><div class="arn"><span class="arc">②</span>新增/编辑</div><div class="arstat">✅ 完成 (85)</div></div>
+                <div class="aru now"><div class="arn"><span class="arc">③</span>角色分配</div><div class="arstat">🟡 代码评审 · 增量 2/3</div></div>
+                <div class="aru wait"><div class="arn"><span class="arc">④</span>批量导入</div><div class="arstat">⏳ 待开发</div></div>
+                <div class="aru wait"><div class="arn"><span class="arc">⑤</span>操作日志</div><div class="arstat">⏳ 待开发</div></div>
+              </div>
+            </div>
+
+            <div class="hsec">
+              <div class="hh t">👥 员工实时活动 —— 每个人正在忙什么</div>
+              <div class="actgrid">
+                <div class="act busy">
+                  <div class="ahd"><span class="anm"><span class="dot"></span>开发工程师</span><span class="ast">忙</span></div>
+                  <div class="now">正在 <b>编码实现</b><br>派子任务跑测试驱动</div>
+                  <div class="ameta">增量 2/3 · 已用 12m · opus</div>
+                </div>
+                <div class="act busy">
+                  <div class="ahd"><span class="anm"><span class="dot"></span>评审专家</span><span class="ast">忙</span></div>
+                  <div class="now">正在 <b>代码 + 质量评审</b><br>第 1 轮 · 仲裁 2 条冲突</div>
+                  <div class="ameta">已打 84/100 · 已用 4m</div>
+                </div>
+                <div class="act idle">
+                  <div class="ahd"><span class="anm"><span class="dot"></span>需求架构师</span><span class="ast">闲</span></div>
+                  <div class="now">需求规格 / 拆解已交付<br>等下游回流</div>
+                  <div class="ameta">14:10 交接 → 开发</div>
+                </div>
+                <div class="act idle">
+                  <div class="ahd"><span class="anm"><span class="dot"></span>测试工程师</span><span class="ast">待命</span></div>
+                  <div class="now">等开发完成<br>→ 进入测试阶段</div>
+                  <div class="ameta">待上游交接</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="cqobanner">
+              <span class="ci">🛡️ CQO 监督</span>
+              <span class="cok">● 合规率 100%</span>
+              <span class="cwarn">⚠ 需求规格评审反馈仅 87 字（产物 4231 字），建议复评</span>
+            </div>
+
+            <div class="hsec">
+              <div class="hh">🕒 实时事件流</div>
+              <div class="events">
+                <div class="ev"><span class="ts">15:08:11</span><span class="ek score">评审打分</span>角色分配 · 代码评审 <span class="score">84</span> · 仲裁 2 条冲突</div>
+                <div class="ev"><span class="ts">14:55:09</span><span class="ek collab">协作请求</span>开发 → 评审〔代码评审 / 质量评审〕</div>
+                <div class="ev"><span class="ts">14:32:20</span><span class="ek done2">故事完成</span>新增/编辑用户 → <span class="pass">验收通过 85</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 通道③ + 说明 -->
+      <div class="colR">
+        <div>
+          <div class="chlbl t3"><span class="num">3</span>对话流摘要 —— 进度播报 / 升级时，总指挥主动找你</div>
+          <div class="chat">
+            <div class="chatrow">
+              <div class="ava">CEO</div>
+              <div class="bubble">
+                <div class="bt">📊 需求进度播报 — 用户管理模块改造</div>
+                <ul>
+                  <li>完成度<b style="color:var(--gold)">48%（2/5 用户故事）</b></li>
+                  <li>当前<b>角色分配 · 代码评审中</b></li>
+                  <li>平均评分<b style="color:var(--green)">86.6</b></li>
+                  <li>升级总指挥<b>0 次</b></li>
+                </ul>
+                <div class="ask">CQO 提示需复评，要我让评审专家复评吗？
+                  <span class="yn"><span>是</span><span>否</span></span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="legend">
+          <div class="lgh">为什么要三个通道？—— 各管一种「看」的场景</div>
+          <div class="lgrow c1"><span class="ln">1</span><div class="lc"><b>命令行状态栏</b>：一行速览，干活时余光就能瞄到「现在跑到哪、有没有告警」。</div></div>
+          <div class="lgrow c2"><span class="ln">2</span><div class="lc"><b>网页实时仪表盘</b>：一份自包含 HTML（非 markdown 预览），用 VSCode Live Preview / 浏览器打开，事件触发热刷新；员工状态 / 评审分数 / 监督告警 / 事件流一屏全景。</div></div>
+          <div class="lgrow c3"><span class="ln">3</span><div class="lc"><b>对话流摘要</b>：关键节点主动找你，阶段聚合、评审升级时总指挥在对话里播报 + 请你拍板。</div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="foot-note">三个通道的数据全部来自同一份<b>事件流</b>（底座只记账）→ HUD 是派生出来的<b>只读仪表盘</b>，不是另一套真相，永远与实际进度一致。</div>
+  </div>
+
+  <div class="slide-footer"><span>KDev 数字员工 · 架构与进展总览</span><span>07 / 10</span></div>
 </section>
 
 <!-- ============ 7 kdev-team 真实落地：开发工程师 ============ -->
@@ -528,7 +839,7 @@
           <div class="fnode rev">代码 / 质量评审<span class="fk">评审</span></div>
         </div>
         <div class="flowchain" style="margin-top:4px">
-          <div class="fnode acc">端到端测试<span class="fk">验收</span></div><span class="farrow">→</span>
+          <div class="fnode acc">端到端自测<span class="fk">验收类</span></div><span class="farrow">→</span>
           <div class="fnode dec">是否还有增量<span class="fk">岔路</span></div><span class="farrow">→</span>
           <div class="fnode rev">安全评审<span class="fk">评审</span></div><span class="farrow">→</span>
           <div class="fnode act">合并主分支<span class="fk">干活</span></div><span class="farrow">→</span>
@@ -543,7 +854,7 @@
     <div class="cols" style="padding:13px 0 0">
       <div class="col" style="flex:1">
         <div class="note" style="margin-top:0">
-          <b class="kt">7 个能力单元已就位：</b>调度 · 环境对齐 · 计划 · 前端 · 端到端测试 · 部署 · 安全。
+          <b class="kt">7 个能力单元已就位：</b>调度 · 环境对齐 · 计划 · 前端 · 端到端自测 · 部署 · 安全。
           调度单元像「工头」，按上面的流程把活儿分给其余 6 个，自己不亲手写代码。
         </div>
       </div>
@@ -554,7 +865,7 @@
       </div>
     </div>
   </div>
-  <div class="slide-footer"><span>KDev 数字员工 · 架构与进展总览</span><span>07 / 09</span></div>
+  <div class="slide-footer"><span>KDev 数字员工 · 架构与进展总览</span><span>08 / 10</span></div>
 </section>
 
 <!-- ============ 8 进展路线图 + 里程碑 ============ -->
@@ -584,7 +895,7 @@
         </div>
         <div class="rstage todo">
           <div class="rleft"><div class="rsn">阶段 3</div><div class="rsa l3">迈向第三级</div></div>
-          <div class="rbody">评审专家上岗 + 跨员工协作 + 框架层（派单 / 产物 / 看板）</div>
+          <div class="rbody">评审专家上岗 + 跨员工协作 + 框架层（派单 / 产物 / 事件流）+ kdev-hud 驾驶舱</div>
           <div class="rstat">⏳ 规划中</div>
         </div>
         <div class="rstage todo">
@@ -614,7 +925,7 @@
       </div>
     </div>
   </div>
-  <div class="slide-footer"><span>KDev 数字员工 · 架构与进展总览</span><span>08 / 09</span></div>
+  <div class="slide-footer"><span>KDev 数字员工 · 架构与进展总览</span><span>09 / 10</span></div>
 </section>
 
 <!-- ============ 9 结尾 ============ -->
@@ -634,7 +945,7 @@
       <span class="pill">阶段 3 / 4 ⏳ 在路上</span>
     </div>
   </div>
-  <div class="slide-footer"><span>KDev 数字员工 · 架构与进展总览</span><span>09 / 09</span></div>
+  <div class="slide-footer"><span>KDev 数字员工 · 架构与进展总览</span><span>10 / 10</span></div>
 </section>
 
 </body>
