@@ -1,0 +1,30 @@
+plugins/kdev-memory/hooks/lib/migrate_scope.py
+  s_7b636477e90575::t_7166a9cd5418ce 51
+  s_7b636477e90575::t_2339a46a43c2ca 138-140
+  s_7b636477e90575::t_2a010517a6cd13 78-80
+  s_7b636477e90575::t_09c8c5ab502ab7 103-105
+plugins/kdev-memory/tests/test_migrate_scope.py
+  s_7b636477e90575::t_e563a2d17bb804 66-85
+  s_7b636477e90575::t_16cca502b9c26b 10
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "8ba0673e7dc8abb88ea384af048b39e3761adba4",
+  "prompts": {},
+  "humans": {
+    "h_14993d1572361c": {
+      "author": "ly <ly1989abc@126.com>"
+    }
+  },
+  "sessions": {
+    "s_7b636477e90575": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "09506019-0b23-44a4-9cd3-a7ae5f45c360",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
