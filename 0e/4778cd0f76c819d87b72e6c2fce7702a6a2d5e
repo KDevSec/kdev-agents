@@ -1,0 +1,26 @@
+plugins/kdev-memory/tests/test_trigger_match_scope.py
+  s_7b636477e90575::t_c4cfe415f4d463 1-67
+  s_7b636477e90575::t_210cb700102cd5 68-80
+plugins/kdev-memory/hooks/lib/trigger-match.py
+  s_7b636477e90575::t_812fa1db102600 299
+  s_7b636477e90575::t_903cb76eff5eec 46-48
+  s_7b636477e90575::t_b3b98e4121afe8 218-219,221,224
+  s_7b636477e90575::t_ab55643a698f25 271,279,281-293
+  s_7b636477e90575::t_6874b45aafc2fa 474,476-478
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "0e4778cd0f76c819d87b72e6c2fce7702a6a2d5e",
+  "prompts": {},
+  "sessions": {
+    "s_7b636477e90575": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "09506019-0b23-44a4-9cd3-a7ae5f45c360",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": null
+    }
+  }
+}
