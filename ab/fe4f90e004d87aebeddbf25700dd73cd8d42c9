@@ -1,0 +1,39 @@
+plugins/kdev-team/skills/kdev-flow-driver/references/node-agent-routing.md
+  s_0335fce08a4b6e::t_73995984673a31 32-53
+  s_0335fce08a4b6e::t_ec5142fa5c9b74 15-16
+plugins/kdev-team/skills/kdev-flow-driver/SKILL.md
+  s_0335fce08a4b6e::t_e1a967e0a58f41 230,232,234-246
+plugins/kdev-team/orchestration/dev-engineer.node-table.yml
+  s_0335fce08a4b6e::t_ab87bbff459a4a 24-25
+  s_0335fce08a4b6e::t_2e2d91daece8a7 1,4-9
+  s_0335fce08a4b6e::t_50eec47dd06d39 38-39
+plugins/kdev-team/tests/test_orchestration_config.py
+  s_0335fce08a4b6e::t_98dc1b84968f23 14,16,20-28
+plugins/kdev-team/skills/kdev-flow-driver/references/gate-decision-logic.md
+  s_0335fce08a4b6e::t_3b330f2f38d9cf 82-99
+  s_0335fce08a4b6e::t_b9491612055977 7-20,31
+  s_0335fce08a4b6e::t_a1cef24a9d4055 136-146,152,155-156
+plugins/kdev-team/.claude-plugin/plugin.json
+  s_0335fce08a4b6e::t_38f684fe8247bc 4
+plugins/kdev-team/agents/dev-engineer-orchestrator.md
+  s_0335fce08a4b6e::t_9e58714258f6d2 36-38
+  s_0335fce08a4b6e::t_33c2de11bca95d 14
+plugins/kdev-team/agents/dev-engineer-plan.md
+  s_0335fce08a4b6e::t_2823bf67b41ca4 14,17-29,31-33
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "abfe4f90e004d87aebeddbf25700dd73cd8d42c9",
+  "prompts": {},
+  "sessions": {
+    "s_0335fce08a4b6e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "20a2d636-246b-4d52-b657-20f81a9ae261",
+        "model": "astron-code-latest"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
