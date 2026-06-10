@@ -29,3 +29,5 @@ def test_flat_target_is_root_log(tmp_path):
     root = tmp_path / "memory"; root.mkdir()
     assert recorder_target_log(None, root) == root / "执行日志.md"
     assert recorder_target_log("shared", root) == root / "执行日志.md"
+    # 员工 canonical id 在 flat 布局下也兜底回 root 执行日志（向后兼容，scope.py 末分支）
+    assert recorder_target_log("dev-engineer", root) == root / "执行日志.md"
