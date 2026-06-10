@@ -378,7 +378,7 @@ F-NNN 的 `verbatim` 字段（用户原话）是最高价值的 RFE 信号源—
 - 不在 git → `unknown`
 - detached HEAD → `detached`
 
-员工 scope slug 直接取 canonical id（已经是合法标识符，不需要额外 sanitize）。
+员工 scope slug 取 canonical id（经 `sanitize_slug` 规范化，对合法 canonical id 为 no-op）。
 
 ### 智能体落 Step 时的标准流程
 
@@ -442,7 +442,7 @@ python3 plugins/kdev-memory/hooks/lib/migrate_scope.py --staff dev-engineer,req-
 存放项目级公共记录：
 - 决策日志.md / 踩坑日志.md / skill-feedback.md / 当前状态.md
 - 执行日志.md（主线 / shared scope 的 Step rollup）
-- 改进建议.md / 方法论铁规.md / 每日汇总/
+- 改进建议.md / 方法论铁规.md / conventions.md / 每日汇总/ / 归档/
 
 ### staff/\<canonical-id\>/ — 员工专属执行 rollup
 
@@ -455,7 +455,7 @@ python3 plugins/kdev-memory/hooks/lib/migrate_scope.py --staff dev-engineer,req-
 - `state/`（计数器、pending-commits）
 - `checkpoints/`（PreCompact 快照）
 - `dataset/`（蒸馏切片包）
-- `config.yaml`
+- `config.yaml` / `strict`（严格模式开关）
 - `.last-*`（蒸馏时间戳标记）
 
 ### 召回 / brief / rollup 聚合
