@@ -1,0 +1,19 @@
+docs/superpowers/plans/2026-06-10-阶段2-P-C1-kdev-memory-记忆scope分离.md
+  s_7b636477e90575::t_1acefb32098564 1-1744
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "fc499108f40a1d50a666e5aec3dbe3b32723de89",
+  "prompts": {},
+  "sessions": {
+    "s_7b636477e90575": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "09506019-0b23-44a4-9cd3-a7ae5f45c360",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
