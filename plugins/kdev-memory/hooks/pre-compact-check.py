@@ -29,6 +29,7 @@ force_utf8_stdio()  # Windows GBK 兼容：v0.8.1+ 统一处理 emoji 编码（p
 
 from migrate import kdev_memory_migrate  # noqa: E402
 from checkpoint import prune_old_checkpoints  # noqa: E402
+from scope import shared_dir  # noqa: E402
 
 
 def _read_trigger() -> str:
@@ -76,6 +77,7 @@ def main() -> int:
     if not kdev_dir.is_dir():
         return 0
 
+    shared = shared_dir(kdev_dir)
     trigger = _read_trigger()
     today = date.today().isoformat()
     timestamp = datetime.now().strftime("%Y-%m-%d-%H%M%S")
@@ -85,7 +87,7 @@ def main() -> int:
     checkpoint_file = checkpoint_dir / f"压缩前-{timestamp}.md"
 
     # 判断"是否未落盘"
-    log_file = kdev_dir / "执行日志.md"
+    log_file = shared / "执行日志.md"
     log_empty_today = True
     if log_file.is_file():
         try:
@@ -128,7 +130,7 @@ def main() -> int:
     ])
 
     for src_name in ("执行日志.md", "决策日志.md", "踩坑日志.md", "改进建议.md", "当前状态.md"):
-        src = kdev_dir / src_name
+        src = shared / src_name
         if not src.is_file():
             continue
         parts.extend([
@@ -142,7 +144,7 @@ def main() -> int:
             parts.append("(读取失败)")
         parts.extend(["```", ""])
 
-    today_summary = kdev_dir / "每日汇总" / f"{today}.md"
+    today_summary = shared / "每日汇总" / f"{today}.md"
     if today_summary.is_file():
         parts.extend([
             f"## 📅 今日汇总（{today}）原文",

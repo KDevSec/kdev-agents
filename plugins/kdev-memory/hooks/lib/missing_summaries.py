@@ -16,9 +16,13 @@
 from __future__ import annotations
 
 import re
+import sys
 from datetime import date as _date
 from pathlib import Path
 from typing import List
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from scope import shared_dir  # noqa: E402
 
 
 _DATE_RE = re.compile(r"日期：(\d{4}-\d{2}-\d{2})")
@@ -34,7 +38,7 @@ def list_missing_past_summaries(
 
     返回空格分隔的 YYYY-MM-DD 字符串；无缺失返回空字符串。
     """
-    kdev = Path(kdev_dir)
+    kdev = shared_dir(Path(kdev_dir))
     if not kdev.is_dir():
         return ""
 

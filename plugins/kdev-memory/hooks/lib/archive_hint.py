@@ -17,9 +17,13 @@
 from __future__ import annotations
 
 import re
+import sys
 from datetime import date as _date
 from pathlib import Path
 from typing import Optional
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from scope import shared_dir  # noqa: E402
 
 
 _DATE_RE = re.compile(r"(?:日期|date)[：:]\s*(\d{4}-\d{2}-\d{2})")
@@ -85,7 +89,7 @@ def collect_archive_hints(kdev_dir: str) -> str:
 
     返回的字符串末尾带换行；调用方按需 strip。
     """
-    kdev = Path(kdev_dir)
+    kdev = shared_dir(Path(kdev_dir))
     hints: list = []
 
     line = check_monthly_archive_hint(kdev / "执行日志.md", "执行日志.md")

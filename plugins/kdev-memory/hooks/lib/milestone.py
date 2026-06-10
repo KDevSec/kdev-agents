@@ -27,6 +27,7 @@ PATTERNS: List[str] = [
 
     # --- 工程记忆自己的硬规 ---
     ".kdev/memory/方法论铁规.md",
+    ".kdev/memory/shared/方法论铁规.md",  # P-C1 scoped 布局
     ".kdev/方法论铁规.md",  # 0.2.0 遗留位置（迁移失败 fallback）
 
     # --- 迭代 / Sprint / 冲刺 ---

@@ -15,11 +15,15 @@
 from __future__ import annotations
 
 import re
+import sys
 import time
 from datetime import date as _date
 from datetime import datetime
 from pathlib import Path
 from typing import Optional
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from scope import shared_dir  # noqa: E402
 
 
 _PROMOTE_DONE_RE = re.compile(r"^promote_status:\s*done", re.MULTILINE)
@@ -83,11 +87,12 @@ def _today_eod_ts(today: str) -> float:
 
 def scan_promote_candidates(kdev_dir: str, today: str) -> str:
     """扫描沉淀候选并返回 brief 提醒文本（无信号则空字符串）。"""
-    kdev = Path(kdev_dir)
-    if not kdev.is_dir():
+    root = Path(kdev_dir)
+    if not root.is_dir():
         return ""
 
-    flush = kdev / ".last-promote"
+    base = shared_dir(root)
+    flush = root / ".last-promote"   # marker 留 root（plumbing）
     days_since_promote: Optional[int] = None  # None 等价于 "never"
     if flush.is_file():
         try:
@@ -98,9 +103,9 @@ def scan_promote_candidates(kdev_dir: str, today: str) -> str:
             today_ts = _today_eod_ts(today)
             days_since_promote = int((today_ts - flush_ts) // 86400)
 
-    improvements = kdev / "改进建议.md"
-    rule_md = kdev / "conventions.md"
-    gotchas = kdev / "踩坑日志.md"
+    improvements = base / "改进建议.md"
+    rule_md = base / "conventions.md"
+    gotchas = base / "踩坑日志.md"
 
     r_total = _count_h2(improvements)
     r_done = _count_promote_done(improvements)

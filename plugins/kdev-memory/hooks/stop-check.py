@@ -39,6 +39,7 @@ from milestone import is_milestone_path  # noqa: E402
 from missing_summaries import list_missing_past_summaries  # noqa: E402
 from archive_hint import collect_archive_hints  # noqa: E402
 from pending_commits import format_brief_hint as pending_format_brief_hint  # noqa: E402
+from scope import shared_dir  # noqa: E402
 
 
 def _read_stop_hook_active() -> bool:
@@ -134,8 +135,9 @@ def main() -> int:
     if not kdev_dir.is_dir():
         return 0
 
+    shared = shared_dir(kdev_dir)
     today = date.today().isoformat()
-    summary_file = kdev_dir / "每日汇总" / f"{today}.md"
+    summary_file = shared / "每日汇总" / f"{today}.md"
 
     stop_hook_active = _read_stop_hook_active()
 
@@ -155,7 +157,7 @@ def main() -> int:
         except OSError:
             sm = 0.0
         for name in ("执行日志.md", "决策日志.md", "踩坑日志.md", "改进建议.md"):
-            src = kdev_dir / name
+            src = shared / name
             if not src.is_file():
                 continue
             try:
@@ -171,7 +173,7 @@ def main() -> int:
             )
 
     # 4. 执行日志今天空
-    log_file = kdev_dir / "执行日志.md"
+    log_file = shared / "执行日志.md"
     log_empty_today = False
     if log_file.is_file():
         try:

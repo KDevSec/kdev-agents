@@ -19,6 +19,7 @@ LIB_DIR = SCRIPT_DIR / "lib"
 sys.path.insert(0, str(LIB_DIR))
 
 from migrate import kdev_memory_migrate  # noqa: E402
+from scope import shared_dir  # noqa: E402
 
 
 def _find_newer(kdev_dir: Path, flush_file: Path, max_items: int = 20) -> List[str]:
@@ -88,8 +89,9 @@ def main() -> int:
     if not kdev_dir.is_dir():
         return 0
 
+    shared = shared_dir(kdev_dir)
     today = date.today().isoformat()
-    log_file = kdev_dir / "执行日志.md"
+    log_file = shared / "执行日志.md"
     flush_file = kdev_dir / ".last-flush"
     warn_file = kdev_dir / f"WARN-未记录-{today}.md"
 
