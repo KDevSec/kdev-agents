@@ -48,7 +48,7 @@ def migrate_to_scoped(
     root = Path(root)
     if not today:
         today = _date.today().isoformat()
-    result: Dict = {"migrated": False, "moved": [], "staff_created": []}
+    result: Dict = {"migrated": False, "moved": [], "failed": [], "staff_created": []}
 
     if not root.is_dir():
         return result
@@ -75,8 +75,9 @@ def migrate_to_scoped(
         try:
             shutil.move(str(src), str(shared / item))
             result["moved"].append(item)
-        except OSError:
-            pass
+        except OSError as e:
+            result["failed"].append(item)
+            print(f"[kdev-memory] ⚠️ 迁移失败，保持原位：{item}（{e}）", file=sys.stderr)
     result["migrated"] = True
 
     _ensure_staff()
@@ -99,6 +100,9 @@ def migrate_to_scoped(
         "",
     ]
     lines += [f"- `{m}`" for m in result["moved"]] or ["_（无）_"]
+    if result["failed"]:
+        lines += ["", "## ⚠️ 迁移失败（保持原位，请手动处理）", ""]
+        lines += [f"- `{m}`" for m in result["failed"]]
     lines += ["", "## 新建 staff scope", ""]
     lines += [f"- `staff/{s}/`" for s in staff]
     lines += [
@@ -131,6 +135,9 @@ def main() -> int:
               f"建 staff {result['staff_created']}")
     else:
         print(f"[kdev-memory] 已是 scoped（或空），补建 staff {result['staff_created']}")
+    if result.get("failed"):
+        print(f"[kdev-memory] ⚠️ {len(result['failed'])} 项迁移失败，请手动处理：{result['failed']}",
+              file=sys.stderr)
     return 0
 
 

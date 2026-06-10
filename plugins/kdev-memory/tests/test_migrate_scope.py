@@ -7,6 +7,7 @@ from pathlib import Path
 LIB_DIR = Path(__file__).parent.parent / "hooks" / "lib"
 sys.path.insert(0, str(LIB_DIR))
 
+import migrate_scope  # noqa: E402
 from migrate_scope import migrate_to_scoped  # noqa: E402
 
 
@@ -62,3 +63,23 @@ def test_migrate_creates_shared_marker(tmp_path):
     mem = _flat_repo(tmp_path)
     migrate_to_scoped(mem, staff=["dev-engineer"], today="2026-06-10")
     assert is_scoped(mem) is True
+
+
+def test_migrate_partial_failure_tracked(tmp_path, monkeypatch):
+    import shutil as _sh
+    mem = _flat_repo(tmp_path)
+    real_move = _sh.move
+    def fake_move(src, dst, *a, **k):
+        if str(src).endswith("踩坑日志.md"):
+            raise OSError("simulated")
+        return real_move(src, dst, *a, **k)
+    monkeypatch.setattr(migrate_scope.shutil, "move", fake_move)
+    result = migrate_scope.migrate_to_scoped(mem, staff=["dev-engineer"], today="2026-06-10")
+    assert "踩坑日志.md" in result["failed"]
+    assert "踩坑日志.md" not in result["moved"]
+    # 失败项保持原位
+    assert (mem / "踩坑日志.md").is_file()
+    # 其它项正常迁入
+    assert (mem / "shared" / "执行日志.md").is_file()
+    # notice 含失败区
+    assert "迁移失败" in (mem / "MIGRATED-scope-2026-06-10.md").read_text(encoding="utf-8")
