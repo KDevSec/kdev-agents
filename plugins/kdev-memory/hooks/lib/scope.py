@@ -38,10 +38,13 @@ def shared_dir(root: PathLike = DEFAULT_ROOT) -> Path:
 
 
 def staff_root(root: PathLike = DEFAULT_ROOT) -> Path:
+    """per-员工 scope 的根目录 `<root>/staff/`。"""
     return Path(root) / "staff"
 
 
 def staff_dir(scope_id: str, root: PathLike = DEFAULT_ROOT) -> Path:
+    """某员工 scope 目录 `<root>/staff/<scope_id>/`。
+    调用方负责传入干净的 canonical ASCII id（本函数不做 path-traversal 防护）。"""
     return staff_root(root) / scope_id
 
 
@@ -78,6 +81,10 @@ def resolve_step_slug(scope: Optional[str], root: PathLike = DEFAULT_ROOT) -> st
     Step ID 形态恒为 `Step <slug>-N`；P-C1b 的 transcript 溯源是 Step 条目里
     独立字段，不折进 slug。
     """
+    # `root` is accepted for API symmetry with the rest of this module and is
+    # reserved for future scope validation (e.g. checking scope_id ∈ list_staff(root));
+    # it does not affect slug computation today.
+    _ = root  # explicitly mark as intentionally unused
     from step_id import compute_branch_slug, sanitize_slug
     if scope is None or scope.strip().lower() in SHARED_SCOPES:
         return compute_branch_slug()

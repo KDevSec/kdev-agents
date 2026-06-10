@@ -101,4 +101,19 @@ def test_resolve_slug_sanitizes_staff_id(tmp_path):
     assert resolve_step_slug("dev engineer!", root) == "dev-engineer"
 
 def test_shared_scopes_constant():
-    assert "shared" in SHARED_SCOPES and "default" in SHARED_SCOPES
+    assert SHARED_SCOPES == frozenset({"", "shared", "default", "project"})
+
+def test_resolve_slug_shared_scopes_case_insensitive(tmp_path, monkeypatch):
+    import subprocess
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    subprocess.run(["git", "init", "-q", "-b", "main"], cwd=repo, check=True)
+    subprocess.run(["git", "-c", "user.email=t@t", "-c", "user.name=t",
+                    "commit", "-q", "--allow-empty", "-m", "init"], cwd=repo, check=True)
+    monkeypatch.chdir(repo)
+    for scope in ("SHARED", "Default", "PROJECT"):
+        assert resolve_step_slug(scope) == "main"
+
+def test_staff_root(tmp_path):
+    root = _flat(tmp_path)
+    assert staff_root(root) == root / "staff"
