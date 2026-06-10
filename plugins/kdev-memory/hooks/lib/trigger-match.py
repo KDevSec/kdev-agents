@@ -43,6 +43,9 @@ from pathlib import Path
 KDEV_DIR = Path(".kdev/memory")
 STATE_FILE = KDEV_DIR / "state" / "trigger-sessions.json"
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from scope import shared_dir, staff_log_files  # noqa: E402
+
 # 约定的项目级 spec 文件扫描路径
 SPEC_PATHS = [
     "constitution.md",
@@ -212,16 +215,13 @@ def _extract_entries_with_triggers(
 
 
 def _iter_memory_files(prefix: str) -> list[Path]:
-    """返回主文件 + 归档子目录下所有同前缀的归档文件。
-
-    扫描顺序：主文件 → 归档目录（按文件名排序）。
-    归档命名约定见 SKILL.md「文件切档与归档」章节。
-    """
+    """主文件（shared 解析）+ 归档子目录下同前缀归档文件。"""
+    base = shared_dir(KDEV_DIR)
     paths = []
-    main = KDEV_DIR / f"{prefix}.md"
+    main = base / f"{prefix}.md"
     if main.is_file():
         paths.append(main)
-    archive_dir = KDEV_DIR / "归档"
+    archive_dir = base / "归档"
     if archive_dir.is_dir():
         paths.extend(sorted(archive_dir.glob(f"{prefix}-*.md")))
     return paths
@@ -268,6 +268,7 @@ def scan_step_entries() -> list[dict]:
 
     entries = []
     heading_re = re.compile(r"^##\s+(Step\s+[\w.-]+)[：:]\s*(.+?)\s*$")
+    # shared / flat 主线
     for path in _iter_memory_files("执行日志"):
         lines = _read_file(path)
         if lines is None:
@@ -275,16 +276,27 @@ def scan_step_entries() -> list[dict]:
         entries.extend(_extract_entries_with_triggers(
             lines, heading_re,
             lambda m, line: (m.group(1), m.group(2)),
-            "Step",
-            str(path),
-            date_filter=date_ok,
+            "Step", str(path), date_filter=date_ok,
         ))
+    # per-员工 scope（scoped 布局才有；flat 下 staff_log_files 返回 []）
+    for scope_id, path in staff_log_files("执行日志.md", KDEV_DIR):
+        lines = _read_file(path)
+        if lines is None:
+            continue
+        scoped = _extract_entries_with_triggers(
+            lines, heading_re,
+            lambda m, line: (m.group(1), m.group(2)),
+            "Step", str(path), date_filter=date_ok,
+        )
+        for e in scoped:
+            e["scope"] = scope_id
+        entries.extend(scoped)
     return entries
 
 
 def scan_tiegui_entries() -> list[dict]:
     """扫 .kdev/memory/方法论铁规.md 的每条规则。"""
-    path = KDEV_DIR / "方法论铁规.md"
+    path = shared_dir(KDEV_DIR) / "方法论铁规.md"
     lines = _read_file(path)
     if lines is None:
         return []
@@ -459,12 +471,11 @@ def format_recall(selected: list[dict]) -> str:
     ]
     for entry in selected:
         source_label = {
-            "G": "踩坑",
-            "Step": "今日进度",
-            "铁规": "铁规",
-            "spec": "项目 spec",
+            "G": "踩坑", "Step": "今日进度", "铁规": "铁规", "spec": "项目 spec",
         }.get(entry["source"], entry["source"])
-        lines.append(f"- **{entry['id']}**（{source_label}）{entry['title']}")
+        scope = entry.get("scope")
+        scope_tag = f"·{scope}" if scope else ""
+        lines.append(f"- **{entry['id']}**（{source_label}{scope_tag}）{entry['title']}")
         lines.append(f"  → `{entry['path']}`")
     lines.append("")
     lines.append("（相关记忆本会话只注入一次；若不相关请忽略）")
