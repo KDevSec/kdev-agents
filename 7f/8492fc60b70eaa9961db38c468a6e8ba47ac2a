@@ -1,0 +1,53 @@
+docs/framework/01-design/2026-06-10-03-KDev数字员工-编排底座-合稿-v1.0.md
+  s_0907f17a04af5e::t_553786a8e6c5de 200
+  s_0907f17a04af5e::t_c4659cc0c90e9e 1-199,201-223
+docs/framework/01-design/2026-06-10-05-KDev数字员工-记忆底座-合稿-v1.0.md
+  s_0907f17a04af5e::t_aec1d2fbcf720b 1,5-11
+  s_0907f17a04af5e::t_c4659cc0c90e9e 17-32,59,61-63,65-69,71,73,104-107,127,155,213,300
+  s_0907f17a04af5e::t_12c349ab91714f 278-297
+docs/framework/01-design/KDev数字员工架构总览_演讲原型_v1.0.html
+  s_0907f17a04af5e::t_4eb094c6750bc4 230
+  s_7b636477e90575::t_9216aa2396822a 136-139,205-229,231-359,377,430,460,470,478,483-492,498-499,502,509,536-541,559-563,569,573,586,588-589,622,629,635-640,642-643,645-647,650-654,677-816,842,857,868,898,928,948
+docs/framework/01-design/2026-06-10-01-KDev数字员工设计总览-演讲稿-v1.0.md
+  s_0907f17a04af5e::t_817052a73aa29c 96,100-103
+  s_0907f17a04af5e::t_c4659cc0c90e9e 10,246-248
+  s_0907f17a04af5e::t_7bf61487ff9859 143
+  s_0907f17a04af5e::t_f03a2220227f96 121,123-127,131
+  s_0907f17a04af5e::t_4e7a5d3e253d66 180,182,184-190,192-196,198-200
+docs/framework/01-design/2026-06-10-04-KDev数字员工-HUD驾驶舱-kdev-hud-设计-v1.0.md
+  s_0907f17a04af5e::t_060c9d42072641 1-8,10-125
+  s_0907f17a04af5e::t_c4659cc0c90e9e 9
+.gitignore
+  s_7b636477e90575::t_92c05f54987b63 101-103
+docs/framework/01-design/2026-06-06-01-数字员工整体设计路线图roadmap-v1.0.md
+  s_0907f17a04af5e::t_c4659cc0c90e9e 10,28,118,137,172,204,242
+  s_7b636477e90575::t_329f0c30aeb8c2 61
+  s_7b636477e90575::t_e54bf6917b220d 45
+  s_0907f17a04af5e::t_1f06ddc904e762 92,110,173,240-241,243
+docs/framework/01-design/2026-06-10-02-KDev数字员工-概念模型与员工能力-合稿-v1.0.md
+  s_0907f17a04af5e::t_c4659cc0c90e9e 1-647
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "7f8492fc60b70eaa9961db38c468a6e8ba47ac2a",
+  "prompts": {},
+  "sessions": {
+    "s_0907f17a04af5e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "8807b9c4-5f6d-4a9e-9cf6-3ade8bcaa9dc",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    },
+    "s_7b636477e90575": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "09506019-0b23-44a4-9cd3-a7ae5f45c360",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
