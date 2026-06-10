@@ -37,7 +37,7 @@ from promote_scan import scan_promote_candidates  # noqa: E402
 from distill_trigger import check_distill_trigger  # noqa: E402
 from pending_commits import format_brief_hint as pending_format_brief_hint  # noqa: E402
 from skill_version import detect_drift as skill_detect_drift  # noqa: E402
-from scope import shared_dir, list_staff, staff_dir, is_scoped  # noqa: E402
+from scope import shared_dir, list_staff, staff_dir  # noqa: E402
 
 SUPPRESS = json.dumps({"continue": True, "suppressOutput": True})
 
