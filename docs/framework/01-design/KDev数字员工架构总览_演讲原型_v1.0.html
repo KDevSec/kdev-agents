@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KDev 数字员工 · 架构与进展总览（演讲原型 v1.0）</title>
+<style>
+  :root{
+    --bg:#0a1422; --slide:#0f1d31; --slide2:#13243c;
+    --panel:#16273f; --panel2:#1b3050; --bd:#2c4467; --line:#26405f;
+    --ink:#d7e2f0; --mut:#8ea4be; --white:#f2f7fc;
+    --blue:#4a9eff; --bluedk:#1f4e79; --teal:#2ec5b6; --red:#ff5d6c;
+    --gold:#f5b740; --green:#43dd8b; --purple:#9b8cff;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);font-family:"Microsoft YaHei","PingFang SC","微软雅黑",sans-serif;color:var(--ink)}
+  .slide{position:relative;width:1280px;height:720px;background:linear-gradient(160deg,var(--slide) 0%,var(--slide2) 100%);margin:26px auto;overflow:hidden;border:1px solid var(--line)}
+  .slide-footer{position:absolute;left:34px;right:34px;bottom:12px;display:flex;justify-content:space-between;font-size:11.5px;color:#5f7691;border-top:1px solid var(--line);padding-top:6px}
+
+  /* 顶栏 */
+  .topbar{display:flex;align-items:center;gap:13px;padding:20px 34px 8px}
+  .badge{width:34px;height:34px;background:var(--blue);color:#06203f;font-size:20px;font-weight:bold;display:flex;align-items:center;justify-content:center;flex:0 0 auto;border-radius:7px}
+  .chaplabel{color:var(--gold);font-size:16px;font-weight:bold;flex:0 0 auto;letter-spacing:.5px}
+  .maintitle{color:var(--white);font-size:23px;font-weight:bold;line-height:1.12}
+  .titlerule{height:3px;background:linear-gradient(90deg,var(--blue),transparent);margin:0 34px}
+
+  .body{padding:14px 34px 0}
+  .cols{display:flex;gap:14px;padding:14px 34px 0;align-items:flex-start}
+  .col{display:flex;flex-direction:column;gap:11px}
+
+  .panel{border:1px solid var(--line);background:var(--panel);border-radius:8px}
+  .ph{background:var(--bluedk);color:var(--white);font-size:13.5px;font-weight:bold;padding:6px 12px;border-radius:8px 8px 0 0}
+  .ph.red{background:#6e2230} .ph.teal{background:#185f57} .ph.gold{background:#6b5113}
+  .pb{padding:10px 12px;font-size:12px;line-height:1.55;color:var(--ink)}
+  .kr{color:var(--red);font-weight:bold} .kb{color:var(--blue);font-weight:bold}
+  .kg{color:var(--green);font-weight:bold} .kt{color:var(--teal);font-weight:bold}
+  .ky{color:var(--gold);font-weight:bold} .mut{color:var(--mut)}
+
+  /* 标签药丸 */
+  .pills{display:flex;gap:9px;flex-wrap:wrap}
+  .pill{border:1px solid var(--line);background:rgba(74,158,255,.08);color:var(--ink);font-size:12px;font-weight:bold;padding:4px 12px;border-radius:20px}
+  .pill.b{border-color:var(--blue);color:var(--blue)} .pill.t{border-color:var(--teal);color:var(--teal)}
+  .pill.y{border-color:var(--gold);color:var(--gold)} .pill.g{border-color:var(--green);color:var(--green)}
+  .pill.r{border-color:var(--red);color:var(--red)}
+
+  /* 封面 */
+  .cover{height:100%;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center;gap:22px;padding:0 60px}
+  .cover .logo{width:64px;height:64px;background:var(--blue);color:#06203f;font-size:38px;font-weight:bold;display:flex;align-items:center;justify-content:center;border-radius:14px}
+  .cover h1{color:var(--white);font-size:46px;font-weight:bold;letter-spacing:1px}
+  .cover .sub{color:var(--gold);font-size:21px;font-weight:bold}
+  .cover .desc{color:var(--mut);font-size:15px;line-height:1.8;max-width:840px}
+  .cover .meta{color:#5f7691;font-size:13px;margin-top:6px}
+  .glowline{width:160px;height:4px;background:linear-gradient(90deg,transparent,var(--blue),transparent);border-radius:4px}
+
+  /* 三段主张卡 */
+  .triad{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+  .tcard{border:1px solid var(--line);background:var(--panel);border-top:4px solid var(--blue);border-radius:8px}
+  .tcard .th{color:var(--white);font-weight:bold;font-size:15px;padding:9px 13px;display:flex;align-items:center;gap:9px;border-bottom:1px solid var(--line)}
+  .tcard .th .n{width:24px;height:24px;background:var(--blue);color:#06203f;border-radius:50%;font-size:13px;font-weight:bold;display:flex;align-items:center;justify-content:center;flex:0 0 auto}
+  .tcard .tb{padding:11px 13px;font-size:12px;line-height:1.6;color:var(--ink)}
+  .tcard.t2{border-top-color:var(--teal)} .tcard.t2 .th .n{background:var(--teal)}
+  .tcard.t3{border-top-color:var(--gold)} .tcard.t3 .th .n{background:var(--gold);color:#3a2c05}
+
+  /* 金字塔 */
+  .pyramid{display:flex;flex-direction:column;align-items:center;gap:6px;padding:6px 0}
+  .pyr{text-align:center;color:var(--white);font-size:12px;font-weight:bold;padding:8px 10px;border-radius:6px}
+  .pyr small{display:block;font-weight:normal;color:rgba(255,255,255,.78);font-size:10px;margin-top:2px}
+  .pyr1{width:54%;background:var(--blue);color:#06203f} .pyr1 small{color:#0a335f}
+  .pyr2{width:68%;background:var(--teal);color:#053a35} .pyr2 small{color:#064d46}
+  .pyr3{width:82%;background:#2c4467} .pyr4{width:96%;background:#22344f}
+
+  /* 自主度阶梯 */
+  .ladder{display:flex;gap:8px}
+  .lvl{flex:1;border:1px solid var(--line);background:var(--panel);border-radius:7px;padding:9px 8px;text-align:center}
+  .lvl .lt{color:var(--mut);font-size:11px;font-weight:bold}
+  .lvl .ln{color:var(--white);font-size:14px;font-weight:bold;margin:2px 0}
+  .lvl .ld{color:var(--mut);font-size:10.5px;line-height:1.4;margin-top:3px}
+  .lvl.now{border-color:var(--green);background:rgba(67,221,139,.1)}
+  .lvl.now .ln{color:var(--green)}
+  .lvl.future{opacity:.62}
+
+  /* 组织架构图（深色） */
+  .org{display:flex;flex-direction:column;align-items:center;gap:0}
+  .user{color:var(--mut);font-size:13px;font-weight:bold;padding:2px 0}
+  .vbar{width:2px;height:14px;background:var(--line)}
+  .ceo{background:linear-gradient(135deg,var(--blue),#2f6fc0);color:#06203f;font-weight:bold;font-size:15px;padding:9px 30px;border-radius:8px;text-align:center;box-shadow:0 0 22px rgba(74,158,255,.3)}
+  .ceo small{display:block;font-weight:normal;color:#093566;font-size:11px;margin-top:2px}
+  .midrow{display:flex;gap:16px;align-items:stretch;width:100%;justify-content:center;margin-top:4px}
+  .cqo{flex:0 0 168px;background:linear-gradient(135deg,#6e2230,#8f2c3e);border:1px solid var(--red);color:var(--white);font-weight:bold;font-size:13.5px;padding:12px 10px;text-align:center;border-radius:8px;display:flex;flex-direction:column;justify-content:center;gap:4px}
+  .cqo small{font-weight:normal;color:#ffc2c9;font-size:10.5px}
+  .empzone{flex:1;border:1.5px dashed var(--teal);border-radius:9px;padding:10px;display:flex;flex-direction:column;gap:8px;background:rgba(46,197,182,.05)}
+  .empzone .zttl{text-align:center;color:var(--teal);font-weight:bold;font-size:12px}
+  .delivery{display:flex;gap:9px;align-items:stretch}
+  .empgrid{flex:1;display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
+  .emp{border:1px solid var(--teal);background:rgba(46,197,182,.1);border-radius:7px;padding:9px 6px;text-align:center}
+  .emp .en{color:var(--white);font-weight:bold;font-size:12.5px}
+  .emp .ec{color:var(--teal);font-size:10.5px;margin-top:3px}
+  .emp .es{color:var(--mut);font-size:9.5px;margin-top:4px;line-height:1.3}
+  .rev{flex:0 0 122px;border:1.5px solid var(--gold);background:rgba(245,183,64,.12);border-radius:7px;padding:9px 7px;text-align:center;display:flex;flex-direction:column;justify-content:center;gap:3px}
+  .rev .en{color:var(--gold);font-weight:bold;font-size:12.5px}
+  .rev .ec{color:var(--ink);font-size:10px;line-height:1.35}
+  .collab{text-align:center;color:var(--mut);font-size:10.5px;margin-top:2px}
+  .platform{display:flex;gap:11px;margin-top:10px}
+  .pcard{flex:1;border:1px solid var(--line);border-radius:8px;padding:9px 12px;background:var(--panel)}
+  .pcard .pn{font-weight:bold;font-size:13px}
+  .pcard .pd{color:var(--mut);font-size:10.5px;line-height:1.45;margin-top:3px}
+  .pcard.core{border-color:var(--blue)} .pcard.core .pn{color:var(--blue)}
+  .pcard.mem{border-color:var(--purple)} .pcard.mem .pn{color:var(--purple)}
+  .pcard.team{border-color:var(--teal)} .pcard.team .pn{color:var(--teal)}
+
+  /* 计数条 */
+  .countbar{margin-top:9px;border:1px dashed var(--line);border-radius:7px;padding:8px 12px;text-align:center;color:var(--ink);font-size:12.5px;background:rgba(74,158,255,.05)}
+
+  /* 三件套关卡 */
+  .three{display:grid;grid-template-columns:repeat(3,1fr);gap:13px}
+  .gatecard{border:1px solid var(--line);background:var(--panel);border-radius:8px;border-left:4px solid var(--blue)}
+  .gatecard .gh{padding:9px 12px;border-bottom:1px solid var(--line)}
+  .gatecard .gh .gn{color:var(--white);font-weight:bold;font-size:14px}
+  .gatecard .gh .gs{color:var(--mut);font-size:10.5px;margin-top:2px}
+  .gatecard .gb{padding:10px 12px;font-size:11.5px;line-height:1.55;color:var(--ink)}
+  .gatecard.g2{border-left-color:var(--teal)} .gatecard.g2 .gn{color:var(--white)}
+  .gatecard.g3{border-left-color:var(--gold)}
+
+  /* gate 类型小表 */
+  .gtab{width:100%;border-collapse:collapse;font-size:11px;margin-top:4px}
+  .gtab th{background:var(--panel2);color:var(--white);padding:5px 8px;text-align:left;font-size:11px;border:1px solid var(--line)}
+  .gtab td{padding:5px 8px;border:1px solid var(--line);color:var(--ink)}
+  .gtab tr td:first-child{font-weight:bold}
+
+  /* 流程节点链 */
+  .flowchain{display:flex;flex-wrap:wrap;gap:6px;align-items:center;justify-content:center;padding:6px 0}
+  .fnode{border:1px solid var(--line);background:var(--panel);border-radius:6px;padding:7px 9px;text-align:center;font-size:10.5px;color:var(--ink);min-width:78px}
+  .fnode .fk{display:block;font-size:9px;margin-top:2px;font-weight:bold}
+  .fnode.act{border-color:var(--teal)} .fnode.act .fk{color:var(--teal)}
+  .fnode.rev{border-color:var(--blue)} .fnode.rev .fk{color:var(--blue)}
+  .fnode.dec{border-color:var(--gold)} .fnode.dec .fk{color:var(--gold)}
+  .fnode.acc{border-color:var(--purple)} .fnode.acc .fk{color:var(--purple)}
+  .fnode.done{border-color:var(--green);background:rgba(67,221,139,.1)} .fnode.done .fk{color:var(--green)}
+  .farrow{color:var(--mut);font-size:13px}
+
+  /* 飞轮 */
+  .wheel{display:flex;flex-direction:column;gap:7px}
+  .wstep{display:flex;align-items:center;gap:10px;border:1px solid var(--line);background:var(--panel);border-radius:7px;padding:8px 11px}
+  .wstep .wn{width:22px;height:22px;background:var(--teal);color:#053a35;border-radius:50%;font-size:12px;font-weight:bold;display:flex;align-items:center;justify-content:center;flex:0 0 auto}
+  .wstep .wt{font-size:12px;color:var(--ink)}
+  .wstep.plus .wn{background:var(--gold);color:#3a2c05}
+
+  /* 路线图 */
+  .roadmap{display:flex;flex-direction:column;gap:9px}
+  .rstage{display:flex;gap:12px;align-items:stretch;border:1px solid var(--line);background:var(--panel);border-radius:8px;padding:10px 13px}
+  .rstage .rleft{flex:0 0 132px;display:flex;flex-direction:column;gap:3px;border-right:1px solid var(--line);padding-right:11px}
+  .rstage .rsn{color:var(--white);font-weight:bold;font-size:13.5px}
+  .rstage .rsa{font-size:10.5px;font-weight:bold}
+  .rstage .rbody{flex:1;font-size:11.5px;line-height:1.5;color:var(--ink);display:flex;flex-direction:column;justify-content:center}
+  .rstage .rstat{flex:0 0 96px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:bold;text-align:center}
+  .rstage.done{border-color:var(--green)} .rstage.done .rstat{color:var(--green)}
+  .rstage.active{border-color:var(--gold);background:rgba(245,183,64,.07)} .rstage.active .rstat{color:var(--gold)}
+  .rstage.todo{opacity:.66} .rstage.todo .rstat{color:var(--mut)}
+  .rsa.l2{color:var(--green)} .rsa.l3{color:var(--blue)} .rsa.l4{color:var(--purple)}
+
+  /* 里程碑 */
+  .mscard{border:1px solid var(--line);border-radius:8px;padding:11px 14px;background:var(--panel)}
+  .mscard.m0{border-left:4px solid var(--green)}
+  .mscard.m1{border-left:4px solid var(--gold);background:rgba(245,183,64,.07)}
+  .mscard .msh{color:var(--white);font-weight:bold;font-size:14px;margin-bottom:6px}
+  .mscard .msb{font-size:11.5px;line-height:1.6;color:var(--ink)}
+
+  .note{margin-top:11px;border:1px solid var(--line);border-left:3px solid var(--gold);background:rgba(245,183,64,.06);border-radius:6px;padding:9px 13px;font-size:12px;line-height:1.55;color:var(--ink)}
+  h2.lead{color:var(--white);font-size:17px;font-weight:bold;margin:2px 0 4px}
+  .leadmut{color:var(--mut);font-size:12.5px;margin-bottom:8px}
+
+  /* 结尾 */
+  .endbig{height:100%;display:flex;flex-direction:column;justify-content:center;align-items:center;gap:24px;padding:0 70px;text-align:center}
+  .endbig .eh{color:var(--white);font-size:34px;font-weight:bold;line-height:1.35}
+  .endbig .ehl{color:var(--gold)}
+  .endbig .es{color:var(--mut);font-size:16px;line-height:1.9}
+  .endbig .erow{display:flex;gap:14px;margin-top:6px}
+</style>
+</head>
+<body>
+
+<!-- ============ 1 封面 ============ -->
+<section class="slide">
+  <div class="cover">
+    <div class="logo">K</div>
+    <h1>KDev 数字员工</h1>
+    <div class="sub">架构与进展总览 —— 一支能端到端交付的 AI 团队</div>
+    <div class="glowline"></div>
+    <div class="desc">
+      从「能力」逐层组装出「数字员工」，再用一套统一底座把他们编排成一家 6 人 AI 团队。<br>
+      今天，这支团队已经<b style="color:var(--green)">第一次真在底座驱动下，端到端跑通了一个真实的改造任务</b>。
+    </div>
+    <div class="meta">同行技术分享 · 2026-06　|　概念 · 整体架构 · 最新落地进展</div>
+  </div>
+  <div class="slide-footer"><span>KDev 数字员工 · 架构与进展总览</span><span>01 / 09</span></div>
+</section>
+
+<!-- ============ 2 概念 ============ -->
+<section class="slide">
+  <div class="topbar">
+    <div class="badge">2</div><div class="chaplabel">概念</div>
+    <div class="maintitle">三句话讲清：能力 → 数字员工 → 持续升级</div>
+  </div>
+  <div class="titlerule"></div>
+  <div class="cols">
+    <div class="col" style="flex:1.35">
+      <div class="triad">
+        <div class="tcard">
+          <div class="th"><span class="n">1</span>能力</div>
+          <div class="tb">一个<b class="kb">通用 AI</b>，配上专业方法、质量规范、产出模板，就变成<b class="kb">某一类活儿的专家</b>。<br><span class="mut">比如：会写测试用例的、懂安全编码的、能澄清需求的。它是最小的「积木」。</span></div>
+        </div>
+        <div class="tcard t2">
+          <div class="th"><span class="n">2</span>数字员工</div>
+          <div class="tb">把<b class="kt">多个能力 + 一个调度能力</b>组合起来，就是一名能<b class="kt">自己安排、从头干到尾</b>的数字员工。<br><span class="mut">能力是积木，员工是会用积木盖完整房子的人。</span></div>
+        </div>
+        <div class="tcard t3">
+          <div class="th"><span class="n">3</span>持续升级</div>
+          <div class="tb">每干一次活，过程经验沉淀进<b class="ky">专属知识库</b>，反哺能力 → <b class="ky">下次更准更快</b>。<br><span class="mut">这就是「复利飞轮」——越用越强。</span></div>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="ph">自主度阶梯 —— 像自动驾驶一样分级（当前在第二级）</div>
+        <div class="pb" style="padding:11px 12px">
+          <div class="ladder">
+            <div class="lvl"><div class="lt">第一级</div><div class="ln">助手</div><div class="ld">人一步步带<br>执行单个动作</div></div>
+            <div class="lvl now"><div class="lt">第二级 · 现在这里</div><div class="ln">协同</div><div class="ld">员工做完整任务<br>人在关键处确认</div></div>
+            <div class="lvl future"><div class="lt">第三级</div><div class="ln">自主</div><div class="ld">端到端自己跑<br>人只管异常</div></div>
+            <div class="lvl future"><div class="lt">第四级</div><div class="ln">自治</div><div class="ld">自我监督<br>自我进化</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col" style="flex:1">
+      <div class="panel">
+        <div class="ph teal">从底层到员工 —— 自下而上一层层搭起来</div>
+        <div class="pb" style="padding:14px 12px 16px">
+          <div class="pyramid">
+            <div class="pyr pyr1">数字员工<small>调度多个能力 → 端到端交付</small></div>
+            <div class="pyr pyr2">能力<small>= 某类活儿的专用专家</small></div>
+            <div class="pyr pyr3">底层技能<small>方法 ＋ 规范 ＋ 模板 ＋ 知识库</small></div>
+            <div class="pyr pyr4">通用 AI<small>推理 ＋ 工具 ＋ 模型选择</small></div>
+          </div>
+          <div style="text-align:center;color:var(--mut);font-size:11px;margin-top:10px">底层越宽、越通用；越往上越专、越像「人」</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer"><span>KDev 数字员工 · 架构与进展总览</span><span>02 / 09</span></div>
+</section>
+
+<!-- ============ 3 团队全景架构图（centerpiece） ============ -->
+<section class="slide">
+  <div class="topbar">
+    <div class="badge">3</div><div class="chaplabel">全景</div>
+    <div class="maintitle">这支团队长什么样 —— 6 名员工，28 个 AI 工作单元</div>
+  </div>
+  <div class="titlerule"></div>
+  <div class="body" style="padding-top:14px">
+    <div class="pills" style="margin-bottom:14px;justify-content:center">
+      <span class="pill b">1 名总指挥</span>
+      <span class="pill r">1 名质量总监</span>
+      <span class="pill t">3 名交付员工</span>
+      <span class="pill y">1 名评审专家</span>
+      <span class="pill">＝ 6 名员工 / 28 个 AI 工作单元</span>
+    </div>
+    <div class="org">
+      <div class="user">👤 用户（只跟「总指挥」对话）</div>
+      <div class="vbar"></div>
+      <div class="ceo">CEO 总指挥<small>对话 · 派活 · 决策 · 拍板兜底</small></div>
+      <div class="vbar"></div>
+      <div class="midrow">
+        <div class="cqo">CQO 质量总监<small>盯流程合规<br>有「叫停」权</small></div>
+        <div class="empzone">
+          <div class="zttl">↔ 三名交付员工：各自从头干到尾，彼此可直接对接（不必都过总指挥）</div>
+          <div class="delivery">
+            <div class="empgrid">
+              <div class="emp"><div class="en">需求架构师</div><div class="ec">5 项能力 + 调度</div><div class="es">澄清需求 → 拆方案<br>→ 原型 → 详细设计</div></div>
+              <div class="emp"><div class="en">开发工程师</div><div class="ec">6 项能力 + 调度</div><div class="es">环境 → 计划 → 编码<br>→ 验收 → 部署</div></div>
+              <div class="emp"><div class="en">测试工程师</div><div class="ec">4 项能力 + 调度</div><div class="es">用例设计 → 执行<br>→ 覆盖评审</div></div>
+            </div>
+            <div class="rev">
+              <div class="en">评审专家</div>
+              <div class="ec">资深质检官<br>7 类核心评审<br>收敛把关</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="countbar">
+      28 个 AI 工作单元 ＝ <b class="kb">1 总指挥</b> ＋ <b class="kr">1 质量总监</b> ＋ <b class="kt">4 调度</b> ＋ <b class="kt">15 业务能力</b>（需求5 + 开发6 + 测试4）＋ <b class="ky">7 评审能力</b>
+      <span class="mut">｜ 完整形态可拆到 39 个（评审专家展开成 18 个视角）</span>
+    </div>
+    <div class="platform">
+      <div class="pcard team"><div class="pn">kdev-team · 员工层</div><div class="pd">6 名员工的实际业务实现（开发工程师已落地）</div></div>
+      <div class="pcard core"><div class="pn">kdev-core · 编排底座</div><div class="pd">让员工「按流程跑起来」的统一引擎</div></div>
+      <div class="pcard mem"><div class="pn">kdev-memory · 记忆底座</div><div class="pd">让员工「记得住、越用越强」的工程记忆</div></div>
+    </div>
+  </div>
+  <div class="slide-footer"><span>KDev 数字员工 · 架构与进展总览</span><span>03 / 09</span></div>
+</section>
+
+<!-- ============ 4 三个插件分工 ============ -->
+<section class="slide">
+  <div class="topbar">
+    <div class="badge">4</div><div class="chaplabel">整体架构</div>
+    <div class="maintitle">三个组件，各管一摊 —— 谁干活、谁调度、谁记忆</div>
+  </div>
+  <div class="titlerule"></div>
+  <div class="cols">
+    <div class="col" style="flex:1">
+      <div class="panel">
+        <div class="ph teal">① kdev-team —— 员工层（谁干活）</div>
+        <div class="pb">
+          6 名 AI 员工的真实业务实现：每名员工有自己的能力清单和工作流程。<br>
+          <span class="mut">这是用户真正「雇来干活」的那批人。</span>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="ph">② kdev-core —— 编排底座（谁调度）</div>
+        <div class="pb">
+          一套统一引擎，专门解决「员工按什么流程跑、在哪里把关、卡住了怎么办」。<br>
+          <b class="kb">一条铁律</b>：底座<b>只记账、不替员工做判断</b>——评审、跑测试、选路线都由员工或人来做，底座只负责记录结果、推进到下一步。<br>
+          <span class="mut">所以底座很「薄」，跟具体用哪个大模型无关。</span>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="ph gold">③ kdev-memory —— 记忆底座（谁记忆）</div>
+        <div class="pb">
+          员工的工程记忆：做过什么、踩过什么坑、定过什么规矩，跨会话都记得住。<br>
+          <span class="mut">员工层「硬依赖」它；它单独装也能用（给个人开发者做跨会话续航）。</span>
+        </div>
+      </div>
+    </div>
+    <div class="col" style="flex:.92">
+      <div class="panel">
+        <div class="ph">一张图看清依赖关系</div>
+        <div class="pb" style="padding:16px 14px">
+          <div class="org" style="gap:0">
+            <div class="user">👤 用户</div>
+            <div class="vbar"></div>
+            <div style="border:1px solid var(--teal);background:rgba(46,197,182,.1);border-radius:8px;padding:10px 16px;text-align:center;width:80%">
+              <b class="kt">kdev-team</b><br><span class="mut" style="font-size:11px">CEO · CQO · 业务员工 · 评审专家</span>
+            </div>
+            <div style="color:var(--mut);font-size:11px;margin:7px 0">都跑在 ↓ 底座上</div>
+            <div style="border:1px solid var(--blue);background:rgba(74,158,255,.1);border-radius:8px;padding:10px 16px;text-align:center;width:88%">
+              <b class="kb">kdev-core 编排底座</b><br><span class="mut" style="font-size:11px">状态记录 · 流程引擎 · 三类把关关卡</span>
+            </div>
+            <div style="color:var(--mut);font-size:11px;margin:7px 0">↓ 都依赖记忆底料</div>
+            <div style="border:1px solid var(--purple);background:rgba(155,140,255,.1);border-radius:8px;padding:10px 16px;text-align:center;width:96%">
+              <b style="color:var(--purple)">kdev-memory 记忆底座</b><br><span class="mut" style="font-size:11px">三层记忆 · 多分区 · 跨会话续航</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="note" style="margin-top:0">
+        <b class="ky">为什么要拆三层？</b> 干活、调度、记忆是三件不同的事。拆开后：底座能被别的产品复用、记忆能单独装、员工层能独立演进——各自迭代不互相拖累。
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer"><span>KDev 数字员工 · 架构与进展总览</span><span>04 / 09</span></div>
+</section>
+
+<!-- ============ 5 底座三件套 ============ -->
+<section class="slide">
+  <div class="topbar">
+    <div class="badge">5</div><div class="chaplabel">编排底座</div>
+    <div class="maintitle">底座靠三样东西让员工「跑得起来、卡得住、续得上」</div>
+  </div>
+  <div class="titlerule"></div>
+  <div class="body" style="padding-top:14px">
+    <div class="three">
+      <div class="gatecard">
+        <div class="gh"><div class="gn">① 状态记录</div><div class="gs">每条流程一份进度档案</div></div>
+        <div class="gb">
+          员工干到哪一步、每个关卡的结果，全程<b class="kb">原子化写进一份档案</b>。<br><br>
+          <b class="kg">最大好处：断点续跑</b>——中途断电、被打断，再起来能从上次那一步接着干，不用从头来。
+        </div>
+      </div>
+      <div class="gatecard g2">
+        <div class="gh"><div class="gn">② 流程节点引擎</div><div class="gs">每条业务自己声明节点表</div></div>
+        <div class="gb">
+          每条业务流程由它自己声明「有哪些步骤、什么顺序」（不写死段数：设计流程 4 段、开发流程十几段）。<br><br>
+          底座只提供<b class="kt">推进引擎</b>：把关通过 → 进下一步；把关不过 → <b class="kt">退回去重做</b>（有次数上限，不会无限打转）。
+        </div>
+      </div>
+      <div class="gatecard g3">
+        <div class="gh"><div class="gn">③ 三类把关关卡</div><div class="gs">核心难点，也是最大卖点</div></div>
+        <div class="gb">
+          所有把关点，无论多复杂，都归成<b class="ky">三种类型</b>，用同一套逻辑处理。<br><br>
+          这是「一套底座能跑任意业务」的根：换业务，只是换节点表和关卡配置。
+        </div>
+      </div>
+    </div>
+    <div class="panel" style="margin-top:13px">
+      <div class="ph gold">三类把关关卡 —— 怎么把关、不过怎么办</div>
+      <div class="pb" style="padding:10px 14px">
+        <table class="gtab">
+          <tr><th style="width:120px">关卡类型</th><th style="width:230px">干什么</th><th style="width:180px">谁来判</th><th>判不过怎么办</th></tr>
+          <tr><td class="ky">评审</td><td>检查产出质量（代码 / 方案 / 安全…）</td><td>默认 AI，可改成人或人机双审</td><td>退回去改 → 重审（最多 3 次）；还不过 → <b class="kr">升级交人工</b></td></tr>
+          <tr><td class="kt">岔路决策</td><td>在分叉口选一条路（复杂还是简单走法）</td><td>默认 AI，岔路口可交给人</td><td>选了哪条就走哪条（不重试）</td></tr>
+          <tr><td style="color:var(--purple)">验收</td><td>跑端到端测试、验真功能</td><td>自动跑测试，可叠加人复核</td><td>没过就退回修复节点重跑</td></tr>
+        </table>
+        <div style="margin-top:9px;font-size:11.5px;color:var(--mut)">
+          把关结果以<b class="kb">结构化数据</b>记录（不靠猜文本），所以谁都能程序化查「这关重试了几轮、谁判的」。卡住超过上限<b class="kr">一定升级交人工，绝不偷偷降格放行</b>。
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer"><span>KDev 数字员工 · 架构与进展总览</span><span>05 / 09</span></div>
+</section>
+
+<!-- ============ 6 记忆 + 飞轮 ============ -->
+<section class="slide">
+  <div class="topbar">
+    <div class="badge">6</div><div class="chaplabel">记忆底座</div>
+    <div class="maintitle">记忆怎么分层 —— 既省成本，又让员工越用越强</div>
+  </div>
+  <div class="titlerule"></div>
+  <div class="cols">
+    <div class="col" style="flex:1.15">
+      <div class="panel">
+        <div class="ph">三层记忆 —— 各记各的，不互相挤占</div>
+        <div class="pb" style="padding:11px 13px">
+          <div style="display:flex;flex-direction:column;gap:9px">
+            <div style="border:1px solid var(--teal);border-radius:7px;padding:9px 11px;background:rgba(46,197,182,.07)">
+              <b class="kt">操作层 · 轻流水</b>　<span class="mut" style="font-size:11px">员工高频用</span><br>
+              <span style="font-size:11.5px">一行一条「做了啥 / 要做啥」，极省。员工干活全程只碰这层。</span>
+            </div>
+            <div style="border:1px solid var(--gold);border-radius:7px;padding:9px 11px;background:rgba(245,183,64,.07)">
+              <b class="ky">叙事层 · 工程记忆</b>　<span class="mut" style="font-size:11px">人读 + 续航用</span><br>
+              <span style="font-size:11.5px">完整的步骤记录、决策、踩坑。不每次都写，而是<b>阶段性从流水汇总一次</b>。</span>
+            </div>
+            <div style="border:1px solid var(--blue);border-radius:7px;padding:9px 11px;background:rgba(74,158,255,.07)">
+              <b class="kb">状态层 · 当前进度</b>　<span class="mut" style="font-size:11px">实时</span><br>
+              <span style="font-size:11.5px">「现在在哪一步、下一步去哪」，就是底座那份进度档案。</span>
+            </div>
+          </div>
+          <div style="margin-top:10px;font-size:11px;color:var(--mut)">
+            <b>记忆分区</b>：共享区（全员的决策 / 踩坑）+ 每名员工的私有区，按路径前缀隔离；总指挥和质量总监可跨区查。整套记忆用 Git 托管，自动同步。
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col" style="flex:.95">
+      <div class="panel">
+        <div class="ph teal">复利飞轮 —— 越用越强（升级版）</div>
+        <div class="pb" style="padding:11px 13px">
+          <div class="wheel">
+            <div class="wstep"><span class="wn">1</span><span class="wt">数字员工干活（需求 → 验收）</span></div>
+            <div class="wstep"><span class="wn">2</span><span class="wt">过程经验沉淀进专属知识库</span></div>
+            <div class="wstep"><span class="wn">3</span><span class="wt">知识反哺能力（下次更准更快）</span></div>
+            <div class="wstep plus"><span class="wn">+</span><span class="wt"><b class="ky">未来：也反哺「流程本身」</b>——发现某关卡总是白过、某顺序更优，就提议改流程</span></div>
+            <div class="wstep"><span class="wn">4</span><span class="wt">越用越强 → 回到第 1 步</span></div>
+          </div>
+          <div class="note" style="margin-top:11px">
+            <b class="ky">从「人编排流程」走向「员工自己优化流程」。</b><br>这就是最高级别（自治）的核心——但员工只能<b>提议</b>、不能擅自改，最终要人确认。当前只预留挂钩。
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer"><span>KDev 数字员工 · 架构与进展总览</span><span>06 / 09</span></div>
+</section>
+
+<!-- ============ 7 kdev-team 真实落地：开发工程师 ============ -->
+<section class="slide">
+  <div class="topbar">
+    <div class="badge">7</div><div class="chaplabel">真实落地</div>
+    <div class="maintitle">第一名上岗的员工：开发工程师（kdev-team 已落地）</div>
+  </div>
+  <div class="titlerule"></div>
+  <div class="body" style="padding-top:12px">
+    <h2 class="lead">他的一条完整工作流程 —— 16 个步骤、9 道把关，全跑在底座上</h2>
+    <div class="leadmut">下面每个方块是一个步骤；颜色代表它是「干活」还是「把关」，把关又分三类（评审 / 岔路 / 验收）。</div>
+    <div class="panel">
+      <div class="pb" style="padding:14px 12px">
+        <div class="flowchain">
+          <div class="fnode act">背景对齐<span class="fk">干活</span></div><span class="farrow">→</span>
+          <div class="fnode dec">关联度判断<span class="fk">岔路</span></div><span class="farrow">→</span>
+          <div class="fnode act">写实施计划<span class="fk">干活</span></div><span class="farrow">→</span>
+          <div class="fnode rev">方案评审<span class="fk">评审</span></div><span class="farrow">→</span>
+          <div class="fnode dec">复杂度判断<span class="fk">岔路</span></div><span class="farrow">→</span>
+          <div class="fnode act">编码实现<span class="fk">干活</span></div><span class="farrow">→</span>
+          <div class="fnode rev">完成验证<span class="fk">评审</span></div><span class="farrow">→</span>
+          <div class="fnode rev">代码 / 质量评审<span class="fk">评审</span></div>
+        </div>
+        <div class="flowchain" style="margin-top:4px">
+          <div class="fnode acc">端到端测试<span class="fk">验收</span></div><span class="farrow">→</span>
+          <div class="fnode dec">是否还有增量<span class="fk">岔路</span></div><span class="farrow">→</span>
+          <div class="fnode rev">安全评审<span class="fk">评审</span></div><span class="farrow">→</span>
+          <div class="fnode act">合并主分支<span class="fk">干活</span></div><span class="farrow">→</span>
+          <div class="fnode acc">部署 + 灰度验收<span class="fk">验收</span></div><span class="farrow">→</span>
+          <div class="fnode done">产出清点完成<span class="fk">收尾</span></div>
+        </div>
+        <div style="text-align:center;color:var(--mut);font-size:11px;margin-top:11px">
+          任何一道评审 / 验收没过 → <b class="kt">退回前面的实现步骤重做</b> → 重新把关（最多 3 次，超了就升级交人工）
+        </div>
+      </div>
+    </div>
+    <div class="cols" style="padding:13px 0 0">
+      <div class="col" style="flex:1">
+        <div class="note" style="margin-top:0">
+          <b class="kt">7 个能力单元已就位：</b>调度 · 环境对齐 · 计划 · 前端 · 端到端测试 · 部署 · 安全。
+          调度单元像「工头」，按上面的流程把活儿分给其余 6 个，自己不亲手写代码。
+        </div>
+      </div>
+      <div class="col" style="flex:1">
+        <div class="note" style="margin-top:0;border-left-color:var(--green);background:rgba(67,221,139,.07)">
+          <b class="kg">这套流程不是写死的。</b>用户改一份配置文件，就能开关某道关卡、把「谁来判」从 AI 改成人、调重试次数——<b>同一个员工换一套打法</b>。
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer"><span>KDev 数字员工 · 架构与进展总览</span><span>07 / 09</span></div>
+</section>
+
+<!-- ============ 8 进展路线图 + 里程碑 ============ -->
+<section class="slide">
+  <div class="topbar">
+    <div class="badge">8</div><div class="chaplabel">最新进展</div>
+    <div class="maintitle">做到哪了 —— 五个阶段，前两个里程碑已经达成</div>
+  </div>
+  <div class="titlerule"></div>
+  <div class="cols">
+    <div class="col" style="flex:1.18">
+      <div class="roadmap">
+        <div class="rstage done">
+          <div class="rleft"><div class="rsn">阶段 0</div><div class="rsa">打地基</div></div>
+          <div class="rbody">底座三件套（状态记录 / 流程引擎 / 三类关卡）+ 记忆 Git 托管</div>
+          <div class="rstat">✅ 已完成</div>
+        </div>
+        <div class="rstage done">
+          <div class="rleft"><div class="rsn">阶段 1 ★</div><div class="rsa l2">第二级 · 协同</div></div>
+          <div class="rbody">开发工程师端到端跑通真实改造任务（首次实测）</div>
+          <div class="rstat">✅ 已完成</div>
+        </div>
+        <div class="rstage active">
+          <div class="rleft"><div class="rsn">阶段 2</div><div class="rsa l2">第二级 · 协同</div></div>
+          <div class="rbody">员工集中到 kdev-team（已完成）· 第二名员工「需求架构师」+ 记忆分区（进行中）</div>
+          <div class="rstat">🔨 进行中</div>
+        </div>
+        <div class="rstage todo">
+          <div class="rleft"><div class="rsn">阶段 3</div><div class="rsa l3">迈向第三级</div></div>
+          <div class="rbody">评审专家上岗 + 跨员工协作 + 框架层（派单 / 产物 / 看板）</div>
+          <div class="rstat">⏳ 规划中</div>
+        </div>
+        <div class="rstage todo">
+          <div class="rleft"><div class="rsn">阶段 4</div><div class="rsa l4">第四级 · 北极星</div></div>
+          <div class="rbody">质量总监元监督 + 自我进化 + 跨开发工具</div>
+          <div class="rstat">⏳ 远期</div>
+        </div>
+      </div>
+    </div>
+    <div class="col" style="flex:1">
+      <div class="mscard m0">
+        <div class="msh">🏁 里程碑 M0 —— 地基立住了</div>
+        <div class="msb">底座三件套 <b class="kg">66 项测试全绿</b>、已合主干；整套工程记忆已用 Git 托管、自动同步生效。</div>
+      </div>
+      <div class="mscard m1">
+        <div class="msh">⭐ 里程碑 M1 —— 团队史上首次端到端实测</div>
+        <div class="msb">
+          开发工程师在底座驱动下，<b class="ky">真刀真枪跑通了一个真实的界面改造任务</b>。证明「底座真在驱动、不是演戏」的硬证据：<br>
+          · 16 个步骤经 <b>约 25 次独立进程</b>流转，进度档案全程续接（<b class="kg">中途断了能接着跑</b>）；<br>
+          · 9 道关卡覆盖<b>全部三类</b>把关；<br>
+          · 出现一次「验收没过 → 退回修 → 重审通过」的<b>活体闭环</b>；<br>
+          · 真产出可运行的前端 + 对版的登录页。
+        </div>
+      </div>
+      <div class="note" style="margin-top:11px">
+        <b class="kt">阶段 2 已落地的一块：</b>把分散的员工实现集中进 kdev-team——开发工程师的 7 个能力单元成了可直接调用的标准单元，11 项团队测试 + 76 项底座测试全绿。
+      </div>
+    </div>
+  </div>
+  <div class="slide-footer"><span>KDev 数字员工 · 架构与进展总览</span><span>08 / 09</span></div>
+</section>
+
+<!-- ============ 9 结尾 ============ -->
+<section class="slide">
+  <div class="endbig">
+    <div class="logo" style="width:56px;height:56px;background:var(--blue);color:#06203f;font-size:32px;font-weight:bold;display:flex;align-items:center;justify-content:center;border-radius:13px">K</div>
+    <div class="eh">从「人带着 AI 干活」<br>走向「<span class="ehl">一支会自己交付、越用越强的 AI 团队</span>」</div>
+    <div class="glowline"></div>
+    <div class="es">
+      底座（怎么跑）已经立住　·　流程（跑什么）可自由编排　·　自我进化（自己优化怎么跑）在路上<br>
+      <span style="color:#5f7691;font-size:14px">下一步：第二名员工上岗 · 真实任务全量跑 · 评审专家与跨员工协作</span>
+    </div>
+    <div class="erow">
+      <span class="pill g">阶段 0 ✅ 地基</span>
+      <span class="pill g">阶段 1 ✅ 首次实测</span>
+      <span class="pill y">阶段 2 🔨 进行中</span>
+      <span class="pill">阶段 3 / 4 ⏳ 在路上</span>
+    </div>
+  </div>
+  <div class="slide-footer"><span>KDev 数字员工 · 架构与进展总览</span><span>09 / 09</span></div>
+</section>
+
+</body>
+</html>
