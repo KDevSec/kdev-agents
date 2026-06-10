@@ -1,0 +1,25 @@
+plugins/kdev-memory/hooks/lib/weekly.py
+  s_7b636477e90575::t_41c63a8bb1c403 100
+  s_7b636477e90575::t_ed3c43d10c5e81 79-91
+  s_7b636477e90575::t_3a8367a2e11159 121-123
+  s_7b636477e90575::t_e86a115f8faae1 179
+  s_7b636477e90575::t_1b4c6ba81fa8f0 32-33
+plugins/kdev-memory/tests/test_weekly_scope.py
+  s_7b636477e90575::t_029e849a012111 1-41
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "6430ce4b33e06cc174ee7e35ad711d1df829eec6",
+  "prompts": {},
+  "sessions": {
+    "s_7b636477e90575": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "09506019-0b23-44a4-9cd3-a7ae5f45c360",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
