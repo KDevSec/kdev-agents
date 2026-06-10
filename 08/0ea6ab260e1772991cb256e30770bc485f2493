@@ -1,0 +1,19 @@
+plugins/kdev-memory/tests/test_scope_integration.py
+  s_7b636477e90575::t_61a98565d178ae 1-79
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "080ea6ab260e1772991cb256e30770bc485f2493",
+  "prompts": {},
+  "sessions": {
+    "s_7b636477e90575": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "09506019-0b23-44a4-9cd3-a7ae5f45c360",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
