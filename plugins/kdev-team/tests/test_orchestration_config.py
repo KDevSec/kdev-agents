@@ -11,10 +11,21 @@ def _load():
     return data, node_machine.load_node_table(data)
 
 
-def test_node_table_loads_and_has_16_nodes():
+def test_node_table_loads_and_has_17_nodes():
     data, table = _load()
-    assert len(table["nodes"]) == 16
+    assert len(table["nodes"]) == 17  # 16 + n9c-increment 增量循环 gate
     assert table["terminal_fail"] == "n-fail"
+
+
+def test_increment_gate_loops_back_or_finalizes():
+    """n9c-increment decision gate: more→回 n6b 做下一增量 / done→进收尾链 n10-sec。"""
+    data, table = _load()
+    spec = data["gate_specs"]["g-increment"]
+    assert spec["kind"] == "decision"
+    assert spec["branches"]["more"] == "n6b-impl-subagent"
+    assert spec["branches"]["done"] == "n10-sec"
+    # g-e2e PASS 现在落在增量判断 gate（不再直奔收尾）
+    assert data["gate_specs"]["g-e2e"]["on_pass"] == "n9c-increment"
 
 
 def test_every_gate_node_has_a_gate_spec():

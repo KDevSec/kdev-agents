@@ -227,13 +227,23 @@ python3 -m kdev_core unblock $FLOW <slug> --to-node <回到哪个节点>
 
 然后重新进入 Driving Loop。建议 `--to-node` 设为回流目标节点（如 n6b），而不是停在原来 escalate 的 gate 节点。
 
-### 3.3 多轮实现（frontend 需要多 increment）
+### 3.3 增量 vs 实现工序（别踩 G-005 的坑）
 
-考题有 T0→T1→T2→T3 四个大任务，一轮 dev-engineer-frontend 做不完。处理方式：
+**先分清两件事**（详见 `references/gate-decision-logic.md` 顶部）：
 
-- n6b 节点每次派单给 frontend agent 时，明确告诉它"这一轮做哪个 increment"（如"先做 T0 全局布局 + T1 登录页"）
-- 前一轮完成 → n8-verify → n9a → n9b-e2e → 回到 n6b 做下一 increment
-- 这是 SOP 的正常回流路径，引擎自动处理
+- **增量 = 能独立过 e2e 的纵向切片**（如"购物车""支付"各自可独立验收）→ 走 g-increment 循环
+- **实现工序 = 一个增量内部的横向分层**（如 T0 主题 → T1 登录 → T2 仪表盘，是一套视觉系统的分层）→ 在**单个 n6b 节点内部**做完，可多次派 frontend 分批建，**中间不跑 gate 链**
+
+**两种循环别混**：
+
+| 想干什么 | 走哪条路 |
+|---|---|
+| 一个增量内部分批写代码（T0→T4） | n6b 内部多次派 frontend，**不经过 gate** |
+| 一个增量没做好要重做 | g-verify/g-e2e **FAIL 回流** → n6b |
+| 这个增量过了 e2e，做下一个纵向切片 | g-e2e PASS → **g-increment more** → n6b |
+| 所有增量都过了 e2e | g-increment **done** → 收尾链（n10→n11→n12，跑一次） |
+
+**关键**：考题列的 T0/T1/T2/T3/T4 是**实现工序不是增量**——UED 视觉改造整体就是 **1 个增量**（N=1），T0-T4 在 n6b 内部一次做完，e2e PASS 后 g-increment 直接判 `done` 进收尾。**绝不要把 T0-T4 当 4 个增量去 g-increment more 循环，更不要用 g-deploy FAIL 当增量切换**（那是被根治掉的旧 bug）。
 
 ### 3.4 n6a vs n6b 选择
 

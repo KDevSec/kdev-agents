@@ -12,8 +12,8 @@
 | n2-worktree | 新建 worktree | `dev-engineer-env` | 开发工程师·环境准备 | 在 worktree 里做（关联度低时走此分支） | repo_url, workspace 路径, 分支名 |
 | n3-plan | 写 implementation-plan | `dev-engineer-plan` | 开发工程师·实施计划 | 写 PLAN.md：任务拆解、TDD 序列、验收标准 | 任务描述, gate_a_verdict（high/low）, 考题或 spec 文件路径, workspace 路径 |
 | n6a-impl-inline | 主控直接实现 | **不派 agent** | — | 主控自己写代码（simple 任务时走此分支） | 任务描述, PLAN.md 路径, workspace 路径 |
-| n6b-impl-subagent | subagent 派单实现(含TDD) | `dev-engineer-frontend` | 开发工程师·前端实现 | 改 src：视觉改造（token 对齐 + 页面逐页走查） | 任务描述, PLAN.md 路径, rules.md 路径, prototype 图路径, 当前 increment 范围（如"T0+T1"）, workspace 路径, src 项目路径 |
-| n11-merge | 合并主分支 | `dev-engineer-deploy` | 开发工程师·部署上线 | 合并分支 + 起测试环境 + release notes | 分支名, workspace 路径, 项目路径 |
+| n6b-impl-subagent | subagent 派单实现(含TDD) | `dev-engineer-frontend` | 开发工程师·前端实现 | 改 src：视觉改造（token 对齐 + 页面逐页走查）。**当前增量内部的实现工序（T0→T4 这种分层）在这一个节点里做完，可多次派 frontend 分批建，中间不跑 gate 链** | 任务描述, PLAN.md 路径, rules.md 路径, prototype 图路径, **当前是第几个增量（纵向切片）**, workspace 路径, src 项目路径 |
+| n11-merge | 合并主分支 | `dev-engineer-deploy` | 开发工程师·部署上线 | 合并分支 + 起测试环境 + release notes（**收尾链，整任务只跑一次，真合并不空过**） | 分支名, workspace 路径, 项目路径 |
 
 ## Gate 节点不派 agent
 
@@ -28,6 +28,28 @@ Gate 节点由编排器（你）自行判断，不派业务 agent。具体判据
 | n12-deploy (g-deploy) | `dev-engineer-deploy` + e2e 检查 | deploy agent 起环境后，e2e agent 做金丝雀冒烟 |
 
 注意：这些 gate 的"检查"部分确实需要派 agent，但"判断"部分由编排器做。流程是：先派 agent 收证据 → 读证据 → 编排器判 verdict → record-gate。
+
+## 逐增量循环 vs 收尾链（once）
+
+```
+逐增量循环（每个纵向切片跑一遍）：
+  n6b 实现 → n8-verify → n9a-code-review → n9b-e2e → n9c-increment(more/done)
+   ▲                                                      │ more（还有切片）
+   └──────────────────────────────────────────────────────┘
+                                              │ done（切片全过 e2e）
+收尾链（整任务只跑一次）：                      ▼
+  n10-sec → n11-merge → n12-deploy → n13-done
+```
+
+- **逐增量**：实现 + verify + 代码评审 + e2e，每个增量一遍。more 回 n6b 做下一切片。
+- **收尾一次**：安全扫全量 diff、单次真合并、单次部署金丝雀。**只在 g-increment done 后跑。**
+- 单增量任务（N=1，如纯视觉改造）：循环只跑一遍，直接 done 进收尾。
+
+## ⚠️ 产物落在任务 workspace 的 delivery/，不是框架仓（G-006 根因）
+
+派 e2e / deploy / frontend agent 时，**必须在上下文里写死"产物根 = `<任务workspace>/delivery/`"**，所有截图、报告、patch 都落这里。
+
+**坑**：数字员工跑外部任务时 cwd 可能串到框架仓，agent 会无脑套用全局"截图放 `<项目>/screenshots/`"规则，把考试截图丢进框架仓 `kdev-agents/screenshots/`——违反考题交付目录要求。**显式注入 delivery/ 绝对路径 + 声明"本次是外部任务、产物一律落 delivery/、不套用全局 screenshots 规则"**，盖过全局默认。
 
 ## n6a vs n6b 的选择
 

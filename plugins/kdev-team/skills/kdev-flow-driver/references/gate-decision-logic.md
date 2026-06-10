@@ -4,6 +4,20 @@
 
 适用于 `dev-engineer`（开发工程师）员工的 coding-flow。其他员工会有自己的 gate 判定逻辑。
 
+## ⚠️ 先搞清"增量"是什么（最容易踩的坑）
+
+**增量 = 能独立过 e2e 验收的纵向切片**，不是实现分层。这条定义决定了整个 flow 循环几次。
+
+| | 实现切片（不是增量） | 交付增量（是增量） |
+|---|---|---|
+| 例子 | T0 主题 → T1 登录 → T2 仪表盘（一套视觉系统的横向分层） | "购物车" / "支付" / "订单确认"（各自能独立 e2e 的纵向功能） |
+| 单独拿出来 | 没法端到端验收（T0 主题单独没有可验收的东西） | 能独立跑过 e2e |
+| 该住哪 | **单个增量内部**，是 n6b 实现节点自己的工序 | **flow 级 g-increment 循环单元** |
+
+**判增量数 N 的红线**：一个切片如果**自己过不了 e2e**，它就不是增量，是某增量的子任务，归进那个增量的 task 列表。
+
+**踩过的坑（G-005）**：UED 考题被错拆成 T0-T4 四个"增量"（其实是一套视觉系统的实现分层，**整体只有 1 个增量**）。编排器每个 T 跑一遍 gate 链、跑完想回去做下一个，但拓扑没给合法回头路，于是劫持 `g-deploy FAIL` 当增量循环——deploy 根本没失败、merge 被空过、还撞了 retry cap。**g-increment gate 就是为根治这个而加的合法回头路。**
+
 ## Gate 总览
 
 | Gate | 节点 | Kind | Reviewer | 阶段1 处理 |
@@ -14,6 +28,7 @@
 | g-verify | n8-verify | review | self | 自判 |
 | g-code-review | n9a-code-review | review | reviewer-expert | **deferred** |
 | g-e2e | n9b-e2e | acceptance | self | 自判 |
+| **g-increment** | **n9c-increment** | **decision** | **self** | **自判（more/done）** |
 | g-sec-review | n10-sec | review | reviewer-expert | **deferred** |
 | g-deploy | n12-deploy | acceptance | self | 自判 |
 
@@ -64,6 +79,24 @@
 - **PASS**：视觉还原可接受 + 核心功能可用 + CHECKLIST 无硬伤
 - **FAIL**：视觉偏差大 / 功能不可用 / CHECKLIST 有硬伤，回流到 n6b 修
 
+> e2e PASS = "**这个增量交付完成**"。过了 e2e 就进 g-increment 判断还有没有下一个切片。
+
+### g-increment（增量循环判断，decision → more/done）
+
+判断"刚过 e2e 的这个增量是不是最后一个"，决定回去做下一切片还是进收尾链。
+
+**判据**（在 n3-plan 时已按"可独立 e2e"切好增量、定死总数 N）：
+- 编排器跟踪当前做完的是第 k 个增量（从 PLAN.md 的增量清单数）
+- **k < N** → `more`（回 n6b 做第 k+1 个切片）
+- **k == N** → `done`（所有切片都过了 e2e，进收尾链 n10-sec → merge → deploy）
+
+**铁律**：
+1. **N 在 n3-plan 定死，不能边跑边加**。要加增量 = 回 n3-plan 重新规划，不在循环里临时塞。
+2. **每个 more 回去的必须是"能独立过 e2e 的纵向切片"**，不是实现分层。如果你发现自己想 more 回去做的是"T0 主题打底""抽个公共组件"这种——停，那是上一个增量没做完的工序，不该走 g-increment，该是 g-e2e/g-verify FAIL 回流。
+3. **单增量任务 N=1**：第一个增量过 e2e 后直接 `done`，循环只跑一遍。纯视觉改造、单页面改造这类通常 N=1（T0-T4/各页面都是一个增量内部的实现工序）。
+
+> g-increment 是 decision gate，不碰 retry cap——可以合法循环 N 次，不会像被劫持的 g-deploy FAIL 那样撞 max_retries。
+
 ### g-deploy（部署+金丝雀验收，acceptance → PASS/FAIL）
 
 判断部署是否成功 + 金丝雀冒烟是否通过。需要先派 dev-engineer-deploy agent 部署，然后 e2e 做金丝雀检查：
@@ -100,12 +133,24 @@
 | g-relevance | low | n2-worktree |
 | g-complexity | simple | n6a-impl-inline |
 | g-complexity | complex | n6b-impl-subagent |
+| **g-increment** | **more** | **n6b-impl-subagent（下一切片）** |
+| **g-increment** | **done** | **n10-sec（进收尾链）** |
+
+## 逐增量循环 vs 收尾链（once）
+
+| 阶段 | 节点 | 跑几次 | 说明 |
+|---|---|---|---|
+| 逐增量循环 | n6b → n8-verify → n9a-code-review → n9b-e2e → n9c-increment | **每增量一次** | 每个纵向切片走完整质量链；more 回 n6b 做下一切片 |
+| 收尾链 | n10-sec → n11-merge → n12-deploy → n13-done | **整任务只一次** | 所有切片都过 e2e 后（g-increment done）才跑：安全扫全量 diff、单次合并、单次部署 |
+
+**别再用 g-deploy FAIL 当增量循环**（G-005 根因）——增量循环走 g-increment more；g-deploy FAIL 回归本义（部署/金丝雀真挂了才 FAIL）。收尾链每个节点整个任务只经过一次，n11-merge 是真合并（不是空过）。
 
 ## 回流规则
 
 - g-verify FAIL → n6b-impl-subagent（重做实现）
 - g-e2e FAIL → n6b-impl-subagent（重做实现）
-- g-deploy FAIL → n6b-impl-subagent（重做实现）
+- g-deploy FAIL → n6b-impl-subagent（真部署失败才回流，不是增量切换）
 - g-plan-review FAIL → n3-plan（重写计划，但阶段1 deferred 不会 FAIL）
 
 回流最多 2 次（总共 3 次尝试），第 3 次引擎自动 escalate 为 blocked。
+g-increment 的 more 循环**不算回流**（decision gate，不碰 cap），可循环 N 次。
