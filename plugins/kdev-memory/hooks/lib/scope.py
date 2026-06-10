@@ -71,6 +71,20 @@ def state_dir(root: PathLike = DEFAULT_ROOT) -> Path:
     return Path(root) / "state"
 
 
+def recorder_target_log(scope: Optional[str], root: PathLike = DEFAULT_ROOT) -> Path:
+    """kdev-step-recorder 写 Step 的目标 执行日志.md。
+
+    - shared/default/None → shared_dir(root)/执行日志.md（flat 下即 root/执行日志.md）
+    - 员工 canonical id → staff/<id>/执行日志.md（flat 兜底回 root/执行日志.md）
+    """
+    root = Path(root)
+    if scope is None or scope.strip().lower() in SHARED_SCOPES:
+        return shared_dir(root) / "执行日志.md"
+    if is_scoped(root):
+        return staff_dir(scope.strip(), root) / "执行日志.md"
+    return shared_dir(root) / "执行日志.md"
+
+
 def resolve_step_slug(scope: Optional[str], root: PathLike = DEFAULT_ROOT) -> str:
     """scope → Step ID slug。
 
