@@ -37,6 +37,7 @@ from promote_scan import scan_promote_candidates  # noqa: E402
 from distill_trigger import check_distill_trigger  # noqa: E402
 from pending_commits import format_brief_hint as pending_format_brief_hint  # noqa: E402
 from skill_version import detect_drift as skill_detect_drift  # noqa: E402
+from scope import shared_dir, list_staff, staff_dir, is_scoped  # noqa: E402
 
 SUPPRESS = json.dumps({"continue": True, "suppressOutput": True})
 
@@ -111,6 +112,30 @@ def _last_heading(path: Path, prefix: str) -> str:
         if line.startswith(prefix):
             last = line
     return last
+
+
+def _staff_scope_block(kdev_dir: Path) -> str:
+    """scoped 布局：列每个员工 scope 的 Step 数 + 最新 Step。flat → 空字符串。"""
+    staff = list_staff(kdev_dir)
+    if not staff:
+        return ""
+    lines = ["", "👥 **员工 scope 进度**："]
+    for sid in staff:
+        log = staff_dir(sid, kdev_dir) / "执行日志.md"
+        count = 0
+        latest = ""
+        if log.is_file():
+            try:
+                text = log.read_text(encoding="utf-8")
+            except OSError:
+                text = ""
+            for line in text.splitlines():
+                if line.startswith("## Step "):
+                    count += 1
+                    latest = line[len("## "):].strip()
+        tail = f"（最新 {latest}）" if latest else ""
+        lines.append(f"- {sid}: {count} 条 Step{tail}")
+    return "\n".join(lines)
 
 
 def _claude_md_drift_hint() -> str:
@@ -242,6 +267,7 @@ def _build_brief(
     recent_g: str,
     pending_hint: str = "",
     skill_drift_hint: str = "",
+    staff_block: str = "",
 ) -> str:
     """按 mode 组装 brief 文本。返回带换行的 markdown 字符串。"""
 
@@ -348,6 +374,9 @@ def _build_brief(
                 recent.append(f"- {recent_g}")
             parts.append("\n".join(recent))
 
+        if staff_block:
+            parts.append(staff_block)
+
         parts.append("\n💡 **建议**：如需详细上下文，Read .kdev/memory/当前状态.md 和最近的 .kdev/memory/每日汇总/*.md。")
 
     return "\n".join(parts)
@@ -371,14 +400,16 @@ def main() -> int:
         print(SUPPRESS)
         return 0
 
+    shared = shared_dir(kdev_dir)
+
     source, session_id = _read_source()
 
     # 数据收集
     warn_files = _glob_warn_files(kdev_dir)
     checkpoint_files = _glob_checkpoint_files(kdev_dir)
-    log_file = kdev_dir / "执行日志.md"
+    log_file = shared / "执行日志.md"
     log_today = _log_today_status(log_file, today)
-    summary_today_status = "已生成" if (kdev_dir / "每日汇总" / f"{today}.md").is_file() else "未生成"
+    summary_today_status = "已生成" if (shared / "每日汇总" / f"{today}.md").is_file() else "未生成"
     missing_past = list_missing_past_summaries(str(kdev_dir), today)
     drift_hint = _claude_md_drift_hint()
     step_hint = _step_hint(log_file, today)
@@ -393,8 +424,9 @@ def main() -> int:
     state_unresolved = read_state_field("unresolved_gotchas")
 
     recent_step = _last_heading(log_file, "## Step ")
-    recent_q = _last_heading(kdev_dir / "决策日志.md", "## Q-")
-    recent_g = _last_heading(kdev_dir / "踩坑日志.md", "## G-")
+    recent_q = _last_heading(shared / "决策日志.md", "## Q-")
+    recent_g = _last_heading(shared / "踩坑日志.md", "## G-")
+    staff_block = _staff_scope_block(kdev_dir)
 
     # pending-commits hint
     pending_hint = pending_format_brief_hint(
@@ -437,6 +469,7 @@ def main() -> int:
         recent_g=recent_g,
         pending_hint=pending_hint or "",
         skill_drift_hint=skill_drift_hint,
+        staff_block=staff_block,
     )
 
     if not brief.strip():
