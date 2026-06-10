@@ -26,6 +26,7 @@ SCRIPT_DIR = Path(__file__).resolve().parent
 sys.path.insert(0, str(SCRIPT_DIR))
 
 from memory_config import read_distill_mode, read_distill_thresholds  # noqa: E402
+from scope import shared_dir  # noqa: E402
 
 
 @dataclass
@@ -192,7 +193,7 @@ def check_distill_trigger(kdev_dir: Path | str = ".kdev/memory") -> TriggerCheck
     # 数据增长统计
     new_f = _count_entries_after(kdev / "skill-feedback.md", r"^##\s+F-\d+", last_ts)
     new_r = _count_entries_after(kdev / "改进建议.md", r"^##\s+R-\d+", last_ts)
-    new_misalign = _count_misalign_after(kdev / "执行日志.md", last_ts)
+    new_misalign = _count_misalign_after(shared_dir(kdev) / "执行日志.md", last_ts)
 
     reasons: list[str] = []
 

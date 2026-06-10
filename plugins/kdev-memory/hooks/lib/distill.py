@@ -31,6 +31,7 @@ from _utf8 import force_utf8_stdio  # noqa: E402
 force_utf8_stdio()
 
 from sanitize import sanitize_text, verify_no_leaks  # noqa: E402
+from scope import shared_dir, staff_log_files  # noqa: E402
 
 
 # ==================== Entry 数据结构 ====================
@@ -156,17 +157,18 @@ def _split_entries(text: str, head_re: re.Pattern[str], source_file: str) -> lis
 
 
 def _iter_memory_files(kdev_dir: Path, prefix: str) -> Iterable[Path]:
-    """主文件 + 归档目录下同前缀的所有 markdown。"""
-    main = kdev_dir / f"{prefix}.md"
+    """主文件（shared 解析）+ 归档目录下同前缀 markdown。"""
+    base = shared_dir(kdev_dir)
+    main = base / f"{prefix}.md"
     if main.is_file():
         yield main
-    archive = kdev_dir / "归档"
+    archive = base / "归档"
     if archive.is_dir():
         yield from sorted(archive.glob(f"{prefix}-*.md"))
 
 
 def collect_entries(kdev_dir: Path) -> list[Entry]:
-    """扫所有核心 markdown + 归档，产出 Entry 列表。"""
+    """扫所有核心 markdown + 归档（shared 解析）+ per-员工 Step 日志。"""
     entries: list[Entry] = []
     for kind, (filename, head_re) in HEAD_PATTERNS.items():
         prefix = filename.removesuffix(".md")
@@ -176,6 +178,14 @@ def collect_entries(kdev_dir: Path) -> list[Entry]:
             except (OSError, UnicodeDecodeError):
                 continue
             entries.extend(_split_entries(text, head_re, path.name))
+    # per-员工 scope Step（flat 下 staff_log_files 返回 []）
+    step_head_re = HEAD_PATTERNS["Step"][1]
+    for scope_id, path in staff_log_files("执行日志.md", kdev_dir):
+        try:
+            text = path.read_text(encoding="utf-8")
+        except (OSError, UnicodeDecodeError):
+            continue
+        entries.extend(_split_entries(text, step_head_re, path.name))
     return entries
 
 
