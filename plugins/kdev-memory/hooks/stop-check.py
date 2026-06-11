@@ -60,7 +60,7 @@ def _read_stop_hook_active() -> bool:
 
 
 def _step_completeness_scan(
-    log_path: Path, today: str, rating_mode: str = "user-required"
+    log_path: Path, today: str, rating_mode: str
 ) -> Tuple[int, str]:
     """调 step_completeness.py 模块，返回 (today_half_count, hint_text)。"""
     lib = LIB_DIR / "step_completeness.py"
