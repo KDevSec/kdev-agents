@@ -337,3 +337,96 @@ def test_parse_mixed_legacy_and_prefix():
 """
     steps = step_completeness.parse_steps(log)
     assert [s["label"] for s in steps] == ["Step 1", "Step main-9"]
+
+
+# ---------------------------------------------------------------------------
+# P-C0.5: rating_mode 形参 + header 内联 status 解析
+# ---------------------------------------------------------------------------
+
+_RM_LOG = """# 执行日志
+
+## Step main-30: 用户评分空但模型自评齐全
+日期：2026-06-11
+
+### 模型自评
+- 顺畅度自评：4/5
+- 扣分项：赶工漏一个边界
+
+### 用户评分
+- 完成时间：—
+- 顺畅度：—/5
+"""
+
+
+def test_user_required_reports_empty_user_score():
+    steps = step_completeness.parse_steps(_RM_LOG)
+    issues = step_completeness.check_step(steps[0], rating_mode="user-required")
+    assert any("用户评分段" in i for i in issues)
+
+
+def test_model_only_exempts_empty_user_score():
+    steps = step_completeness.parse_steps(_RM_LOG)
+    issues = step_completeness.check_step(steps[0], rating_mode="model-only")
+    assert issues == []
+
+
+def test_user_opt_in_exempts_empty_user_score():
+    steps = step_completeness.parse_steps(_RM_LOG)
+    issues = step_completeness.check_step(steps[0], rating_mode="user-opt-in")
+    assert issues == []
+
+
+def test_deduction_still_checked_in_model_only():
+    """扣分项缺失在所有模式都算半残（防讨好式满分，与评分模式无关）。"""
+    log = """## Step main-31: 扣分项空
+日期：2026-06-11
+
+### 模型自评
+- 顺畅度自评：5/5
+- 扣分项：—
+
+### 用户评分
+- 完成时间：—
+- 顺畅度：—/5
+"""
+    step = step_completeness.parse_steps(log)[0]
+    issues = step_completeness.check_step(step, rating_mode="model-only")
+    assert any("扣分项" in i for i in issues)
+
+
+def test_run_check_threads_rating_mode():
+    import tempfile
+    from pathlib import Path
+    d = Path(tempfile.mkdtemp())
+    p = d / "执行日志.md"
+    p.write_text(_RM_LOG, encoding="utf-8")
+    assert step_completeness.run_check(p, "2026-06-11", rating_mode="user-required")["status"] == "has_half_complete"
+    assert step_completeness.run_check(p, "2026-06-11", rating_mode="model-only")["status"] == "ok"
+
+
+def test_default_rating_mode_is_user_required():
+    """不传 rating_mode 时保持现行严格行为（既有 11 测试文件不被波及的保证）。"""
+    steps = step_completeness.parse_steps(_RM_LOG)
+    assert any("用户评分段" in i for i in step_completeness.check_step(steps[0]))
+
+
+def test_inline_header_status_voided_is_parsed():
+    """header 伪 frontmatter 里的内联 `status: voided-faded`（无 --- 围栏）应被解析并跳过。"""
+    log = """## Step main-32: 内联 status 销账
+status: voided-faded   # 半残销账 2026-06-11
+日期：2026-06-11
+
+### 用户评分
+- 完成时间：—
+- 顺畅度：—/5
+"""
+    steps = step_completeness.parse_steps(log)
+    assert steps[0]["status"] == "voided-faded"
+    # user-required 下也应跳过（status 优先级高于字段检查）
+    assert step_completeness.check_step(steps[0], rating_mode="user-required") == []
+
+
+def test_inline_status_with_trailing_comment_token():
+    """`status: voided-faded   # 注释` 应只取第一个非空 token。"""
+    log = "## Step main-33: x\nstatus: voided-faded   # note\n日期：2026-06-11\n"
+    assert step_completeness.parse_steps(log)[0]["status"] == "voided-faded"

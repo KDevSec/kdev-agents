@@ -40,6 +40,7 @@ from missing_summaries import list_missing_past_summaries  # noqa: E402
 from archive_hint import collect_archive_hints  # noqa: E402
 from pending_commits import format_brief_hint as pending_format_brief_hint  # noqa: E402
 from scope import shared_dir  # noqa: E402
+from memory_config import read_rating_mode  # noqa: E402
 
 
 def _read_stop_hook_active() -> bool:
@@ -59,7 +60,7 @@ def _read_stop_hook_active() -> bool:
 
 
 def _step_completeness_scan(
-    log_path: Path, today: str
+    log_path: Path, today: str, rating_mode: str
 ) -> Tuple[int, str]:
     """调 step_completeness.py 模块，返回 (today_half_count, hint_text)。"""
     lib = LIB_DIR / "step_completeness.py"
@@ -71,7 +72,7 @@ def _step_completeness_scan(
             return 0, ""
         mod = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(mod)
-        result = mod.run_check(log_path, today)
+        result = mod.run_check(log_path, today, rating_mode=rating_mode)
         result["_today_iso"] = today
         hint = mod.format_hint_for_stop(result) or ""
         count = int(result.get("today_half_complete", 0) or 0)
@@ -137,6 +138,7 @@ def main() -> int:
 
     shared = shared_dir(kdev_dir)
     today = date.today().isoformat()
+    rating_mode = read_rating_mode(kdev_dir)
     summary_file = shared / "每日汇总" / f"{today}.md"
 
     stop_hook_active = _read_stop_hook_active()
@@ -207,10 +209,14 @@ def main() -> int:
             f"切档步骤见 SKILL.md 的「文件切档与归档」章节。改进建议.md 不切档。"
         )
 
-    # 7. Step 完整度扫描
-    step_today_half, step_hint = _step_completeness_scan(log_file, today)
-    if step_hint:
-        reminders.append(step_hint)
+    # 7. Step 完整度扫描（按 rating.mode 降级）
+    #   model-only：完全跳过半残检测；user-opt-in / user-required：照扫
+    if rating_mode == "model-only":
+        step_today_half, step_hint = 0, ""
+    else:
+        step_today_half, step_hint = _step_completeness_scan(log_file, today, rating_mode)
+        if step_hint:
+            reminders.append(step_hint)
 
     # 8. pending-commits 阈值软提醒
     state_dir = kdev_dir / "state"
@@ -232,7 +238,7 @@ def main() -> int:
             )
             return 2
 
-    if not stop_hook_active and strict_flag and step_today_half > 0:
+    if not stop_hook_active and strict_flag and step_today_half > 0 and rating_mode == "user-required":
         sys.stderr.write(
             f"[kdev-memory/strict] 今日新增 {step_today_half} 条 Step 但字段半残"
             f"（用户评分段时分戳空 / 扣分项空 等）。\n"

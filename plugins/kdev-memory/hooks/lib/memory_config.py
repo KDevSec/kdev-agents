@@ -9,6 +9,8 @@
 - distill.reminder_days: 7（默认）
 - distill.reminder_new_f: 10（默认）
 - distill.reminder_new_misalign: 3（默认）
+- rating.mode: model-only | user-opt-in | user-required  —— 评分模式（默认 user-opt-in）
+- brief.verbosity: compact | normal | verbose  —— SessionStart brief 详略（默认 normal）
 
 支持两种语法：顶层 flat key（`distill_mode: auto`）和一层嵌套（`distill:` + 缩进 `mode: auto`）。
 parser 内部统一用 dot notation 存储（`distill.mode`）。
@@ -24,6 +26,14 @@ VALID_RECORD_MODES: tuple[RecordMode, ...] = ("hybrid", "inline")
 
 DistillMode = Literal["auto", "manual"]
 VALID_DISTILL_MODES: tuple[DistillMode, ...] = ("auto", "manual")
+
+RatingMode = Literal["model-only", "user-opt-in", "user-required"]
+VALID_RATING_MODES: tuple[RatingMode, ...] = ("model-only", "user-opt-in", "user-required")
+DEFAULT_RATING_MODE: RatingMode = "user-opt-in"
+
+BriefVerbosity = Literal["compact", "normal", "verbose"]
+VALID_BRIEF_VERBOSITY: tuple[BriefVerbosity, ...] = ("compact", "normal", "verbose")
+DEFAULT_BRIEF_VERBOSITY: BriefVerbosity = "normal"
 
 # 蒸馏触发阈值默认值（详见 references/蒸馏触发机制.md）
 DEFAULT_DISTILL_REMINDER_DAYS = 7
@@ -124,6 +134,38 @@ def read_distill_mode(kdev_dir: Path | str = ".kdev/memory") -> DistillMode:
     return "auto"
 
 
+def read_rating_mode(kdev_dir: Path | str = ".kdev/memory") -> RatingMode:
+    """读 rating.mode 字段。未配置 / 非法值 → user-opt-in（插件默认，温和）。
+
+    承 Q-002：本项目 config 写 `rating.mode: model-only`（机读化"用户不再评分"决策）。
+    兼容 flat dot-key（`rating.mode`）、嵌套（`rating:` + `mode:`）、下划线（`rating_mode`）。
+    """
+    config = _read_config(kdev_dir)
+    value = (config.get("rating.mode") or config.get("rating_mode") or "").lower()
+    if value in VALID_RATING_MODES:
+        return value  # type: ignore[return-value]
+    return DEFAULT_RATING_MODE
+
+
+def rating_mode_configured(kdev_dir: Path | str = ".kdev/memory") -> bool:
+    """config 是否显式写了 rating.mode 键（用于 brief 首次提示判断）。"""
+    config = _read_config(kdev_dir)
+    return ("rating.mode" in config) or ("rating_mode" in config)
+
+
+def read_brief_verbosity(kdev_dir: Path | str = ".kdev/memory") -> BriefVerbosity:
+    """读 brief.verbosity 字段。未配置 / 非法值 → normal（现行行为）。
+
+    compact 只注入 WARN + pending_decisions + 今日进度一行，其余写 brief-detail.md；
+    verbose 全量（不截断半残清单）。
+    """
+    config = _read_config(kdev_dir)
+    value = (config.get("brief.verbosity") or config.get("brief_verbosity") or "").lower()
+    if value in VALID_BRIEF_VERBOSITY:
+        return value  # type: ignore[return-value]
+    return DEFAULT_BRIEF_VERBOSITY
+
+
 def _read_int_default(config: dict[str, str], keys: tuple[str, ...], default: int) -> int:
     """从 config 按 key 顺序取整数；解析失败返回 default。"""
     for key in keys:
@@ -181,6 +223,8 @@ def main() -> int:
             "record_mode": read_record_mode(kdev),
             "distill_mode": read_distill_mode(kdev),
             **read_distill_thresholds(kdev),
+            "rating_mode": read_rating_mode(kdev),
+            "brief_verbosity": read_brief_verbosity(kdev),
         }
         print(json.dumps(out, ensure_ascii=False, indent=2))
     else:
