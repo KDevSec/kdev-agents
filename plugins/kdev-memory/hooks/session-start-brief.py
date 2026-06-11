@@ -38,6 +38,7 @@ from distill_trigger import check_distill_trigger  # noqa: E402
 from pending_commits import format_brief_hint as pending_format_brief_hint  # noqa: E402
 from skill_version import detect_drift as skill_detect_drift  # noqa: E402
 from scope import shared_dir, list_staff, staff_dir  # noqa: E402
+from memory_config import read_rating_mode, rating_mode_configured, read_brief_verbosity  # noqa: E402
 
 SUPPRESS = json.dumps({"continue": True, "suppressOutput": True})
 
@@ -226,7 +227,7 @@ def _distill_hint(kdev_dir: Path) -> str:
     return msg + ("\n" + recent_auto_msg if recent_auto_msg else "")
 
 
-def _step_hint(log_file: Path, today: str) -> str:
+def _step_hint(log_file: Path, today: str, rating_mode: str = "user-required", max_list: int = 5) -> str:
     """跑 step_completeness.run_check + format_hint_for_brief。"""
     lint_lib = LIB_DIR / "step_completeness.py"
     if not (log_file.is_file() and lint_lib.is_file()):
@@ -237,10 +238,35 @@ def _step_hint(log_file: Path, today: str) -> str:
             return ""
         mod = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(mod)
-        result = mod.run_check(log_file, today)
-        return mod.format_hint_for_brief(result) or ""
+        result = mod.run_check(log_file, today, rating_mode=rating_mode)
+        return mod.format_hint_for_brief(result, max_list=max_list) or ""
     except Exception:
         return ""
+
+
+def _rating_setup_hint(kdev_dir: Path) -> str:
+    """首次（config 无 rating.mode 键、且未提示过）→ 返回一次性评分模式设置提示。
+
+    用 state/.rating-setup-shown marker 去重，保证"一次性"。已配置或已提示过 → 空串。
+    """
+    if rating_mode_configured(kdev_dir):
+        return ""
+    marker = kdev_dir / "state" / ".rating-setup-shown"
+    if marker.is_file():
+        return ""
+    try:
+        marker.parent.mkdir(parents=True, exist_ok=True)
+        marker.write_text("", encoding="utf-8")
+    except OSError:
+        pass
+    return (
+        "<kdev-memory-rating-setup>\n"
+        "kdev-memory 评分模式可配置。当前默认 user-opt-in（自评后轻提一句，不回应就过）。\n"
+        "• 说\"关掉评分\"→ model-only（只模型自评，零追问）\n"
+        "• 说\"严格评分\"→ user-required（每 Step 必追问）\n"
+        "• 随时一句话切换，Claude 改 config.yaml 立即生效。\n"
+        "</kdev-memory-rating-setup>"
+    )
 
 
 def _build_brief(
@@ -268,6 +294,8 @@ def _build_brief(
     pending_hint: str = "",
     skill_drift_hint: str = "",
     staff_block: str = "",
+    rating_setup_hint: str = "",
+    verbosity: str = "normal",
 ) -> str:
     """按 mode 组装 brief 文本。返回带换行的 markdown 字符串。"""
 
@@ -315,6 +343,8 @@ def _build_brief(
                 parts.append("🔴 " + p0_block.rstrip("\n"))
             if p1_block:
                 parts.append("🟡 " + p1_block.rstrip("\n"))
+        if rating_setup_hint:
+            parts.append("\n" + rating_setup_hint)
     elif mode == "compact":
         parts.append("项目有 .kdev/ 工程记忆。刚从压缩中恢复。")
         if checkpoint_files:
@@ -324,8 +354,28 @@ def _build_brief(
             parts.append("🔴 未处理的 P0 阻塞：\n" + p0_block.rstrip("\n"))
         if p1_block:
             parts.append("🟡 需核对：\n" + p1_block.rstrip("\n"))
+        if rating_setup_hint:
+            parts.append("\n" + rating_setup_hint)
     else:
         # startup / clear / default
+        if verbosity == "compact":
+            cparts: List[str] = [f"项目有 .kdev/ 工程记忆（brief.verbosity=compact）。当前（{today}）："]
+            for w in warn_files:
+                cparts.append(f"🔴 {w}")
+            if step_hint and "今日" in step_hint:
+                cparts.append("🔴 " + step_hint)
+            if state_pending:
+                cparts.append(f"- pending_decisions: {state_pending}")
+            prog_one = f"📊 今日进度：执行日志 {log_today}；汇总 {summary_today_status}"
+            if git_branch:
+                prog_one += f"；分支 {git_branch}"
+            cparts.append(prog_one)
+            cparts.append("🗂 完整 brief（项目状态/最近条目/半残/distill/promote）已写入 "
+                          ".kdev/memory/brief-detail.md，按需 Read。")
+            if rating_setup_hint:
+                cparts.append("\n" + rating_setup_hint)
+            return "\n".join(cparts)
+
         parts.append(f"项目有 .kdev/ 工程记忆。当前状态（{today}）：\n")
         if p0_block:
             parts.append("🔴 **P0 硬阻塞（立刻处理）**：\n" + p0_block)
@@ -378,6 +428,8 @@ def _build_brief(
             parts.append(staff_block)
 
         parts.append("\n💡 **建议**：如需详细上下文，Read .kdev/memory/当前状态.md 和最近的 .kdev/memory/每日汇总/*.md。")
+        if rating_setup_hint:
+            parts.append("\n" + rating_setup_hint)
 
     return "\n".join(parts)
 
@@ -401,6 +453,9 @@ def main() -> int:
         return 0
 
     shared = shared_dir(kdev_dir)
+    rating_mode = read_rating_mode(kdev_dir)
+    verbosity = read_brief_verbosity(kdev_dir)
+    rating_setup_hint = _rating_setup_hint(kdev_dir)
 
     source, session_id = _read_source()
 
@@ -412,7 +467,8 @@ def main() -> int:
     summary_today_status = "已生成" if (shared / "每日汇总" / f"{today}.md").is_file() else "未生成"
     missing_past = list_missing_past_summaries(str(kdev_dir), today)
     drift_hint = _claude_md_drift_hint()
-    step_hint = _step_hint(log_file, today)
+    step_hint = _step_hint(log_file, today, rating_mode=rating_mode,
+                           max_list=999 if verbosity == "verbose" else 5)
     promote_hint = scan_promote_candidates(str(kdev_dir), today)
     distill_hint = _distill_hint(kdev_dir)
 
@@ -470,7 +526,28 @@ def main() -> int:
         pending_hint=pending_hint or "",
         skill_drift_hint=skill_drift_hint,
         staff_block=staff_block,
+        rating_setup_hint=rating_setup_hint,
+        verbosity=verbosity,
     )
+
+    if verbosity == "compact" and source in ("startup", "clear", "default", ""):
+        # 把"全量 normal brief"写盘供主动查阅（compact 注入的是裁剪版）
+        detail = _build_brief(
+            mode="startup", today=today, git_branch=git_branch, warn_files=warn_files,
+            checkpoint_files=checkpoint_files, log_today=log_today,
+            summary_today_status=summary_today_status, missing_past=missing_past,
+            drift_hint=drift_hint, step_hint=step_hint, promote_hint=promote_hint,
+            distill_hint=distill_hint, state_phase=state_phase, state_iter=state_iter,
+            state_step=state_step, state_last=state_last, state_pending=state_pending,
+            state_unresolved=state_unresolved, recent_step=recent_step, recent_q=recent_q,
+            recent_g=recent_g, pending_hint=pending_hint or "", skill_drift_hint=skill_drift_hint,
+            staff_block=staff_block, rating_setup_hint="", verbosity="normal",
+        )
+        try:
+            (kdev_dir / "brief-detail.md").write_text(
+                f"# kdev-memory brief-detail（{today} 全量）\n\n{detail}\n", encoding="utf-8")
+        except OSError:
+            pass
 
     if not brief.strip():
         print(SUPPRESS)
