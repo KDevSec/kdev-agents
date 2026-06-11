@@ -1,0 +1,21 @@
+plugins/kdev-memory/hooks/session-start-brief.py
+  s_54d8d748b888e0::t_00651b9b5da9ac 504-513,515,518,520-521
+plugins/kdev-memory/tests/test_brief_verbosity.py
+  s_54d8d748b888e0::t_6d553d163505ce 72-79
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "80d90a76311a12a5514c1a28a4253a33885e2c01",
+  "prompts": {},
+  "sessions": {
+    "s_54d8d748b888e0": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "27c3a208-d7f1-4318-a30e-2b77e6ee2ffe",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
