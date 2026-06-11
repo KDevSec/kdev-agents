@@ -1,0 +1,21 @@
+plugins/kdev-memory/hooks/lib/migrate_void_faded.py
+  s_54d8d748b888e0::t_bda984171617a3 1-92
+plugins/kdev-memory/tests/test_migrate_void_faded.py
+  s_54d8d748b888e0::t_118d05e435eaf0 1-99
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "6309d5faac33b5671ee35764801e0c068af81df6",
+  "prompts": {},
+  "sessions": {
+    "s_54d8d748b888e0": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "27c3a208-d7f1-4318-a30e-2b77e6ee2ffe",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
