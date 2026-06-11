@@ -67,6 +67,23 @@ VOIDED_HEURISTIC_PATTERNS = (
 VOIDED_STATUSES = {"voided-faded", "voided-r-nnn"}
 
 
+def _extract_inline_status(body: str) -> str | None:
+    """読 Step header 伪 frontmatter 里的内联 `status:`（`## Step` 行下方、首个空行/###/> 之前）。
+
+    真实日志的 status 多写在 header（无 --- 围栏），历史上未被解析——本函数补这个口子。
+    只取冒号后第一个非空 token（容忍行尾 `# 注释`）。
+    """
+    lines = body.splitlines()
+    for line in lines[1:]:  # lines[0] 是 "## Step ..." 标题行
+        s = line.strip()
+        if not s or s.startswith("#") or s.startswith(">"):
+            break
+        m = re.match(r"^status\s*:\s*(\S+)", s)
+        if m:
+            return m.group(1).strip()
+    return None
+
+
 def parse_steps(log_text: str) -> list[dict[str, Any]]:
     """把执行日志切成 Step 条目列表。
 
@@ -104,6 +121,8 @@ def parse_steps(log_text: str) -> list[dict[str, Any]]:
             sf = re.search(r"^\s*status\s*:\s*(\S+)", fm_text, re.MULTILINE)
             if sf:
                 entry_status = sf.group(1).strip()
+        if entry_status is None:
+            entry_status = _extract_inline_status(body)
 
         steps.append({
             "label": label,
@@ -115,7 +134,7 @@ def parse_steps(log_text: str) -> list[dict[str, Any]]:
     return steps
 
 
-def check_step(step: dict[str, Any]) -> list[str]:
+def check_step(step: dict[str, Any], rating_mode: str = "user-required") -> list[str]:
     """返回该 Step 的 issues 列表（空表示无半残）。"""
     body = step["body"]
 
@@ -134,24 +153,22 @@ def check_step(step: dict[str, Any]) -> list[str]:
 
     issues: list[str] = []
 
-    # 1. 用户评分段：找"### 用户评分" → 提取时分戳和顺畅度
-    user_section = _extract_section(body, "### 用户评分") or _extract_section(body, "## 用户评分")
-    if user_section is not None:
-        ts = _extract_field(user_section, "完成时间")
-        score = _extract_field(user_section, "顺畅度")
-        if ts is None or _is_placeholder(ts):
-            issues.append(f"用户评分段「完成时间」为 {_describe_placeholder(ts)}")
-        if score is None or _is_placeholder(score):
-            issues.append(f"用户评分段「顺畅度」为 {_describe_placeholder(score)}")
-    # 若整个用户评分段都没有，也算半残
-    # 注意：只认 section 标题（`## 用户评分` 或 `### 用户评分`），避免 Step 标题
-    # 里含"用户评分"四个字时误判（如 "Step 5: 完全无用户评分段"）
-    elif (
-        "## 用户评分" not in body
-        and "### 用户评分" not in body
-        and _has_model_self_review(body)
-    ):
-        issues.append("有模型自评段但无用户评分段（Step 未完整闭环）")
+    # 1. 用户评分段（仅 user-required 模式检查；model-only / user-opt-in 视空为正常）
+    if rating_mode == "user-required":
+        user_section = _extract_section(body, "### 用户评分") or _extract_section(body, "## 用户评分")
+        if user_section is not None:
+            ts = _extract_field(user_section, "完成时间")
+            score = _extract_field(user_section, "顺畅度")
+            if ts is None or _is_placeholder(ts):
+                issues.append(f"用户评分段「完成时间」为 {_describe_placeholder(ts)}")
+            if score is None or _is_placeholder(score):
+                issues.append(f"用户评分段「顺畅度」为 {_describe_placeholder(score)}")
+        elif (
+            "## 用户评分" not in body
+            and "### 用户评分" not in body
+            and _has_model_self_review(body)
+        ):
+            issues.append("有模型自评段但无用户评分段（Step 未完整闭环）")
 
     # 2. 模型自评段的扣分项
     self_section = _extract_section(body, "### 模型自评") or _extract_section(body, "## 模型自评")
@@ -226,7 +243,7 @@ def _has_model_self_review(body: str) -> bool:
     return "### 模型自评" in body or "## 模型自评" in body
 
 
-def run_check(log_path: Path, today: str, lookback_days: int = DEFAULT_LOOKBACK_DAYS) -> dict[str, Any]:
+def run_check(log_path: Path, today: str, lookback_days: int = DEFAULT_LOOKBACK_DAYS, rating_mode: str = "user-required") -> dict[str, Any]:
     """主入口：扫执行日志，返回检测结果 dict。
 
     - log_path: .kdev/memory/执行日志.md 路径
@@ -251,7 +268,7 @@ def run_check(log_path: Path, today: str, lookback_days: int = DEFAULT_LOOKBACK_
     half_complete: list[dict[str, Any]] = []
     today_count = 0
     for step in scanned_steps:
-        issues = check_step(step)
+        issues = check_step(step, rating_mode=rating_mode)
         if issues:
             entry = {
                 "step_label": step["label"],
