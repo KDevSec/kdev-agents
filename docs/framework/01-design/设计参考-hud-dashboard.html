@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>KDev 数字员工 · 架构与进展总览（演讲原型 v1.0）</title>
+<title>KDev HUD · 网页实时仪表盘（独立版）</title>
 <style>
   :root{
     --bg:#0a1422; --slide:#0f1d31; --slide2:#13243c;
@@ -376,224 +376,17 @@
   .foot-note{margin-top:7px;font-size:11px;color:var(--mut);text-align:center}
   .foot-note b{color:var(--gold)}
 </style>
+<style>
+  /* —— 独立版包装：把 .dash 居中放大，便于浏览器截图 —— */
+  body{background:var(--bg);min-height:100vh;display:flex;align-items:flex-start;justify-content:center;padding:40px 24px;margin:0}
+  .sa-wrap{width:780px;max-width:100%}
+  .sa-cap{font-family:"Microsoft YaHei","PingFang SC",sans-serif;color:#9fb3cf;font-size:12.5px;letter-spacing:.04em;margin:0 2px 13px}
+  .sa-cap b{color:var(--teal)}
+</style>
 </head>
 <body>
-
-
-
-<!-- ============ 3 团队全景架构图（centerpiece · v1.5 能力清单风格） ============ -->
-<section class="slide">
-  <div class="topbar">
-    <div class="badge">1</div><div class="chaplabel">整体架构</div>
-    <div class="maintitle">整体架构一张图 —— 员工层 + 编排底座 + 记忆底座 + 观测层</div>
-  </div>
-  <div class="titlerule"></div>
-  <div class="body" style="padding-top:12px">
-    <div class="org" style="gap:0">
-      <div class="user">👤 用户（只跟「总指挥」对话）</div>
-      <div class="vbar"></div>
-    </div>
-    <div class="layerframe">
-      <div class="ftag">员工层 · kdev-team</div>
-      <div style="display:flex;justify-content:center;margin-bottom:8px">
-        <div class="ceo" style="width:auto;padding:8px 28px">主控员（总指挥）<small>6 项能力：顶层约束 · 用户对话 · 派活 · 决策 · 阶段聚合 · 评审升级裁决</small></div>
-      </div>
-    <div class="teamgrid">
-      <div class="cqocol">
-        <div class="ct">监督员</div>
-        <div class="cs">元监督 · 只读<br>有「叫停」权</div>
-        <div class="cmeta">流程监督<br>监控全员<br>合规聚合</div>
-      </div>
-      <div class="empwrap">
-        <div class="wlbl">↔ 业务员工层 —— 每名员工 ＝ 多项业务能力 ＋ 1 项「调度能力」(编排)；员工之间可直接协作，不必都过总指挥</div>
-        <div class="empcols">
-          <div class="ecol">
-            <div class="ehd"><div class="en">需求架构师</div><div class="ecnt">5 业务能力 + 1 调度</div></div>
-            <div class="caprow orch"><span class="cn">编排</span><span class="cd">内部调度·协作</span></div>
-            <div class="caprow"><span class="cn">需求澄清</span><span class="cd">澄清原始需求</span></div>
-            <div class="caprow"><span class="cn">需求计划</span><span class="cd">写需求规格</span></div>
-            <div class="caprow"><span class="cn">需求拆解</span><span class="cd">迭代+用户故事</span></div>
-            <div class="caprow"><span class="cn">原型设计</span><span class="cd">高保真原型</span></div>
-            <div class="caprow"><span class="cn">方案设计</span><span class="cd">技术方案</span></div>
-          </div>
-          <div class="ecol">
-            <div class="ehd"><div class="en">开发工程师</div><div class="ecnt">6 业务能力 + 1 调度</div></div>
-            <div class="caprow orch"><span class="cn">编排</span><span class="cd">内部调度·协作</span></div>
-            <div class="caprow"><span class="cn">环境准备</span><span class="cd">栈/工具链</span></div>
-            <div class="caprow"><span class="cn">实施计划</span><span class="cd">计划+复杂度</span></div>
-            <div class="caprow"><span class="cn">编码实现</span><span class="cd">测试驱动开发</span></div>
-            <div class="caprow"><span class="cn">端到端自测</span><span class="cd">自测跑通</span></div>
-            <div class="caprow"><span class="cn">安全扫描</span><span class="cd">安全清单</span></div>
-            <div class="caprow"><span class="cn">部署上线</span><span class="cd">合并/部署</span></div>
-          </div>
-          <div class="ecol">
-            <div class="ehd"><div class="en">测试工程师</div><div class="ecnt">4 业务能力 + 1 调度</div></div>
-            <div class="caprow orch"><span class="cn">编排</span><span class="cd">内部调度·协作</span></div>
-            <div class="caprow"><span class="cn">测试点设计</span><span class="cd">国标 29119</span></div>
-            <div class="caprow"><span class="cn">用例开发</span><span class="cd">字段化用例</span></div>
-            <div class="caprow"><span class="cn">界面自动化</span><span class="cd">UI 脚本执行</span></div>
-            <div class="caprow"><span class="cn">接口自动化</span><span class="cd">API 用例执行</span></div>
-          </div>
-          <div class="ecol review">
-            <div class="ehd"><div class="en">评审专家</div><div class="ecnt">10 核心 + 6 扩展 + 1 调度</div></div>
-            <div class="caprow orch"><span class="cn">编排</span><span class="cd">调度·仲裁·终审聚合</span></div>
-            <div class="revgrid2">
-              <span><b>需求方向</b><i>该不该做</i></span><span><b>SR 需求</b><i>需求写全没</i></span>
-              <span><b>迭代拆分</b><i>分批合不合理</i></span><span><b>用户故事</b><i>能否独立验收</i></span>
-              <span><b>原型</b><i>界面好不好用</i></span><span><b>方案+架构</b><i>技术行不行</i></span>
-              <span><b>代码+质量</b><i>对不对·好不好维护</i></span><span><b>安全</b><i>有无漏洞</i></span>
-              <span><b>测试设计</b><i>测得全不全</i></span><span><b>测试执行</b><i>实跑覆盖多少</i></span>
-            </div>
-            <div class="revext">+6 按需扩展：<b>部署检查·性能·文档·合规·可观测·可访问</b></div>
-          </div>
-        </div>
-      </div>
-    </div>
-    </div>
-    <div class="platlbl">▼ 员工层跑在下面 <b>3 层底座/平台</b>上　·　6 员工 / 默认 31 个 AI 工作单元（全开 37）</div>
-    <div class="platrow">
-      <div class="pl core"><div class="pln">编排底座 · kdev-core</div><small>状态记录 · 流转引擎 · 三类关卡 —— <b class="kb">只记账不判断</b>（调度）</small></div>
-      <div class="pl mem"><div class="pln">记忆底座 · kdev-memory</div><small>叙事 + 加料 · scope 多流 —— 全团队<b style="color:var(--purple)">硬依赖</b>（记忆）</small></div>
-      <div class="pl hud"><div class="pln">观测层 · kdev-hud</div><small>三通道驾驶舱 · <b class="kt">只读派生</b>（观测 · 阶段3）</small></div>
-    </div>
-  </div>
-  <div class="slide-footer"><span>KDev 数字员工 · 架构与进展总览</span><span>01 / 05</span></div>
-</section>
-
-
-<!-- ============ 5 底座三件套 ============ -->
-<section class="slide">
-  <div class="topbar">
-    <div class="badge">2</div><div class="chaplabel">编排底座</div>
-    <div class="maintitle">底座靠三样东西让员工「跑得起来、卡得住、续得上」</div>
-  </div>
-  <div class="titlerule"></div>
-  <div class="body" style="padding-top:14px">
-    <div class="three">
-      <div class="gatecard">
-        <div class="gh"><div class="gn">① 记两本机器账</div><div class="gs">控制态 + 事实流水</div></div>
-        <div class="gb">
-          <b class="kb">控制态</b>「我在哪一步」+ <b class="kb">事实流水</b>「发生了啥」，全程<b class="kb">原子化落盘</b>。<span class="mut">（记忆层从这本流水提炼，见第 3 页）</span><br>
-          <b class="kg">最大好处：断点续跑</b>——中途断电、被打断，再起来从上次那步接着干。
-        </div>
-      </div>
-      <div class="gatecard g2">
-        <div class="gh"><div class="gn">② 流程节点引擎</div><div class="gs">每条业务自己声明节点表</div></div>
-        <div class="gb">
-          每条业务流程由它自己声明「有哪些步骤、什么顺序」（不写死段数：设计 4 段 / 开发十几段）。<br>
-          底座只提供<b class="kt">推进引擎</b>：把关通过 → 进下一步；把关不过 → <b class="kt">退回去重做</b>（有次数上限，不会无限打转）。
-        </div>
-      </div>
-      <div class="gatecard g3">
-        <div class="gh"><div class="gn">③ 三类把关关卡</div><div class="gs">核心难点，也是最大卖点</div></div>
-        <div class="gb">
-          所有把关点，无论多复杂，都归成<b class="ky">三种类型</b>，用同一套逻辑处理。<br>
-          这是「一套底座能跑任意业务」的根：换业务，只是换节点表和关卡配置。
-        </div>
-      </div>
-    </div>
-    <div class="panel" style="margin-top:13px">
-      <div class="ph gold">三类把关关卡 —— 怎么把关、不过怎么办</div>
-      <div class="pb" style="padding:10px 14px">
-        <table class="gtab">
-          <tr><th style="width:120px">关卡类型</th><th style="width:230px">干什么</th><th style="width:180px">谁来判</th><th>判不过怎么办</th></tr>
-          <tr><td class="ky">评审</td><td>检查产出质量（代码 / 方案 / 安全…）</td><td>默认 AI，可改成人或人机双审</td><td>退回去改 → 重审（最多 3 次）；还不过 → <b class="kr">升级交人工</b></td></tr>
-          <tr><td class="kt">岔路决策</td><td>在分叉口选一条路（复杂还是简单走法）</td><td>默认 AI，岔路口可交给人</td><td>选了哪条就走哪条（不重试）</td></tr>
-          <tr><td style="color:var(--purple)">验收</td><td>跑端到端测试、验真功能</td><td>自动跑测试，可叠加人复核</td><td>没过就退回修复节点重跑</td></tr>
-        </table>
-        <div style="margin-top:8px;font-size:11px;color:var(--mut)">
-          把关结果以<b class="kb">结构化数据</b>记录（不靠猜文本），能程序化查「这关重试几轮、谁判的」；卡住超上限<b class="kr">一定升级交人工，绝不偷偷降格放行</b>。
-        </div>
-      </div>
-      <div class="sopstrip">
-        <b class="ky">节点表 ＋ 关卡 ＝ 一条流程的 SOP，可自由编排：</b>
-        <span class="sl">L0 作者定默认</span><span class="sarrow">→</span>
-        <span class="sl">L1 用户改配置（开关关卡 · 谁来判 AI↔人 · 重试数 · 跳过/重排节点）</span><span class="sarrow">→</span>
-        <span class="sl">L2 员工自优化（自演进 · 未来）</span>
-      </div>
-    </div>
-  </div>
-  <div class="slide-footer"><span>KDev 数字员工 · 架构与进展总览</span><span>02 / 05</span></div>
-</section>
-
-<!-- ============ 6 记忆 + 飞轮 ============ -->
-<section class="slide">
-  <div class="topbar">
-    <div class="badge">3</div><div class="chaplabel">记忆底座</div>
-    <div class="maintitle">记忆 = 从机器到人的「提炼 + 加料」，不重复造账</div>
-  </div>
-  <div class="titlerule"></div>
-  <div class="cols">
-    <div class="col" style="flex:1.15">
-      <div class="panel">
-        <div class="ph">底座记机器账，记忆把它提炼成人能读的工程记忆</div>
-        <div class="pb" style="padding:12px 13px">
-          <div style="display:flex;align-items:stretch;gap:10px">
-            <div style="flex:0 0 auto;width:128px;border:1px dashed var(--blue);border-radius:8px;padding:9px 10px;background:rgba(74,158,255,.06)">
-              <div style="color:var(--blue);font-weight:bold;font-size:11.5px;margin-bottom:5px">底座两本机器账</div>
-              <div style="font-size:10.5px;line-height:1.5"><b class="kb">控制态</b> 我在哪步<br><b class="kb">事实流水</b> 发生了啥<br><span class="mut" style="font-size:9.5px">（见第 2 页·kdev-core 写）</span></div>
-            </div>
-            <div style="flex:0 0 auto;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--gold);font-size:10px;font-weight:bold">
-              <div>蒸馏</div><div style="font-size:18px">→</div><div>+加料</div>
-            </div>
-            <div style="flex:1;border:1px solid var(--gold);border-radius:8px;padding:9px 11px;background:rgba(245,183,64,.08)">
-              <div style="color:var(--gold);font-weight:bold;font-size:11.5px;margin-bottom:5px">kdev-memory · 叙事层（人读）</div>
-              <div style="font-size:10.5px;line-height:1.55">步骤记录 · 决策 · 踩坑<br><b class="ky">+ 自评 / 用户评分</b>（机器给不了的那一维）<br><span class="mut" style="font-size:9.5px">阶段性从流水汇总一次，不每动作写</span></div>
-            </div>
-          </div>
-          <div style="margin-top:11px;font-size:11px;color:var(--ink);border-left:3px solid var(--gold);padding-left:9px;background:rgba(245,183,64,.05);border-radius:4px;padding:6px 9px">
-            <b class="ky">一条原则</b>：记忆只加「机器给不了的那一维」(评价/经验/叙事)；凡是镜像机器原始态的，让位给底座——<b>不造第二本账</b>。
-          </div>
-          <div style="margin-top:9px;font-size:10.5px;color:var(--mut)">
-            <b class="kt">全团队的记忆底座，不是 CEO 私有</b>：共享区(决策/踩坑/CEO 续航) + 每员工私有区 + <b class="ky">评审经验→喂飞轮</b>。多个消费者:CEO 续航 · 评审专家越评越准 · 各员工记自己的账。整套 Git 托管自动同步。
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="col" style="flex:.95">
-      <div class="panel">
-        <div class="ph teal">复利飞轮 —— 越用越强（升级版）</div>
-        <div class="pb" style="padding:11px 13px">
-          <div class="wheel">
-            <div class="wstep"><span class="wn">1</span><span class="wt">数字员工干活（需求 → 验收）</span></div>
-            <div class="wstep"><span class="wn">2</span><span class="wt">过程经验沉淀进专属知识库</span></div>
-            <div class="wstep"><span class="wn">3</span><span class="wt">知识反哺能力（下次更准更快）</span></div>
-            <div class="wstep plus"><span class="wn">+</span><span class="wt"><b class="ky">未来：也反哺「流程本身」</b>——发现某关卡总是白过、某顺序更优，就提议改流程</span></div>
-            <div class="wstep"><span class="wn">4</span><span class="wt">越用越强 → 回到第 1 步</span></div>
-          </div>
-          <div class="note" style="margin-top:11px">
-            <b class="ky">从「人编排流程」走向「员工自己优化流程」。</b><br>这就是最高级别（自治）的核心——但员工只能<b>提议</b>、不能擅自改，最终要人确认。当前只预留挂钩。
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="slide-footer"><span>KDev 数字员工 · 架构与进展总览</span><span>03 / 05</span></div>
-</section>
-
-<section class="slide">
-  <div class="topbar">
-    <div class="badge">★</div><div class="chaplabel">HUD 驾驶舱</div>
-    <div class="maintitle">进度随时可见 —— 三个通道把 6 名员工的实时状态推到你眼前
-      <small>独立 plugin <b style="color:var(--teal)">kdev-hud</b> 观测层（阶段3）｜ 底座只记账，HUD 只读消费这些账、渲染成「实时仪表盘」——三通道全部从事件流自动派生，只读、不可手改，永远与实际进度一致</small>
-    </div>
-  </div>
-  <div class="titlerule"></div>
-
-  <div class="stage">
-    <!-- 通道① -->
-    <div class="chlbl"><span class="num">1</span>命令行状态栏 —— 每次发言刷新，一行速览「我在哪」</div>
-    <div class="statusbar">
-      <div class="seg brand">🏢 KDev 团队</div>
-      <div class="seg node">需求「用户管理模块」<span class="ed">48% ✏️</span> · 开发·代码评审 第2轮<span class="blink">▋</span></div>
-      <div class="seg busy">👤 开发 忙 · 评审 忙</div>
-      <div class="seg warn">⚠ 待处理 1</div>
-    </div>
-
-    <div class="grid2">
-      <!-- 通道② 网页实时仪表盘（HTML 版） -->
-      <div class="colL">
-        <div class="chlbl t2"><span class="num">2</span>网页实时仪表盘 —— 自包含 HTML，事件触发热刷新，一屏全景驾驶舱</div>
+<div class="sa-wrap">
+<div class="sa-cap">KDev HUD · 通道② <b>网页实时仪表盘</b> —— 自包含 HTML · 事件流派生 · 只读，不可手改</div>
         <div class="dash">
           <div class="dbar">
             <div class="dots"><i class="r"></i><i class="y"></i><i class="g"></i></div>
@@ -670,71 +463,6 @@
             </div>
           </div>
         </div>
-      </div>
-
-      <!-- 通道③ 对话流摘要 ×2（上下各一个：进度播报 + 评审升级裁决） -->
-      <div class="colR" style="justify-content:space-between">
-        <div>
-          <div class="chlbl t3"><span class="num">3</span>对话流摘要 —— 进度播报 / 升级时，总指挥主动找你</div>
-          <div class="chat">
-            <div class="chatrow">
-              <div class="ava">CEO</div>
-              <div class="bubble">
-                <div class="bt">📊 需求进度播报 — 用户管理模块改造</div>
-                <ul>
-                  <li>完成度<b style="color:var(--gold)">48%（2/5 用户故事）</b></li>
-                  <li>当前<b>角色分配 · 代码评审中</b></li>
-                  <li>平均评分<b style="color:var(--green)">86.6</b></li>
-                  <li>升级总指挥<b>0 次</b></li>
-                </ul>
-                <div class="ask">CQO 提示需复评，要我让评审专家复评吗？
-                  <span class="yn"><span>是</span><span>否</span></span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="chat">
-          <div class="chatrow">
-            <div class="ava">CEO</div>
-            <div class="bubble">
-              <div class="bt">⚠ 评审升级 — 代码评审触顶，请你裁决</div>
-              <ul>
-                <li>节点<b>角色分配 · 代码评审</b></li>
-                <li>评分<b style="color:var(--gold)">80（阈值 85）</b></li>
-                <li>重试<b style="color:var(--red)">已达 3 轮上限</b></li>
-                <li>处置<b>升级总指挥 · 不偷偷放行</b></li>
-              </ul>
-              <div class="ask">退回重做 / 转人工 / 按现状放行？
-                <span class="yn"><span>退回</span><span>人工</span><span>放行</span></span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="foot-note">三个通道的数据全部来自同一份<b>事件流</b>（底座只记账）→ HUD 是派生出来的<b>只读仪表盘</b>，不是另一套真相，永远与实际进度一致。</div>
-  </div>
-
-  <div class="slide-footer"><span>KDev 数字员工 · 架构与进展总览</span><span>04 / 05</span></div>
-</section>
-
-
-
-<!-- ============ 9 结尾 ============ -->
-<section class="slide">
-  <div class="endbig">
-    <div class="logo" style="width:56px;height:56px;background:var(--blue);color:#06203f;font-size:32px;font-weight:bold;display:flex;align-items:center;justify-content:center;border-radius:13px">K</div>
-    <div class="eh">从「人带着 AI 干活」<br>走向「<span class="ehl">一支会自己交付、越用越强的 AI 团队</span>」</div>
-    <div class="glowline"></div>
-    <div class="es">
-      底座管「怎么跑」　·　SOP 管「跑什么」（可自由编排）　·　自我进化管「自己优化怎么跑」
-    </div>
-  </div>
-  <div class="slide-footer"><span>KDev 数字员工 · 架构与进展总览</span><span>05 / 05</span></div>
-</section>
-
+</div>
 </body>
 </html>

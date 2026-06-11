@@ -207,6 +207,64 @@
   .logoK{width:58px;height:58px;border-radius:14px;background:var(--blue);color:#fff;display:grid;place-items:center;font-size:34px;font-weight:800}
   .wrapb{flex:1;display:flex;gap:18px;margin-top:12px;min-height:0}
   .col{flex:1;display:flex;flex-direction:column;gap:11px;min-height:0}
+
+  /* ===== 架构页 v3：紧凑 CEO + CQO 虚拟线圈 + 4 员工统一紫色能力 chip + 双底座 ===== */
+  .ceobox{align-self:center;width:760px;max-width:80%;border:1.5px solid var(--orange);border-radius:11px;
+    background:linear-gradient(180deg,#FFF8F0,#fff);padding:6px 18px;margin-top:6px;
+    box-shadow:0 7px 20px -15px rgba(237,125,49,.5)}
+  .ceotop{display:flex;align-items:baseline;justify-content:center;gap:11px;flex-wrap:wrap}
+  .ceoname{font-size:15px;font-weight:800;color:#B5611A}
+  .ceorole{font-size:11.5px;color:var(--dim)}
+  .ceoscenes{display:flex;align-items:baseline;justify-content:center;gap:7px;margin-top:5px;flex-wrap:wrap}
+  .ceolead{font-size:10.5px;font-weight:700;color:var(--ink2)}
+  .ceolead b{color:var(--red)}
+  .cscene{font-size:10.5px;font-weight:700;color:#9A5B00;background:#FCF1E0;border:1px solid #F2DDB8;border-radius:999px;padding:1.5px 9px}
+  .ceotail{font-size:10.5px;color:var(--mute)}
+
+  .dispatch{align-self:center;display:flex;flex-direction:column;align-items:center;gap:1px;margin-top:2px}
+  .dline{width:2px;height:9px;background:var(--mute);opacity:.55;border-radius:2px}
+  .dtext{font-size:10.5px;font-weight:700;color:var(--dim)}
+
+  .cqowrap{position:relative;display:flex;flex-direction:column;margin-top:9px;
+    border:2px dashed var(--red);border-radius:14px;padding:14px 12px 8px;
+    background:linear-gradient(180deg,rgba(212,93,102,.045),rgba(212,93,102,.012))}
+  .cqobar{position:absolute;top:-12px;left:18px;right:18px;display:flex;align-items:center;justify-content:space-between;gap:10px;pointer-events:none}
+  .cqobar-l{display:flex;align-items:center;gap:9px;background:#fff;padding:2px 8px;border-radius:7px;min-width:0}
+  .cqotag{font-size:12.5px;font-weight:800;color:#B23842;white-space:nowrap}
+  .cqodesc{font-size:10px;color:var(--dim);line-height:1.25;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .cqostop{font-size:11px;font-weight:800;color:#fff;background:var(--red);border-radius:999px;padding:3px 12px;white-space:nowrap;box-shadow:0 0 0 4px #fff}
+
+  .teamrow{display:grid;grid-template-columns:1fr 1fr 1fr 1.5fr;gap:10px;align-items:stretch}
+  .ecard{border:1px solid #dbe2ee;border-radius:10px;background:#fff;padding:8px 9px;
+    display:flex;flex-direction:column;gap:5px;box-shadow:0 6px 18px -14px rgba(68,114,196,.4)}
+  .ecard.rev{border-color:#D9CFF6;background:#fdfcff}
+  .ecard-hd{display:flex;align-items:center;justify-content:space-between;gap:6px}
+  .ename{font-size:13.5px;font-weight:800;color:var(--ink2)}
+  .ecnt{font-size:10px;font-weight:800;color:#1E7A43;background:#E5F6EC;border:1px solid #C2E8D1;border-radius:6px;padding:2px 8px;white-space:nowrap}
+  .esub{font-size:9.5px;color:var(--mute);margin-top:-2px}
+  /* 每个能力 = 紫色底色 chip */
+  .ecaps{display:flex;flex-direction:column;gap:4px}
+  .cap{display:flex;align-items:baseline;justify-content:space-between;gap:6px;
+    background:#F3EFFD;border:1px solid #E0D7F7;border-radius:6px;padding:3px 9px}
+  .cap .ck{font-size:11px;font-weight:700;color:#5336B8;white-space:nowrap}
+  .cap .ck.o{color:#2F5BAA}
+  .cap .cd{font-size:9px;color:var(--mute);text-align:right;line-height:1.2}
+  /* 评审专家：编排 chip + 10 视角紫色网格 + 6 扩展 */
+  .rvgrid{display:grid;grid-template-columns:1fr 1fr;gap:4px}
+  .rchip{display:flex;flex-direction:column;align-items:center;text-align:center;
+    background:#F3EFFD;border:1px solid #E0D7F7;border-radius:6px;padding:2.5px 6px}
+  .rchip b{font-size:10px;color:#5336B8;line-height:1.25}
+  .rchip i{font-style:normal;font-size:8px;color:var(--mute);line-height:1.2}
+  .rvext{font-size:9px;color:var(--mute);line-height:1.35;margin-top:1px}
+  .rvext b{color:#9A5B00}
+
+  .collab{margin-top:7px;text-align:center;font-size:9.5px;color:var(--dim);line-height:1.4}
+  .collab b{color:var(--ink2)}
+  .collab .ar{color:var(--orange);font-weight:800}
+
+  /* 双底座连接 + 行 */
+  .baselead{align-self:center;font-size:10.5px;font-weight:700;color:var(--dim);margin-top:9px}
+  .baselead b{color:var(--blue-d)}
 </style>
 </head>
 <body>
@@ -216,90 +274,108 @@
 <section class="slide" id="s1">
   <div class="inner">
     <div class="hd"><div class="lgph">KDev · 数字员工</div><div class="secpill">01 · 整体架构</div></div>
-    <div class="ht"><div class="vbar"></div><div>
-      <div class="htitle">一张图看全 —— <span class="ac">一支 6 人 AI 团队，架在两个底座上</span></div>
-      <div class="hsub">用户透过<b>观测层</b>看见团队；团队跑在 <b>编排底座</b>（怎么跑）+ <b>记忆底座</b>（记得住、越用越强）之上。</div>
+    <div class="ht" style="margin-top:10px"><div class="vbar"></div><div>
+      <div class="htitle" style="font-size:21px">一张图看全 —— <span class="ac">CEO 总控 · CQO 监督 · 4 名员工，架在两个底座上</span></div>
+      <div class="hsub"><b>CEO</b> 仅 4 种场景介入；<b>CQO</b> 元监督横跨全员、有阻断权；4 名员工<b>格式完全统一</b>（每项能力 = 一个紫色 chip）；全员跑在 <b>编排底座 ＋ 记忆底座</b> 之上。</div>
     </div></div>
 
-    <div class="archcol">
-      <div class="uband">👤 用户</div>
-      <div class="updown">对话（经主控员）　·　观测（看 HUD）　↕</div>
+    <div class="ceobox">
+      <div class="ceotop"><span class="ceoname">CEO · 主控员</span><span class="ceorole">总指挥 · 对话 / 派单 / 决策 / 升级裁决 —— 唯一对用户入口</span></div>
+      <div class="ceoscenes">
+        <span class="ceolead"><b>●</b> 仅 4 种场景介入：</span>
+        <span class="cscene">① 阶段聚合</span><span class="cscene">② 异常升级</span><span class="cscene">③ 用户问询</span><span class="cscene">④ 评审 3 循环后裁决</span>
+        <span class="ceotail">· 不做微观管理</span>
+      </div>
+    </div>
 
-      <div class="obsband">
-        <div class="on">观测层 · kdev-hud</div>
-        <div class="od">三通道<b>实时驾驶舱</b>：命令行状态栏 · 网页仪表盘 · 对话播报 —— <b>只读</b>，把底座的账本变成看得见的进度</div>
-        <span class="pill p-cyan">只读派生</span>
+    <div class="dispatch"><span class="dline"></span><span class="dtext">▼ 派单（Agent 调员工编排）</span></div>
+
+    <div class="cqowrap">
+      <div class="cqobar">
+        <div class="cqobar-l">
+          <span class="cqotag">CQO · 首席质量官</span>
+          <span class="cqodesc">元监督 · 只读不写 · 横跨全员巡查 · 阶段合规聚合报告 · 只对 CEO 汇报 · 同时监督评审专家</span>
+        </div>
+        <span class="cqostop">● 有阻断权</span>
       </div>
 
-      <div class="empframe">
-        <div class="ftag">员工层 · kdev-team</div>
-        <div class="ceobar"><span class="cn">主控员（总指挥）</span><span class="cd">6 项能力：顶层约束 · 用户对话 · 派单 · 决策 · 阶段聚合 · 评审升级裁决 —— 唯一对用户入口</span></div>
-        <div class="emprow">
-          <div class="emp sup">
-            <div class="eh"><span class="en">监督员</span><span class="ec">CQO</span></div>
-            <div class="crow"><span class="k">流程监督</span><span class="d">元监督·只读</span></div>
-            <div class="crow"><span class="k">监控全员</span><span class="d">跨员工巡查</span></div>
-            <div class="crow"><span class="k">合规聚合</span><span class="d">阶段合规报告</span></div>
-            <div class="crow"><span class="k" style="color:#B23842">叫停权</span><span class="d">流程违规可阻断</span></div>
+      <div class="teamrow">
+        <!-- 员工 1 -->
+        <div class="ecard">
+          <div class="ecard-hd"><span class="ename">需求架构师</span><span class="ecnt">6 agent</span></div>
+          <div class="esub">5 业务能力 ＋ 1 编排</div>
+          <div class="ecaps">
+            <div class="cap"><span class="ck o">编排</span><span class="cd">内部调度 · 协作</span></div>
+            <div class="cap"><span class="ck">需求澄清</span><span class="cd">澄清原始需求</span></div>
+            <div class="cap"><span class="ck">需求计划</span><span class="cd">写需求规格 SR</span></div>
+            <div class="cap"><span class="ck">需求拆解</span><span class="cd">迭代 + 用户故事</span></div>
+            <div class="cap"><span class="ck">原型设计</span><span class="cd">高保真原型</span></div>
+            <div class="cap"><span class="ck">方案设计</span><span class="cd">技术方案</span></div>
           </div>
-          <div class="emp">
-            <div class="eh"><span class="en">需求架构师</span><span class="ec">5+1</span></div>
-            <div class="crow"><span class="k o">编排</span><span class="d">内部调度·协作</span></div>
-            <div class="crow"><span class="k">需求澄清</span><span class="d">澄清原始需求</span></div>
-            <div class="crow"><span class="k">需求计划</span><span class="d">写需求规格 SR</span></div>
-            <div class="crow"><span class="k">需求拆解</span><span class="d">迭代+用户故事</span></div>
-            <div class="crow"><span class="k">原型设计</span><span class="d">高保真原型</span></div>
-            <div class="crow"><span class="k">方案设计</span><span class="d">技术方案</span></div>
+        </div>
+
+        <!-- 员工 2 -->
+        <div class="ecard">
+          <div class="ecard-hd"><span class="ename">开发工程师</span><span class="ecnt">7 agent</span></div>
+          <div class="esub">6 业务能力 ＋ 1 编排</div>
+          <div class="ecaps">
+            <div class="cap"><span class="ck o">编排</span><span class="cd">内部调度 · 协作</span></div>
+            <div class="cap"><span class="ck">环境准备</span><span class="cd">栈 / 工具链</span></div>
+            <div class="cap"><span class="ck">实施计划</span><span class="cd">计划 + 复杂度</span></div>
+            <div class="cap"><span class="ck">编码实现</span><span class="cd">测试驱动开发</span></div>
+            <div class="cap"><span class="ck">端到端自测</span><span class="cd">自测跑通</span></div>
+            <div class="cap"><span class="ck">安全扫描</span><span class="cd">安全清单</span></div>
+            <div class="cap"><span class="ck">部署上线</span><span class="cd">合并 / 部署</span></div>
           </div>
-          <div class="emp">
-            <div class="eh"><span class="en">开发工程师</span><span class="ec">6+1</span></div>
-            <div class="crow"><span class="k o">编排</span><span class="d">内部调度·协作</span></div>
-            <div class="crow"><span class="k">环境准备</span><span class="d">栈/工具链</span></div>
-            <div class="crow"><span class="k">实施计划</span><span class="d">计划+复杂度</span></div>
-            <div class="crow"><span class="k">编码实现</span><span class="d">测试驱动开发</span></div>
-            <div class="crow"><span class="k">端到端自测</span><span class="d">自测跑通</span></div>
-            <div class="crow"><span class="k">安全扫描</span><span class="d">安全清单</span></div>
-            <div class="crow"><span class="k">部署上线</span><span class="d">合并/部署</span></div>
+        </div>
+
+        <!-- 员工 3 -->
+        <div class="ecard">
+          <div class="ecard-hd"><span class="ename">测试工程师</span><span class="ecnt">5 agent</span></div>
+          <div class="esub">4 业务能力 ＋ 1 编排</div>
+          <div class="ecaps">
+            <div class="cap"><span class="ck o">编排</span><span class="cd">内部调度 · 协作</span></div>
+            <div class="cap"><span class="ck">测试点设计</span><span class="cd">国标 29119</span></div>
+            <div class="cap"><span class="ck">用例开发</span><span class="cd">字段化用例</span></div>
+            <div class="cap"><span class="ck">界面自动化</span><span class="cd">UI 脚本执行</span></div>
+            <div class="cap"><span class="ck">接口自动化</span><span class="cd">API 用例执行</span></div>
           </div>
-          <div class="emp">
-            <div class="eh"><span class="en">测试工程师</span><span class="ec">4+1</span></div>
-            <div class="crow"><span class="k o">编排</span><span class="d">内部调度·协作</span></div>
-            <div class="crow"><span class="k">测试点设计</span><span class="d">国标 29119</span></div>
-            <div class="crow"><span class="k">用例开发</span><span class="d">字段化用例</span></div>
-            <div class="crow"><span class="k">界面自动化</span><span class="d">UI 脚本执行</span></div>
-            <div class="crow"><span class="k">接口自动化</span><span class="d">API 用例执行</span></div>
+        </div>
+
+        <!-- 员工 4 · 评审专家（内容沿用当前 HTML：10 核心评审 + 6 按需扩展 + 1 编排） -->
+        <div class="ecard rev">
+          <div class="ecard-hd"><span class="ename">评审专家</span><span class="ecnt">17 agent</span></div>
+          <div class="esub">16 评审能力 ＋ 1 编排</div>
+          <div class="ecaps">
+            <div class="cap"><span class="ck o">编排</span><span class="cd">调度 · 仲裁 · 终审聚合</span></div>
           </div>
-          <div class="emp rev">
-            <div class="eh"><span class="en">评审专家</span><span class="ec">10+6+1</span></div>
-            <div class="crow"><span class="k o">编排</span><span class="d">调度·仲裁·终审聚合</span></div>
-            <div class="revg">
-              <span><b>需求方向</b><i>该不该做</i></span><span><b>SR 需求</b><i>需求写全没</i></span>
-              <span><b>迭代拆分</b><i>分批合不合理</i></span><span><b>用户故事</b><i>能否独立验收</i></span>
-              <span><b>原型</b><i>界面好不好用</i></span><span><b>方案</b><i>技术行不行</i></span>
-              <span><b>代码</b><i>对不对·好维护</i></span><span><b>安全</b><i>有无漏洞</i></span>
-              <span><b>测试设计</b><i>测得全不全</i></span><span><b>测试执行</b><i>实跑覆盖多少</i></span>
-            </div>
-            <div class="revx">+6 按需扩展：<b>部署检查 · 性能 · 文档 · 合规 · 可观测 · 可访问</b></div>
+          <div class="rvgrid">
+            <span class="rchip"><b>需求方向</b><i>该不该做</i></span><span class="rchip"><b>SR 需求</b><i>需求写全没</i></span>
+            <span class="rchip"><b>迭代拆分</b><i>分批合不合理</i></span><span class="rchip"><b>用户故事</b><i>能否独立验收</i></span>
+            <span class="rchip"><b>原型</b><i>界面好不好用</i></span><span class="rchip"><b>方案</b><i>技术行不行</i></span>
+            <span class="rchip"><b>代码</b><i>对不对·好维护</i></span><span class="rchip"><b>安全</b><i>有无漏洞</i></span>
+            <span class="rchip"><b>测试设计</b><i>测得全不全</i></span><span class="rchip"><b>测试执行</b><i>实跑覆盖多少</i></span>
           </div>
+          <div class="rvext">+6 按需扩展：<b>部署检查 · 性能 · 文档 · 合规 · 可观测 · 可访问</b></div>
         </div>
       </div>
 
-      <div class="cntline">合计 <b>6 名员工 / 默认 31 个 AI 工作单元</b>（全开 37）＝ 1 主控 ＋ 1 监督 ＋ 4 编排 ＋ 15 业务能力 ＋ 10 核心评审</div>
-      <div class="updown">都跑在 ↓ 两个底座上</div>
+      <div class="collab">↕ <b>员工间直接协作</b>：编排能力之间发函（开发请评审 = 开发/编排 <span class="ar">→</span> 评审/编排 <span class="ar">→</span> 评审能力 <span class="ar">→</span> 回流）　3 跳单程 / 6 跳往返 · 不经 CEO · CQO 后台抽查合规</div>
+    </div>
 
-      <div class="baserow">
-        <div class="base core">
-          <div class="bh"><span class="bn">编排底座 · kdev-core</span><span class="bm">让员工「按流程跑起来」</span></div>
-          <div class="brow"><span class="bt">状态记录：控制态「我在哪步」+ 事实流水「发生了啥」→ 断点续跑</span><span class="bt">流程节点引擎：节点表声明 · 过→推进 / 不过→退回（有上限）</span></div>
-          <div class="brow"><span class="bt">三类关卡：评审 / 岔路 / 验收 · 超限升人工</span><span class="bt">账本 features/&lt;功能&gt;/：状态 + 流水 + 交付物</span><span class="bt">SOP 可编排（L0/L1/L2）</span></div>
-          <div class="bnote">铁律：只记账 + 流转，不替员工做判断（判断喂回来）</div>
-        </div>
-        <div class="base mem">
-          <div class="bh"><span class="bn">记忆底座 · kdev-memory</span><span class="bm">让员工「记得住、越用越强」</span></div>
-          <div class="brow"><span class="bt">叙事 / 蒸馏：步骤 · 决策 · 踩坑 + 自评 / 用户评分（从流水提炼+加料）</span><span class="bt">多 scope：shared 共享 + staff/&lt;员工&gt; 私有</span></div>
-          <div class="brow"><span class="bt">评审经验 → 喂复利飞轮（越评越准）</span><span class="bt">跨会话续航（主控员冷启动）</span><span class="bt">Git 托管自动同步</span></div>
-          <div class="bnote">全团队共享，不是主控员私有：续航 + 飞轮 + 各员工的账</div>
-        </div>
+    <div class="baselead">▼ 全员都跑在 <b>两个底座</b> 上</div>
+    <div class="baserow">
+      <div class="base core">
+        <div class="bh"><span class="bn">编排底座 · kdev-core</span><span class="bm">让员工「按流程跑起来」</span></div>
+        <div class="brow"><span class="bt">状态记录：控制态「我在哪步」+ 事实流水「发生了啥」→ 断点续跑</span><span class="bt">流程节点引擎：节点表声明 · 过→推进 / 不过→退回（有上限）</span></div>
+        <div class="brow"><span class="bt">三类关卡：评审 / 岔路 / 验收 · 超限升人工</span><span class="bt">账本 features/&lt;功能&gt;/：状态 + 流水 + 交付物 · SOP 可编排</span></div>
+        <div class="bnote">铁律：只记账 + 流转，不替员工做判断（判断喂回来）</div>
+      </div>
+      <div class="base mem">
+        <div class="bh"><span class="bn">记忆底座 · kdev-memory</span><span class="bm">让员工「记得住、越用越强」</span></div>
+        <div class="brow"><span class="bt">叙事 / 蒸馏：步骤 · 决策 · 踩坑 + 自评 / 用户评分（从流水提炼+加料）</span><span class="bt">多 scope：shared 共享 + staff/&lt;员工&gt; 私有</span></div>
+        <div class="brow"><span class="bt">评审经验 → 喂复利飞轮（越评越准）</span><span class="bt">跨会话续航（主控员冷启动）· Git 托管自动同步</span></div>
+        <div class="bnote">全团队共享，不是主控员私有：续航 + 飞轮 + 各员工的账</div>
       </div>
     </div>
   </div>
