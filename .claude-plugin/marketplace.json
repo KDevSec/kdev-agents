@@ -84,6 +84,12 @@
       "description": "KDev 数字员工集群：编排+业务 agent + per-员工 node-table + staff.yml 花名册（员工集中总目录）",
       "category": "development",
       "source": "./plugins/kdev-team"
+    },
+    {
+      "name": "kdev-core",
+      "description": "数字员工编排底座（R1 状态/R2 流转/R3 关卡）：feature-first 存储 + events.jsonl 流水。被 kdev-team 经 python -m kdev_core 驱动。",
+      "category": "development",
+      "source": "./plugins/kdev-core"
     }
   ]
 }
