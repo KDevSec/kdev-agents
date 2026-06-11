@@ -1,0 +1,23 @@
+docs/framework/01-design/2026-06-10-03-KDev数字员工-编排底座-合稿-v1.0.md
+  s_f8c1c9f64db852::t_3eee401a74d009 192,196-200
+docs/framework/01-design/2026-06-06-01-数字员工整体设计路线图roadmap-v1.0.md
+  s_f8c1c9f64db852::t_b3ca6e8113fea2 116,122,125,127,132
+  s_f8c1c9f64db852::t_5679a307018868 109-110
+  s_f8c1c9f64db852::t_8cc60caec37dc4 75,80-81,83,99
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "f3c9117ce3264803b3d433e1fdca9a861ff86ffa",
+  "prompts": {},
+  "sessions": {
+    "s_f8c1c9f64db852": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "03697b91-a174-4618-a4e5-3b1863ba91b9",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
