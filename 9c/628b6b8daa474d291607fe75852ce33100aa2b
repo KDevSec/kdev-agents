@@ -1,0 +1,19 @@
+docs/framework/01-design/KDev数字员工架构总览_演讲原型_v1.1.html
+  s_0907f17a04af5e::t_d3aeeb9c49de07 149,151-153,171-189,231,278-279,399,419-433,437,444,451-453,460-472,475-478
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "9c628b6b8daa474d291607fe75852ce33100aa2b",
+  "prompts": {},
+  "sessions": {
+    "s_0907f17a04af5e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "8807b9c4-5f6d-4a9e-9cf6-3ade8bcaa9dc",
+        "model": "claude-fable-5"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
