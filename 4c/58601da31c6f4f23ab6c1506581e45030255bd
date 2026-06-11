@@ -1,0 +1,22 @@
+docs/framework/01-design/2026-06-10-02-KDev数字员工-概念模型与员工能力-合稿-v1.0.md
+  s_0907f17a04af5e::t_c9b4edba80b7be 233-246
+  s_0907f17a04af5e::t_4512897d8dff4c 255,257-262
+docs/framework/01-design/KDev数字员工架构总览_演讲原型_v1.0.html
+  s_0907f17a04af5e::t_6b2485a24c92ba 129-130,132,137,149-152,467-469,505-509
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "4c58601da31c6f4f23ab6c1506581e45030255bd",
+  "prompts": {},
+  "sessions": {
+    "s_0907f17a04af5e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "8807b9c4-5f6d-4a9e-9cf6-3ade8bcaa9dc",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
