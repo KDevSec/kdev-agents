@@ -110,6 +110,17 @@
 
   /* 计数条 */
   .countbar{margin-top:9px;border:1px dashed var(--line);border-radius:7px;padding:8px 12px;text-align:center;color:var(--ink);font-size:12.5px;background:rgba(74,158,255,.05)}
+  /* 4 层平台条(v1.5 整体架构) */
+  .platlbl{text-align:center;color:var(--mut);font-size:11px;margin:8px 0 6px}
+  .platlbl b{color:var(--ink)}
+  .platrow{display:grid;grid-template-columns:repeat(4,1fr);gap:9px}
+  .pl{border:1px solid var(--line);border-radius:8px;padding:7px 11px;background:var(--panel);border-top:3px solid var(--blue)}
+  .pl .pln{font-weight:bold;font-size:12.5px;color:var(--white)}
+  .pl small{display:block;color:var(--mut);font-size:10px;margin-top:3px;line-height:1.35}
+  .pl.team{border-top-color:var(--teal)} .pl.team .pln{color:var(--teal)}
+  .pl.core{border-top-color:var(--blue)} .pl.core .pln{color:var(--blue)}
+  .pl.mem{border-top-color:var(--purple)} .pl.mem .pln{color:var(--purple)}
+  .pl.hud{border-top-color:var(--teal);border-style:dashed} .pl.hud .pln{color:var(--teal)}
 
   /* 员工能力列（v1.5 密集风格） */
   .teamgrid{display:flex;gap:10px;align-items:stretch;margin-top:9px}
@@ -434,7 +445,7 @@
 <section class="slide">
   <div class="topbar">
     <div class="badge">3</div><div class="chaplabel">全景</div>
-    <div class="maintitle">这支团队长什么样 —— 6 名员工 · 每人的具体能力清单</div>
+    <div class="maintitle">整体架构一张图 —— 员工层 + 编排底座 + 记忆底座 + 观测层</div>
   </div>
   <div class="titlerule"></div>
   <div class="body" style="padding-top:12px">
@@ -494,9 +505,12 @@
         </div>
       </div>
     </div>
-    <div class="countbar">
-      合计 <b>6 名员工 / 默认 31 个 AI 工作单元</b> ＝ <b class="kb">1 总指挥</b> ＋ <b class="kr">1 质量总监</b> ＋ <b class="kt">4 调度</b> ＋ <b class="kt">15 业务能力</b>（需求5 + 开发6 + 测试4）＋ <b class="ky">10 核心评审</b>
-      <span class="mut">｜ 再开 6 项按需扩展评审 → 全开 37（终审聚合隐藏，不单列）</span>
+    <div class="platlbl">▼ <b>6 名员工 / 默认 31 个 AI 工作单元</b>（全开 37）—— 这支团队（员工层）跑在下面 3 层平台上</div>
+    <div class="platrow">
+      <div class="pl team"><div class="pln">员工层 · kdev-team</div><small>↑ 上方这支 6 员工团队（干活）</small></div>
+      <div class="pl core"><div class="pln">编排底座 · kdev-core</div><small>状态记录 · 流转引擎 · 三类关卡（调度）</small></div>
+      <div class="pl mem"><div class="pln">记忆底座 · kdev-memory</div><small>叙事 + 加料 · scope 多流（记忆）</small></div>
+      <div class="pl hud"><div class="pln">观测层 · kdev-hud</div><small>三通道驾驶舱 · 只读（观测 · 阶段3）</small></div>
     </div>
   </div>
   <div class="slide-footer"><span>KDev 数字员工 · 架构与进展总览</span><span>03 / 10</span></div>
