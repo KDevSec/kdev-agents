@@ -1,0 +1,22 @@
+plugins/kdev-core/kdev_core/migrate.py
+  s_f8c1c9f64db852::t_8e212006e03eeb 1-37,42-111
+  s_f8c1c9f64db852::t_160966cf1b4414 38-41
+plugins/kdev-core/tests/test_migrate.py
+  s_f8c1c9f64db852::t_a87c0b7926ac6d 1-96
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "10b7b7cbd0d7746076e521aea4f1fbfc79a3bddb",
+  "prompts": {},
+  "sessions": {
+    "s_f8c1c9f64db852": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "03697b91-a174-4618-a4e5-3b1863ba91b9",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
