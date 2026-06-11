@@ -289,7 +289,37 @@ def list_features(workspace):
     return result
 
 
-# stories API 在 Task 4 追加到本模块。
+_VALID_STORY_STATUSES = {"pending", "in_progress", "done"}
+
+
+def add_story(workspace, slug, *, story_id, title, status="pending", step_id=None):
+    """追加一个用户故事到 stories[]（feature 级，HUD 完成度分母）。id 不可重复。"""
+    if status not in _VALID_STORY_STATUSES:
+        raise ValueError(f"story status must be one of {sorted(_VALID_STORY_STATUSES)}, got {status!r}")
+    state = read_state(workspace, slug=slug)
+    if any(s.get("id") == story_id for s in state.get("stories", [])):
+        raise FlowStateError(f"story {story_id!r} already exists in feature {slug!r}")
+    state["stories"] = [*state.get("stories", []),
+                        {"id": story_id, "title": title, "status": status}]
+    write_state(workspace, None, slug=slug, state=state, step_id=step_id)
+    return read_state(workspace, slug=slug)
+
+
+def set_story_status(workspace, slug, *, story_id, status, step_id=None):
+    """更新某用户故事状态（HUD 完成度分子）。"""
+    if status not in _VALID_STORY_STATUSES:
+        raise ValueError(f"story status must be one of {sorted(_VALID_STORY_STATUSES)}, got {status!r}")
+    state = read_state(workspace, slug=slug)
+    stories = [dict(s) for s in state.get("stories", [])]
+    for s in stories:
+        if s.get("id") == story_id:
+            s["status"] = status
+            break
+    else:
+        raise FlowStateError(f"no story {story_id!r} in feature {slug!r}")
+    state["stories"] = stories
+    write_state(workspace, None, slug=slug, state=state, step_id=step_id)
+    return read_state(workspace, slug=slug)
 
 
 def complete_run(workspace, slug, *, status="completed", close_feature=False, step_id=None):
