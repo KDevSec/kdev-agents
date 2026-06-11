@@ -289,20 +289,69 @@ def list_features(workspace):
     return result
 
 
-# complete_run / start_run / stories API 在 Task 3 / Task 4 追加到本模块。
+# stories API 在 Task 4 追加到本模块。
 
 
 def complete_run(workspace, slug, *, status="completed", close_feature=False, step_id=None):
+    """终结当前在跑棒次：fold active → runs[] 一行摘要 + 清空 active。Q3: 默认不动 feature 级。"""
+    if status not in {"completed", "aborted"}:
+        raise ValueError(f"complete_run status must be completed|aborted, got {status!r}")
     state = read_state(workspace, slug=slug)
     if not state["_has_active"]:
         raise FlowStateError(f"feature {slug!r} has no active run to complete")
     run_summary = {
-        "flow": state["flow"], "run": state["run"], "status": status,
-        "final_node": state["current_node"], "ended_at": _now_iso(),
+        "flow": state["flow"],
+        "run": state["run"],
+        "status": status,
+        "final_node": state["current_node"],
+        "ended_at": _now_iso(),
     }
     state["runs"] = [*state.get("runs", []), run_summary]
     state["_has_active"] = False
     if close_feature:
         state["feature_status"] = status
-    write_state(workspace, None, slug=slug, state=state)
+    write_state(workspace, None, slug=slug, state=state, step_id=step_id)
+    return read_state(workspace, slug=slug)
+
+
+def start_run(workspace, flow, slug, *, initial_node=None,
+              review_mode="ai", auto_mode=False, step_id=None):
+    """补活：feature 已存在且无在跑棒次时，开新 run 填 active（run 号自增）。单棒约束。"""
+    if review_mode not in VALID_REVIEW_MODES:
+        raise ValueError(f"review_mode must be one of {sorted(VALID_REVIEW_MODES)}, got {review_mode!r}")
+    state = read_state(workspace, slug=slug)  # 不存在 → FlowStateError(no flow-state.json)
+    if state["_has_active"]:
+        raise FlowStateError(
+            f"feature {slug!r} already has an active run (run {state['run']}); "
+            f"complete it before starting a new one (单棒约束)"
+        )
+    next_run = max((r.get("run", 0) for r in state.get("runs", [])), default=0) + 1
+    state["_has_active"] = True
+    state["_active_started_at"] = _now_iso()
+    state["flow"] = flow
+    state["run"] = next_run
+    state["current_node"] = initial_node
+    state["status"] = "in_progress"
+    state["gate_iters"] = {}
+    state["gate_calls"] = 0
+    state["retries"] = {}
+    state["blocked_reason"] = None
+    state["config"] = {"review_mode": review_mode, "auto_mode": auto_mode}
+    if state.get("feature_status") in {"completed", "aborted"}:
+        state["feature_status"] = "in_progress"  # 补活重开
+    write_state(workspace, flow, slug=slug, state=state, step_id=step_id)
+    return read_state(workspace, slug=slug)
+
+
+def close_feature(workspace, slug, *, status="completed", step_id=None):
+    """显式收口 feature 级 status（无在跑棒次时才允许）。"""
+    if status not in {"completed", "aborted"}:
+        raise ValueError(f"close_feature status must be completed|aborted, got {status!r}")
+    state = read_state(workspace, slug=slug)
+    if state["_has_active"]:
+        raise FlowStateError(
+            f"feature {slug!r} has an active run; complete it before closing the feature"
+        )
+    state["feature_status"] = status
+    write_state(workspace, None, slug=slug, state=state, step_id=step_id)
     return read_state(workspace, slug=slug)
