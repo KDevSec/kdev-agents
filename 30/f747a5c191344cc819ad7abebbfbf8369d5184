@@ -1,0 +1,28 @@
+plugins/kdev-memory/hooks/session-start-brief.py
+  s_54d8d748b888e0::t_4bfb3f8779bd4f 346-347,357-358,361-378,431-432
+  s_54d8d748b888e0::t_eadac695d46b52 529-530
+  s_54d8d748b888e0::t_f3f5d0b06da8d4 456-458
+  s_54d8d748b888e0::t_e0c703fe405587 470-471
+  s_54d8d748b888e0::t_74551368eaa192 533-551
+  s_54d8d748b888e0::t_bbdc0c8faa85ad 41
+  s_54d8d748b888e0::t_6ea48b105eb7ac 230,241-242,247-269
+  s_54d8d748b888e0::t_648b291bd22c4d 297-298
+plugins/kdev-memory/tests/test_brief_verbosity.py
+  s_54d8d748b888e0::t_d08ef1f99cad6a 1-71
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "30f747a5c191344cc819ad7abebbfbf8369d5184",
+  "prompts": {},
+  "sessions": {
+    "s_54d8d748b888e0": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "27c3a208-d7f1-4318-a30e-2b77e6ee2ffe",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
