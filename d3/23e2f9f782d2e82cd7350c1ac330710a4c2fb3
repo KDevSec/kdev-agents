@@ -1,0 +1,31 @@
+plugins/kdev-core/tests/test_flow_lifecycle.py
+  s_f8c1c9f64db852::t_184aebdcc8ded2 14-17,23-25
+plugins/kdev-core/tests/test_node_smoke.py
+  s_f8c1c9f64db852::t_ab29a3e593c004 2
+  s_f8c1c9f64db852::t_36da70e2440448 56-59
+  s_f8c1c9f64db852::t_7147d62a3220a9 27-31
+plugins/kdev-core/tests/test_smoke_lifecycle.py
+  s_f8c1c9f64db852::t_926ab92ee13a31 38,41
+  s_f8c1c9f64db852::t_b6bdf5005b9ee1 23-28
+plugins/kdev-core/tests/conftest.py
+  s_f8c1c9f64db852::t_ff4ff6932f8011 14
+plugins/kdev-core/tests/test_gate_smoke.py
+  s_f8c1c9f64db852::t_4145c1115ead22 2
+  s_f8c1c9f64db852::t_f00e7202e01011 41-45
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "d323e2f9f782d2e82cd7350c1ac330710a4c2fb3",
+  "prompts": {},
+  "sessions": {
+    "s_f8c1c9f64db852": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "03697b91-a174-4618-a4e5-3b1863ba91b9",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
