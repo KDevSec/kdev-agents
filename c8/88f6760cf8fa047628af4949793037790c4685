@@ -1,0 +1,23 @@
+docs/framework/01-design/2026-06-10-01-KDev数字员工设计总览-演讲稿-v1.0.md
+  s_0907f17a04af5e::t_ddb013c792e7d1 5,16,98-103,204,206-207,211
+docs/framework/01-design/KDev数字员工架构总览_演讲原型_v1.0.html
+  s_0907f17a04af5e::t_8062527cc296d5 448
+  s_0907f17a04af5e::t_805b61b5e002f3 113-123
+  s_0907f17a04af5e::t_650a9a800263c8 508-513
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "c888f6760cf8fa047628af4949793037790c4685",
+  "prompts": {},
+  "sessions": {
+    "s_0907f17a04af5e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "8807b9c4-5f6d-4a9e-9cf6-3ade8bcaa9dc",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
