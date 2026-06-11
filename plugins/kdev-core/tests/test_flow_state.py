@@ -7,6 +7,7 @@ import pytest
 
 from kdev_core.flow_state import (
     init_state, read_state, write_state, FlowStateError,
+    resume_state, mark_inactive,
 )
 from kdev_core import events
 
@@ -175,3 +176,19 @@ def test_same_slug_is_same_feature(tmp_workspace):
     init_state(tmp_workspace, "coding-flow", "feat-x", display_name="X", initial_node="n0")
     with pytest.raises(FlowStateError, match="already exists"):
         init_state(tmp_workspace, "design-flow", "feat-x", display_name="X", initial_node="n0")
+
+
+def test_resume_state_returns_in_progress_active(tmp_workspace):
+    init_state(tmp_workspace, FLOW, "f", display_name="F", initial_node="n0")
+    st = resume_state(tmp_workspace, FLOW, "f")
+    assert st["_has_active"] is True and st["status"] == "in_progress"
+
+
+def test_mark_inactive_folds_run_and_closes_feature(tmp_workspace):
+    init_state(tmp_workspace, FLOW, "f", display_name="F", initial_node="n0")
+    out = mark_inactive(tmp_workspace, FLOW, "f", status="completed")
+    assert out["_has_active"] is False
+    assert out["feature_status"] == "completed"
+    assert len(out["runs"]) == 1
+    with pytest.raises(FlowStateError, match="not resumable"):
+        resume_state(tmp_workspace, FLOW, "f")

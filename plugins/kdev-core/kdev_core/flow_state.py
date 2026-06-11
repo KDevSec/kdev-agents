@@ -21,8 +21,6 @@ from pathlib import Path
 from kdev_core import events as _events
 
 VALID_REVIEW_MODES = {"ai", "both", "human"}
-_FEATURE_STATUSES = {"in_progress", "completed", "aborted"}
-
 
 class FlowStateError(Exception):
     """Raised when flow-state.json is missing, corrupt, or in an invalid state."""
@@ -137,7 +135,7 @@ def read_state(workspace, flow=None, slug=None):
     return _flatten(doc)
 
 
-def _rebuild_doc(workspace, slug, flat) -> dict:
+def _rebuild_doc(slug, flat) -> dict:
     """扁平内存视图 -> 嵌套磁盘 doc（不含 _meta；事件虹吸由 write_state 负责）。"""
     if flat.get("_has_active"):
         active = {
@@ -185,14 +183,11 @@ def _write_doc(workspace, slug, doc, *, step_id=None) -> None:
         raise
 
 
-def write_state(workspace, flow, slug=None, state=None, *, step_id=None):
+def write_state(workspace, flow=None, slug=None, state=None, *, step_id=None):
     """写扁平 state：重建嵌套 doc + 虹吸 history/phase_history 增量进 events.jsonl。
 
     兼容旧位置签名 write_state(ws, flow, slug, state)。新式可 write_state(ws, slug=..., state=...)。
     """
-    # 兼容位置参数：write_state(ws, flow, slug, state)
-    if state is None and slug is not None and not isinstance(slug, str):
-        state, slug = slug, flow  # 不该走到；显式签名优先
     if state is None:
         raise ValueError("write_state requires a state dict")
     if slug is None:
@@ -208,7 +203,7 @@ def write_state(workspace, flow, slug=None, state=None, *, step_id=None):
         _events.append_event(workspace, slug,
                              _events.gate_event(slug=slug, flow=flow_id, run=run_id, gate_result=gr))
     # 2. 重建嵌套 doc 并原子写
-    doc = _rebuild_doc(workspace, slug, flat)
+    doc = _rebuild_doc(slug, flat)
     _write_doc(workspace, slug, doc, step_id=step_id)
 
 
@@ -216,7 +211,7 @@ def mark_inactive(workspace, flow, slug=None, *, status="aborted", step_id=None)
     """[兼容旧 API] 终结当前在跑棒次：等价 complete_run。fold active→runs[] + 清空 active。
 
     旧语义是 active=False + 顶层 status。新语义：run 级终态 + 折叠台账；feature 级 status
-    仅在 completed 时一并置（保最小兼容：旧调用方 complete 即视作功能完结）。
+    一并置为给定的终态（completed 或 aborted）。
     """
     if slug is None:
         slug = flow
