@@ -64,6 +64,9 @@ def test_brief_verbosity_default_and_values(tmp_path):
     kdev2 = _write_config(tmp_path, "brief.verbosity: compact\n")
     assert memory_config.read_brief_verbosity(kdev2) == "compact"
 
+    kdev3 = _write_config(tmp_path, "brief.verbosity: verbose\n")
+    assert memory_config.read_brief_verbosity(kdev3) == "verbose"
+
 
 def test_brief_verbosity_invalid_falls_back(tmp_path):
     kdev = _write_config(tmp_path, "brief.verbosity: loud\n")

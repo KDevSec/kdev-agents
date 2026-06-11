@@ -9,6 +9,8 @@
 - distill.reminder_days: 7（默认）
 - distill.reminder_new_f: 10（默认）
 - distill.reminder_new_misalign: 3（默认）
+- rating.mode: model-only | user-opt-in | user-required  —— 评分模式（默认 user-opt-in）
+- brief.verbosity: compact | normal | verbose  —— SessionStart brief 详略（默认 normal）
 
 支持两种语法：顶层 flat key（`distill_mode: auto`）和一层嵌套（`distill:` + 缩进 `mode: auto`）。
 parser 内部统一用 dot notation 存储（`distill.mode`）。
