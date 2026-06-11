@@ -1,0 +1,19 @@
+docs/superpowers/plans/2026-06-11-kdev-memory-减痛轨-PC0.5+PC1a.md
+  s_54d8d748b888e0::t_b6ba8e0c59d175 1-1346
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "6e00a5f24d00214301eb2bf1ebf0d1690baa8461",
+  "prompts": {},
+  "sessions": {
+    "s_54d8d748b888e0": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "27c3a208-d7f1-4318-a30e-2b77e6ee2ffe",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
