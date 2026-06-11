@@ -1,5 +1,32 @@
 # kdev-memory CHANGELOG
 
+## [0.15.0] — 2026-06-11
+
+**kdev-memory 减痛轨 P-C0.5 + P-C1a：评分模式可配 + brief 分级 + subagent 输出精简。**
+
+### ✨ 新增
+
+- **`rating.mode`（config.yaml，flat dot-key）** — 评分三档：`model-only`（零追问，= Q-002 机读化）/ `user-opt-in`（插件默认，轻提一句不阻塞）/ `user-required`（现行硬闸门）。`memory_config.read_rating_mode` / `rating_mode_configured`。
+- **`brief.verbosity`（config.yaml）** — SessionStart brief 三档：`compact`（只注入 WARN + pending_decisions + 今日进度一行，其余写 `.kdev/memory/brief-detail.md`）/ `normal`（现行）/ `verbose`（全量不截断）。`memory_config.read_brief_verbosity`。
+- **首次评分提示** — config 无 `rating.mode` 键时 brief 注入一次性 `<kdev-memory-rating-setup>`（`state/.rating-setup-shown` marker 去重）。
+- **`hooks/lib/migrate_void_faded.py`** — Q-002 后"仅因用户评分空"的半残 Step 批量盖 `status: voided-faded` + 销账注释（幂等，dry-run 默认 / `--apply` 落盘；按 body 切片重建，对重复标题鲁棒）。
+
+### 🔄 变更
+
+- **`step_completeness`** — `check_step`/`run_check` 加 `rating_mode` 形参（默认 `user-required` 保现状）：`model-only`/`user-opt-in` 下"用户评分段空"不算半残；扣分项缺失**所有模式仍查**（防讨好式满分）。`parse_steps` 补 header 内联 `status:` 解析（修历史 latent bug——Step 1/2/3 的内联 voided-faded 此前从未生效）。
+- **`stop-check`** — 按 `rating.mode` 降级：`model-only` 跳过半残检测、`user-opt-in` 软提醒不阻塞、`user-required` 现行（soft + strict 阻塞）。
+- **`session-start-brief`** — verbosity 分级 + 首次评分提示 + 给半残扫描传 `rating_mode`。
+- **`agents/kdev-step-recorder.md`** — 读 `rating.mode` 决定用户评分段写法（model-only 留空 + 内联 `status: voided-faded` + 销账注释，**绝不伪填自评分**）；Return format 砍 `APPENDED_BLOCK`，只回 6 行审计字段。
+- **`SKILL.md` / `六类记录-schema.md`** — 评分动作链按 `rating.mode` 三分支重写；schema 注明 model-only 留空 + voided-faded 标准做法。
+
+### 🧱 向后兼容 / 约束
+
+- **默认温和**：`rating.mode` 默认 `user-opt-in`、`brief.verbosity` 默认 `normal`；`user-required` = 现行行为完整保留。
+- **不伪造用户评分**：model-only 用户评分段留空 + voided-faded，绝不拷自评分（污染 misalignment 切片）。
+- **不预留** `peer_review`（他评 defer）；**不碰** P-C1b transcript 溯源（commit-tracker offset / step-recorder input 重写均未做）。
+- **测试**：新增 `test_rating_mode_config` / `test_brief_verbosity` / `test_stop_check` / `test_migrate_void_faded`，更新 `test_step_completeness`；全量 323 绿。
+- **G-004 提醒**：本版 bump `0.14.0 → 0.15.0`，用户侧需刷 marketplace（`/plugin` 更新/重装）+ 重启 session 才生效。
+
 ## [0.14.0] — 2026-06-10
 
 **P-C1 记忆 scope 分离（数字员工集群 阶段2）：kdev-memory scope-aware，opt-in 向后兼容。**
