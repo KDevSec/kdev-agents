@@ -11,6 +11,6 @@ sys.path.insert(0, str(PLUGIN_ROOT))
 def tmp_workspace(tmp_path: Path) -> Path:
     """Temp dir simulating a project workspace.
 
-    `.kdev/flows/<flow>/<slug>/` is created on demand by the code under test.
+    `.kdev/features/<slug>/` is created on demand by the code under test.
     """
     return tmp_path

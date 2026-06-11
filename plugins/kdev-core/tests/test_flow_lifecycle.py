@@ -11,15 +11,18 @@ FLOW = "coding-flow"
 def test_mark_inactive_defaults_to_aborted(tmp_workspace):
     init_state(tmp_workspace, FLOW, "f", display_name="F")
     st = mark_inactive(tmp_workspace, FLOW, "f")
-    assert st["active"] is False
-    assert st["status"] == "aborted"
+    # active run folded -> no active; terminal disposition lives at feature level.
+    assert st["_has_active"] is False
+    assert st["feature_status"] == "aborted"
+    assert st["runs"][-1]["status"] == "aborted"
 
 
 def test_mark_inactive_completed(tmp_workspace):
     init_state(tmp_workspace, FLOW, "f", display_name="F")
     st = mark_inactive(tmp_workspace, FLOW, "f", status="completed")
-    assert st["active"] is False
-    assert st["status"] == "completed"
+    assert st["_has_active"] is False
+    assert st["feature_status"] == "completed"
+    assert st["runs"][-1]["status"] == "completed"
 
 
 def test_mark_inactive_rejects_bad_status(tmp_workspace):

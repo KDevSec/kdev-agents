@@ -20,8 +20,12 @@ def test_full_lifecycle(tmp_workspace):
     assert read_state(tmp_workspace, FLOW, "auth")["current_node"] == "n3-e2e"
 
     done = mark_inactive(tmp_workspace, FLOW, "auth", status="completed")
-    assert done["status"] == "completed"
-    assert done["active"] is False
+    # Terminal: active run folds into runs[]; disposition lives at feature level,
+    # last node is preserved on the folded run summary.
+    assert done["_has_active"] is False
+    assert done["feature_status"] == "completed"
+    assert done["runs"][-1]["status"] == "completed"
+    assert done["runs"][-1]["final_node"] == "n3-e2e"
 
 
 def test_resume_after_interrupt(tmp_workspace):
@@ -31,8 +35,8 @@ def test_resume_after_interrupt(tmp_workspace):
     st["current_node"] = "n2-tdd"
     write_state(tmp_workspace, FLOW, "auth", st)
 
-    # A "new session" resumes: still in_progress + active True -> resumable at n2.
+    # A "new session" resumes: still in_progress + active run present -> resumable at n2.
     resumed = resume_state(tmp_workspace, FLOW, "auth")
     assert resumed["status"] == "in_progress"
-    assert resumed["active"] is True
+    assert resumed["_has_active"] is True
     assert resumed["current_node"] == "n2-tdd"  # NOT reset to n0
