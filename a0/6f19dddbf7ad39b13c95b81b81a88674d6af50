@@ -1,0 +1,25 @@
+plugins/kdev-core/tests/test_flow_state.py
+  s_f8c1c9f64db852::t_3679f29256b073 179-194
+  s_f8c1c9f64db852::t_25164baab49554 10
+plugins/kdev-core/kdev_core/flow_state.py
+  s_f8c1c9f64db852::t_c67904e08e69ee 186
+  s_f8c1c9f64db852::t_d31276df333f25 214
+  s_f8c1c9f64db852::t_bc2605fe1a4385 138
+  s_f8c1c9f64db852::t_9bb6d5f33754f7 206
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "a06f19dddbf7ad39b13c95b81b81a88674d6af50",
+  "prompts": {},
+  "sessions": {
+    "s_f8c1c9f64db852": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "03697b91-a174-4618-a4e5-3b1863ba91b9",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
