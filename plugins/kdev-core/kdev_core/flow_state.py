@@ -385,3 +385,13 @@ def close_feature(workspace, slug, *, status="completed", step_id=None):
     state["feature_status"] = status
     write_state(workspace, None, slug=slug, state=state, step_id=step_id)
     return read_state(workspace, slug=slug)
+
+
+def handoff_dir(workspace, slug, employee):
+    """返回（并 mkdir -p）.kdev/features/<slug>/handoffs/<employee>/。
+
+    最小约定：只生成目录路径，内容由员工填、handoff 协议留 P-B。
+    """
+    p = _feature_dir(workspace, slug) / "handoffs" / employee
+    p.mkdir(parents=True, exist_ok=True)
+    return p
