@@ -113,7 +113,7 @@
   /* 4 层平台条(v1.5 整体架构) */
   .platlbl{text-align:center;color:var(--mut);font-size:11px;margin:8px 0 6px}
   .platlbl b{color:var(--ink)}
-  .platrow{display:grid;grid-template-columns:repeat(4,1fr);gap:9px}
+  .platrow{display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
   .pl{border:1px solid var(--line);border-radius:8px;padding:7px 11px;background:var(--panel);border-top:3px solid var(--blue)}
   .pl .pln{font-weight:bold;font-size:12.5px;color:var(--white)}
   .pl small{display:block;color:var(--mut);font-size:10px;margin-top:3px;line-height:1.35}
@@ -121,9 +121,11 @@
   .pl.core{border-top-color:var(--blue)} .pl.core .pln{color:var(--blue)}
   .pl.mem{border-top-color:var(--purple)} .pl.mem .pln{color:var(--purple)}
   .pl.hud{border-top-color:var(--teal);border-style:dashed} .pl.hud .pln{color:var(--teal)}
+  .layerframe{border:2px solid var(--red);border-radius:10px;padding:12px 11px 9px;position:relative;margin-top:7px}
+  .layerframe .ftag{position:absolute;top:-12px;left:16px;background:var(--red);color:#fff;font-weight:bold;font-size:14px;padding:2px 13px;border-radius:5px}
 
   /* 员工能力列（v1.5 密集风格） */
-  .teamgrid{display:flex;gap:10px;align-items:stretch;margin-top:9px}
+  .teamgrid{display:flex;gap:10px;align-items:stretch;margin-top:4px}
   .cqocol{flex:0 0 152px;background:linear-gradient(160deg,#6e2230,#7e2738);border:1px solid var(--red);border-radius:8px;color:var(--white);padding:11px 10px;display:flex;flex-direction:column;gap:6px}
   .cqocol .ct{font-weight:bold;font-size:13.5px;text-align:center}
   .cqocol .cs{font-size:10px;color:#ffc8ce;line-height:1.45;text-align:center}
@@ -385,7 +387,7 @@
     </div>
     <div class="meta">同行技术分享 · 2026-06　|　概念 · 整体架构 · 最新落地进展</div>
   </div>
-  <div class="slide-footer"><span>KDev 数字员工 · 架构与进展总览</span><span>01 / 10</span></div>
+  <div class="slide-footer"><span>KDev 数字员工 · 架构与进展总览</span><span>01 / 09</span></div>
 </section>
 
 <!-- ============ 2 概念 ============ -->
@@ -438,13 +440,13 @@
       </div>
     </div>
   </div>
-  <div class="slide-footer"><span>KDev 数字员工 · 架构与进展总览</span><span>02 / 10</span></div>
+  <div class="slide-footer"><span>KDev 数字员工 · 架构与进展总览</span><span>02 / 09</span></div>
 </section>
 
 <!-- ============ 3 团队全景架构图（centerpiece · v1.5 能力清单风格） ============ -->
 <section class="slide">
   <div class="topbar">
-    <div class="badge">3</div><div class="chaplabel">全景</div>
+    <div class="badge">3</div><div class="chaplabel">整体架构</div>
     <div class="maintitle">整体架构一张图 —— 员工层 + 编排底座 + 记忆底座 + 观测层</div>
   </div>
   <div class="titlerule"></div>
@@ -452,8 +454,12 @@
     <div class="org" style="gap:0">
       <div class="user">👤 用户（只跟「总指挥」对话）</div>
       <div class="vbar"></div>
-      <div class="ceo" style="width:auto;padding:9px 30px">CEO 总指挥（主控员）<small>6 项能力：顶层约束 · 用户对话 · 派活 · 决策 · 阶段聚合 · 评审升级裁决</small></div>
     </div>
+    <div class="layerframe">
+      <div class="ftag">员工层 · kdev-team</div>
+      <div style="display:flex;justify-content:center;margin-bottom:8px">
+        <div class="ceo" style="width:auto;padding:8px 28px">CEO 总指挥（主控员）<small>6 项能力：顶层约束 · 用户对话 · 派活 · 决策 · 阶段聚合 · 评审升级裁决</small></div>
+      </div>
     <div class="teamgrid">
       <div class="cqocol">
         <div class="ct">CQO 质量总监</div>
@@ -505,92 +511,22 @@
         </div>
       </div>
     </div>
-    <div class="platlbl">▼ <b>6 名员工 / 默认 31 个 AI 工作单元</b>（全开 37）—— 这支团队（员工层）跑在下面 3 层平台上</div>
+    </div>
+    <div class="platlbl">▼ 员工层跑在下面 <b>3 层底座/平台</b>上　·　6 员工 / 默认 31 个 AI 工作单元（全开 37）</div>
     <div class="platrow">
-      <div class="pl team"><div class="pln">员工层 · kdev-team</div><small>↑ 上方这支 6 员工团队（干活）</small></div>
-      <div class="pl core"><div class="pln">编排底座 · kdev-core</div><small>状态记录 · 流转引擎 · 三类关卡（调度）</small></div>
-      <div class="pl mem"><div class="pln">记忆底座 · kdev-memory</div><small>叙事 + 加料 · scope 多流（记忆）</small></div>
-      <div class="pl hud"><div class="pln">观测层 · kdev-hud</div><small>三通道驾驶舱 · 只读（观测 · 阶段3）</small></div>
+      <div class="pl core"><div class="pln">编排底座 · kdev-core</div><small>状态记录 · 流转引擎 · 三类关卡 —— <b class="kb">只记账不判断</b>（调度）</small></div>
+      <div class="pl mem"><div class="pln">记忆底座 · kdev-memory</div><small>叙事 + 加料 · scope 多流 —— 全团队<b style="color:var(--purple)">硬依赖</b>（记忆）</small></div>
+      <div class="pl hud"><div class="pln">观测层 · kdev-hud</div><small>三通道驾驶舱 · <b class="kt">只读派生</b>（观测 · 阶段3）</small></div>
     </div>
   </div>
-  <div class="slide-footer"><span>KDev 数字员工 · 架构与进展总览</span><span>03 / 10</span></div>
+  <div class="slide-footer"><span>KDev 数字员工 · 架构与进展总览</span><span>03 / 09</span></div>
 </section>
 
-<!-- ============ 4 三个插件分工 ============ -->
-<section class="slide">
-  <div class="topbar">
-    <div class="badge">4</div><div class="chaplabel">整体架构</div>
-    <div class="maintitle">四个组件，各管一摊 —— 干活 / 调度 / 记忆 / 观测</div>
-  </div>
-  <div class="titlerule"></div>
-  <div class="cols">
-    <div class="col" style="flex:1">
-      <div class="panel">
-        <div class="ph teal">① kdev-team —— 员工层（谁干活）</div>
-        <div class="pb">
-          6 名 AI 员工的真实业务实现：每名员工有自己的能力清单和工作流程。<br>
-          <span class="mut">这是用户真正「雇来干活」的那批人。</span>
-        </div>
-      </div>
-      <div class="panel">
-        <div class="ph">② kdev-core —— 编排底座（谁调度）</div>
-        <div class="pb">
-          一套统一引擎，专门解决「员工按什么流程跑、在哪里把关、卡住了怎么办」。<br>
-          <b class="kb">一条铁律</b>：底座<b>只记账、不替员工做判断</b>——评审、跑测试、选路线都由员工或人来做，底座只负责记录结果、推进到下一步。<br>
-          <span class="mut">所以底座很「薄」，跟具体用哪个大模型无关。</span>
-        </div>
-      </div>
-      <div class="panel">
-        <div class="ph gold">③ kdev-memory —— 记忆底座（谁记忆）</div>
-        <div class="pb">
-          员工的工程记忆：做过什么、踩过什么坑、定过什么规矩，跨会话都记得住。<br>
-          <span class="mut">员工层「硬依赖」它；它单独装也能用（给个人开发者做跨会话续航）。</span>
-        </div>
-      </div>
-      <div class="panel">
-        <div class="ph" style="background:#185f57">④ kdev-hud —— 观测层（谁看进度）<span style="font-weight:normal;opacity:.85;font-size:11px">· 阶段3</span></div>
-        <div class="pb">
-          把底座的账本变成<b class="kt">实时驾驶舱</b>：命令行状态栏 + 网页仪表盘。<span class="mut">纯只读消费、不记账不判断；不装照跑、装了更直观。</span>
-        </div>
-      </div>
-    </div>
-    <div class="col" style="flex:.92">
-      <div class="panel">
-        <div class="ph">一张图看清依赖关系</div>
-        <div class="pb" style="padding:16px 14px">
-          <div class="org" style="gap:0">
-            <div class="user">👤 用户</div>
-            <div class="vbar"></div>
-            <div style="border:1px solid var(--teal);background:rgba(46,197,182,.1);border-radius:8px;padding:10px 16px;text-align:center;width:80%">
-              <b class="kt">kdev-team</b><br><span class="mut" style="font-size:11px">CEO · CQO · 业务员工 · 评审专家</span>
-            </div>
-            <div style="color:var(--mut);font-size:11px;margin:7px 0">都跑在 ↓ 底座上</div>
-            <div style="border:1px solid var(--blue);background:rgba(74,158,255,.1);border-radius:8px;padding:10px 16px;text-align:center;width:88%">
-              <b class="kb">kdev-core 编排底座</b><br><span class="mut" style="font-size:11px">状态记录 · 流程引擎 · 三类把关关卡</span>
-            </div>
-            <div style="color:var(--mut);font-size:11px;margin:7px 0">↓ 都依赖记忆底料</div>
-            <div style="border:1px solid var(--purple);background:rgba(155,140,255,.1);border-radius:8px;padding:10px 16px;text-align:center;width:96%">
-              <b style="color:var(--purple)">kdev-memory 记忆底座</b><br><span class="mut" style="font-size:11px">叙事层(提炼+加料) · 全团队共享 · 跨会话续航</span>
-            </div>
-            <div style="color:var(--mut);font-size:11px;margin:7px 0">底座旁挂 · 只读 →</div>
-            <div style="border:1px dashed var(--teal);background:rgba(46,197,182,.06);border-radius:8px;padding:8px 16px;text-align:center;width:72%">
-              <b class="kt">kdev-hud 观测</b><br><span class="mut" style="font-size:11px">只读 events/state · 阶段3</span>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div class="note" style="margin-top:0">
-        <b class="ky">为什么拆成四件？</b> 干活、调度、记忆、观测是四件不同的事。拆开后：底座能被别的产品复用、记忆/观测能单独装、员工层能独立演进——各自迭代不互相拖累。
-      </div>
-    </div>
-  </div>
-  <div class="slide-footer"><span>KDev 数字员工 · 架构与进展总览</span><span>04 / 10</span></div>
-</section>
 
 <!-- ============ 5 底座三件套 ============ -->
 <section class="slide">
   <div class="topbar">
-    <div class="badge">5</div><div class="chaplabel">编排底座</div>
+    <div class="badge">4</div><div class="chaplabel">编排底座</div>
     <div class="maintitle">底座靠三样东西让员工「跑得起来、卡得住、续得上」</div>
   </div>
   <div class="titlerule"></div>
@@ -599,7 +535,7 @@
       <div class="gatecard">
         <div class="gh"><div class="gn">① 记两本机器账</div><div class="gs">控制态 + 事实流水</div></div>
         <div class="gb">
-          <b class="kb">控制态</b>「我在哪一步」+ <b class="kb">事实流水</b>「发生了啥」，全程<b class="kb">原子化落盘</b>。<span class="mut">（记忆层就从这本流水提炼，见第 6 页）</span><br><br>
+          <b class="kb">控制态</b>「我在哪一步」+ <b class="kb">事实流水</b>「发生了啥」，全程<b class="kb">原子化落盘</b>。<span class="mut">（记忆层就从这本流水提炼，见第 5 页）</span><br><br>
           <b class="kg">最大好处：断点续跑</b>——中途断电、被打断，再起来从上次那步接着干。
         </div>
       </div>
@@ -633,13 +569,13 @@
       </div>
     </div>
   </div>
-  <div class="slide-footer"><span>KDev 数字员工 · 架构与进展总览</span><span>05 / 10</span></div>
+  <div class="slide-footer"><span>KDev 数字员工 · 架构与进展总览</span><span>04 / 09</span></div>
 </section>
 
 <!-- ============ 6 记忆 + 飞轮 ============ -->
 <section class="slide">
   <div class="topbar">
-    <div class="badge">6</div><div class="chaplabel">记忆底座</div>
+    <div class="badge">5</div><div class="chaplabel">记忆底座</div>
     <div class="maintitle">记忆 = 从机器到人的「提炼 + 加料」，不重复造账</div>
   </div>
   <div class="titlerule"></div>
@@ -651,7 +587,7 @@
           <div style="display:flex;align-items:stretch;gap:10px">
             <div style="flex:0 0 auto;width:128px;border:1px dashed var(--blue);border-radius:8px;padding:9px 10px;background:rgba(74,158,255,.06)">
               <div style="color:var(--blue);font-weight:bold;font-size:11.5px;margin-bottom:5px">底座两本机器账</div>
-              <div style="font-size:10.5px;line-height:1.5"><b class="kb">控制态</b> 我在哪步<br><b class="kb">事实流水</b> 发生了啥<br><span class="mut" style="font-size:9.5px">（见第 5 页·kdev-core 写）</span></div>
+              <div style="font-size:10.5px;line-height:1.5"><b class="kb">控制态</b> 我在哪步<br><b class="kb">事实流水</b> 发生了啥<br><span class="mut" style="font-size:9.5px">（见第 4 页·kdev-core 写）</span></div>
             </div>
             <div style="flex:0 0 auto;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--gold);font-size:10px;font-weight:bold">
               <div>蒸馏</div><div style="font-size:18px">→</div><div>+加料</div>
@@ -688,7 +624,7 @@
       </div>
     </div>
   </div>
-  <div class="slide-footer"><span>KDev 数字员工 · 架构与进展总览</span><span>06 / 10</span></div>
+  <div class="slide-footer"><span>KDev 数字员工 · 架构与进展总览</span><span>05 / 09</span></div>
 </section>
 
 <section class="slide">
@@ -827,13 +763,13 @@
     <div class="foot-note">三个通道的数据全部来自同一份<b>事件流</b>（底座只记账）→ HUD 是派生出来的<b>只读仪表盘</b>，不是另一套真相，永远与实际进度一致。</div>
   </div>
 
-  <div class="slide-footer"><span>KDev 数字员工 · 架构与进展总览</span><span>07 / 10</span></div>
+  <div class="slide-footer"><span>KDev 数字员工 · 架构与进展总览</span><span>06 / 09</span></div>
 </section>
 
 <!-- ============ 7 kdev-team 真实落地：开发工程师 ============ -->
 <section class="slide">
   <div class="topbar">
-    <div class="badge">7</div><div class="chaplabel">真实落地</div>
+    <div class="badge">6</div><div class="chaplabel">真实落地</div>
     <div class="maintitle">第一名上岗的员工：开发工程师（kdev-team 已落地）</div>
   </div>
   <div class="titlerule"></div>
@@ -879,13 +815,13 @@
       </div>
     </div>
   </div>
-  <div class="slide-footer"><span>KDev 数字员工 · 架构与进展总览</span><span>08 / 10</span></div>
+  <div class="slide-footer"><span>KDev 数字员工 · 架构与进展总览</span><span>07 / 09</span></div>
 </section>
 
 <!-- ============ 8 进展路线图 + 里程碑 ============ -->
 <section class="slide">
   <div class="topbar">
-    <div class="badge">8</div><div class="chaplabel">最新进展</div>
+    <div class="badge">7</div><div class="chaplabel">最新进展</div>
     <div class="maintitle">做到哪了 —— 五个阶段，前两个里程碑已经达成</div>
   </div>
   <div class="titlerule"></div>
@@ -939,7 +875,7 @@
       </div>
     </div>
   </div>
-  <div class="slide-footer"><span>KDev 数字员工 · 架构与进展总览</span><span>09 / 10</span></div>
+  <div class="slide-footer"><span>KDev 数字员工 · 架构与进展总览</span><span>08 / 09</span></div>
 </section>
 
 <!-- ============ 9 结尾 ============ -->
@@ -959,7 +895,7 @@
       <span class="pill">阶段 3 / 4 ⏳ 在路上</span>
     </div>
   </div>
-  <div class="slide-footer"><span>KDev 数字员工 · 架构与进展总览</span><span>10 / 10</span></div>
+  <div class="slide-footer"><span>KDev 数字员工 · 架构与进展总览</span><span>09 / 09</span></div>
 </section>
 
 </body>
