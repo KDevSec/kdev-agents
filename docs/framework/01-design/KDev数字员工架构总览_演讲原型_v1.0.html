@@ -123,6 +123,9 @@
   .pl.hud{border-top-color:var(--teal);border-style:dashed} .pl.hud .pln{color:var(--teal)}
   .layerframe{border:2px solid var(--red);border-radius:10px;padding:12px 11px 9px;position:relative;margin-top:7px}
   .layerframe .ftag{position:absolute;top:-12px;left:16px;background:var(--red);color:#fff;font-weight:bold;font-size:14px;padding:2px 13px;border-radius:5px}
+  .sopstrip{margin-top:11px;border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:7px;padding:9px 13px;font-size:11.5px;color:var(--ink);background:rgba(245,183,64,.05);display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+  .sopstrip .sl{border:1px solid var(--line);border-radius:5px;padding:2px 9px;font-size:10.5px;background:var(--panel)}
+  .sopstrip .sarrow{color:var(--mut)}
 
   /* 员工能力列（v1.5 密集风格） */
   .teamgrid{display:flex;gap:10px;align-items:stretch;margin-top:4px}
@@ -134,7 +137,7 @@
   .empwrap .wlbl{text-align:center;color:var(--teal);font-size:10.5px;font-weight:bold}
   .empcols{display:flex;gap:9px;align-items:stretch}
   .ecol{flex:1;border:1px solid var(--line);border-radius:7px;overflow:hidden;background:var(--panel);display:flex;flex-direction:column}
-  .ecol.review{flex:0 0 198px;border-color:var(--gold)}
+  .ecol.review{flex:0 0 236px;border-color:var(--gold)}
   .ecol .ehd{padding:6px 8px;text-align:center;border-bottom:1px solid var(--line);background:rgba(46,197,182,.12)}
   .ecol .ehd .en{color:var(--white);font-weight:bold;font-size:12.5px}
   .ecol .ehd .ecnt{color:var(--teal);font-size:9.5px;margin-top:1px}
@@ -376,79 +379,12 @@
 </head>
 <body>
 
-<!-- ============ 1 封面 ============ -->
-<section class="slide">
-  <div class="cover">
-    <div class="logo">K</div>
-    <h1>KDev 数字员工</h1>
-    <div class="sub">架构与进展总览 —— 一支能端到端交付的 AI 团队</div>
-    <div class="glowline"></div>
-    <div class="desc">
-      从「能力」逐层组装出「数字员工」，再用一套统一底座把他们编排成一家 6 人 AI 团队。<br>
-      今天，这支团队已经<b style="color:var(--green)">第一次真在底座驱动下，端到端跑通了一个真实的改造任务</b>。
-    </div>
-    <div class="meta">同行技术分享 · 2026-06　|　概念 · 整体架构 · 最新落地进展</div>
-  </div>
-  <div class="slide-footer"><span>KDev 数字员工 · 架构与进展总览</span><span>01 / 09</span></div>
-</section>
 
-<!-- ============ 2 概念 ============ -->
-<section class="slide">
-  <div class="topbar">
-    <div class="badge">2</div><div class="chaplabel">概念</div>
-    <div class="maintitle">三句话讲清：能力 → 数字员工 → 持续升级</div>
-  </div>
-  <div class="titlerule"></div>
-  <div class="cols">
-    <div class="col" style="flex:1.35">
-      <div class="triad">
-        <div class="tcard">
-          <div class="th"><span class="n">1</span>能力</div>
-          <div class="tb">一个<b class="kb">通用 AI</b>，配上专业方法、质量规范、产出模板，就变成<b class="kb">某一类活儿的专家</b>。<br><span class="mut">比如：会写测试用例的、懂安全编码的、能澄清需求的。它是最小的「积木」。</span></div>
-        </div>
-        <div class="tcard t2">
-          <div class="th"><span class="n">2</span>数字员工</div>
-          <div class="tb">把<b class="kt">多个能力 + 一个调度能力</b>组合起来，就是一名能<b class="kt">自己安排、从头干到尾</b>的数字员工。<br><span class="mut">能力是积木，员工是会用积木盖完整房子的人。</span></div>
-        </div>
-        <div class="tcard t3">
-          <div class="th"><span class="n">3</span>持续升级</div>
-          <div class="tb">每干一次活，过程经验沉淀进<b class="ky">专属知识库</b>，反哺能力 → <b class="ky">下次更准更快</b>。<br><span class="mut">这就是「复利飞轮」——越用越强。</span></div>
-        </div>
-      </div>
-      <div class="panel">
-        <div class="ph">自主度阶梯 —— 像自动驾驶一样分级（当前在第二级）</div>
-        <div class="pb" style="padding:11px 12px">
-          <div class="ladder">
-            <div class="lvl"><div class="lt">第一级</div><div class="ln">助手</div><div class="ld">人一步步带<br>执行单个动作</div></div>
-            <div class="lvl now"><div class="lt">第二级 · 现在这里</div><div class="ln">协同</div><div class="ld">员工做完整任务<br>人在关键处确认</div></div>
-            <div class="lvl future"><div class="lt">第三级</div><div class="ln">自主</div><div class="ld">端到端自己跑<br>人只管异常</div></div>
-            <div class="lvl future"><div class="lt">第四级</div><div class="ln">自治</div><div class="ld">自我监督<br>自我进化</div></div>
-          </div>
-        </div>
-      </div>
-    </div>
-    <div class="col" style="flex:1">
-      <div class="panel">
-        <div class="ph teal">从底层到员工 —— 自下而上一层层搭起来</div>
-        <div class="pb" style="padding:14px 12px 16px">
-          <div class="pyramid">
-            <div class="pyr pyr1">数字员工<small>调度多个能力 → 端到端交付</small></div>
-            <div class="pyr pyr2">能力<small>= 某类活儿的专用专家</small></div>
-            <div class="pyr pyr3">底层技能<small>方法 ＋ 规范 ＋ 模板 ＋ 知识库</small></div>
-            <div class="pyr pyr4">通用 AI<small>推理 ＋ 工具 ＋ 模型选择</small></div>
-          </div>
-          <div style="text-align:center;color:var(--mut);font-size:11px;margin-top:10px">底层越宽、越通用；越往上越专、越像「人」</div>
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="slide-footer"><span>KDev 数字员工 · 架构与进展总览</span><span>02 / 09</span></div>
-</section>
 
 <!-- ============ 3 团队全景架构图（centerpiece · v1.5 能力清单风格） ============ -->
 <section class="slide">
   <div class="topbar">
-    <div class="badge">3</div><div class="chaplabel">整体架构</div>
+    <div class="badge">1</div><div class="chaplabel">整体架构</div>
     <div class="maintitle">整体架构一张图 —— 员工层 + 编排底座 + 记忆底座 + 观测层</div>
   </div>
   <div class="titlerule"></div>
@@ -460,13 +396,13 @@
     <div class="layerframe">
       <div class="ftag">员工层 · kdev-team</div>
       <div style="display:flex;justify-content:center;margin-bottom:8px">
-        <div class="ceo" style="width:auto;padding:8px 28px">CEO 总指挥（主控员）<small>6 项能力：顶层约束 · 用户对话 · 派活 · 决策 · 阶段聚合 · 评审升级裁决</small></div>
+        <div class="ceo" style="width:auto;padding:8px 28px">主控员（总指挥）<small>6 项能力：顶层约束 · 用户对话 · 派活 · 决策 · 阶段聚合 · 评审升级裁决</small></div>
       </div>
     <div class="teamgrid">
       <div class="cqocol">
-        <div class="ct">CQO<br>质量总监</div>
+        <div class="ct">监督员</div>
         <div class="cs">元监督 · 只读<br>有「叫停」权</div>
-        <div class="cmeta">抽查产物<br>维护标准<br>合规聚合<br>异常应急</div>
+        <div class="cmeta">流程监督<br>监控全员<br>合规聚合</div>
       </div>
       <div class="empwrap">
         <div class="wlbl">↔ 业务员工层 —— 每名员工 ＝ 多项业务能力 ＋ 1 项「调度能力」(编排)；员工之间可直接协作，不必都过总指挥</div>
@@ -505,7 +441,7 @@
               <span><b>需求方向</b><i>该不该做</i></span><span><b>SR 需求</b><i>需求写全没</i></span>
               <span><b>迭代拆分</b><i>分批合不合理</i></span><span><b>用户故事</b><i>能否独立验收</i></span>
               <span><b>原型</b><i>界面好不好用</i></span><span><b>方案+架构</b><i>技术行不行</i></span>
-              <span><b>代码+质量</b><i>对·好维护</i></span><span><b>安全</b><i>有无漏洞</i></span>
+              <span><b>代码+质量</b><i>对不对·好不好维护</i></span><span><b>安全</b><i>有无漏洞</i></span>
               <span><b>测试设计</b><i>测得全不全</i></span><span><b>测试执行</b><i>实跑覆盖多少</i></span>
             </div>
             <div class="revext">+6 按需扩展：<b>部署检查·性能·文档·合规·可观测·可访问</b></div>
@@ -521,14 +457,14 @@
       <div class="pl hud"><div class="pln">观测层 · kdev-hud</div><small>三通道驾驶舱 · <b class="kt">只读派生</b>（观测 · 阶段3）</small></div>
     </div>
   </div>
-  <div class="slide-footer"><span>KDev 数字员工 · 架构与进展总览</span><span>03 / 09</span></div>
+  <div class="slide-footer"><span>KDev 数字员工 · 架构与进展总览</span><span>01 / 05</span></div>
 </section>
 
 
 <!-- ============ 5 底座三件套 ============ -->
 <section class="slide">
   <div class="topbar">
-    <div class="badge">4</div><div class="chaplabel">编排底座</div>
+    <div class="badge">2</div><div class="chaplabel">编排底座</div>
     <div class="maintitle">底座靠三样东西让员工「跑得起来、卡得住、续得上」</div>
   </div>
   <div class="titlerule"></div>
@@ -537,21 +473,21 @@
       <div class="gatecard">
         <div class="gh"><div class="gn">① 记两本机器账</div><div class="gs">控制态 + 事实流水</div></div>
         <div class="gb">
-          <b class="kb">控制态</b>「我在哪一步」+ <b class="kb">事实流水</b>「发生了啥」，全程<b class="kb">原子化落盘</b>。<span class="mut">（记忆层就从这本流水提炼，见第 5 页）</span><br><br>
+          <b class="kb">控制态</b>「我在哪一步」+ <b class="kb">事实流水</b>「发生了啥」，全程<b class="kb">原子化落盘</b>。<span class="mut">（记忆层从这本流水提炼，见第 3 页）</span><br>
           <b class="kg">最大好处：断点续跑</b>——中途断电、被打断，再起来从上次那步接着干。
         </div>
       </div>
       <div class="gatecard g2">
         <div class="gh"><div class="gn">② 流程节点引擎</div><div class="gs">每条业务自己声明节点表</div></div>
         <div class="gb">
-          每条业务流程由它自己声明「有哪些步骤、什么顺序」（不写死段数：设计流程 4 段、开发流程十几段）。<br><br>
+          每条业务流程由它自己声明「有哪些步骤、什么顺序」（不写死段数：设计 4 段 / 开发十几段）。<br>
           底座只提供<b class="kt">推进引擎</b>：把关通过 → 进下一步；把关不过 → <b class="kt">退回去重做</b>（有次数上限，不会无限打转）。
         </div>
       </div>
       <div class="gatecard g3">
         <div class="gh"><div class="gn">③ 三类把关关卡</div><div class="gs">核心难点，也是最大卖点</div></div>
         <div class="gb">
-          所有把关点，无论多复杂，都归成<b class="ky">三种类型</b>，用同一套逻辑处理。<br><br>
+          所有把关点，无论多复杂，都归成<b class="ky">三种类型</b>，用同一套逻辑处理。<br>
           这是「一套底座能跑任意业务」的根：换业务，只是换节点表和关卡配置。
         </div>
       </div>
@@ -565,19 +501,25 @@
           <tr><td class="kt">岔路决策</td><td>在分叉口选一条路（复杂还是简单走法）</td><td>默认 AI，岔路口可交给人</td><td>选了哪条就走哪条（不重试）</td></tr>
           <tr><td style="color:var(--purple)">验收</td><td>跑端到端测试、验真功能</td><td>自动跑测试，可叠加人复核</td><td>没过就退回修复节点重跑</td></tr>
         </table>
-        <div style="margin-top:9px;font-size:11.5px;color:var(--mut)">
-          把关结果以<b class="kb">结构化数据</b>记录（不靠猜文本），所以谁都能程序化查「这关重试了几轮、谁判的」。卡住超过上限<b class="kr">一定升级交人工，绝不偷偷降格放行</b>。
+        <div style="margin-top:8px;font-size:11px;color:var(--mut)">
+          把关结果以<b class="kb">结构化数据</b>记录（不靠猜文本），能程序化查「这关重试几轮、谁判的」；卡住超上限<b class="kr">一定升级交人工，绝不偷偷降格放行</b>。
         </div>
+      </div>
+      <div class="sopstrip">
+        <b class="ky">节点表 ＋ 关卡 ＝ 一条流程的 SOP，可自由编排：</b>
+        <span class="sl">L0 作者定默认</span><span class="sarrow">→</span>
+        <span class="sl">L1 用户改配置（开关关卡 · 谁来判 AI↔人 · 重试数 · 跳过/重排节点）</span><span class="sarrow">→</span>
+        <span class="sl">L2 员工自优化（自演进 · 未来）</span>
       </div>
     </div>
   </div>
-  <div class="slide-footer"><span>KDev 数字员工 · 架构与进展总览</span><span>04 / 09</span></div>
+  <div class="slide-footer"><span>KDev 数字员工 · 架构与进展总览</span><span>02 / 05</span></div>
 </section>
 
 <!-- ============ 6 记忆 + 飞轮 ============ -->
 <section class="slide">
   <div class="topbar">
-    <div class="badge">5</div><div class="chaplabel">记忆底座</div>
+    <div class="badge">3</div><div class="chaplabel">记忆底座</div>
     <div class="maintitle">记忆 = 从机器到人的「提炼 + 加料」，不重复造账</div>
   </div>
   <div class="titlerule"></div>
@@ -589,7 +531,7 @@
           <div style="display:flex;align-items:stretch;gap:10px">
             <div style="flex:0 0 auto;width:128px;border:1px dashed var(--blue);border-radius:8px;padding:9px 10px;background:rgba(74,158,255,.06)">
               <div style="color:var(--blue);font-weight:bold;font-size:11.5px;margin-bottom:5px">底座两本机器账</div>
-              <div style="font-size:10.5px;line-height:1.5"><b class="kb">控制态</b> 我在哪步<br><b class="kb">事实流水</b> 发生了啥<br><span class="mut" style="font-size:9.5px">（见第 4 页·kdev-core 写）</span></div>
+              <div style="font-size:10.5px;line-height:1.5"><b class="kb">控制态</b> 我在哪步<br><b class="kb">事实流水</b> 发生了啥<br><span class="mut" style="font-size:9.5px">（见第 2 页·kdev-core 写）</span></div>
             </div>
             <div style="flex:0 0 auto;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--gold);font-size:10px;font-weight:bold">
               <div>蒸馏</div><div style="font-size:18px">→</div><div>+加料</div>
@@ -626,7 +568,7 @@
       </div>
     </div>
   </div>
-  <div class="slide-footer"><span>KDev 数字员工 · 架构与进展总览</span><span>05 / 09</span></div>
+  <div class="slide-footer"><span>KDev 数字员工 · 架构与进展总览</span><span>03 / 05</span></div>
 </section>
 
 <section class="slide">
@@ -765,120 +707,10 @@
     <div class="foot-note">三个通道的数据全部来自同一份<b>事件流</b>（底座只记账）→ HUD 是派生出来的<b>只读仪表盘</b>，不是另一套真相，永远与实际进度一致。</div>
   </div>
 
-  <div class="slide-footer"><span>KDev 数字员工 · 架构与进展总览</span><span>06 / 09</span></div>
+  <div class="slide-footer"><span>KDev 数字员工 · 架构与进展总览</span><span>04 / 05</span></div>
 </section>
 
-<!-- ============ 7 kdev-team 真实落地：开发工程师 ============ -->
-<section class="slide">
-  <div class="topbar">
-    <div class="badge">6</div><div class="chaplabel">真实落地</div>
-    <div class="maintitle">第一名上岗的员工：开发工程师（kdev-team 已落地）</div>
-  </div>
-  <div class="titlerule"></div>
-  <div class="body" style="padding-top:12px">
-    <h2 class="lead">他的一条完整工作流程 —— 16 个步骤、9 道把关，全跑在底座上</h2>
-    <div class="leadmut">下面每个方块是一个步骤；颜色代表它是「干活」还是「把关」，把关又分三类（评审 / 岔路 / 验收）。</div>
-    <div class="panel">
-      <div class="pb" style="padding:14px 12px">
-        <div class="flowchain">
-          <div class="fnode act">背景对齐<span class="fk">干活</span></div><span class="farrow">→</span>
-          <div class="fnode dec">关联度判断<span class="fk">岔路</span></div><span class="farrow">→</span>
-          <div class="fnode act">写实施计划<span class="fk">干活</span></div><span class="farrow">→</span>
-          <div class="fnode rev">方案评审<span class="fk">评审</span></div><span class="farrow">→</span>
-          <div class="fnode dec">复杂度判断<span class="fk">岔路</span></div><span class="farrow">→</span>
-          <div class="fnode act">编码实现<span class="fk">干活</span></div><span class="farrow">→</span>
-          <div class="fnode rev">完成验证<span class="fk">评审</span></div><span class="farrow">→</span>
-          <div class="fnode rev">代码 / 质量评审<span class="fk">评审</span></div>
-        </div>
-        <div class="flowchain" style="margin-top:4px">
-          <div class="fnode acc">端到端自测<span class="fk">验收类</span></div><span class="farrow">→</span>
-          <div class="fnode dec">是否还有增量<span class="fk">岔路</span></div><span class="farrow">→</span>
-          <div class="fnode rev">安全评审<span class="fk">评审</span></div><span class="farrow">→</span>
-          <div class="fnode act">合并主分支<span class="fk">干活</span></div><span class="farrow">→</span>
-          <div class="fnode acc">部署 + 灰度验收<span class="fk">验收</span></div><span class="farrow">→</span>
-          <div class="fnode done">产出清点完成<span class="fk">收尾</span></div>
-        </div>
-        <div style="text-align:center;color:var(--mut);font-size:11px;margin-top:11px">
-          任何一道评审 / 验收没过 → <b class="kt">退回前面的实现步骤重做</b> → 重新把关（最多 3 次，超了就升级交人工）
-        </div>
-      </div>
-    </div>
-    <div class="cols" style="padding:13px 0 0">
-      <div class="col" style="flex:1">
-        <div class="note" style="margin-top:0">
-          <b class="kt">7 个能力单元已就位：</b>调度 · 环境对齐 · 计划 · 前端 · 端到端自测 · 部署 · 安全。
-          调度单元像「工头」，按上面的流程把活儿分给其余 6 个，自己不亲手写代码。
-        </div>
-      </div>
-      <div class="col" style="flex:1">
-        <div class="note" style="margin-top:0;border-left-color:var(--green);background:rgba(67,221,139,.07)">
-          <b class="kg">这套流程不是写死的。</b>用户改一份配置文件，就能开关某道关卡、把「谁来判」从 AI 改成人、调重试次数——<b>同一个员工换一套打法</b>。
-        </div>
-      </div>
-    </div>
-  </div>
-  <div class="slide-footer"><span>KDev 数字员工 · 架构与进展总览</span><span>07 / 09</span></div>
-</section>
 
-<!-- ============ 8 进展路线图 + 里程碑 ============ -->
-<section class="slide">
-  <div class="topbar">
-    <div class="badge">7</div><div class="chaplabel">最新进展</div>
-    <div class="maintitle">做到哪了 —— 五个阶段，前两个里程碑已经达成</div>
-  </div>
-  <div class="titlerule"></div>
-  <div class="cols">
-    <div class="col" style="flex:1.18">
-      <div class="roadmap">
-        <div class="rstage done">
-          <div class="rleft"><div class="rsn">阶段 0</div><div class="rsa">打地基</div></div>
-          <div class="rbody">底座三件套（状态记录 / 流程引擎 / 三类关卡）+ 记忆 Git 托管</div>
-          <div class="rstat">✅ 已完成</div>
-        </div>
-        <div class="rstage done">
-          <div class="rleft"><div class="rsn">阶段 1 ★</div><div class="rsa l2">第二级 · 协同</div></div>
-          <div class="rbody">开发工程师端到端跑通真实改造任务（首次实测）</div>
-          <div class="rstat">✅ 已完成</div>
-        </div>
-        <div class="rstage active">
-          <div class="rleft"><div class="rsn">阶段 2</div><div class="rsa l2">第二级 · 协同</div></div>
-          <div class="rbody">员工集中到 kdev-team（已完成）· 第二名员工「需求架构师」+ 记忆分区（进行中）</div>
-          <div class="rstat">🔨 进行中</div>
-        </div>
-        <div class="rstage todo">
-          <div class="rleft"><div class="rsn">阶段 3</div><div class="rsa l3">迈向第三级</div></div>
-          <div class="rbody">评审专家上岗 + 跨员工协作 + 框架层（派单 / 产物 / 事件流）+ kdev-hud 驾驶舱</div>
-          <div class="rstat">⏳ 规划中</div>
-        </div>
-        <div class="rstage todo">
-          <div class="rleft"><div class="rsn">阶段 4</div><div class="rsa l4">第四级 · 北极星</div></div>
-          <div class="rbody">质量总监元监督 + 自我进化 + 跨开发工具</div>
-          <div class="rstat">⏳ 远期</div>
-        </div>
-      </div>
-    </div>
-    <div class="col" style="flex:1">
-      <div class="mscard m0">
-        <div class="msh">🏁 里程碑 M0 —— 地基立住了</div>
-        <div class="msb">底座三件套 <b class="kg">66 项测试全绿</b>、已合主干；整套工程记忆已用 Git 托管、自动同步生效。</div>
-      </div>
-      <div class="mscard m1">
-        <div class="msh">⭐ 里程碑 M1 —— 团队史上首次端到端实测</div>
-        <div class="msb">
-          开发工程师在底座驱动下，<b class="ky">真刀真枪跑通了一个真实的界面改造任务</b>。证明「底座真在驱动、不是演戏」的硬证据：<br>
-          · 16 个步骤经 <b>约 25 次独立进程</b>流转，进度档案全程续接（<b class="kg">中途断了能接着跑</b>）；<br>
-          · 9 道关卡覆盖<b>全部三类</b>把关；<br>
-          · 出现一次「验收没过 → 退回修 → 重审通过」的<b>活体闭环</b>；<br>
-          · 真产出可运行的前端 + 对版的登录页。
-        </div>
-      </div>
-      <div class="note" style="margin-top:11px">
-        <b class="kt">阶段 2 已落地的一块：</b>把分散的员工实现集中进 kdev-team——开发工程师的 7 个能力单元成了可直接调用的标准单元，11 项团队测试 + 76 项底座测试全绿。
-      </div>
-    </div>
-  </div>
-  <div class="slide-footer"><span>KDev 数字员工 · 架构与进展总览</span><span>08 / 09</span></div>
-</section>
 
 <!-- ============ 9 结尾 ============ -->
 <section class="slide">
@@ -887,17 +719,10 @@
     <div class="eh">从「人带着 AI 干活」<br>走向「<span class="ehl">一支会自己交付、越用越强的 AI 团队</span>」</div>
     <div class="glowline"></div>
     <div class="es">
-      底座（怎么跑）已经立住　·　流程（跑什么）可自由编排　·　自我进化（自己优化怎么跑）在路上<br>
-      <span style="color:#5f7691;font-size:14px">下一步：第二名员工上岗 · 真实任务全量跑 · 评审专家与跨员工协作</span>
-    </div>
-    <div class="erow">
-      <span class="pill g">阶段 0 ✅ 地基</span>
-      <span class="pill g">阶段 1 ✅ 首次实测</span>
-      <span class="pill y">阶段 2 🔨 进行中</span>
-      <span class="pill">阶段 3 / 4 ⏳ 在路上</span>
+      底座管「怎么跑」　·　SOP 管「跑什么」（可自由编排）　·　自我进化管「自己优化怎么跑」
     </div>
   </div>
-  <div class="slide-footer"><span>KDev 数字员工 · 架构与进展总览</span><span>09 / 09</span></div>
+  <div class="slide-footer"><span>KDev 数字员工 · 架构与进展总览</span><span>05 / 05</span></div>
 </section>
 
 </body>
