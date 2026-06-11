@@ -1,0 +1,22 @@
+plugins/kdev-memory/agents/kdev-step-recorder.md
+  s_54d8d748b888e0::t_4f82c6d9dcf0c6 243
+  s_54d8d748b888e0::t_0fa39367488af0 218,221-225
+  s_54d8d748b888e0::t_f58e44234664d5 118,125,128
+  s_54d8d748b888e0::t_dc584a10f61934 158,161,164-183
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "b625cabe26480b9b1e62e6289187081bdf3bd857",
+  "prompts": {},
+  "sessions": {
+    "s_54d8d748b888e0": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "27c3a208-d7f1-4318-a30e-2b77e6ee2ffe",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
