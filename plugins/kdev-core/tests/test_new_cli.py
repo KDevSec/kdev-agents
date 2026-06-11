@@ -202,8 +202,10 @@ def test_list_flows_with_entries(tmp_workspace, capsys):
     slugs = {e["slug"] for e in out}
     assert slugs == {"auth", "ued6"}
     for entry in out:
-        assert entry["status"] == "in_progress"
-        assert entry["active"] is True
+        # list-features 概要：feature 级 status + active run 概要字段
+        assert entry["feature_status"] == "in_progress"
+        assert entry["active_flow"] == FLOW
+        assert entry["active_run"] == 1
 
 
 # ── enriched _print_state ────────────────────────────────────────────────
@@ -219,4 +221,47 @@ def test_show_includes_config_and_blocked_reason(tmp_workspace, capsys):
     assert out["display_name"] == "E"
     assert out["blocked_reason"] is None
     assert "gate_iters" in out
-    assert "phase_history" in out
+    # phase_history 已退役 → 扁平视图新增 events_len / stories / runs
+    assert out["events_len"] == 0
+    assert out["stories"] == []
+    assert out["runs"] == []
+
+
+# ── feature-first 新增子命令 ──────────────────────────────────────────────
+
+def test_cli_start_run_after_complete(tmp_workspace, run_cli):
+    run_cli(["init", "coding-flow", "f", "--display-name", "F",
+             "--initial-node", "n0"])
+    run_cli(["complete", "coding-flow", "f"])
+    out = run_cli(["start-run", "design-flow", "f", "--initial-node", "d0"])
+    data = json.loads(out)
+    assert data["run"] == 2 and data["flow"] == "design-flow"
+    assert data["active"] is True and data["current_node"] == "d0"
+
+
+def test_cli_add_story_and_list_features(tmp_workspace, run_cli):
+    run_cli(["init", "coding-flow", "f", "--display-name", "F",
+             "--initial-node", "n0"])
+    run_cli(["add-story", "coding-flow", "f", "--id", "US-1", "--title", "登录"])
+    run_cli(["set-story-status", "coding-flow", "f", "--id", "US-1",
+             "--status", "done"])
+    feats = json.loads(run_cli(["list-features"]))
+    assert feats[0]["slug"] == "f"
+    assert feats[0]["stories_done"] == 1 and feats[0]["stories_total"] == 1
+
+
+def test_cli_events_after_advance(tmp_workspace, run_cli, toy_table_file):
+    run_cli(["init", "toy", "f", "--display-name", "F", "--initial-node", "n1"])
+    run_cli(["advance", "toy", "f", "g1", "--table", str(toy_table_file)])
+    evs = json.loads(run_cli(["events", "toy", "f"]))
+    assert any(e["type"] == "transition" and e["to"] == "g1" for e in evs)
+
+
+def test_cli_handoff_path(tmp_workspace, run_cli):
+    run_cli(["init", "coding-flow", "f", "--display-name", "F",
+             "--initial-node", "n0"])
+    out = run_cli(["handoff-path", "coding-flow", "f",
+                   "--employee", "req-architect"]).strip()
+    assert out.endswith("/.kdev/features/f/handoffs/req-architect")
+    from pathlib import Path
+    assert Path(out).is_dir()

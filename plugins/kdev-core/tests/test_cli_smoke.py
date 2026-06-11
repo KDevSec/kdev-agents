@@ -66,5 +66,9 @@ def test_cli_full_lifecycle_and_resume(tmp_workspace, capsys):
           "--verdict", "PASS", "--request-id", "ac1", "--table", t] + ws)
     final = flow_state.read_state(tmp_workspace, FLOW, "x")
     assert final["current_node"] == "n-done"
-    # 三类 gate 都进了 history（decision + review*2 + acceptance = 4）
-    assert len(final["history"]) == 4
+    # 三类 gate 都进了 events 流（decision + review*2 + acceptance = 4 条 gate 事件）
+    from kdev_core import events
+    evs = events.read_events(tmp_workspace, "x")
+    gate_evs = [e for e in evs if e["type"] == "gate"]
+    assert len(gate_evs) == 4
+    assert {e["kind"] for e in gate_evs} == {"decision", "review", "acceptance"}
