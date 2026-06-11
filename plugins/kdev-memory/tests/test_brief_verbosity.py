@@ -69,3 +69,11 @@ def test_verbosity_normal_is_full(tmp_path):
     assert "📊 **今日进度**" in ctx
     assert "brief-detail.md" not in ctx
     assert not (repo / ".kdev" / "memory" / "brief-detail.md").is_file()
+
+
+def test_verbosity_verbose_is_full_no_detail_file(tmp_path):
+    repo = _init(tmp_path, config_text="rating.mode: model-only\nbrief.verbosity: verbose\n")
+    ctx = _ctx(repo)
+    assert "📊 **今日进度**" in ctx
+    assert "brief-detail.md" not in ctx
+    assert not (repo / ".kdev" / "memory" / "brief-detail.md").is_file()

@@ -501,48 +501,24 @@ def main() -> int:
     else:
         skill_drift_hint = ""
 
-    brief = _build_brief(
-        mode=source,
-        today=today,
-        git_branch=git_branch,
-        warn_files=warn_files,
-        checkpoint_files=checkpoint_files,
-        log_today=log_today,
-        summary_today_status=summary_today_status,
-        missing_past=missing_past,
-        drift_hint=drift_hint,
-        step_hint=step_hint,
-        promote_hint=promote_hint,
-        distill_hint=distill_hint,
-        state_phase=state_phase,
-        state_iter=state_iter,
-        state_step=state_step,
-        state_last=state_last,
-        state_pending=state_pending,
-        state_unresolved=state_unresolved,
-        recent_step=recent_step,
-        recent_q=recent_q,
-        recent_g=recent_g,
-        pending_hint=pending_hint or "",
-        skill_drift_hint=skill_drift_hint,
-        staff_block=staff_block,
-        rating_setup_hint=rating_setup_hint,
-        verbosity=verbosity,
+    brief_kwargs = dict(
+        mode=source, today=today, git_branch=git_branch, warn_files=warn_files,
+        checkpoint_files=checkpoint_files, log_today=log_today,
+        summary_today_status=summary_today_status, missing_past=missing_past,
+        drift_hint=drift_hint, step_hint=step_hint, promote_hint=promote_hint,
+        distill_hint=distill_hint, state_phase=state_phase, state_iter=state_iter,
+        state_step=state_step, state_last=state_last, state_pending=state_pending,
+        state_unresolved=state_unresolved, recent_step=recent_step, recent_q=recent_q,
+        recent_g=recent_g, pending_hint=pending_hint or "", skill_drift_hint=skill_drift_hint,
+        staff_block=staff_block, rating_setup_hint=rating_setup_hint, verbosity=verbosity,
     )
+    brief = _build_brief(**brief_kwargs)
 
     if verbosity == "compact" and source in ("startup", "clear", "default", ""):
+        # source "compact" = 压缩后恢复会话，由上面的 mode=="compact" 分支处理，不写 detail
         # 把"全量 normal brief"写盘供主动查阅（compact 注入的是裁剪版）
-        detail = _build_brief(
-            mode="startup", today=today, git_branch=git_branch, warn_files=warn_files,
-            checkpoint_files=checkpoint_files, log_today=log_today,
-            summary_today_status=summary_today_status, missing_past=missing_past,
-            drift_hint=drift_hint, step_hint=step_hint, promote_hint=promote_hint,
-            distill_hint=distill_hint, state_phase=state_phase, state_iter=state_iter,
-            state_step=state_step, state_last=state_last, state_pending=state_pending,
-            state_unresolved=state_unresolved, recent_step=recent_step, recent_q=recent_q,
-            recent_g=recent_g, pending_hint=pending_hint or "", skill_drift_hint=skill_drift_hint,
-            staff_block=staff_block, rating_setup_hint="", verbosity="normal",
-        )
+        detail = _build_brief(**{**brief_kwargs, "mode": "startup",
+                                 "rating_setup_hint": "", "verbosity": "normal"})
         try:
             (kdev_dir / "brief-detail.md").write_text(
                 f"# kdev-memory brief-detail（{today} 全量）\n\n{detail}\n", encoding="utf-8")
