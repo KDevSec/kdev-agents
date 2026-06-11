@@ -1,0 +1,24 @@
+docs/framework/01-design/2026-06-10-05-KDev数字员工-记忆底座-合稿-v1.0.md
+  s_0907f17a04af5e::t_8974ea9e6a2abb 167
+  s_0907f17a04af5e::t_523ec2809b1ef8 49,53,55
+  s_0907f17a04af5e::t_6396eb8243bb5d 164
+  s_0907f17a04af5e::t_50fc122761dc09 88,91,93-94,96-98,101-107,110
+  s_0907f17a04af5e::t_1f09cefd3a93d0 54
+  s_0907f17a04af5e::t_724275c03b2a6b 270
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "38e88a879da9c14f38c1aeaaeac94d644e786ad8",
+  "prompts": {},
+  "sessions": {
+    "s_0907f17a04af5e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "8807b9c4-5f6d-4a9e-9cf6-3ade8bcaa9dc",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
