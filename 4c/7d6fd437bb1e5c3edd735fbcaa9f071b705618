@@ -1,0 +1,26 @@
+docs/framework/01-design/KDev数字员工架构总览_演讲原型_v1.0.html
+  s_04ab383f3e0dd4::t_38e6a9f7326ad8 675-676,698-713
+docs/framework/01-design/设计参考-hud-cli-statusline.sh
+  s_04ab383f3e0dd4::t_e286774b731dec 9
+  s_04ab383f3e0dd4::t_739325b578396b 16
+docs/framework/01-design/KDev数字员工架构总览_演讲原型_v1.1.html
+  s_04ab383f3e0dd4::t_38e6a9f7326ad8 210-267,277-279,282-289,291-299,302-313,315-328,330-341,343-350,352-357,359,363-364,366-378
+docs/framework/01-design/设计参考-hud-dashboard.html
+  s_04ab383f3e0dd4::t_38e6a9f7326ad8 1-468
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "4c7d6fd437bb1e5c3edd735fbcaa9f071b705618",
+  "prompts": {},
+  "sessions": {
+    "s_04ab383f3e0dd4": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "6d5fb80e-4c47-4b52-9a05-b59be705ef17",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
