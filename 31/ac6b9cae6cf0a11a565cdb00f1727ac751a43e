@@ -1,0 +1,21 @@
+plugins/kdev-core/kdev_core/flow_state.py
+  s_f8c1c9f64db852::t_f7d0db57fa2946 388-397
+plugins/kdev-core/tests/test_handoffs.py
+  s_f8c1c9f64db852::t_b5637332663cf1 1-15
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "31ac6b9cae6cf0a11a565cdb00f1727ac751a43e",
+  "prompts": {},
+  "sessions": {
+    "s_f8c1c9f64db852": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "03697b91-a174-4618-a4e5-3b1863ba91b9",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
