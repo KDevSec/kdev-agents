@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KDev 数字员工 · 架构总览（演讲原型 v1.1）</title>
+<style>
+  :root{
+    --ink:#3A4660; --ink2:#44546A; --dim:#6B7896; --mute:#93A0B8; --line:#E2E6EE;
+    --blue:#4472C4; --blue-d:#2F5BAA; --orange:#ED7D31; --violet:#6749DE; --soft:#EAF0FB;
+    --green:#1E7A43; --red:#D45D66; --cyan:#0E7B8A;
+    --cjk:"Microsoft YaHei","PingFang SC","Noto Sans SC",sans-serif;
+    --mono:"JetBrains Mono","SFMono-Regular",ui-monospace,monospace;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{background:#eef2f7;color:var(--ink2);font-family:var(--cjk);-webkit-font-smoothing:antialiased}
+  .book{display:flex;flex-direction:column;align-items:center;gap:28px;padding:34px 20px 60px}
+  .slide{position:relative;width:1280px;height:720px;overflow:hidden;border-radius:10px;border:1px solid #dfe4ec;background:#fff;box-shadow:0 18px 50px -28px rgba(80,100,140,.5)}
+  .inner{position:absolute;inset:0;padding:26px 50px 46px;display:flex;flex-direction:column}
+
+  .hd{display:flex;align-items:center;justify-content:space-between;flex:none}
+  .hd .lgph{font-family:var(--cjk);font-size:13px;font-weight:800;color:var(--blue);letter-spacing:.04em}
+  .secpill{font-size:12px;font-weight:700;color:var(--blue-d);background:#E8F0FC;border:1px solid #C9DCF6;border-radius:999px;padding:5px 14px;letter-spacing:.06em}
+  .ht{display:flex;align-items:flex-start;gap:13px;margin-top:14px;flex:none}
+  .vbar{flex:none;width:5px;align-self:stretch;min-height:40px;background:var(--violet);border-radius:3px}
+  .htitle{font-size:25px;font-weight:800;color:var(--ink2);line-height:1.22}
+  .htitle .ac{color:var(--blue)}
+  .hsub{font-size:13px;color:var(--dim);margin-top:6px;line-height:1.5}
+  .hsub b{color:var(--ink2)}
+  .deckft{position:absolute;left:50px;right:50px;bottom:13px;display:flex;justify-content:space-between;align-items:center;font-size:11.5px;color:var(--mute)}
+  .deckft .pg b{color:var(--blue)}
+
+  .card{background:rgba(255,255,255,.92);border:1px solid #e3e8f1;border-radius:10px;padding:12px 14px;box-shadow:0 6px 18px -12px rgba(68,114,196,.3)}
+  .card.c{border-top:3px solid var(--blue)} .card.v{border-top:3px solid var(--violet)} .card.g{border-top:3px solid var(--orange)} .card.r{border-top:3px solid var(--red)} .card.q{border-top:3px solid var(--cyan)}
+  .card .ct{font-size:15px;font-weight:800;color:var(--ink2);margin-bottom:4px}
+  .card .cx{font-size:12.5px;color:var(--dim);line-height:1.5}
+  .card .cx b{color:var(--ink2)}
+  .grid{display:grid;gap:12px}.g2{grid-template-columns:1fr 1fr}.g3{grid-template-columns:repeat(3,1fr)}
+  .chip{font-family:var(--mono);font-size:10px;color:var(--blue-d);background:#eaf0fb;border:1px solid #d2e0f7;border-radius:5px;padding:2px 7px;white-space:nowrap}
+  .pill{font-size:11px;font-weight:700;padding:3px 10px;border-radius:999px;display:inline-flex;gap:5px;align-items:center}
+  .p-blue{color:#2F5BAA;background:#E8F0FC;border:1px solid #C9DCF6}
+  .p-violet{color:#5336B8;background:#EEE9FC;border:1px solid #D9CFF6}
+  .p-gold{color:#9A5B00;background:#FCF1E0;border:1px solid #F2DDB8}
+  .p-green{color:#1E7A43;background:#E5F6EC;border:1px solid #C2E8D1}
+  .p-red{color:#B23842;background:#FBE9EB;border:1px solid #F3CDD1}
+  .p-cyan{color:#0E7B8A;background:#E2F6F8;border:1px solid #BFE9EE}
+  .iron{background:#FCF1E0;border:1px solid #F2DDB8;border-left:4px solid var(--orange);border-radius:9px;padding:9px 14px;font-size:13px;color:var(--ink2);font-weight:600;line-height:1.45}
+  .iron em{color:var(--blue-d);font-style:normal;font-weight:800}
+  table.dat{width:100%;border-collapse:collapse;font-size:12px;background:#fff;border-radius:9px;overflow:hidden;box-shadow:0 6px 18px -12px rgba(68,114,196,.3)}
+  table.dat th{background:#E8F0FC;color:#2F5BAA;font-weight:800;font-size:11.5px;text-align:left;padding:7px 10px;border-bottom:1px solid #C9DCF6}
+  table.dat td{padding:7px 10px;border-bottom:1px solid #EDF1F7;color:var(--dim);vertical-align:top}
+  table.dat tr:last-child td{border-bottom:none}table.dat td b{color:var(--ink2)}
+  .flow{display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+  .fn{padding:5px 11px;border-radius:8px;border:1px solid #d8e1f0;background:#fff;font-size:11.5px;font-weight:700;color:var(--ink2)}
+  .fn.gate{border-color:#D9CFF6;color:#5336B8;background:#F3EFFD}
+  .fn.ok{border-color:#C2E8D1;color:#1E7A43;background:#EDFAF2}
+  .fa{color:var(--orange);font-weight:800}
+
+  /* ===== 架构页：层叠结构 ===== */
+  .archcol{flex:1;display:flex;flex-direction:column;align-items:center;gap:5px;margin-top:4px;min-height:0}
+  .uband{font-size:13.5px;font-weight:800;color:var(--ink2)}
+  .updown{font-size:11px;color:var(--mute)}
+  .obsband{width:100%;display:flex;align-items:center;gap:12px;background:#E2F6F8;border:1px solid #BFE9EE;border-radius:10px;padding:6px 16px}
+  .obsband .on{font-size:14px;font-weight:800;color:var(--cyan);white-space:nowrap}
+  .obsband .od{flex:1;font-size:11.5px;color:var(--dim);line-height:1.4}
+  .obsband .od b{color:var(--ink2)}
+  .empframe{width:100%;position:relative;border:2px solid var(--blue);border-radius:11px;padding:12px 12px 10px;background:linear-gradient(180deg,#f7faff,#fff)}
+  .empframe .ftag{position:absolute;top:-11px;left:16px;background:var(--blue);color:#fff;font-weight:800;font-size:12.5px;padding:2px 12px;border-radius:5px}
+  .ceobar{display:flex;align-items:center;justify-content:center;gap:9px;margin-bottom:7px}
+  .ceobar .cn{font-size:14px;font-weight:800;color:var(--blue-d)}
+  .ceobar .cd{font-size:11px;color:var(--dim)}
+  .emprow{display:grid;grid-template-columns:.8fr 1fr 1fr 1fr 1.25fr;gap:8px}
+  .emp{border:1px solid #e3e8f1;border-radius:9px;padding:7px 8px;background:#fff;display:flex;flex-direction:column;gap:4px}
+  .emp.sup{border-color:#F3CDD1;background:#fdf4f5}
+  .emp.rev{border-color:#D9CFF6;background:#faf8ff}
+  .emp .eh{display:flex;align-items:center;justify-content:space-between;gap:4px}
+  .emp .en{font-size:12px;font-weight:800;color:var(--ink2)}
+  .emp .ec{font-family:var(--mono);font-size:9px;color:#fff;background:var(--blue);border-radius:4px;padding:1px 5px}
+  .emp.sup .ec{background:var(--red)} .emp.rev .ec{background:var(--violet)}
+  .emp .ecaps{display:flex;flex-wrap:wrap;gap:3px}
+  .emp .cap{font-size:9px;color:var(--blue-d);background:#eef3fc;border:1px solid #dde8f8;border-radius:4px;padding:1px 5px;line-height:1.3}
+  .emp.rev .cap{color:#5336B8;background:#f1edfc;border-color:#e0d7f7}
+  .emp .more{font-size:9px;color:var(--mute)}
+  .emp .crow{display:flex;justify-content:space-between;align-items:baseline;gap:5px;border-bottom:1px solid #f0f3f8;padding:1.5px 0}
+  .emp .crow:last-child{border-bottom:0}
+  .emp .crow .k{font-size:10px;font-weight:700;color:var(--ink2);white-space:nowrap}
+  .emp .crow .k.o{color:var(--blue-d)}
+  .emp .crow .d{font-size:8.5px;color:var(--mute);text-align:right;line-height:1.25}
+  .revg{display:grid;grid-template-columns:1fr 1fr;gap:3px;margin-top:2px}
+  .revg span{display:flex;flex-direction:column;background:#f1edfc;border:1px solid #e0d7f7;border-radius:4px;padding:2px 4px;text-align:center}
+  .revg span b{font-size:9px;color:#5336B8;line-height:1.25}
+  .revg span i{font-style:normal;font-size:7.8px;color:var(--mute);line-height:1.2}
+  .revx{font-size:8.5px;color:var(--mute);margin-top:3px;line-height:1.35}
+  .revx b{color:#9A5B00}
+  .cntline{width:100%;text-align:center;font-size:11px;color:var(--dim)}
+  .cntline b{color:var(--blue-d)}
+  .baserow{width:100%;display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .base{border:1px solid #e3e8f1;border-radius:10px;padding:8px 13px;background:#fff;box-shadow:0 6px 18px -12px rgba(68,114,196,.3)}
+  .base.core{border-top:3px solid var(--blue)} .base.mem{border-top:3px solid var(--violet)}
+  .base .bh{display:flex;align-items:baseline;gap:8px;margin-bottom:6px}
+  .base .bn{font-size:15px;font-weight:800;color:var(--ink2)}
+  .base.core .bn{color:var(--blue-d)} .base.mem .bn{color:#5336B8}
+  .base .bm{font-size:10.5px;color:var(--mute)}
+  .base .brow{display:flex;flex-wrap:wrap;gap:5px;margin-bottom:5px}
+  .base .bt{font-size:10.5px;color:var(--dim);background:#f4f7fc;border:1px solid #e6edf6;border-radius:5px;padding:2px 7px}
+  .base.mem .bt{background:#f6f3fc;border-color:#ece6f8}
+  .base .bnote{font-size:10.5px;color:var(--ink2);font-weight:700}
+  .base.core .bnote{color:var(--blue-d)} .base.mem .bnote{color:#5336B8}
+
+  /* ===== 三件套 / 关卡 ===== */
+  .three{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+  .gc{border:1px solid #e3e8f1;border-radius:10px;background:#fff;box-shadow:0 6px 18px -12px rgba(68,114,196,.3);overflow:hidden}
+  .gc .gh{padding:9px 13px;border-bottom:1px solid #eef2f8}
+  .gc .gh .gn{font-size:14.5px;font-weight:800;color:var(--ink2)}
+  .gc .gh .gs{font-size:10.5px;color:var(--mute);margin-top:1px}
+  .gc.c1{border-top:3px solid var(--blue)} .gc.c2{border-top:3px solid var(--cyan)} .gc.c3{border-top:3px solid var(--orange)}
+  .gc .gb{padding:10px 13px;font-size:12px;color:var(--dim);line-height:1.5}
+  .gc .gb b{color:var(--ink2)}
+  .sopstrip{display:flex;align-items:center;gap:7px;flex-wrap:wrap;background:#FCF1E0;border:1px solid #F2DDB8;border-radius:9px;padding:9px 13px;font-size:11.5px;color:var(--ink2)}
+  .sopstrip .sl{background:#fff;border:1px solid #ecd9b3;border-radius:6px;padding:3px 9px;font-size:10.5px;color:#9A5B00;font-weight:700}
+  .sopstrip .sa{color:var(--orange);font-weight:800}
+
+  /* ===== 记忆三层 ===== */
+  .memflow{display:flex;align-items:stretch;gap:10px}
+  .mlayer{flex:1;border:1px solid #e3e8f1;border-radius:10px;padding:11px 13px;background:#fff;box-shadow:0 6px 18px -12px rgba(68,114,196,.3)}
+  .mlayer .mt{font-size:13.5px;font-weight:800;color:var(--ink2)}
+  .mlayer .mw{font-size:10px;color:var(--mute);margin:1px 0 5px}
+  .mlayer .md{font-size:11.5px;color:var(--dim);line-height:1.5}
+  .mlayer.m1{border-top:3px solid var(--blue)} .mlayer.m2{border-top:3px solid var(--blue)} .mlayer.m3{border-top:3px solid var(--violet)}
+  .marrow{flex:none;display:flex;flex-direction:column;align-items:center;justify-content:center;color:var(--orange);font-weight:800;font-size:10px}
+  .wheel{display:flex;flex-direction:column;gap:7px}
+  .ws{display:flex;align-items:center;gap:10px;background:#fff;border:1px solid #e3e8f1;border-radius:9px;padding:8px 12px;box-shadow:0 5px 14px -12px rgba(68,114,196,.3)}
+  .ws .wn{flex:none;width:24px;height:24px;border-radius:7px;background:var(--violet);color:#fff;display:grid;place-items:center;font-family:var(--mono);font-weight:800;font-size:12px}
+  .ws.plus .wn{background:var(--orange)}
+  .ws .wt{font-size:12px;color:var(--ink2)}
+
+  /* ===== HUD ===== */
+  .ch{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+  .ch .cnum{flex:none;width:22px;height:22px;border-radius:7px;background:var(--cyan);color:#fff;display:grid;place-items:center;font-family:var(--mono);font-weight:800;font-size:11px}
+  .ch .cttl{font-size:13.5px;font-weight:800;color:var(--ink2)}
+  .statusbar{display:flex;align-items:center;gap:0;background:#1E2A3F;border-radius:8px;font-family:var(--mono);font-size:12px;color:#D7E2F5;overflow:hidden}
+  .statusbar .seg{padding:8px 13px;border-right:1px solid rgba(255,255,255,.1);white-space:nowrap}
+  .statusbar .seg:last-child{border-right:0;margin-left:auto;color:#F2C46B}
+  .statusbar .b1{color:#9DBCFF;font-weight:700} .statusbar .ed{color:#F2C46B;font-weight:700} .statusbar .bz{color:#7FD8E8}
+  .dash{border:1px solid #e3e8f1;border-radius:10px;background:#fbfcfe;overflow:hidden;box-shadow:0 6px 18px -12px rgba(68,114,196,.3)}
+  .dbar{display:flex;align-items:center;gap:8px;padding:7px 12px;background:#eef3fa;border-bottom:1px solid #e3e8f1;font-family:var(--mono);font-size:11px;color:var(--dim)}
+  .dbar .live{margin-left:auto;color:var(--green);font-weight:700}
+  .dbody{padding:10px 13px;display:flex;flex-direction:column;gap:9px}
+  .tiles{display:grid;grid-template-columns:repeat(4,1fr);gap:9px}
+  .tile{border:1px solid #e3e8f1;border-radius:8px;padding:7px 11px;background:#fff;border-left:3px solid var(--blue)}
+  .tile .tl{font-size:10px;color:var(--mute)} .tile .tv{font-family:var(--mono);font-size:18px;font-weight:800;color:var(--ink2);line-height:1.15}
+  .tile.g{border-left-color:var(--green)} .tile.g .tv{color:var(--green)} .tile.o{border-left-color:var(--orange)} .tile.o .tv{color:#9A5B00}
+  .pipe{display:flex;gap:4px}
+  .ps{flex:1;border-radius:6px;border:1px solid #e3e8f1;background:#fff;padding:5px 3px;text-align:center;font-size:9px;color:var(--mute);line-height:1.3}
+  .ps b{display:block;color:var(--ink2);font-size:9.5px} .ps i{font-style:normal;font-family:var(--mono);font-size:8px}
+  .ps.done{background:#EDFAF2;border-color:#C2E8D1} .ps.done b{color:var(--green)} .ps.done i{color:var(--green)}
+  .ps.now{background:#FCF1E0;border-color:#F2DDB8} .ps.now b{color:#9A5B00} .ps.now i{color:#9A5B00;font-weight:700}
+  .feed{font-family:var(--mono);font-size:10px;color:var(--dim);display:flex;flex-direction:column;gap:3px}
+  .feed .ts{color:var(--mute)}
+  .actrow{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}
+  .act{border:1px solid #e3e8f1;border-radius:8px;background:#fff;padding:6px 8px}
+  .act.busy{border-color:#C2E8D1;background:#f4fbf7}
+  .act .an{font-size:10.5px;font-weight:800;color:var(--ink2);display:flex;align-items:center;gap:4px}
+  .act .dot{flex:none;width:7px;height:7px;border-radius:50%;background:#cbd5e3}
+  .act.busy .dot{background:var(--green)}
+  .act .aw{font-size:9.5px;color:var(--dim);line-height:1.35;margin-top:2px}
+  .act .aw b{color:var(--cyan)}
+  .cqoband{display:flex;align-items:center;gap:10px;background:#FCF1E0;border:1px solid #F2DDB8;border-radius:7px;padding:5px 10px;font-size:10.5px;color:var(--ink2)}
+  .legend{border:1px solid #e3e8f1;border-radius:10px;background:#fff;padding:11px 13px;box-shadow:0 6px 18px -12px rgba(68,114,196,.3)}
+  .legend .lh{font-size:13px;font-weight:800;color:var(--ink2);margin-bottom:7px}
+  .lrow{display:flex;gap:9px;font-size:11px;padding:5px 0;border-bottom:1px solid #f0f3f8;line-height:1.45}
+  .lrow:last-child{border-bottom:0}
+  .lrow .ln{flex:none;width:18px;height:18px;border-radius:50%;display:grid;place-items:center;font-size:11px;font-weight:800;color:#fff}
+  .lrow.c1 .ln{background:var(--blue)} .lrow.c2 .ln{background:var(--cyan)} .lrow.c3 .ln{background:var(--orange)}
+  .lrow b{color:var(--ink2)}
+
+  /* ===== 封面 / 结尾 ===== */
+  .cover,.endbig{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:18px;padding:0 70px}
+  .cover h1{font-size:46px;font-weight:800;color:var(--blue);line-height:1.2}
+  .cover .sub{font-size:22px;font-weight:700;color:var(--ink2)}
+  .cover .meta{font-size:15px;color:var(--dim);line-height:1.9;max-width:840px}
+  .endbig .eh{font-size:32px;font-weight:800;color:var(--ink2);line-height:1.4}
+  .endbig .eh .ac{color:var(--blue)}
+  .endbig .es{font-size:15px;color:var(--dim);line-height:1.9}
+  .glow{width:150px;height:4px;background:linear-gradient(90deg,transparent,var(--blue),transparent);border-radius:4px}
+  .logoK{width:58px;height:58px;border-radius:14px;background:var(--blue);color:#fff;display:grid;place-items:center;font-size:34px;font-weight:800}
+  .wrapb{flex:1;display:flex;gap:18px;margin-top:12px;min-height:0}
+  .col{flex:1;display:flex;flex-direction:column;gap:11px;min-height:0}
+</style>
+</head>
+<body>
+<div class="book">
+
+<!-- ============ 1 整体架构 ============ -->
+<section class="slide" id="s1">
+  <div class="inner">
+    <div class="hd"><div class="lgph">KDev · 数字员工</div><div class="secpill">01 · 整体架构</div></div>
+    <div class="ht"><div class="vbar"></div><div>
+      <div class="htitle">一张图看全 —— <span class="ac">一支 6 人 AI 团队，架在两个底座上</span></div>
+      <div class="hsub">用户透过<b>观测层</b>看见团队；团队跑在 <b>编排底座</b>（怎么跑）+ <b>记忆底座</b>（记得住、越用越强）之上。</div>
+    </div></div>
+
+    <div class="archcol">
+      <div class="uband">👤 用户</div>
+      <div class="updown">对话（经主控员）　·　观测（看 HUD）　↕</div>
+
+      <div class="obsband">
+        <div class="on">观测层 · kdev-hud</div>
+        <div class="od">三通道<b>实时驾驶舱</b>：命令行状态栏 · 网页仪表盘 · 对话播报 —— <b>只读</b>，把底座的账本变成看得见的进度</div>
+        <span class="pill p-cyan">阶段3</span>
+      </div>
+
+      <div class="empframe">
+        <div class="ftag">员工层 · kdev-team</div>
+        <div class="ceobar"><span class="cn">主控员（总指挥）</span><span class="cd">6 项能力：顶层约束 · 用户对话 · 派单 · 决策 · 阶段聚合 · 评审升级裁决 —— 唯一对用户入口</span></div>
+        <div class="emprow">
+          <div class="emp sup">
+            <div class="eh"><span class="en">监督员</span><span class="ec">CQO</span></div>
+            <div class="crow"><span class="k">流程监督</span><span class="d">元监督·只读</span></div>
+            <div class="crow"><span class="k">监控全员</span><span class="d">跨员工巡查</span></div>
+            <div class="crow"><span class="k">合规聚合</span><span class="d">阶段合规报告</span></div>
+            <div class="crow"><span class="k" style="color:#B23842">叫停权</span><span class="d">流程违规可阻断</span></div>
+          </div>
+          <div class="emp">
+            <div class="eh"><span class="en">需求架构师</span><span class="ec">5+1</span></div>
+            <div class="crow"><span class="k o">编排</span><span class="d">内部调度·协作</span></div>
+            <div class="crow"><span class="k">需求澄清</span><span class="d">澄清原始需求</span></div>
+            <div class="crow"><span class="k">需求计划</span><span class="d">写需求规格 SR</span></div>
+            <div class="crow"><span class="k">需求拆解</span><span class="d">迭代+用户故事</span></div>
+            <div class="crow"><span class="k">原型设计</span><span class="d">高保真原型</span></div>
+            <div class="crow"><span class="k">方案设计</span><span class="d">技术方案</span></div>
+          </div>
+          <div class="emp">
+            <div class="eh"><span class="en">开发工程师</span><span class="ec">6+1</span></div>
+            <div class="crow"><span class="k o">编排</span><span class="d">内部调度·协作</span></div>
+            <div class="crow"><span class="k">环境准备</span><span class="d">栈/工具链</span></div>
+            <div class="crow"><span class="k">实施计划</span><span class="d">计划+复杂度</span></div>
+            <div class="crow"><span class="k">编码实现</span><span class="d">测试驱动开发</span></div>
+            <div class="crow"><span class="k">端到端自测</span><span class="d">自测跑通</span></div>
+            <div class="crow"><span class="k">安全扫描</span><span class="d">安全清单</span></div>
+            <div class="crow"><span class="k">部署上线</span><span class="d">合并/部署</span></div>
+          </div>
+          <div class="emp">
+            <div class="eh"><span class="en">测试工程师</span><span class="ec">4+1</span></div>
+            <div class="crow"><span class="k o">编排</span><span class="d">内部调度·协作</span></div>
+            <div class="crow"><span class="k">测试点设计</span><span class="d">国标 29119</span></div>
+            <div class="crow"><span class="k">用例开发</span><span class="d">字段化用例</span></div>
+            <div class="crow"><span class="k">界面自动化</span><span class="d">UI 脚本执行</span></div>
+            <div class="crow"><span class="k">接口自动化</span><span class="d">API 用例执行</span></div>
+          </div>
+          <div class="emp rev">
+            <div class="eh"><span class="en">评审专家</span><span class="ec">10+6+1</span></div>
+            <div class="crow"><span class="k o">编排</span><span class="d">调度·仲裁·终审聚合</span></div>
+            <div class="revg">
+              <span><b>需求方向</b><i>该不该做</i></span><span><b>SR 需求</b><i>需求写全没</i></span>
+              <span><b>迭代拆分</b><i>分批合不合理</i></span><span><b>用户故事</b><i>能否独立验收</i></span>
+              <span><b>原型</b><i>界面好不好用</i></span><span><b>方案+架构</b><i>技术行不行</i></span>
+              <span><b>代码+质量</b><i>对不对·好维护</i></span><span><b>安全</b><i>有无漏洞</i></span>
+              <span><b>测试设计</b><i>测得全不全</i></span><span><b>测试执行</b><i>实跑覆盖多少</i></span>
+            </div>
+            <div class="revx">+6 按需扩展：<b>部署检查 · 性能 · 文档 · 合规 · 可观测 · 可访问</b></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="cntline">合计 <b>6 名员工 / 默认 31 个 AI 工作单元</b>（全开 37）＝ 1 主控 ＋ 1 监督 ＋ 4 编排 ＋ 15 业务能力 ＋ 10 核心评审</div>
+      <div class="updown">都跑在 ↓ 两个底座上</div>
+
+      <div class="baserow">
+        <div class="base core">
+          <div class="bh"><span class="bn">编排底座 · kdev-core</span><span class="bm">让员工「按流程跑起来」</span></div>
+          <div class="brow"><span class="bt">状态记录：控制态「我在哪步」+ 事实流水「发生了啥」→ 断点续跑</span><span class="bt">流程节点引擎：节点表声明 · 过→推进 / 不过→退回（有上限）</span></div>
+          <div class="brow"><span class="bt">三类关卡：评审 / 岔路 / 验收 · 超限升人工</span><span class="bt">账本 features/&lt;功能&gt;/：状态 + 流水 + 交付物</span><span class="bt">SOP 可编排（L0/L1/L2）</span></div>
+          <div class="bnote">铁律：只记账 + 流转，不替员工做判断（判断喂回来）</div>
+        </div>
+        <div class="base mem">
+          <div class="bh"><span class="bn">记忆底座 · kdev-memory</span><span class="bm">让员工「记得住、越用越强」</span></div>
+          <div class="brow"><span class="bt">叙事 / 蒸馏：步骤 · 决策 · 踩坑 + 自评 / 用户评分（从流水提炼+加料）</span><span class="bt">多 scope：shared 共享 + staff/&lt;员工&gt; 私有</span></div>
+          <div class="brow"><span class="bt">评审经验 → 喂复利飞轮（越评越准）</span><span class="bt">跨会话续航（主控员冷启动）</span><span class="bt">Git 托管自动同步</span></div>
+          <div class="bnote">全团队共享，不是主控员私有：续航 + 飞轮 + 各员工的账</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="deckft"><span>KDev 数字员工 · 架构总览 v1.1</span><span class="pg">01 / <b>04</b></span></div>
+</section>
+
+<!-- ============ 2 编排底座 ============ -->
+<section class="slide" id="s2">
+  <div class="inner">
+    <div class="hd"><div class="lgph">KDev · 数字员工</div><div class="secpill">02 · 编排底座 kdev-core</div></div>
+    <div class="ht"><div class="vbar" style="background:var(--blue)"></div><div>
+      <div class="htitle">底座靠三样东西让员工 <span class="ac">跑得起来、卡得住、续得上</span></div>
+      <div class="hsub">铁律：<b>只记账 + 流转，不做判断本身</b>——评审 / 跑测试 / 选路线由员工或人来做，结果喂回底座。</div>
+    </div></div>
+
+    <div class="wrapb" style="flex-direction:column;gap:11px">
+      <div class="three">
+        <div class="gc c1"><div class="gh"><div class="gn">① 记两本机器账</div><div class="gs">控制态 + 事实流水</div></div>
+          <div class="gb"><b>控制态</b>「我在哪一步」+ <b>事实流水</b>「发生了啥」，全程原子化落盘（记忆层从流水提炼，见第 3 页）。<br><br><b style="color:var(--green)">最大好处：断点续跑</b>——断电 / 被打断，再起来从上次那步接着干。</div>
+        </div>
+        <div class="gc c2"><div class="gh"><div class="gn">② 流程节点引擎</div><div class="gs">每条业务自己声明节点表</div></div>
+          <div class="gb">业务自己声明「有哪些步骤、什么顺序」（不写死段数）。底座只提供<b>推进引擎</b>：把关过 → 进下一步；不过 → <b>退回重做</b>（有上限，不死循环）。</div>
+        </div>
+        <div class="gc c3"><div class="gh"><div class="gn">③ 三类把关关卡</div><div class="gs">核心难点 = 最大卖点</div></div>
+          <div class="gb">所有把关点都归成<b>三种类型</b>，一套逻辑处理。这是「一套底座跑任意业务」的根：换业务只换节点表 + 关卡配置。</div>
+        </div>
+      </div>
+
+      <table class="dat">
+        <tr><th style="width:110px">关卡类型</th><th style="width:300px">干什么</th><th style="width:210px">谁来判</th><th>判不过怎么办</th></tr>
+        <tr><td><b style="color:var(--orange)">评审</b></td><td>检查产出质量（代码 / 方案 / 安全…）</td><td>默认 AI，可改成人或人机双审</td><td>退回改 → 重审（最多 3 次）；还不过 → <b style="color:var(--red)">升级交人工</b></td></tr>
+        <tr><td><b style="color:var(--cyan)">岔路决策</b></td><td>在分叉口选一条路（复杂 / 简单走法）</td><td>默认 AI，岔路口可交给人</td><td>选哪条走哪条（不重试）</td></tr>
+        <tr><td><b style="color:var(--violet)">验收</b></td><td>跑端到端测试、验真功能</td><td>自动跑测试，可叠加人复核</td><td>没过退回修复节点重跑</td></tr>
+      </table>
+
+      <div style="font-size:11px;color:var(--dim);padding:0 2px">把关结果以<b style="color:var(--ink2)">结构化数据</b>记录（不靠猜文本），能程序化查「这关重试几轮、谁判的」；卡住超上限<b style="color:#B23842">一定升级交人工，绝不偷偷降格放行</b>。</div>
+      <div class="sopstrip">
+        <b style="color:#9A5B00">节点表 ＋ 关卡 ＝ 一条流程的 SOP，可自由编排：</b>
+        <span class="sl">L0 作者定默认</span><span class="sa">→</span>
+        <span class="sl">L1 用户改配置（开关关卡 · 谁来判 AI↔人 · 重试数 · 跳过 / 重排节点）</span><span class="sa">→</span>
+        <span class="sl">L2 员工自优化（自演进 · 未来）</span>
+      </div>
+    </div>
+  </div>
+  <div class="deckft"><span>KDev 数字员工 · 架构总览 v1.1</span><span class="pg">02 / <b>04</b></span></div>
+</section>
+
+<!-- ============ 3 记忆底座 ============ -->
+<section class="slide" id="s3">
+  <div class="inner">
+    <div class="hd"><div class="lgph">KDev · 数字员工</div><div class="secpill">03 · 记忆底座 kdev-memory</div></div>
+    <div class="ht"><div class="vbar"></div><div>
+      <div class="htitle">记忆 = 从机器到人的 <span class="ac">「提炼 + 加料」</span>，不重复造账</div>
+      <div class="hsub">三层数据从机器到人：<b>控制态 / 事实流水</b>是底座的机器账（第 2 页）；记忆只管最上面的<b>叙事层</b>——从流水蒸馏，再加机器给不了的那一维。</div>
+    </div></div>
+
+    <div class="wrapb">
+      <div class="col" style="flex:1.25">
+        <div class="memflow">
+          <div class="mlayer m1"><div class="mt">控制态</div><div class="mw">机器 · kdev-core</div><div class="md">我在哪一步（flow-state）</div></div>
+          <div class="marrow">＋</div>
+          <div class="mlayer m2"><div class="mt">事实流水</div><div class="mw">机器 · kdev-core</div><div class="md">发生了啥（events.jsonl）</div></div>
+          <div class="marrow">蒸馏<br>＋加料<br>→</div>
+          <div class="mlayer m3"><div class="mt">叙事 / 蒸馏 <span style="font-size:10px;color:var(--violet)">= 记忆</span></div><div class="mw">人 · kdev-memory</div><div class="md">步骤 · 决策 · 踩坑 <b style="color:var(--violet)">+ 自评 / 用户评分</b></div></div>
+        </div>
+        <div class="iron" style="margin-top:2px"><em>一条原则</em>：记忆只加「机器给不了的那一维」（评价 / 经验 / 叙事）；凡是镜像机器原始态的，让位给底座——<b>不造第二本账</b>。</div>
+        <div class="card"><div class="ct">全团队的记忆底座，不是主控员私有</div>
+          <div class="cx"><b>shared</b>（决策 / 踩坑 / 主控员续航）+ <b>staff/&lt;员工&gt;</b>（各员工私有 rollup + <b style="color:var(--violet)">评审经验 → 喂飞轮</b>）。多消费者：主控员续航 · 评审专家越评越准 · 各员工记自己的账。整套 Git 托管自动同步。</div>
+        </div>
+        <div class="card q"><div class="ct">两个模式 · 一条派生链</div>
+          <div class="cx"><b>单装</b>＝给人做跨会话续航（含进度，它是唯一来源）；<b>装了 kdev-team</b>＝进度让位 HUD / 底座，记忆收窄成「判断 + 续航」层。Step 的「执行事实」从流水蒸馏，<b>「自评 / 评分」才是记忆独有的加料</b>。</div>
+        </div>
+      </div>
+      <div class="col" style="flex:.92">
+        <div class="card v" style="flex:1;display:flex;flex-direction:column;justify-content:center">
+          <div class="ct" style="color:#5336B8">复利飞轮 —— 越用越强（升级版）</div>
+          <div class="wheel" style="margin-top:8px">
+            <div class="ws"><span class="wn">1</span><span class="wt">数字员工干活（需求 → 验收）</span></div>
+            <div class="ws"><span class="wn">2</span><span class="wt">过程经验沉淀进专属知识库</span></div>
+            <div class="ws"><span class="wn">3</span><span class="wt">知识反哺能力（下次更准更快）</span></div>
+            <div class="ws plus"><span class="wn">+</span><span class="wt"><b style="color:#9A5B00">未来：也反哺「流程本身」</b>（自演进）</span></div>
+            <div class="ws"><span class="wn">4</span><span class="wt">越用越强 → 回到第 1 步</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="deckft"><span>KDev 数字员工 · 架构总览 v1.1</span><span class="pg">03 / <b>04</b></span></div>
+</section>
+
+<!-- ============ 4 HUD 驾驶舱 ============ -->
+<section class="slide" id="s4">
+  <div class="inner">
+    <div class="hd"><div class="lgph">KDev · 数字员工</div><div class="secpill">04 · 观测层 kdev-hud</div></div>
+    <div class="ht"><div class="vbar" style="background:var(--cyan)"></div><div>
+      <div class="htitle">进度随时可见 —— <span class="ac">三个通道把团队实时状态推到眼前</span></div>
+      <div class="hsub">只读消费底座的账（events / state），渲染成驾驶舱；<b>不记账、不判断</b>，永远与实际进度一致。<b>阶段3</b> 跟事件流一起建。</div>
+    </div></div>
+
+    <div class="wrapb" style="flex-direction:column;gap:10px">
+      <div>
+        <div class="ch"><span class="cnum">1</span><span class="cttl">命令行状态栏 —— 一行速览「我在哪」</span></div>
+        <div class="statusbar">
+          <div class="seg b1">🏢 KDev 团队</div>
+          <div class="seg">开发阶段 · 代码评审 <span class="ed">✏️ 第2轮</span></div>
+          <div class="seg bz">开发工程师 忙 · 评审专家 忙</div>
+          <div class="seg">⚠ 待处理 1</div>
+        </div>
+      </div>
+      <div class="wrapb" style="margin-top:0">
+        <div class="col" style="flex:1.5">
+          <div class="ch"><span class="cnum">2</span><span class="cttl">网页实时仪表盘 —— 一屏全景</span></div>
+          <div class="dash">
+            <div class="dbar">🔒 localhost:7890/hud · KDev 实时驾驶舱<span class="live">● LIVE</span></div>
+            <div class="dbody">
+              <div class="tiles">
+                <div class="tile"><div class="tl">当前阶段</div><div class="tv">3/4</div></div>
+                <div class="tile g"><div class="tl">评审通过</div><div class="tv">5<span style="font-size:12px;color:var(--mute)">/10</span></div></div>
+                <div class="tile"><div class="tl">平均评分</div><div class="tv">86.6</div></div>
+                <div class="tile o"><div class="tl">待处理告警</div><div class="tv">1</div></div>
+              </div>
+              <div class="actrow">
+                <div class="act busy"><div class="an"><span class="dot"></span>开发工程师 · 忙</div><div class="aw">正在 <b>编码实现</b> · 增量 2/3 · 已用 12m</div></div>
+                <div class="act busy"><div class="an"><span class="dot"></span>评审专家 · 忙</div><div class="aw">正在 <b>代码+质量评审</b> · 第 1 轮 · 已打 84</div></div>
+                <div class="act"><div class="an"><span class="dot"></span>需求架构师 · 闲</div><div class="aw">SR / 用户故事已交付，等下游回流</div></div>
+                <div class="act"><div class="an"><span class="dot"></span>测试工程师 · 待命</div><div class="aw">等开发完成 → 进入测试阶段</div></div>
+              </div>
+              <div class="pipe">
+                <div class="ps done"><b>需求方向</b><i>95</i></div><div class="ps done"><b>SR</b><i>87</i></div>
+                <div class="ps done"><b>迭代拆分</b><i>82</i></div><div class="ps done"><b>用户故事</b><i>88</i></div>
+                <div class="ps done"><b>方案</b><i>91</i></div><div class="ps now"><b>代码质量</b><i>84 评审中</i></div>
+                <div class="ps"><b>安全</b><i>⏳</i></div><div class="ps"><b>测试设计</b><i>⏳</i></div>
+                <div class="ps"><b>测试执行</b><i>⏳</i></div><div class="ps"><b>终审</b><i>⏳</i></div>
+              </div>
+              <div class="cqoband">🛡️ 监督员　<b style="color:var(--green)">● 合规率 100%</b>　<span style="color:#9A5B00">⚠ 1 告警：SR 评审反馈仅 87 字（产物 4231 字），建议复评</span></div>
+              <div class="feed">
+                <div><span class="ts">15:08:11</span>　评审汇总　代码评审 → <b style="color:var(--green)">通过 86</b></div>
+                <div><span class="ts">14:55:09</span>　协作请求　开发 → 评审〔代码 / 质量评审〕</div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="col" style="flex:1">
+          <div class="ch"><span class="cnum">3</span><span class="cttl">对话播报 —— 主控员主动汇报</span></div>
+          <div class="card" style="border-left:4px solid var(--blue)">
+            <div class="ct">📊 阶段聚合 — 开发完成</div>
+            <div class="cx" style="margin-top:4px">评审通过 <b style="color:var(--green)">9/9</b> · 均分 <b>87.2</b> · 触发返工 2 次 · 升级总指挥 0 次<br>下一步：进入测试阶段？〔是 / 否〕</div>
+          </div>
+          <div class="legend" style="flex:1">
+            <div class="lh">三个通道，各管一种「看」</div>
+            <div class="lrow c1"><span class="ln">1</span><div>干活时余光速览：跑到哪、有没有告警</div></div>
+            <div class="lrow c2"><span class="ln">2</span><div>想细看时打开：完成度 / 谁在忙 / 评审分 / 事件流</div></div>
+            <div class="lrow c3"><span class="ln">3</span><div>关键节点主动播报 + 请你拍板（归主控员）</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="deckft"><span>KDev 数字员工 · 架构总览 v1.1</span><span class="pg">04 / <b>04</b></span></div>
+</section>
+
+
+</div>
+</body>
+</html>
