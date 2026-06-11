@@ -1,0 +1,24 @@
+plugins/kdev-memory/hooks/lib/memory_config.py
+  s_54d8d748b888e0::t_341c4570b633f1 135-166
+  s_54d8d748b888e0::t_7d7a463be5345b 224-225
+  s_54d8d748b888e0::t_daf4c4031b1088 28-35
+plugins/kdev-memory/tests/test_rating_mode_config.py
+  s_54d8d748b888e0::t_b4c6dc43c25c3b 18
+  s_54d8d748b888e0::t_60cdee8d9bc331 1-17,19-70
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "2f479c2a6b6c0e9b3dad4be1d30f3e5dd0ce804f",
+  "prompts": {},
+  "sessions": {
+    "s_54d8d748b888e0": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "27c3a208-d7f1-4318-a30e-2b77e6ee2ffe",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
