@@ -1,0 +1,23 @@
+docs/framework/01-design/KDev数字员工架构总览_演讲原型_v1.0.html
+  s_0907f17a04af5e::t_45b3378dc1a7d6 116,125,390,443,458-462,514-515,517-519,522,572,627,766,818,878,898
+  s_0907f17a04af5e::t_51181b472acdfb 124,128
+  s_0907f17a04af5e::t_94bfab34016037 449,529,538,578,590,772,824
+docs/framework/01-design/2026-06-10-04-KDev数字员工-HUD驾驶舱-kdev-hud-设计-v1.0.md
+  s_0907f17a04af5e::t_94bfab34016037 9
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "2b85de9f61987bf15754c8a92ac295d5bc7efbe8",
+  "prompts": {},
+  "sessions": {
+    "s_0907f17a04af5e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "8807b9c4-5f6d-4a9e-9cf6-3ade8bcaa9dc",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
