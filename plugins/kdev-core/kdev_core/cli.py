@@ -22,26 +22,32 @@ def _load_table(path):
     return table, data.get("gate_specs", {})
 
 
-def _print_state(state):
-    """Print enriched state JSON for orchestrator consumption."""
+def _print_state(state, workspace):
+    """Print enriched state JSON for orchestrator consumption (flat view)."""
+    from kdev_core import events
+    slug = state.get("slug")
     print(json.dumps({
-        "flow": state["flow"],
-        "slug": state["slug"],
+        "slug": slug,
+        "flow": state.get("flow"),
         "display_name": state.get("display_name"),
-        "status": state["status"],
-        "active": state["active"],
-        "current_node": state["current_node"],
+        "feature_status": state.get("feature_status"),
+        "status": state.get("status"),            # run 级
+        "active": state.get("_has_active", False),
+        "run": state.get("run"),
+        "current_node": state.get("current_node"),
         "config": state.get("config"),
         "gate_calls": state.get("gate_calls", 0),
-        "history_len": len(state.get("history", [])),
-        "blocked_reason": state.get("blocked_reason"),
         "gate_iters": state.get("gate_iters", {}),
-        "phase_history": state.get("phase_history", [])[-5:],
+        "blocked_reason": state.get("blocked_reason"),
+        "stories": state.get("stories", []),
+        "runs": state.get("runs", []),
+        "events_len": len(events.read_events(workspace, slug)),
     }, ensure_ascii=False, indent=2))
 
 
 def cmd_show(args):
-    _print_state(flow_state.read_state(args.workspace, args.flow, args.slug))
+    _print_state(flow_state.read_state(args.workspace, args.flow, args.slug),
+                 args.workspace)
     return 0
 
 
@@ -50,13 +56,16 @@ def cmd_init(args):
                           display_name=args.display_name,
                           review_mode=args.review_mode,
                           auto_mode=args.auto_mode,
-                          initial_node=args.initial_node)
-    _print_state(flow_state.read_state(args.workspace, args.flow, args.slug))
+                          initial_node=args.initial_node,
+                          origin=args.origin, relates_to=args.relates_to)
+    _print_state(flow_state.read_state(args.workspace, slug=args.slug),
+                 args.workspace)
     return 0
 
 
 def cmd_resume(args):
-    _print_state(flow_state.resume_state(args.workspace, args.flow, args.slug))
+    _print_state(flow_state.resume_state(args.workspace, args.flow, args.slug),
+                 args.workspace)
     return 0
 
 
@@ -65,7 +74,7 @@ def cmd_advance(args):
     state = node_machine.advance_persist(
         args.workspace, args.flow, args.slug, args.to_node,
         table=table, reflow=args.reflow, reason=args.reason)
-    _print_state(state)
+    _print_state(state, args.workspace)
     return 0
 
 
@@ -78,14 +87,74 @@ def cmd_record_gate(args):
     state = gate.record_gate_persist(
         args.workspace, args.flow, args.slug, gr,
         table=table, gate_specs=gate_specs)
-    _print_state(state)
+    _print_state(state, args.workspace)
     return 0
 
 
 def cmd_complete(args):
-    state = flow_state.mark_inactive(args.workspace, args.flow, args.slug,
-                                     status=args.status)
-    _print_state(state)
+    flow_state.mark_inactive(args.workspace, args.flow, args.slug,
+                             status=args.status)
+    _print_state(flow_state.read_state(args.workspace, slug=args.slug),
+                 args.workspace)
+    return 0
+
+
+def cmd_start_run(args):
+    flow_state.start_run(args.workspace, args.flow, args.slug,
+                         initial_node=args.initial_node,
+                         review_mode=args.review_mode, auto_mode=args.auto_mode)
+    _print_state(flow_state.read_state(args.workspace, slug=args.slug),
+                 args.workspace)
+    return 0
+
+
+def cmd_add_story(args):
+    flow_state.add_story(args.workspace, args.slug, story_id=args.id,
+                         title=args.title, status=args.status)
+    _print_state(flow_state.read_state(args.workspace, slug=args.slug),
+                 args.workspace)
+    return 0
+
+
+def cmd_set_story_status(args):
+    flow_state.set_story_status(args.workspace, args.slug, story_id=args.id,
+                                status=args.status)
+    _print_state(flow_state.read_state(args.workspace, slug=args.slug),
+                 args.workspace)
+    return 0
+
+
+def cmd_close_feature(args):
+    flow_state.close_feature(args.workspace, args.slug, status=args.status)
+    _print_state(flow_state.read_state(args.workspace, slug=args.slug),
+                 args.workspace)
+    return 0
+
+
+def cmd_list_features(args):
+    print(json.dumps(flow_state.list_features(args.workspace),
+                     ensure_ascii=False, indent=2))
+    return 0
+
+
+def cmd_events(args):
+    from kdev_core import events
+    print(json.dumps(events.read_events(args.workspace, args.slug),
+                     ensure_ascii=False, indent=2))
+    return 0
+
+
+def cmd_handoff_path(args):
+    p = flow_state.handoff_dir(args.workspace, args.slug, args.employee)
+    print(str(p))
+    return 0
+
+
+def cmd_migrate(args):
+    from kdev_core import migrate
+    report = migrate.migrate_workspace(args.workspace, dry_run=args.dry_run,
+                                        remove_old=args.remove_old)
+    print(json.dumps(report, ensure_ascii=False, indent=2))
     return 0
 
 
@@ -132,13 +201,14 @@ def cmd_unblock(args):
     to_node = getattr(args, "to_node", None)
     state = flow_state.unblock_state(args.workspace, args.flow, args.slug,
                                     to_node=to_node)
-    _print_state(state)
+    _print_state(state, args.workspace)
     return 0
 
 
 def cmd_list_flows(args):
-    flows = flow_state.list_flows(args.workspace)
-    print(json.dumps(flows, ensure_ascii=False, indent=2))
+    """[兼容别名] list-flows → list_features."""
+    print(json.dumps(flow_state.list_features(args.workspace),
+                     ensure_ascii=False, indent=2))
     return 0
 
 
@@ -164,6 +234,8 @@ def build_parser():
     pi.add_argument("--review-mode", default="ai", choices=["ai", "both", "human"])
     pi.add_argument("--auto-mode", action="store_true")
     pi.add_argument("--initial-node", default=None)
+    pi.add_argument("--origin", default=None)
+    pi.add_argument("--relates-to", default=None)
     pi.set_defaults(func=cmd_init)
 
     pr = _common(sub, "resume")
@@ -211,6 +283,49 @@ def build_parser():
     plf.add_argument("--workspace", default=".", help="workspace root (default: cwd)")
     plf.set_defaults(func=cmd_list_flows)
 
+    psr = _common(sub, "start-run")
+    psr.add_argument("--initial-node", default=None)
+    psr.add_argument("--review-mode", default="ai", choices=["ai", "both", "human"])
+    psr.add_argument("--auto-mode", action="store_true")
+    psr.set_defaults(func=cmd_start_run)
+
+    pas = _common(sub, "add-story")
+    pas.add_argument("--id", required=True)
+    pas.add_argument("--title", required=True)
+    pas.add_argument("--status", default="pending",
+                     choices=["pending", "in_progress", "done"])
+    pas.set_defaults(func=cmd_add_story)
+
+    pss = _common(sub, "set-story-status")
+    pss.add_argument("--id", required=True)
+    pss.add_argument("--status", required=True,
+                     choices=["pending", "in_progress", "done"])
+    pss.set_defaults(func=cmd_set_story_status)
+
+    pcf = _common(sub, "close-feature")
+    pcf.add_argument("--status", default="completed",
+                     choices=["completed", "aborted"])
+    pcf.set_defaults(func=cmd_close_feature)
+
+    pev = _common(sub, "events")
+    pev.set_defaults(func=cmd_events)
+
+    php = _common(sub, "handoff-path")
+    php.add_argument("--employee", required=True)
+    php.set_defaults(func=cmd_handoff_path)
+
+    plf2 = sub.add_parser("list-features")
+    plf2.add_argument("--workspace", default=".",
+                      help="workspace root (default: cwd)")
+    plf2.set_defaults(func=cmd_list_features)
+
+    pmg = sub.add_parser("migrate")
+    pmg.add_argument("--workspace", default=".",
+                     help="workspace root (default: cwd)")
+    pmg.add_argument("--dry-run", action="store_true")
+    pmg.add_argument("--remove-old", action="store_true")
+    pmg.set_defaults(func=cmd_migrate)
+
     return p
 
 
@@ -219,7 +334,7 @@ def main(argv=None):
     try:
         return args.func(args)
     except (flow_state.FlowStateError, node_machine.NodeMachineError,
-            gate.GateError) as exc:
+            gate.GateError, ValueError) as exc:
         print(f"error: {exc}", file=sys.stderr)
         return 1
 

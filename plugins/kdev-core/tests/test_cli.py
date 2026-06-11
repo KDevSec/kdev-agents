@@ -125,7 +125,13 @@ def test_record_gate_review_pass_advances(tmp_workspace, capsys):
     out = json.loads(capsys.readouterr().out)
     assert rc == 0
     assert out["current_node"] == "n-acc"
-    assert out["history_len"] == 1
+    # history 已退役 → events 流：一次 review PASS 落 gate 事件 + 流转事件
+    capsys.readouterr()
+    cli.main(["events", FLOW, "g", "--workspace", str(tmp_workspace)])
+    evs = json.loads(capsys.readouterr().out)
+    assert out["events_len"] == 2
+    assert any(e["type"] == "gate" and e.get("gate") == "g-rev" for e in evs)
+    assert any(e["type"] == "transition" and e.get("to") == "n-acc" for e in evs)
 
 
 def test_record_gate_review_fail_reflows_then_escalates(tmp_workspace, capsys):
@@ -154,8 +160,11 @@ def test_complete_marks_completed_and_blocks_resume(tmp_workspace, capsys):
     rc = cli.main(["complete", FLOW, "fin", "--workspace", str(tmp_workspace)])
     out = json.loads(capsys.readouterr().out)
     assert rc == 0
-    assert out["status"] == "completed"
+    # complete → mark_inactive 折叠 active：feature 级 completed，run 折进 runs[]
+    assert out["feature_status"] == "completed"
     assert out["active"] is False
+    assert out["status"] is None          # run 级状态随 active 折叠
+    assert len(out["runs"]) == 1 and out["runs"][0]["status"] == "completed"
     # 完成后不再可 resume（守 §8.3：终结后状态正确，resume 拒绝）
     rc2 = cli.main(["resume", FLOW, "fin", "--workspace", str(tmp_workspace)])
     assert rc2 == 1

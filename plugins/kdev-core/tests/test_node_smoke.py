@@ -1,4 +1,5 @@
 """Integration smoke — node machine driving persisted R1 flow-state end to end."""
+from kdev_core import events
 from kdev_core.flow_state import init_state, read_state
 from kdev_core.node_machine import load_node_table, advance_persist
 
@@ -23,8 +24,11 @@ def test_happy_path_persisted(tmp_workspace):
     advance_persist(tmp_workspace, FLOW, "auth", "n2", table=TABLE)       # g1 -> n2 (PASS)
     final = advance_persist(tmp_workspace, FLOW, "auth", "done", table=TABLE)  # n2 -> done
     assert final["current_node"] == "done"
-    assert len(final["phase_history"]) == 3
-    assert [e["to"] for e in final["phase_history"]] == ["g1", "n2", "done"]
+    # phase_history is siphoned to events.jsonl under the new model; the 3 transitions
+    # must be recorded there in order with the same `to` targets.
+    trans_evs = [e for e in events.read_events(tmp_workspace, "auth") if e["type"] == "transition"]
+    assert len(trans_evs) == 3
+    assert [e["to"] for e in trans_evs] == ["g1", "n2", "done"]
 
 
 def test_reflow_then_recover_persisted(tmp_workspace):
@@ -49,4 +53,7 @@ def test_reflow_overflow_persists_terminal_fail(tmp_workspace):
     advance_persist(tmp_workspace, FLOW, "auth", "g1", table=TABLE)               # back to g1
     final = advance_persist(tmp_workspace, FLOW, "auth", "n1", table=TABLE, reflow=True)  # retry 3 > 2 -> failed
     assert final["current_node"] == "failed"
-    assert final["phase_history"][-1]["forced_fail"] is True
+    # The overflow transition (forced to terminal_fail) is the last transition event.
+    trans_evs = [e for e in events.read_events(tmp_workspace, "auth") if e["type"] == "transition"]
+    assert trans_evs[-1]["forced_fail"] is True
+    assert trans_evs[-1]["to"] == "failed"

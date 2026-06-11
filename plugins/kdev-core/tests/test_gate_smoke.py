@@ -1,4 +1,5 @@
 """Integration smoke — full gate loop over persisted R1 + R2 (review FAIL->reflow->PASS, and escalate)."""
+from kdev_core import events
 from kdev_core.flow_state import init_state, read_state, write_state
 from kdev_core.node_machine import load_node_table
 from kdev_core.gate import make_gate_result, record_gate_persist
@@ -37,7 +38,11 @@ def test_fail_then_pass_persisted(tmp_workspace):
     final = record_gate_persist(tmp_workspace, FLOW, "auth", r_pass, table=TABLE, gate_specs=SPECS)
     assert final["current_node"] == "n-ship"
     assert final["gate_iters"]["g-code"] == 0
-    assert len(final["history"]) == 2
+    # GateResults are siphoned to events.jsonl: both verdicts (FAIL then PASS) recorded.
+    gate_evs = [e for e in events.read_events(tmp_workspace, "auth") if e["type"] == "gate"]
+    assert len(gate_evs) == 2
+    assert [e["verdict"] for e in gate_evs] == ["FAIL", "PASS"]
+    assert all(e["gate"] == "g-code" for e in gate_evs)
     assert final["gate_calls"] == 2
 
 
