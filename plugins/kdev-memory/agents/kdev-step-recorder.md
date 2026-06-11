@@ -115,15 +115,17 @@ python3 -c "
 import sys
 sys.path.insert(0, 'plugins/kdev-memory/hooks/lib')
 from scope import resolve_step_slug, recorder_target_log
+from memory_config import read_rating_mode
 from step_id import mint_next_step_id
 from pathlib import Path
 scope = '<scope from YAML, default shared>'
 slug = resolve_step_slug(scope)
 print('MINTED:', mint_next_step_id(Path('.kdev/memory/state'), slug=slug))
 print('TARGET:', recorder_target_log(scope))
+print('RATING_MODE:', read_rating_mode())
 "
 ```
-Capture `MINTED:` (e.g. `Step dev-engineer-3`) and `TARGET:` (the 执行日志 path to append to). The counter file is now incremented (side effect).
+Capture `MINTED:` (e.g. `Step dev-engineer-3`) and `TARGET:` (the 执行日志 path to append to). The counter file is now incremented (side effect). Capture `RATING_MODE：决定用户评分段的写法（见 step 2）。`
 
 2. **Compose 4-section Step entry** matching SKILL.md §"Step 完成硬闸门":
 
@@ -153,15 +155,32 @@ about: <about value>
 - 本步最值得扣分项：<self_eval_deduction>
 
 ### 用户评分
-- 完成时间：—
-- 顺畅度：—/5
-- 评语：—
-
-> 半残销账：用户 2026-05-27 明确"后面我不再评分"（Q-002），不主动追问
+（按 RATING_MODE 填写——见下方"用户评分段 + 评分差异分析段（按 RATING_MODE）"分支规范）
 
 ### 评分差异分析
-- n/a（Q-002 跳过用户评分）
+（按 RATING_MODE 填写）
 ```
+
+**用户评分段 + 评分差异分析段（按 RATING_MODE）**：
+
+- `model-only`：在 `## Step <ID>` 标题行下方加内联 `status: voided-faded`，用户评分段留 `—` 骨架 + 销账注释，**绝不拷自评分**：
+  ```markdown
+  ## Step <ID>: <title>
+  status: voided-faded   # 半残销账：rating.mode=model-only（承 Q-002），用户评分段不主动采集
+  triggers: [...]
+  日期：<today>
+  about: <about value>
+  ...（执行事实 + 模型自评同上）...
+  ### 用户评分
+  - 完成时间：—
+  - 顺畅度：—/5
+  - 用户评价：
+  > 半残销账：rating.mode=model-only（承 Q-002），用户评分段保留骨架不主动采集
+  ### 评分差异分析
+  - n/a（model-only 跳过用户评分）
+  ```
+- `user-opt-in`：用户评分段留 `—` 骨架（**不**盖 status，用户随时可填），无销账注释；评分差异分析写 `- 待用户补分后生成`。
+- `user-required`：用户评分段留 `—` 骨架（现行），主会话负责当场追问回填。
 
 3. **Append to** `<TARGET path from step 1>` using **bash heredoc append (PREFERRED, v0.2)**:
 
@@ -196,16 +215,14 @@ EOF
 
 ## Return format
 
-On success:
+On success（**只回一行确认 + 极简审计字段，不再回传 APPENDED_BLOCK 长文**——详细内容已写进 执行日志.md 文件本身）:
 ```
 STATUS: DONE
-MINTED_ID: Step main-11
-COUNTER_NEW_VALUE: 11
-FILES_UPDATED:
-  - .kdev/memory/执行日志.md (appended Step main-11 block)
-  - .kdev/memory/当前状态.md (frontmatter current_step + last_updated)
-APPENDED_BLOCK: |
-  <paste the exact 4-section block you wrote>
+MINTED_ID: Step main-NN
+COUNTER: NN
+SCOPE: <scope>
+RATING_MODE: <model-only|user-opt-in|user-required>
+TARGET: <执行日志 path appended to>
 ```
 
 On reject:
@@ -223,3 +240,4 @@ SUGGESTED_FIX: <what main session should add/change>
 - Do NOT touch `kdev-memory plugin` code; you're a consumer of the lib, not a developer.
 - Do NOT silently fix problems in the input — REJECT and let main session fix.
 - Keep your own context lean; do not Read 执行日志.md unless needed for the Edit operation (you may need to read the last few lines to construct an Edit anchor).
+- 返回精简：成功时只回上述 6 行审计字段，**不要**把写入的 4 段内容再贴回 stdout（主会话已知意图，详情在文件里）。
