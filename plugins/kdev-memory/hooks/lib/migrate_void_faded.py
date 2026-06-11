@@ -34,31 +34,36 @@ def void_faded_backlog(log_text: str, cutoff_date: str, today: str) -> Tuple[str
       - date >= cutoff_date
       - check_step(user-required) 非空 AND check_step(model-only) 空
         （即半残纯由用户评分空导致；扣分项等真问题保留 nag）
+
+    按 parse_steps 的连续 body 切片逐条重建（不用全局 str.replace），
+    对重复标题鲁棒。
     """
     steps = parse_steps(log_text)
-    text = log_text
+    if not steps:
+        return log_text, []
+    # prefix = 第一条 Step 之前的内容（文件头）。第一条 body 以首个 `## Step` 开头，
+    # 之前无同样切片，find 取到的就是首条起点。
+    prefix = log_text[: log_text.find(steps[0]["body"])]
     stamped: List[str] = []
+    new_bodies: List[str] = []
     for step in steps:
-        if step.get("status") is not None:
-            continue
-        d = step.get("date") or ""
-        if d < cutoff_date:
-            continue
-        half_strict = check_step(step, rating_mode="user-required")
-        half_model = check_step(step, rating_mode="model-only")
-        if not (half_strict and not half_model):
-            continue
-        heading_line = step["body"].splitlines()[0]  # "## Step <label>: <title>"
-        status_line = (
-            f"status: voided-faded   # 半残销账 {today}: "
-            f"rating.mode=model-only（承 Q-002，用户评分段保留骨架不主动采集）"
+        body = step["body"]
+        should_stamp = (
+            step.get("status") is None
+            and (step.get("date") or "") >= cutoff_date
+            and check_step(step, rating_mode="user-required")
+            and not check_step(step, rating_mode="model-only")
         )
-        old = heading_line + "\n"
-        new = heading_line + "\n" + status_line + "\n"
-        if old in text:
-            text = text.replace(old, new, 1)
+        if should_stamp:
+            status_line = (
+                f"status: voided-faded   # 半残销账 {today}: "
+                f"rating.mode=model-only（承 Q-002，用户评分段保留骨架不主动采集）"
+            )
+            head, sep, rest = body.partition("\n")  # head = "## Step ...: title"
+            body = head + "\n" + status_line + (sep + rest if sep else "\n")
             stamped.append(step["label"])
-    return text, stamped
+        new_bodies.append(body)
+    return prefix + "".join(new_bodies), stamped
 
 
 def main() -> int:

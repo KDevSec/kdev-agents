@@ -97,3 +97,23 @@ def test_idempotent():
     twice, s2 = mvf.void_faded_backlog(once, CUTOFF, "2026-06-11")
     assert s2 == []
     assert twice == once
+
+
+def test_duplicate_headings_each_stamped_independently():
+    log = (
+        "# 执行日志\n\n"
+        "## Step dup-1: 同名\n日期：2026-05-28\n\n"
+        "### 模型自评\n- 顺畅度自评：4/5\n- 扣分项：x\n\n"
+        "### 用户评分\n- 完成时间：—\n- 顺畅度：—/5\n\n"
+        "## Step dup-1: 同名\n日期：2026-05-29\n\n"
+        "### 模型自评\n- 顺畅度自评：4/5\n- 扣分项：y\n\n"
+        "### 用户评分\n- 完成时间：—\n- 顺畅度：—/5\n"
+    )
+    new_text, stamped = mvf.void_faded_backlog(log, CUTOFF, "2026-06-11")
+    # 两条同名 Step 都应各自盖一次章
+    assert new_text.count("status: voided-faded") == 2
+    assert len(stamped) == 2
+    # 幂等：再跑不重复盖
+    twice, s2 = mvf.void_faded_backlog(new_text, CUTOFF, "2026-06-11")
+    assert s2 == []
+    assert twice.count("status: voided-faded") == 2
