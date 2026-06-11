@@ -1,0 +1,19 @@
+plugins/kdev-memory/hooks/stop-check.py
+  s_54d8d748b888e0::t_838abe09b2f7b0 63
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "413057cb4896759b22022d51f8f27dc1e5b9a94d",
+  "prompts": {},
+  "sessions": {
+    "s_54d8d748b888e0": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "27c3a208-d7f1-4318-a30e-2b77e6ee2ffe",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
