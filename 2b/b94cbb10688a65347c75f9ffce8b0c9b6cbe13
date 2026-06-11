@@ -1,0 +1,25 @@
+plugins/kdev-core/.claude-plugin/plugin.json
+  s_f8c1c9f64db852::t_f3d14155c20089 1-8
+plugins/kdev-core/CHANGELOG.md
+  s_f8c1c9f64db852::t_0337db48bda662 1-21
+.claude-plugin/marketplace.json
+  s_f8c1c9f64db852::t_24b3666f3561a2 87-92
+plugins/kdev-core/kdev_core/__init__.py
+  s_f8c1c9f64db852::t_3da1c6e61dfa17 1
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "2bb94cbb10688a65347c75f9ffce8b0c9b6cbe13",
+  "prompts": {},
+  "sessions": {
+    "s_f8c1c9f64db852": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "03697b91-a174-4618-a4e5-3b1863ba91b9",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
