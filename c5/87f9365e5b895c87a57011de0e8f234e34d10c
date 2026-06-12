@@ -1,0 +1,21 @@
+plugins/kdev-team/tests/test_cross_employee_handoff.py
+  s_9a8395740f3dc5::t_3abb1e8c35052a 1-48
+plugins/kdev-team/skills/kdev-flow-driver/SKILL.md
+  s_9a8395740f3dc5::t_0f67f4d5ef7621 200-237
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "c587f9365e5b895c87a57011de0e8f234e34d10c",
+  "prompts": {},
+  "sessions": {
+    "s_9a8395740f3dc5": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5d2ea462-0b9b-4af5-b5ff-735cb99395b6",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
