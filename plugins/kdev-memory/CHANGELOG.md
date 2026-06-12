@@ -1,5 +1,27 @@
 # kdev-memory CHANGELOG
 
+## [0.16.0] — 2026-06-13
+
+**P-C1b：Step 落盘 transcript 溯源 + 模型他评。**
+
+### ✨ 新增
+
+- **commit-tracker stash transcript_path** 进 pending state；step-recorder 用 Bash `sed`/`jq` + `transcript_extract.py` 读真 transcript 抽结构化事实（`tools_invoked` / `errors_hit` / `files_touched` / `commit_shas` / `skills_invoked` / `subagents_dispatched`），并据此 + skills_invoked 做 recorder 侧 `subject` 推断，不再要主会话喂 ~30 行 YAML（用 Bash 切片，非 Read 工具——Read 有 25k 整文件 token 闸）。
+- 评估从 `### 模型自评` 改 `### 模型他评`（独立 recorder 读真 transcript，记录层修 MQ-2 confabulate），半残检测兼容两名。
+
+### 🔄 变更
+
+- **nudge 阈值改 age 为主**（TDD 爆量不刷屏）。
+
+### 🐛 修复
+
+- **G-010**：commit-tracker 读 `tool_input`（snake，官方契约）而非 `toolInput` → 复活死掉的 pending nudge。
+
+### 🧱 向后兼容 / 约束
+
+- `pending_commits.read()` 对缺 `since_offset` / `transcript_path` 的旧版 state 文件 `setdefault` 补默认值（round-trip 测试显式锁定该生产安全行为）。
+- ⚠️ G-004：bump `0.15.1 → 0.16.0`，用户须刷 marketplace + 重启 session 才生效。
+
 ## [0.15.1] — 2026-06-12
 
 **MQ-1：kdev-step-recorder 收尾返回 6 行机器块 → 一句人话确认。**

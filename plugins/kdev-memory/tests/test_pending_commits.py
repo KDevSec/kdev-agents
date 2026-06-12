@@ -142,3 +142,17 @@ def test_empty_state_has_new_fields(tmp_path):
     data = read(sd)
     assert data["transcript_path"] == ""
     assert data["since_offset"] == 0
+
+
+def test_read_old_format_file_adds_defaults(tmp_path):
+    # 模拟旧版 state 文件（缺 since_offset / transcript_path）
+    sd = tmp_path / "state"
+    sd.mkdir(parents=True)
+    (sd / "pending-commits.json").write_text(
+        '{"since_step_id": "main-5", "since_ts": 100, "commits": []}',
+        encoding="utf-8",
+    )
+    data = read(sd)
+    assert data["since_offset"] == 0          # setdefault 补上
+    assert data["transcript_path"] == ""      # setdefault 补上
+    assert data["since_step_id"] == "main-5"  # 旧字段保留
