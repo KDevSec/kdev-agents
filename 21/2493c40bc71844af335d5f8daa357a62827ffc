@@ -1,0 +1,31 @@
+docs/superpowers/specs/2026-06-09-kdev-memory会话污染治理+评分可配-design.md
+  s_ccdfa58bf5ccb2::t_7fe843833bb244 360,362,364-369,371
+  s_ccdfa58bf5ccb2::t_c81e7f194836cd 412
+  s_ccdfa58bf5ccb2::t_1dd0b2cadf76e2 5,7
+  s_ccdfa58bf5ccb2::t_2aeb6838da1832 64-69
+  s_ccdfa58bf5ccb2::t_2c1fe42e9e2589 375,377,379,381,383-385,387
+docs/framework/01-design/2026-06-06-01-数字员工整体设计路线图roadmap-v1.0.md
+  s_ccdfa58bf5ccb2::t_fafda8f36bb3c0 71
+  s_ccdfa58bf5ccb2::t_11d97994571b93 189
+  s_ccdfa58bf5ccb2::t_e09bd7c0adf7fb 188
+  s_ccdfa58bf5ccb2::t_6199a1fd8d1058 174
+  s_ccdfa58bf5ccb2::t_9282117291ab13 176
+  s_ccdfa58bf5ccb2::t_db2f7b4ecaafda 192
+  s_ccdfa58bf5ccb2::t_22db1776f493f7 65
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "212493c40bc71844af335d5f8daa357a62827ffc",
+  "prompts": {},
+  "sessions": {
+    "s_ccdfa58bf5ccb2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "da13d5ac-244c-4571-b947-8ac7ae860e02",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
