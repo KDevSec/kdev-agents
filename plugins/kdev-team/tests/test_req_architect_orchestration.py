@@ -31,14 +31,14 @@ def test_sop_chain_ir_sr_ar_proto_design():
     assert adj["n8-merge"] == ["n9-done"]
 
 
-def test_three_review_gates_all_self_reviewer():
-    """复刻 design-flow 3 闸门，全 reviewer=self（保 SOP：真自评，非 deferred）。"""
+def test_three_review_gates_bound_to_reviewer_expert():
+    """3 闸翻 reviewer-expert（兑现评审专家，Q-016/spec v0.2）；L1 可回退 self。"""
     data, table = _load()
     specs = data["gate_specs"]
     assert set(specs) == {"g-sr-review", "g-ar-proto-review", "g-design-review"}
     for gid, spec in specs.items():
         assert spec["kind"] == "review", f"{gid} 应是 review gate"
-        assert spec["reviewer"] == "self", f"{gid} 阶段1 应 self 自评（非 deferred）"
+        assert spec["reviewer"] == "reviewer-expert", f"{gid} 应翻 reviewer-expert（兑现评审专家）"
 
 
 def test_gate_pass_reflow_targets():
@@ -70,3 +70,12 @@ def test_gate_specs_targets_valid_and_reviewer_bound():
         for tgt in targets:
             assert tgt in nodes, f"{gid} -> unknown node {tgt}"
         assert spec["reviewer"] in {"self", "reviewer-expert"}
+
+
+def test_req_review_gates_bound_to_reviewer_expert():
+    import yaml
+    from pathlib import Path
+    nt = Path(__file__).resolve().parents[1] / "orchestration/req-architect.node-table.yml"
+    specs = yaml.safe_load(nt.read_text(encoding="utf-8"))["gate_specs"]
+    for g in ("g-sr-review", "g-ar-proto-review", "g-design-review"):
+        assert specs[g]["reviewer"] == "reviewer-expert", f"{g} 应翻 reviewer-expert（兑现评审专家）"

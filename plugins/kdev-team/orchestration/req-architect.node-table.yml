@@ -2,9 +2,10 @@
 # 复用通用 kdev-flow-driver skill + kdev-core 引擎（零改）。员工 canonical id=req-architect。
 # kind=action|gate|terminal；gate 节点带 gate id 指向 gate_specs。
 #
-# reviewer: self=需求架构师自评（按 design-flow review-gate-prompt.md 判据自评，
-#   config.review_mode 控制 ai/both/human 三档）。阶段1 无第三方「评审专家」员工，故 3 闸
-#   全 self（真自评，非 deferred）；待评审专家建成后由 L1 config 翻成 reviewer-expert。
+# reviewer: 评审专家已建（spec 2026-06-12 v0.2 / Q-016）：3 闸 reviewer-expert，编排到 gate
+#   发函 `kdev-team:reviewer-orchestrator`（B 轨 handoff，见 gate-decision-logic.md req 段）；
+#   L1 flow-config 可回退 self（per-gate reviewer 的 engine 级 merge 待后续 plan，本期 L0 字段生效）。
+#   回退 self 时按 design-flow review-gate-prompt.md 判据自评，config.review_mode 控 ai/both/human 三档。
 #
 # 3 评审 gate 复刻 kdev-design-flow 的 3 闸门（保 SOP 行为不破，evals 兜）：
 #   g-sr-review       = design-flow Gate1（SR 需求评审）
@@ -32,6 +33,6 @@ nodes:
   - {id: n-fail,             name: reflow 溢出终止(R2 有界回流 sink；R3 评审 gate escalate 走 status=blocked 留原地不到此), kind: terminal, next: []}
 
 gate_specs:
-  g-sr-review:       {kind: review, on_pass: n3-decompose, on_reflow: n1-spec,      reviewer: self}
-  g-ar-proto-review: {kind: review, on_pass: n6-design,    on_reflow: n4-prototype, reviewer: self}
-  g-design-review:   {kind: review, on_pass: n8-merge,     on_reflow: n6-design,    reviewer: self}
+  g-sr-review:       {kind: review, on_pass: n3-decompose, on_reflow: n1-spec,      reviewer: reviewer-expert}
+  g-ar-proto-review: {kind: review, on_pass: n6-design,    on_reflow: n4-prototype, reviewer: reviewer-expert}
+  g-design-review:   {kind: review, on_pass: n8-merge,     on_reflow: n6-design,    reviewer: reviewer-expert}
