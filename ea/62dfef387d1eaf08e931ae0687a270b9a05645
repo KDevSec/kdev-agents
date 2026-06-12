@@ -1,0 +1,31 @@
+plugins/kdev-team/agents/req-architect-design.md
+  s_154b39c51ca5fd::t_033f6fca06f5f0 1-25
+plugins/kdev-team/agents/req-architect-spec.md
+  s_154b39c51ca5fd::t_9ab606ee9ee712 1-25
+plugins/kdev-team/agents/req-architect-decompose.md
+  s_154b39c51ca5fd::t_52073c22363e2e 1-24
+plugins/kdev-team/tests/test_agents.py
+  s_154b39c51ca5fd::t_fb44cadf34bd29 39-67
+plugins/kdev-team/agents/req-architect-clarify.md
+  s_154b39c51ca5fd::t_6a3ba84f0e809a 1-24
+plugins/kdev-team/agents/req-architect-orchestrator.md
+  s_154b39c51ca5fd::t_fcaab8d1fb0111 1-38
+plugins/kdev-team/agents/req-architect-prototype.md
+  s_154b39c51ca5fd::t_75168be1cae4e3 1-25
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "ea62dfef387d1eaf08e931ae0687a270b9a05645",
+  "prompts": {},
+  "sessions": {
+    "s_154b39c51ca5fd": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "6258de54-e474-415d-8dd1-882f53c3de8b",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
