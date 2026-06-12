@@ -14,4 +14,15 @@ employees:
       - dev-engineer-e2e
       - dev-engineer-deploy
       - dev-engineer-sec
-  # req-architect 阶段2 P-A 追加
+  req-architect:
+    display: 需求架构师
+    flow_skill: kdev-design-flow          # 方法论参考（非编排器）
+    node_table: orchestration/req-architect.node-table.yml
+    runtime_model: opus
+    agents:
+      - req-architect-orchestrator
+      - req-architect-clarify
+      - req-architect-spec
+      - req-architect-decompose
+      - req-architect-prototype
+      - req-architect-design
