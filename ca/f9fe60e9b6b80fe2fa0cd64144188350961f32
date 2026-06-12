@@ -1,0 +1,43 @@
+plugins/kdev-team/skills/kdev-flow-driver/references/node-agent-routing.md
+  s_c6a2827fd70228::t_45ffef9780177f 118-167
+plugins/kdev-team/agents/dev-engineer-sec.md
+  s_c6a2827fd70228::t_88c49159e4354d 13
+  s_c6a2827fd70228::t_c487bacc84f429 9
+  s_c6a2827fd70228::t_c8ec69d2333ad2 19
+plugins/kdev-team/agents/dev-engineer-orchestrator.md
+  s_c6a2827fd70228::t_040839c19ff3c0 26
+  s_c6a2827fd70228::t_060badb1293a66 13
+plugins/kdev-team/agents/dev-engineer-plan.md
+  s_c6a2827fd70228::t_0a0864879ceecc 35
+plugins/kdev-team/skills/kdev-flow-driver/references/gate-decision-logic.md
+  s_c6a2827fd70228::t_52c735971db044 23,26,29,32
+  s_c6a2827fd70228::t_e7d77b93a502d4 168
+  s_c6a2827fd70228::t_57c68a42d0bda1 114,116-117,119-135,137-139
+  s_c6a2827fd70228::t_eb7af596513a65 177-179,185
+plugins/kdev-team/agents/req-architect-orchestrator.md
+  s_c6a2827fd70228::t_4dd2d73b795615 13
+plugins/kdev-team/skills/kdev-flow-driver/SKILL.md
+  s_c6a2827fd70228::t_24aafb83a144a0 260,264,266,272-273,277-279,281
+  s_c6a2827fd70228::t_f00b770d0a2442 20
+  s_c6a2827fd70228::t_3f1bd77a2533da 262,265,267
+plugins/kdev-team/agents/dev-engineer-deploy.md
+  s_c6a2827fd70228::t_678235f9bb479a 12
+plugins/kdev-team/tests/test_reviewer_wiring.py
+  s_c6a2827fd70228::t_fed2c1a9b8a503 1-21
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "caf9fe60e9b6b80fe2fa0cd64144188350961f32",
+  "prompts": {},
+  "sessions": {
+    "s_c6a2827fd70228": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5a71ffa4-4bc3-4dc5-a321-ecbdeae4dcf6",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
