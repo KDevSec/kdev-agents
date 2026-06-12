@@ -1,0 +1,26 @@
+plugins/kdev-core/CHANGELOG.md
+  s_34bc963bed7187::t_6ef13820a6b845 5-13
+plugins/kdev-core/tests/test_new_cli.py
+  s_34bc963bed7187::t_ba3cdde0e28cef 268-284
+plugins/kdev-core/kdev_core/cli.py
+  s_34bc963bed7187::t_794e9fe5ed2028 333-348
+  s_34bc963bed7187::t_b7e60709e40b71 153-168
+plugins/kdev-core/.claude-plugin/plugin.json
+  s_34bc963bed7187::t_71f95e38c1f713 4
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "30a3ccfafe7a64135c39bb25c1f53d9db4a9e286",
+  "prompts": {},
+  "sessions": {
+    "s_34bc963bed7187": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ee9954b3-0c1a-440e-9563-db0573135ca9",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
