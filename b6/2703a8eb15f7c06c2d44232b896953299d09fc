@@ -1,0 +1,23 @@
+plugins/kdev-team/orchestration/req-architect.node-table.yml
+  s_9a8395740f3dc5::t_a806a7e95bf40f 16-17
+plugins/kdev-team/agents/req-architect-orchestrator.md
+  s_9a8395740f3dc5::t_2f0da6b3fbd143 38
+plugins/kdev-team/tests/test_cross_employee_handoff.py
+  s_9a8395740f3dc5::t_fd77f492e73f63 88-101
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "b62703a8eb15f7c06c2d44232b896953299d09fc",
+  "prompts": {},
+  "sessions": {
+    "s_9a8395740f3dc5": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5d2ea462-0b9b-4af5-b5ff-735cb99395b6",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
