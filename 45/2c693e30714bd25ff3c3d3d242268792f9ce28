@@ -1,0 +1,23 @@
+plugins/kdev-team/skills/kdev-flow-driver/references/node-agent-routing.md
+  s_9a8395740f3dc5::t_eb27f8de676f5c 33
+  s_9a8395740f3dc5::t_162d78a66ebb59 110
+  s_9a8395740f3dc5::t_f3dca94b4c07fc 31
+plugins/kdev-team/tests/test_cross_employee_handoff.py
+  s_9a8395740f3dc5::t_2a7a9d77c970ec 49-71
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "452c693e30714bd25ff3c3d3d242268792f9ce28",
+  "prompts": {},
+  "sessions": {
+    "s_9a8395740f3dc5": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5d2ea462-0b9b-4af5-b5ff-735cb99395b6",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
