@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.5.0 — 2026-06-12
+
+**P-B：跨员工 handoff（需求架构师 SR/AR → 开发工程师 coding-flow 输入，M2 收口）**
+
+- `kdev-flow-driver/SKILL.md` 新增 §2.4ter「跨员工 handoff（上游交付 → 下游 spec 输入）」：纯复用 B 轨 `handoff-write`/`handoff-read`，**join 键=同一 feature slug**；定义生产方→交付节点映射（`req-architect → n8-merge`）+ 上游缺失裸任务回退。**不新增 kdev-core 原语**（守「复用别重造」）。
+- `references/node-agent-routing.md`：req-architect `n8-merge` 行加「收尾写交付 handoff」；dev-engineer `n0-env`/`n3-plan` 行加「先读同 slug 上游 req-architect 交付」。
+- `dev-engineer-env`/`dev-engineer-plan` persona：加读上游交付（SR+背景 / AR+方案切增量），缺失回退裸任务。
+- `req-architect-orchestrator` n8-merge + `req-architect.node-table.yml` 注释：补「落跨员工交付 handoff」生产侧契约。
+- 编排仍走通用 `kdev-flow-driver`（G-008，不下放 orchestrator agent）；接 feature-first，不碰旧 `.kdev/flows/`。
+- 测试：新增 `test_cross_employee_handoff.py`（9 个 SKILL/routing/persona/生产侧 契约不变量）；kdev-core `test_handoffs.py` 加跨员工 CLI 往返机制锁（2 个，零生产代码）。
+- ⚠️ G-004：用户须刷 marketplace（`/plugin` 更新/重装）+ 重启 session 才生效。
+
 ## 0.4.0 — 2026-06-12
 
 **B 轨：编排派单 run_in_background 化 + 文件交接（§1.5.6 B done）**
