@@ -2,9 +2,9 @@
 
 | 项 | 值 |
 |---|---|
-| 文档性质 | **设计稿 v0.3**（§5/§6 头脑风暴收敛 → variant 拍板 Q-015；待 §5.6 spike 后起实施计划）|
+| 文档性质 | **设计稿 v0.4**（§5/§6 再收敛：per-step 实时后台 recorder 读 transcript + **模型他评替换自评**；承 Q-015 修正 + 对齐 Q-016 评审专家 mode-2；待 §5.6 spike 后起实施）|
 | lifecycle | design |
-| 日期 | 2026-06-12（v0.3：P-C1b variant 拍板 + §5.6 去风险）/ 2026-06-10（v0.2 修订）/ 2026-06-09（v0.1 初稿）|
+| 日期 | 2026-06-12（v0.4：他评替换自评 + 两层他评对齐 Q-016 / v0.3：variant 拍板 + §5.6 去风险）/ 2026-06-10（v0.2）/ 2026-06-09（v0.1）|
 | 范围 | 治理 kdev-memory 对主会话的侵入（评分动作链打断工作流为核心痛点），评分模式可配，落盘 transcript 溯源化 |
 | 承 | [Q-002 本项目跳过用户评分](../../../.kdev/memory/决策日志.md) · [Q-011 阶段2接入设计](./2026-06-07-阶段2-第二员工+记忆scope-design.md) · [kdev-memory SKILL v0.13.0](../../../plugins/kdev-memory/skills/kdev-memory/SKILL.md) |
 | defer | 他评智能体（移入后续 roadmap）· P-C2 JSONL 操作层 · P-C3 并发写锁 · scope 分离（另见阶段2 P-C1 spec）|
@@ -42,6 +42,22 @@ v0.2 把 P-C1b 定为"transcript 溯源的会话内 fire-and-forget dispatch"，
 | 2 | workflow-batch 这个直觉无处安放 | **reframe 到他评**：workflow-batch 的 fan-out 形态（显式 opt-in / on-demand / 独立读者 / 批量）正是未来「他评/评审专家」(MQ-2) 的形状，不是 Step落盘的。详见改写的 §6 |
 | 3 | §5.6 "路径怎么递给 subagent" 待验证 | **解法 + spike-gate**：hook 把 `transcript_path`+offset stash 进 state 文件，recorder 从文件读、不经 dispatch prompt。但实施前先跑 spike 实测三件事（见新 §5.6），承本项目 G-008/R-009「先核代码再信设计」教训 |
 | 4 | 溯源与 MQ-2 自评 confabulate 的关系没点明 | **新增 §5.8**：溯源免费部分买下 MQ-2（杀事实性 confab），残留敞口收窄到 self_eval 数字一项 → 他评补最后一公里 |
+
+---
+
+## 0.7 v0.4 修订说明（相对 v0.3，再动 §5/§6）
+
+v0.3 拍板了 "(a) per-step + 主会话当场给 self_eval"，并把 workflow-batch 整体推给"未来他评"。用户复盘后修正方向（[Q-015 修正](../../../.kdev/memory/决策日志.md)）：
+
+| # | v0.3 的判断 | v0.4 修正 |
+|---|---|---|
+| 1 | self_eval 必须主会话当场第一人称给（这是 (a) 胜出的核心论据）| **解耦**：把评估从 self-eval 换成 **后台 recorder 读 transcript 出「模型他评」**。我 v0.3 把"self_eval 必绑主会话"错耦进 (a)——(a)/(b) 是**假对立**。一松绑，(a) 的实时 + (b) 的客观后台他评**合成一个更好的设计**。详见改写 §5.0 |
+| 2 | 评估锚定主会话 self_eval（MQ-2 只"部分买下"，残留 self_eval 数字同进程偏差）| **他评替换自评**：`### 模型自评` → `### 模型他评`（独立 recorder 读真 transcript 出执行质量评分）。MQ-2 在**记录层**修掉，不只"部分买下"。承 Q-002（本项目无人评）+ 用户选「他评替换自评」 |
+| 3 | 主控付出 ~5 行指针（含 self_eval）| **主控付出 → 近零**：边界处发**近乎空的 dispatch**（recorder 全程从 transcript 自取事实 + 出他评）+ 靠 hook 必要提醒。诚实地板：hook 不能自主拉起后台 worker（只主循环能调 Agent），故最小 = 1 行触发 + 可选意图 hint |
+| 4 | 载体未细分；workflow-batch 整体推未来 | **载体 = 升级现有 fire-and-forget 后台 dispatch（每步实时）**；重型 Claude Code Workflow fan-out **留给** Q-016 评审专家 mode-2（深度批量他评，L3）。两层他评见 §5.8 |
+| 5 | 他评整体"移入后续 roadmap，本 spec 不做" | **拆两层**：**轻量 per-step 他评落 P-C1b（本设计）**；**重型深度他评 = Q-016 mode-2 评审专家**（workflow-batch / 全标准/评分/仲裁 / L3）。P-C1b 不再"不做他评"，它做**基线层** |
+
+> 与 [Q-016 评审专家](../../../.kdev/memory/决策日志.md) 的关系是本次的关键对齐点，独立成 §5.8 讲清，避免两个决策对"谁做他评"打架。
 
 ---
 
@@ -91,9 +107,9 @@ Q-002 的落地约束已经规定了正确做法，本 spec 全程对齐：
 | 4 | model-only 下用户评分段 | **留空 + 标 voided-faded**，不伪填 | 伪填 source:model = 假用户评分，污染 misalignment 数据；对齐 Q-002 |
 | 5 | 一句话切换 | 用户说"关掉评分" → Claude 写 config → 立即生效 | 零摩擦 |
 | 6 | 首次体验 | SessionStart brief 检测无 `rating.mode` 键 → 一次性提示可配 | 让用户知道选项，但不默认 user-required |
-| 7 | Step 落盘机制 | **variant (a) per-step + transcript 溯源 + 会话内 fire-and-forget**（[Q-015](../../../.kdev/memory/决策日志.md)；否 (b) workflow-batch，见 §5.0）；**§5.6 transcript 可达性 spike-gate 先验后建** | 干掉主会话手写 YAML；(b) 自评无源/切分重建/launch 不可靠/丢实时四败；污染 ~1500 tok/会话（可忽略，§5.3 已判）|
+| 7 | Step 落盘机制 | **后台 recorder 读 transcript 客观采集 + 模型他评（每步实时 fire-and-forget，升级现有 dispatch）**（[Q-015 修正](../../../.kdev/memory/决策日志.md)；(a)/(b) 假对立→合题，见 §5.0）；**§5.6 spike-gate 先验后建** | 主控付出降到近零（无 YAML、无 self_eval）；他评比自评客观、在记录层修 MQ-2；重型 Workflow fan-out 留给 Q-016 mode-2 |
 | 8 | Step 切分 | **沿用现有粒度（工作单元，比 commit 粗）；commit 不当边界** | TDD/subagent-driven 爆量 commit 必须塌缩在一个 Step 内 |
-| 9 | 他评 | **移入后续 roadmap**；形态采 **workflow-batch fan-out**（承接 (b) 的直觉，§6）| right-size 先验证 P-C0.5/1a/1b；他评 = 独立读者读真 transcript/diff，正是 workflow-batch 的天职 |
+| 9 | 他评分层 | **两层**：基线 per-step 他评落 **P-C1b**（§5.8 层1，本期）；深度/专家/批量他评 = **Q-016 评审专家 mode-2**（workflow-batch，L3）| 承用户「他评替换自评」+ 对齐 Q-016 不打架；类比 linter-every-commit vs 周期专家 audit |
 
 ---
 
@@ -131,6 +147,8 @@ rating.mode: model-only      # 本项目 = Q-002；插件默认 user-opt-in
 ```
 
 Step frontmatter 标 `status: voided-faded`。`step_completeness.py` 现有逻辑已对 `voided-*` 跳过欠评扫描——**复用，不新增逻辑**。这样既不伪造数据，又不触发半残 nag。用户随时主动给分 → 当场回填 + 改 status: scored，恢复闭环。
+
+> **与 P-C1b 的术语演进（别误读为冲突）**：本节「模型自评」是**评分模式**层面（谁评：model vs user；model-only = 不追问用户、模型自己评）。P-C1b（§5.8）改的是**模型那一评怎么产出**——从主会话 self-eval 升级为 recorder 独立读 transcript 出 `### 模型他评`。评分模式仍 model-only，只是"模型评"由自评变他评、更客观；P-C1b 落地时把 `### 模型自评` 段迁为 `### 模型他评`。
 
 ### 3.4 首次提示（session-start-brief 新增）
 
@@ -207,52 +225,58 @@ brief.verbosity: normal      # compact | normal | verbose
 
 ---
 
-## 5. P-C1b：Step 落盘 transcript 溯源化（会话内 fire-and-forget）
+## 5. P-C1b：Step 落盘 = 后台 recorder 读 transcript 客观采集 + 模型他评（每步实时 fire-and-forget）
 
 **前置**：P-C1a
 
-这是 v0.1「独立记忆智能体」塌缩后的形态——**不是新架构，是现有 dispatch 模型的一次精简 + 溯源化**。
+这是 v0.1「独立记忆智能体」塌缩后的形态——**不是新架构，是现有 fire-and-forget dispatch 的一次精简 + 溯源化 + 评估换他评**。
 
-### 5.0 机制 variant 拍板：(a) per-step 溯源 ✅ vs (b) workflow-batch ❌（Q-015）
+### 5.0 形态收敛：(a)/(b) 是假对立 → 合题（Q-015 修正）
 
-头脑风暴提出两条路。**拍板 (a)**，理由是 (b) 在四个维度付代价、只在一条已判可忽略的轴上赢：
+v0.3 摆出两条路并拍了 (a)：
 
-| 维度 | **(a) per-step + 溯源 ✅** | (b) workflow-batch ❌ |
+- **(a) per-step**：主会话边界写指针（**含主会话 self_eval**）+ fire-and-forget dispatch；recorder 读 transcript 抽事实。
+- **(b) workflow-batch**：commit 锚点切段 → 显式 launch Workflow → 后台 fan-out N recorder → 批量写。
+
+当时判 (a) 胜，**核心论据是"self_eval 必须主会话当场第一人称给"**。复盘发现这是个**没拆开的耦合假设**：一旦把评估从 self-eval 换成 **后台 recorder 读 transcript 出「模型他评」**，(a) 那张表里"自评无源/切分重建/显式 launch"的胜负手要么失效要么不再重要——所以 (a)/(b) 是**假对立**。
+
+**合题（v0.4 拍板）**：
+
+| 取 (a) 的 | 取 (b) 的 | 弃两者的 |
 |---|---|---|
-| 形态 | 主会话工作单元边界写 ~5 行指针 + fire-and-forget dispatch；recorder 读该段 transcript | commit 锚点切段 → 主会话 launch 1 Workflow → 后台 fan-out N recorder → 批量写 |
-| **自评分来源** | 主会话**当场第一人称**给（在上下文里）| **无源**：要么会话末补写 N 份自评（= 要干掉的 YAML 延后），要么 workflow 从 transcript 生成（滑向他评 + segmenter 判它没目击的工作）|
-| **切分权威** | 主会话**在场当场**划边界（§5.4 / G-008）| 事后 batch segmenter 须**重建从未目击的工作单元边界**；commit≠工作单元（G-008）→ 错更多 |
-| **可靠性** | hook nudge + fire-and-forget，**环境常驻** | Workflow 须**显式 opt-in launch、一次性脚本、hook 拉不起**：会话末批量→崩/关即丢（= §5.3 否掉的"末会话永不补录"）；on-demand→用户得记着喊；下会话补录→§5.3 已否 |
-| 实时性 | 实时，下会话 brief 天然准 | 延迟，丢实时 |
-| 主上下文污染 | ~600–1500 tok/会话（§5.3 判可忽略）| 1 launch + 1 通知，更低——但**赢在已判可忽略的轴上** |
+| **每步实时**（fire-and-forget 后台 dispatch，环境常驻、hook nudge、每步完成即落、续航天然准）| **客观后台采集 + 他评**（recorder 独立读真 transcript 出事实 + 执行质量他评，更客观）| **(a) 的主会话 self_eval**（换他评）；**(b) 的重型 Workflow + 显式 launch + segmenter**（每步实时不需要 fan-out，且 Workflow hook 拉不起、会话末批量崩即丢）|
 
-**结论**：(b) 唯一赢点是边际的，论证形状跟 §5.3 否掉 variant C（跨会话补录）一模一样——**workflow-batch 是 C 的表亲**。但 (b) 的 fan-out 直觉没浪费：它 **reframe 到他评**（显式 / on-demand / 独立读者 / 批量正是他评的天职），见 §6。
+→ 落地形态：**升级现有 step-recorder 后台 dispatch**（即你刚见的 main-73 那种 "1 launch + 1 通知" 模式），让它 ① 从 state 文件自取 `{transcript_path, range}` 读真 transcript（§5.6）② 客观抽事实 ③ 出 `### 模型他评`（§5.8）。**主会话付出塌到近零**（§5.1/§5.2）。
 
-> ⚠️ **字母别混**：§5.3 用 (B)/(C) 是另一根轴——其 **(B) 会话内 dispatch ≈ 本节 (a)**（都是会话内实时）；本节 **(b) workflow-batch 像的是 §5.3 的 (C) 跨会话补录**（显式 launch / 延迟 / 末会话丢失同病），故称"表亲"。
+**为什么不用重型 Workflow fan-out 做本 recorder**：per-step 实时只处理"当前这一步"，不需要并行 fan-out；而 Workflow 须显式 opt-in launch（hook 拉不起）、一次性脚本、会话末批量崩即丢——对"每步常驻实时"是净负担。**重型 Workflow fan-out 留给 [Q-016 评审专家 mode-2](../../../.kdev/memory/决策日志.md)**（按需深度批量他评 / 多步审计 / 全标准评分 / 仲裁，L3）。两层他评见 §5.8。
 
-### 5.1 与今天的唯一区别
+> 字母小提示：§5.3 另用 (B)/(C) 指"会话内 dispatch vs 跨会话补录"，是另一根轴——其 (B) 会话内 ≈ 本节选的"每步实时"，(C) 跨会话仍被否（§5.3）。
+
+### 5.1 主控付出塌到近零
 
 | | 今天 | 改后 |
 |---|---|---|
 | 触发 | commit-tracker 攒 pending + brief/Stop nudge | **不变**（复用，见 §5.5 调参）|
-| 切分权威 | 主会话"工作单元完成 → dispatch"判断 | **不变**（见 §5.4）|
-| 主控付出 | 写 ~30 行事实 YAML 喂 subagent | 写 ~5 行**指针**（自评分&扣分项 + 标题意图 + Q/G 指针；transcript 范围/路径 recorder 自取，见 §5.2/§5.6）|
-| subagent 取数 | 从 YAML | **读 transcript 原件**自行抽执行事实 |
+| 切分权威 | 主会话"工作单元完成 → dispatch"判断 | **不变**（见 §5.4；边界标记从"30 行 YAML"瘦成"近空触发"）|
+| **主控付出** | 写 ~30 行事实 YAML（含 self_eval）喂 subagent | **写近乎空的 dispatch**：1 行触发 + 可选 1 行意图 hint；**不再写事实、不再写 self_eval** |
+| subagent 取数 | 从 YAML | **读 transcript 原件**自抽事实 |
+| **评估** | 主会话侧 `### 模型自评`（同进程，MQ-2 会 confab）| recorder 独立读真 transcript 出 `### 模型他评`（§5.8）|
 | 返回 | 审计摘要 | 一行确认 |
 
-那 ~30 行事实 YAML（最大 token 源）消失，换成 ~5 行指针。新增的唯一机制：**commit-tracker hook 在 commit 那刻多记 `transcript_path` + offset**（写到哪了）进 state 文件，作为范围素材 + 路径来源（详见 §5.6 解 v0.2 待验证点）。
+那 ~30 行事实 YAML（最大 token 源）+ 主会话 self_eval 一起消失，主控只剩"边界处发个近空触发"。新增的唯一机制：**commit-tracker hook 在 commit 那刻多记 `transcript_path` + offset** 进 state 文件，作为范围素材 + 路径来源（§5.6 解 v0.2 待验证点）。
 
-### 5.2 dispatch 载荷（主控付出的全部）
+**诚实地板**：想做到主会话"零动作"全自动后台录，平台不允许——hook 只能跑命令、不能拉起 Agent/Workflow（只主模型循环能调）。最小可达 = 主会话边界发个近空 dispatch + hook 必要提醒。这条地板也是选"每步实时（主循环顺手发）"而非"会话末批量（须主循环临终记得 launch，更易漏）"的理由之一。
+
+### 5.2 dispatch 载荷（主控付出的全部 = 近乎空）
 
 ```yaml
-# transcript_path + offset 范围由 recorder 从 state 文件自取（见 §5.6），不经此指针传
-title_intent: <一句话，模型知道这步在干嘛>
-self_eval_score: 4                               # model-only 下唯一绑主会话的；MQ-2 残留敞口仅此项（§5.8）
-self_eval_deduction: <扣分项，必填——主会话当场给，比今天 subagent 从 summary 反推更不易 confab>
-key_decision_pointers: [Q-012, G-005]            # 编号或一句话，非全文
+# transcript_path + offset 范围 recorder 从 state 文件自取（§5.6），不经此指针
+title_intent: <可选·一句话意图 hint，让 recorder 不把 side-quest 当主线；省略则 recorder 从 transcript 自行归纳>
+# 不再有 self_eval_*（评估改由 recorder 出他评，§5.8）
+# key_decision_pointers 也可省——recorder 能从 transcript 抽 Q/G 编号；留着只是给个锚
 ```
 
-recorder 从 state 文件取 `{transcript_path, range}` → 读该段 → 抽工具数/报错/绕路/文件/commit SHA → 写四段（model-only：用户评分段按 §3.3 留空 voided-faded）→ 一行返回。指针只剩 3 项语义（标题/自评/决策指针），transcript 范围与路径都不再手填。
+recorder 从 state 文件取 `{transcript_path, range}` → 读该段 → 客观抽工具数/报错/绕路/文件/commit SHA/Q-G 决策 → 出 `### 模型他评`（§5.8）→ 写四段（model-only：用户评分段按 §3.3 留空 voided-faded）→ 一行返回。**主控真正必填的只有"触发"本身**；title_intent 是可选润滑，不是负担。
 
 ### 5.3 为什么不做跨会话补录 / cron / claude -p（污染对比）
 
@@ -301,51 +325,61 @@ recorder 从 state 文件取 `{transcript_path, range}` → 读该段 → 抽工
 
 spike FAIL（如路径不可达 / 格式不可解）→ P-C1b 退回讨论，不硬上。
 
+> 注：v0.4 后 recorder 不只抽事实、还**出他评**（§5.8），全程吃 transcript 且**无 YAML 回退**——本 spike 的"读得到、读得对"对 P-C1b 比 v0.3 更关键，spike #2 应连"他评所需的绕路/报错/返工信号能否从 transcript 读全"一起验。
+
 **残留取舍**（机制确定后仍在的）：
 
 | 优点 | 缺点/风险 |
 |---|---|
-| 干掉 30 行 YAML，主会话付出降一档 | recorder 读 transcript 抽错 → 高置信度垃圾（靠 8 hard-gate + 不确定字段显式标注兜）|
+| 干掉 30 行 YAML + self_eval，主会话付出降到**近零** | recorder 读 transcript 抽错/误判 → 高置信度垃圾（靠 8 hard-gate + 不确定字段显式标注兜；他评比抽事实更吃 transcript 质量）|
 | 实时，续航天然准，无跨会话延迟 | recorder 读长 transcript 在**其自身**上下文有成本（按 offset 只读增量段优化）|
 | 小改动、低风险（复用现有 commit-tracker + state 模式）| offset 精度：PostToolUse hook 触发时 transcript 可能尚未 flush 最末几条（slop 可容忍，spike #2 量化）|
 | 无 `claude -p` / cron / 跨会话机制 | — |
 
 ### 5.7 预估工作量
 
-- **spike（gate，前置）**：~1-2h（实测 §5.6 三件事）
-- **实施（spike 过后）**：~6-8h（commit-tracker stash transcript_path+offset 改造 + step-recorder prompt 改 transcript 溯源 + nudge 调参 + 测试）
+- **spike（gate，前置）**：~1-2h（实测 §5.6 三件事 + 他评所需绕路/报错/返工信号能否从 transcript 读全）
+- **实施（spike 过后）**：~7-9h —— commit-tracker stash transcript_path+offset 改造 + step-recorder prompt 改"读 transcript 抽事实 **+ 出他评**" + `### 模型自评`→`### 模型他评` schema 迁移（六类记录-schema / step_completeness / 模板）+ nudge 调参 + 测试
 
-### 5.8 溯源对 MQ-2（自评 confabulate）的买下（连 §6 他评）
+### 5.8 评估 = 模型他评（替换自评）+ 两层他评对齐 Q-016 评审专家
 
-[roadmap §1.5.7 MQ-2](../../framework/01-design/2026-06-06-01-数字员工整体设计路线图roadmap-v1.0.md) 实证：Step main-69 的模型自评**凭空编造**一个扣分项，根因是 subagent 写自评时**没读真实 transcript、据 summary 反推"听起来合理"**。
+**MQ-2 实证**（[roadmap §1.5.7](../../framework/01-design/2026-06-06-01-数字员工整体设计路线图roadmap-v1.0.md)）：Step main-69 的 `### 模型自评` 凭空编造扣分项，根因 = 写自评与写代码同一生成过程、且没读真 transcript、据 summary 反推"听起来合理"。**自评无法 catch 自己的编造**——结构性盲区。
 
-溯源(a) 直接消掉这个根因：
+**v0.4 的解：把记录层的评估从「自评」直接换成「他评」。**
 
-- **杀事实性 confab**——recorder 读真 transcript，工具调用/报错白纸黑字，编不出"grep 漏看 X"。这是 MQ-2 那次失真的**精确解**。
-- **recorder 本就独立于主会话**——它从 transcript 写的事实叙述已是**轻度他评**；残留同进程偏差**收窄到只剩主会话给的 self_eval 数字 + 扣分项**一项。
-- **互补非替代**：溯源 = "自己读真记录"（破事实 confab，自评分仍同进程自判）；**他评 = "独立 agent 读真记录"**（连同进程判断偏差一起破，§6）。溯源是免费的**部分买下**，他评补那最后一公里——两者叠加，不互斥。
+- **谁评**：recorder（独立于主会话的 subagent），**读真 transcript** 出 `### 模型他评`。两个破点同时成立：① 读真记录 → 破事实 confab（编不出"grep 漏看 X"）② 独立生成过程 → 破同进程判断偏差（main-69 那种"听起来合理"的反推没了立足点）。
+- **评什么**：执行质量（客观、有据）——目标达成度 / 绕路与返工 / 报错与恢复 / 是否一遍过，**不是**主观"顺畅度"（顺畅度是第一人称，他评给不了也不该假装给）。扣分项必填且**须引 transcript 证据**（如"第 N 段 Edit 报错后才补"），无证据的扣分项按 8 hard-gate 拒。
+- **去 self_eval 的代价（诚实）**：丢了"self vs peer 偏差"这个 misalignment 信号（要两者并存才测得出 confab 幅度）。但本项目 [Q-002](../../../.kdev/memory/决策日志.md) 早已放弃 misalignment 数据产出，且用户明确选「他评**替换**自评」而非并存——代价已被接受。
+
+**两层他评（与 [Q-016 评审专家](../../../.kdev/memory/决策日志.md) 的关键对齐，别打架）**：
+
+| | 层1 · P-C1b recorder 他评（本设计）| 层2 · Q-016 评审专家 mode-2（L3 未来）|
+|---|---|---|
+| 谁 | 轻量 general recorder（每步顺手）| 重型 reviewer-expert 员工（6+1 standards / 评分表 / 仲裁）|
+| 何时 | **每步实时**，环境常驻 | **按需 / 批量**，显式 launch |
+| 形态 | 升级现有 fire-and-forget 后台 dispatch | workflow-batch fan-out（多步审计）|
+| 深度 | 基线：逮明显 confab + 客观执行质量 | 专家级：跨步系统性失真审计 / 标准化评分 |
+| 类比 | 每次 commit 的 linter | 周期性专家 audit |
+
+**关系厘清**：Q-016 当时记 mode-2「blocked-on P-C1b、P-C1b 只部分买下 MQ-2」——那是 v0.3 口径（P-C1b 仅做事实溯源、self_eval 仍在）。**v0.4 后 P-C1b recorder 直接出 per-step 他评**，所以：① 基线 MQ-2 修复在记录层就完成，不再等 mode-2；② mode-2 从"唯一的他评"降为"**深度/专家/批量复评层**"，是质量升级而非基础设施缺口；③ mode-2 仍 blocked-on P-C1b——但依赖的是 P-C1b 落成的 **transcript 溯源管道 + state offset 机制**（mode-2 的 workflow-batch 也要读 transcript），不是依赖 P-C1b 提供"第一份他评"。
 
 ---
 
-## 6. 他评智能体（移入后续 roadmap，本 spec 不做）—— workflow-batch 在此安家
+## 6. 深度他评 = Q-016 评审专家 mode-2（本 spec 不做，已另起 spec）
 
-模型自评有锚定偏差（倾向自我表扬），未来可加"调另一模型读 transcript 做独立评审"的能力，产出 `peer_score` / `peer_verdict` 落 Step。但：
+v0.3 把"他评"整体推给未来；v0.4 拆两层后，**基线 per-step 他评已落在 P-C1b（§5.8 层1）**，本节只剩**深度/专家/批量**那层——它已不在本 spec，而是 [Q-016 评审专家接入设计](../../../.kdev/memory/决策日志.md) 的 **mode-2**（[spec](./2026-06-12-评审专家reviewer接入设计-design.md)）。
 
-- 当前 right-size 优先验证 P-C0.5/1a/1b
-- 涉及额外 token、评审深度（只能读文字不能看代码）等取舍，需独立设计
-- **→ 记入数字员工集群后续 roadmap（[§1.5.8 第三方他评 / 评审专家](../../framework/01-design/2026-06-06-01-数字员工整体设计路线图roadmap-v1.0.md)），届时单独起 spec**
+为什么深度他评天然是 workflow-batch fan-out：
 
-**reframe（v0.3 新增）**：§5.0 否掉的 workflow-batch **不是没用，是指错了活**——它的 fan-out 形态正是他评的天职：
-
-| 他评固有属性 | workflow-batch 恰好提供 |
+| 深度他评固有属性 | workflow-batch 恰好提供 |
 |---|---|
-| 显式按需（你想 review 才 review，非每步常驻）| Workflow 必须显式 opt-in launch ✅（对 Step落盘是缺口，对他评是**正合适**）|
+| 显式按需（要 audit 才 audit，非每步常驻）| Workflow 必须显式 opt-in launch ✅（对每步 Step落盘是缺口，对按需深审是**正合适**）|
 | 独立读者 | 后台 fan-out N 个独立 agent，各读真 transcript/diff ✅ |
-| 成批 | 对一段工作批量出 `peer_score` ✅ |
+| 成批多步 | 对一段工作/多步批量出 verdict + 评分表 ✅ |
 
-→ **§5.0 里 (b) 的 launch 时机难题（会话末/on-demand/下会话）迁到这里**：在他评里 **on-demand / 显式** 是天然 fit，那个让 Step落盘 不可靠的"显式 launch 缺口"在他评场景**自动消失**。溯源(a) 已部分买下 MQ-2（§5.8），他评补最后一公里（self_eval 数字的同进程偏差）。
+→ **v0.3 纠结的 launch 时机（会话末/on-demand/下会话）在这里自然消解**：深度他评本就 on-demand / 显式，"显式 launch 缺口"不再是缺口。mode-2 blocked-on P-C1b = 等 P-C1b 的 transcript 溯源管道就绪（§5.8 已厘清依赖性质：等管道，不是等"第一份他评"）。
 
-本 spec 的 config **不预留** peer_review 字段（避免 schema 提前复杂化）。
+本 spec 的 config **不预留** peer_review 字段（深度他评的旋钮归 Q-016 评审专家 spec）。
 
 ---
 
@@ -355,7 +389,7 @@ spike FAIL（如路径不可达 / 格式不可解）→ P-C1b 退回讨论，不
 |---|---|---|---|---|
 | **P-C0.5** | `rating.mode` 可配（机读化 Q-002）+ 默认 user-opt-in + 首次提醒 + 44 半残销账 | 4-6h | 无 | 从"每 Step 必追问"降到 model-only 零追问 / opt-in 轻提一句 |
 | **P-C1a** | brief verbosity 分级 + subagent 只回一行 + stop-check 按模式降级 | 4-6h | P-C0.5 | brief 可 compact；subagent 不回长文 |
-| **P-C1b** | Step 落盘 transcript 溯源化（**variant (a) per-step**；会话内 fire-and-forget；commit-tracker stash path+offset；粒度不变）| **spike 1-2h（gate）→ 6-8h** | P-C1a + **§5.6 spike 通过** | 干掉 30 行 YAML，dispatch 付出降一档；顺带部分买下 MQ-2（§5.8）|
+| **P-C1b** | Step 落盘 = 后台 recorder 读 transcript + **模型他评替换自评**（每步实时 fire-and-forget；commit-tracker stash path+offset；粒度不变）| **spike 1-2h（gate）→ 7-9h** | P-C1a + **§5.6 spike 通过** | 主控付出降到近零；记录层修 MQ-2（§5.8）；为 Q-016 mode-2 铺 transcript 管道 |
 | 他评 | 移入后续 roadmap | — | — | — |
 
 ### 与阶段2其他 P 的关系
@@ -369,8 +403,9 @@ spike FAIL（如路径不可达 / 格式不可解）→ P-C1b 退回讨论，不
 
 ## 8. 非目标（defer，防镀金）
 
-- **他评智能体** → 后续 roadmap（形态 = workflow-batch，§6）
-- **workflow-batch 作 Step落盘机制** → 否（§5.0：自评无源 / 切分重建 / 显式 launch 不可靠 / 丢实时，是 §5.3 variant C 的表亲；其 fan-out 形态改投他评）
+- **深度/专家他评** → [Q-016 评审专家 mode-2](../../../.kdev/memory/决策日志.md)（基线 per-step 他评本期已落 P-C1b，§5.8 层1）
+- **重型 Workflow fan-out 作每步 recorder** → 否（§5.0：每步实时不需并行 fan-out + Workflow hook 拉不起 + 会话末批量崩即丢；fan-out 归 Q-016 mode-2 深审）
+- **self_eval 与他评并存** → 否（用户选「替换」；§5.8 已诚实记下丢"self vs peer 偏差"misalignment 信号的代价，本项目 Q-002 早已接受）
 - **跨会话补录 / cron / `claude -p` 独立进程** → 否（§5.3 论证）
 - P-C2 JSONL 操作层（token 痛才上）
 - P-C3 并发写锁（阶段3 并行员工）
