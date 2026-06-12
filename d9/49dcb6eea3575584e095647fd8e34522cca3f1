@@ -1,0 +1,23 @@
+plugins/kdev-team/staff.yml
+  s_c6a2827fd70228::t_5fa0be721d4ae5 20
+  s_c6a2827fd70228::t_f90db20f5c2b70 31-45
+  s_c6a2827fd70228::t_3e0988bb807513 6
+plugins/kdev-team/tests/test_staff.py
+  s_c6a2827fd70228::t_8d9c3d18160d50 28-56
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "d949dcb6eea3575584e095647fd8e34522cca3f1",
+  "prompts": {},
+  "sessions": {
+    "s_c6a2827fd70228": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5a71ffa4-4bc3-4dc5-a321-ecbdeae4dcf6",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
