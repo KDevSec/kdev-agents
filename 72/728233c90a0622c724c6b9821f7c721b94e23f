@@ -1,0 +1,28 @@
+docs/superpowers/specs/2026-06-12-评审专家reviewer接入设计-design.md
+  s_c6a2827fd70228::t_98ac06b37c73dc 304
+  s_c6a2827fd70228::t_ff6f08cbb3fa50 314
+  s_c6a2827fd70228::t_0bfffc1f4db3cf 331
+  s_c6a2827fd70228::t_23e2c1e2d27268 70,72,74,76-82,84
+  s_c6a2827fd70228::t_d1aee4295df3e2 5
+  s_c6a2827fd70228::t_b52f0b2813e4bf 18
+  s_c6a2827fd70228::t_3e9bc473e8c17f 33
+  s_c6a2827fd70228::t_5be7a9f5c97dfd 8
+  s_c6a2827fd70228::t_d1da5d8acca1ed 263,265-276,278
+  s_c6a2827fd70228::t_50219321bf63ad 9
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "72728233c90a0622c724c6b9821f7c721b94e23f",
+  "prompts": {},
+  "sessions": {
+    "s_c6a2827fd70228": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5a71ffa4-4bc3-4dc5-a321-ecbdeae4dcf6",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
