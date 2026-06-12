@@ -5,7 +5,8 @@
 """
 from html import escape
 
-_RELOAD_SECONDS = 2
+_RELOAD_MS = 2000      # auto-reload 间隔（毫秒）；对应 setTimeout 第二参数
+_EVENT_TAIL = 12       # 事件流最多显示最新 N 条
 
 _CSS = """
 :root{--bg:#0a1422;--panel:#16273f;--line:#26405f;--ink:#d7e2f0;--mut:#8ea4be;
@@ -90,7 +91,7 @@ def _page(generated_at, inner):
         "<!DOCTYPE html><html lang=\"zh-CN\"><head><meta charset=\"UTF-8\">"
         "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">"
         f"<title>KDev HUD 驾驶舱</title>"
-        f"<script>setTimeout(function(){{location.reload();}},{_RELOAD_SECONDS}000);</script>"
+        f"<script>setTimeout(function(){{location.reload();}},{_RELOAD_MS});</script>"
         f"<style>{_CSS}</style></head><body><div class=\"wrap\">"
         "<div class=\"bar\"><span class=\"brand\">🏢 KDev 实时驾驶舱</span>"
         f"<span class=\"gen\">生成 {escape(generated_at)}</span>"
@@ -101,6 +102,7 @@ def _page(generated_at, inner):
 
 def render(model, *, generated_at):
     """model = datasource.build_hud_model(...) → 自包含 hud.html 字符串。"""
+    # 数值字段（pct/done/total/iter/run...）由 datasource 保证为 int，原样插值；所有字符串字段一律 escape()
     primary = model.get("primary")
     if primary is None:
         return _render_empty(generated_at)
@@ -160,7 +162,7 @@ def render(model, *, generated_at):
     else:
         alert_html = '<div class="muted">● 无告警</div>'
 
-    evs = list(reversed(primary.get("events", [])))[:12]
+    evs = list(reversed(primary.get("events", [])))[:_EVENT_TAIL]
     if evs:
         ev_html = "".join(
             f'<div class="ev"><span class="ts">{escape(str(e.get("ts","")))}</span>'

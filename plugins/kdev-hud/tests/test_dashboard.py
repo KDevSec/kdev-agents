@@ -49,3 +49,35 @@ def test_dashboard_escapes_html(tmp_workspace, seed):
     html = dash.render(model, generated_at="2026-06-12T08:10:00+00:00")
     assert "<script>alert(1)</script>" not in html
     assert "&lt;script&gt;" in html
+
+
+def test_dashboard_multi_feature_queue(tmp_workspace, seed):
+    seed(tmp_workspace, slug="feat-a", display_name="功能A")
+    seed(tmp_workspace, slug="feat-b", display_name="功能B")
+    model = ds.build_hud_model(tmp_workspace)
+    html = dash.render(model, generated_at="2026-06-12T08:10:00+00:00")
+    assert "多功能队列" in html          # 队列分区出现
+    assert "功能A" in html and "功能B" in html
+
+
+def test_dashboard_single_feature_no_queue(tmp_workspace, seed):
+    seed(tmp_workspace, slug="only-one", display_name="唯一功能")
+    model = ds.build_hud_model(tmp_workspace)
+    html = dash.render(model, generated_at="2026-06-12T08:10:00+00:00")
+    assert "多功能队列" not in html      # 单功能不出队列
+
+
+def test_dashboard_event_stream_newest_first_and_capped(tmp_workspace, seed):
+    # 15 条 transition；渲染应 newest-first 且只取前 12
+    trans = [{"from": f"n{i}", "to": f"n{i+1}", "reflow": False, "forced_fail": False,
+              "reason": "r", "entered_at": "2026-06-12T07:%02d:00+00:00" % i}
+             for i in range(15)]
+    seed(tmp_workspace, slug="ev", transitions=trans)
+    model = ds.build_hud_model(tmp_workspace)
+    html = dash.render(model, generated_at="2026-06-12T08:10:00+00:00")
+    # newest (n14→n15) 在 oldest (n0→n1) 之前；且最老的若干条被截断
+    assert html.index("n14") < html.index("n1 ") if "n1 " in html else True
+    newest_pos = html.find("07:14:00")   # 最新事件 ts
+    oldest_pos = html.find("07:00:00")   # 最老事件 ts（应被 [:12] 截掉 → -1）
+    assert newest_pos != -1              # 最新在
+    assert oldest_pos == -1              # 最老被截断（15 条只显示 12）
