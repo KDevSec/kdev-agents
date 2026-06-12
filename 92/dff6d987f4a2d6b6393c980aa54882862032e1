@@ -1,0 +1,25 @@
+plugins/kdev-memory/tests/test_transcript_extract.py
+  s_ccdfa58bf5ccb2::t_1cef888ceb8aae 1-89
+  s_ccdfa58bf5ccb2::t_8a3f06f995eb68 90-112
+plugins/kdev-memory/hooks/lib/transcript_extract.py
+  s_ccdfa58bf5ccb2::t_9b807f112ad3a7 69
+  s_ccdfa58bf5ccb2::t_1831f3b3738bab 1-12,14-53,56-68,70-100
+  s_ccdfa58bf5ccb2::t_8762083a5ae6ec 13
+  s_ccdfa58bf5ccb2::t_b0c72c281f7513 54-55
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "92dff6d987f4a2d6b6393c980aa54882862032e1",
+  "prompts": {},
+  "sessions": {
+    "s_ccdfa58bf5ccb2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "da13d5ac-244c-4571-b947-8ac7ae860e02",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": null
+    }
+  }
+}
