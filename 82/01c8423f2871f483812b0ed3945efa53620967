@@ -1,0 +1,19 @@
+docs/framework/01-design/2026-06-10-04-KDev数字员工-HUD驾驶舱-kdev-hud-设计-v1.0.md
+  s_492b1072cfb44c::t_bacc9f1d0a532c 92-96
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "8201c8423f2871f483812b0ed3945efa53620967",
+  "prompts": {},
+  "sessions": {
+    "s_492b1072cfb44c": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "223586a5-ba47-48b2-ad64-7638ae92f2a0",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
