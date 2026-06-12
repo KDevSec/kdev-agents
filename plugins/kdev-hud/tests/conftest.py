@@ -26,7 +26,7 @@ def tmp_workspace(tmp_path: Path) -> Path:
 def seed():
     """用 kdev_core 真实 API 在 ws 里造一个 feature 的真实落地数据。
 
-    返回 _seed(ws, slug='user-mgmt', display_name='用户管理模块', stories=[...],
+    返回 _seed(ws, slug='user-mgmt', display_name='用户管理模块', flow='design', stories=[...],
               current_node='code-review', run_status='in_progress',
               blocked_reason=None, gates=[...], transitions=[...]) -> slug
     gates 元素: dict 形如 GateResult（gate/kind/node/verdict/iter/by/issues/ts）
