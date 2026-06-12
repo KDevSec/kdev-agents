@@ -66,3 +66,52 @@ def test_read_handoff_status_malformed_raises(tmp_workspace):
     (d / "n.handoff.json").write_text("{not json", encoding="utf-8")
     with pytest.raises(FlowStateError):
         read_handoff_status(tmp_workspace, "s", "e", "n")
+
+
+import json
+
+
+def test_cross_employee_handoff_cli_roundtrip(run_cli):
+    """P-B：生产方 req-architect 在 design-flow 落交付，消费方 dev-engineer
+    在同 slug 上 coding-flow 读到——证明 B 轨原语零扩展覆盖跨员工跨 flow。"""
+    slug = "user-auth"
+    # 生产方写交付 manifest（artifacts + gate_input role→path 指针）
+    gi = json.dumps({
+        "sr": f".kdev/features/{slug}/handoffs/req-architect/sr.md",
+        "ar": f".kdev/features/{slug}/handoffs/req-architect/ar.md",
+        "design": f".kdev/features/{slug}/handoffs/req-architect/design.md",
+    })
+    out = run_cli([
+        "handoff-write", "design-flow", slug,
+        "--employee", "req-architect", "--node", "n8-merge",
+        "--status", "done", "--summary", "SR/AR/方案 交付",
+        "--artifact", f".kdev/features/{slug}/handoffs/req-architect/sr.md",
+        "--artifact", f".kdev/features/{slug}/handoffs/req-architect/ar.md",
+        "--gate-input", gi,
+    ])
+    assert "n8-merge.handoff.json" in out  # 落在生产方交接目录
+
+    # 消费方（不同 flow / 同 slug / 指生产方 employee+node）读回
+    read_out = run_cli([
+        "handoff-read", "coding-flow", slug,
+        "--employee", "req-architect", "--node", "n8-merge",
+    ])
+    data = json.loads(read_out)
+    assert data["employee"] == "req-architect"
+    assert data["status"] == "done"
+    assert f".kdev/features/{slug}/handoffs/req-architect/sr.md" in data["artifacts"]
+    assert json.loads(data["gate_input"] if isinstance(data["gate_input"], str)
+                      else json.dumps(data["gate_input"]))["ar"].endswith("ar.md")
+
+
+def test_cross_employee_missing_upstream_returns_nonzero(tmp_workspace):
+    """消费方读不存在的上游交付 → cli.main 捕获 FlowStateError 返回 rc=1
+    （已核 cli.py:368-371 catch+return 1，非抛异常）。编排据此回退裸任务，不静默成功。
+    不走 run_cli（它断言 rc==0），直接调 cli.main。"""
+    from kdev_core.cli import main as _cli_main
+    rc = _cli_main([
+        "handoff-read", "coding-flow", "no-such-feature",
+        "--employee", "req-architect", "--node", "n8-merge",
+        "--workspace", str(tmp_workspace),
+    ])
+    assert rc == 1

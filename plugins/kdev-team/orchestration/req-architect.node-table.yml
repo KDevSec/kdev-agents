@@ -13,6 +13,8 @@
 # 评审 FAIL 有界回流：gate_iters 达 max_retries(3) → status=blocked 升人（复刻 design-flow
 #   「3 次仍 FAIL → abort 升人」；引擎用 blocked 表达 escalate，不强过、不冒充第三方）。
 # 产物：运行时落 .kdev/features/<slug>/handoffs/req-architect/；记忆 scope .kdev/memory/staff/req-architect/。
+# 跨员工交付（P-B）：n8-merge 收尾落 handoff（handoff-write --employee req-architect --node n8-merge），
+#   下游 dev-engineer coding-flow 同 slug handoff-read 当 spec/plan 输入。契约见 kdev-flow-driver SKILL §2.4ter。
 flow: design-flow
 max_retries: 3
 terminal_fail: n-fail

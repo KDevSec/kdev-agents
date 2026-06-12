@@ -35,4 +35,4 @@ flow=`design-flow`，table=`orchestration/req-architect.node-table.yml`。每过
 | n4-prototype | `kdev-team:req-architect-prototype`（原型设计）| 高保真原型 → prototype/ |
 | n6-design | `kdev-team:req-architect-design`（方案设计）| 技术方案 → design.md |
 | n2/n5/n7 | 自判（不派 agent）| 评审 gate：按 design-flow 判据自评 PASS/FAIL |
-| n8-merge | 自做（编排聚合）| 阶段聚合报告 + 合并交付（output-merge-rules.md）|
+| n8-merge | 自做（编排聚合）| 阶段聚合报告 + 合并交付（output-merge-rules.md）→ docs/design-flow/<slug>/；**收尾落跨员工交付 handoff**：`kdev_core handoff-write design-flow <slug> --employee req-architect --node n8-merge --status done --summary ... --artifact sr/ar/prototype/design --gate-input '{"sr":..,"ar":..,"prototype":..,"design":..}'`，供下游 coding-flow 同 slug `handoff-read` 当 spec/plan 输入（契约见 kdev-flow-driver SKILL §2.4ter）|
