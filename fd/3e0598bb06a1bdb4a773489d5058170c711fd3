@@ -1,0 +1,54 @@
+plugins/kdev-team/agents/req-architect-orchestrator.md
+  s_b8f8d8f6a95eac::t_d3f7feea7eb4dc 36
+  s_b8f8d8f6a95eac::t_2722bc38f2eac4 35
+  s_b8f8d8f6a95eac::t_2bbaf069da10b3 34
+  s_b8f8d8f6a95eac::t_a981e900daf70e 32
+  s_b8f8d8f6a95eac::t_d0703ccc50b62c 33
+plugins/kdev-team/CHANGELOG.md
+  s_b8f8d8f6a95eac::t_a5c0f2fb11d569 3-15
+plugins/kdev-team/skills/kdev-flow-driver/SKILL.md
+  s_b8f8d8f6a95eac::t_c9cb8689074d92 252
+  s_b8f8d8f6a95eac::t_dd94c940a49ac1 153,155
+plugins/kdev-team/.claude-plugin/plugin.json
+  s_b8f8d8f6a95eac::t_01ce0ca84c6260 4
+plugins/kdev-team/skills/kdev-flow-driver/references/node-agent-routing.md
+  s_b8f8d8f6a95eac::t_4a6c5636a1cc6e 98
+  s_b8f8d8f6a95eac::t_c94fee9c260c05 25
+  s_b8f8d8f6a95eac::t_5f8e3862e7881b 100
+  s_b8f8d8f6a95eac::t_337773ecad6b75 97
+  s_b8f8d8f6a95eac::t_f8fc8e067a6b89 39
+  s_b8f8d8f6a95eac::t_1c6ada094ad769 28,40
+  s_b8f8d8f6a95eac::t_c57ae9e33ec13b 27
+  s_b8f8d8f6a95eac::t_01ce2f5492ae30 69
+  s_b8f8d8f6a95eac::t_d2f13e39c783ca 23-24
+  s_b8f8d8f6a95eac::t_e0d3200b07c3fb 38
+  s_b8f8d8f6a95eac::t_88953ba5d2a458 7-18
+  s_b8f8d8f6a95eac::t_b2d91ca7aa6835 99
+  s_b8f8d8f6a95eac::t_d875df4580b3a2 101
+plugins/kdev-team/agents/dev-engineer-orchestrator.md
+  s_b8f8d8f6a95eac::t_64b5d6649523df 38
+  s_b8f8d8f6a95eac::t_9ff2e443a7b08a 34
+  s_b8f8d8f6a95eac::t_ee02a981fedbd4 32
+  s_b8f8d8f6a95eac::t_b163449510d128 33
+  s_b8f8d8f6a95eac::t_23eafadd6fbf93 35
+  s_b8f8d8f6a95eac::t_465dbf84d78493 37
+plugins/kdev-team/skills/kdev-flow-driver/references/gate-decision-logic.md
+  s_b8f8d8f6a95eac::t_54052d49fc10d7 102
+  s_b8f8d8f6a95eac::t_2cb7f03436883b 73
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "fd3e0598bb06a1bdb4a773489d5058170c711fd3",
+  "prompts": {},
+  "sessions": {
+    "s_b8f8d8f6a95eac": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e2da3790-fa59-4d94-9d42-efe15afc08b0",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
