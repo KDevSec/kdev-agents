@@ -1,0 +1,27 @@
+.claude-plugin/marketplace.json
+  s_2da0c01f3d2859::t_c1f0c40ac0cb0a 93-98
+plugins/kdev-hud/kdev_hud/__init__.py
+  s_2da0c01f3d2859::t_89d3ec4527f04b 1-2
+plugins/kdev-hud/tests/conftest.py
+  s_2da0c01f3d2859::t_4022e59f87949a 1-61
+plugins/kdev-hud/.claude-plugin/plugin.json
+  s_2da0c01f3d2859::t_e9cc8307e043c7 1-8
+plugins/kdev-hud/tests/test_datasource.py
+  s_2da0c01f3d2859::t_8d1122b11c7572 1-19
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "a7a69cd26c5fd975811c066b4b16c9288c9f4b32",
+  "prompts": {},
+  "sessions": {
+    "s_2da0c01f3d2859": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c152964b-6a98-427a-af88-706df4e6c77f",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
