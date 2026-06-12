@@ -1,0 +1,22 @@
+plugins/kdev-team/orchestration/reviewer.dispatch-table.yml
+  s_c6a2827fd70228::t_366db425ad1bb0 1-13
+plugins/kdev-team/tests/test_reviewer_dispatch.py
+  s_c6a2827fd70228::t_baaaed70ef3c62 1-47,54-55,64-68
+  s_c6a2827fd70228::t_6f1dc2b362aec1 48-53,56-63
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "5cfbedc6020b63b4808f1c24213f69ca3537daea",
+  "prompts": {},
+  "sessions": {
+    "s_c6a2827fd70228": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5a71ffa4-4bc3-4dc5-a321-ecbdeae4dcf6",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
