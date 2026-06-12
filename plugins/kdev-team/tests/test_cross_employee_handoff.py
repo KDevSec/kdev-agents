@@ -85,3 +85,17 @@ def test_dev_plan_agent_seeds_increments_from_upstream_ar():
     assert "handoff-read" in t
     assert "req-architect" in t
     assert ("AR" in t) or ("用户故事" in t)
+
+
+def test_req_orchestrator_n8_writes_cross_employee_handoff():
+    """req-architect-orchestrator n8-merge 行：聚合 + 写跨员工交付 handoff。"""
+    t = _t(REQ_ORCH)
+    assert "handoff-write" in t
+    assert "n8-merge" in t
+
+
+def test_req_node_table_comment_notes_delivery_handoff():
+    """req-architect node-table 注释提及 n8-merge 落跨员工交付 handoff。"""
+    nt = (ROOT / "orchestration/req-architect.node-table.yml").read_text(encoding="utf-8")
+    assert "handoff" in nt
+    assert "n8-merge" in nt
