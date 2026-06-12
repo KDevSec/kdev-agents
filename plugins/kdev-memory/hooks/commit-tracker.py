@@ -74,7 +74,8 @@ def main() -> int:
         print(SUPPRESS)
         return 0
 
-    cmd = (data.get("toolInput") or {}).get("command", "")
+    cmd = (data.get("tool_input") or {}).get("command", "")
+    transcript_path = data.get("transcript_path", "")
     if not _is_git_commit(cmd):
         print(SUPPRESS)
         return 0
@@ -92,7 +93,7 @@ def main() -> int:
 
     state_dir = repo / ".kdev" / "memory" / "state"
     try:
-        append(state_dir, sha, subject, int(time.time()))
+        append(state_dir, sha, subject, int(time.time()), transcript_path=transcript_path or None)
     except Exception:
         pass
     print(SUPPRESS)

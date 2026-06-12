@@ -53,16 +53,17 @@ import time as _time
 
 
 def test_brief_shows_pending_commits_when_above_threshold(tmp_path):
+    # P-C1b：age 为主——commit 累积超过 age 阈值（最早 > 1800s）才 nudge
     repo = _init_repo_with_kdev(tmp_path, "main")
     state = repo / ".kdev" / "memory" / "state"
     state.mkdir(parents=True, exist_ok=True)
     now = int(_time.time())
     state.joinpath("pending-commits.json").write_text(_json.dumps({
         "since_step_id": "main-15",
-        "since_ts": now - 60,
+        "since_ts": now - 2000,
         "commits": [
-            {"sha": "a"*40, "subject": "s1", "ts": now - 60},
-            {"sha": "b"*40, "subject": "s2", "ts": now - 30},
+            {"sha": "a"*40, "subject": "s1", "ts": now - 2000},  # age=2000 > 1800
+            {"sha": "b"*40, "subject": "s2", "ts": now - 1000},
             {"sha": "c"*40, "subject": "s3", "ts": now - 5},
         ],
     }), encoding="utf-8")

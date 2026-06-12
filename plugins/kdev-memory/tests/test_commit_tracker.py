@@ -25,7 +25,13 @@ def _make_repo_with_commit(tmp_path: Path, msg: str) -> Path:
 
 
 def _run_hook(repo: Path, command: str) -> dict:
-    payload = json.dumps({"toolInput": {"command": command}})
+    # 真实 Claude Code PostToolUse stdin 契约：snake_case（hooks.md Common input fields）
+    payload = json.dumps({
+        "tool_name": "Bash",
+        "tool_input": {"command": command},
+        "transcript_path": str(repo / "fake-transcript.jsonl"),
+        "session_id": "test-session",
+    })
     r = subprocess.run(
         [sys.executable, str(HOOK)],
         cwd=str(repo), input=payload, capture_output=True, text=True,
@@ -130,3 +136,19 @@ def test_hook_silent_when_no_commit_exists(tmp_path):
     # no crash + no entry (since git log fails on a repo with no commits)
     pending = _read_pending(repo)
     assert pending["commits"] == []
+
+
+def test_commit_stashes_transcript_path(tmp_path):
+    repo = _make_repo_with_commit(tmp_path, "stash transcript test")
+    tp = repo / "sess.jsonl"
+    tp.write_text("{}\n{}\n{}\n", encoding="utf-8")  # 3 行真实文件
+    payload = json.dumps({
+        "tool_name": "Bash",
+        "tool_input": {"command": "git commit -m stash"},
+        "transcript_path": str(tp),
+        "session_id": "s1",
+    })
+    subprocess.run([sys.executable, str(HOOK)], cwd=str(repo), input=payload,
+                   capture_output=True, text=True)
+    pending = _read_pending(repo)
+    assert pending["transcript_path"] == str(tp)
