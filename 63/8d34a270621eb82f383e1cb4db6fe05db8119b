@@ -1,0 +1,19 @@
+docs/superpowers/plans/2026-06-13-P-C1b-transcript溯源+模型他评.md
+  s_ccdfa58bf5ccb2::t_92d2de2b54c356 1-771
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "638d34a270621eb82f383e1cb4db6fe05db8119b",
+  "prompts": {},
+  "sessions": {
+    "s_ccdfa58bf5ccb2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "da13d5ac-244c-4571-b947-8ac7ae860e02",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
