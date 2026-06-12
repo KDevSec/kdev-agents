@@ -74,7 +74,7 @@ def main() -> int:
         print(SUPPRESS)
         return 0
 
-    cmd = (data.get("toolInput") or {}).get("command", "")
+    cmd = (data.get("tool_input") or {}).get("command", "")
     if not _is_git_commit(cmd):
         print(SUPPRESS)
         return 0

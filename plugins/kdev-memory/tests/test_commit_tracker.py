@@ -25,7 +25,13 @@ def _make_repo_with_commit(tmp_path: Path, msg: str) -> Path:
 
 
 def _run_hook(repo: Path, command: str) -> dict:
-    payload = json.dumps({"toolInput": {"command": command}})
+    # 真实 Claude Code PostToolUse stdin 契约：snake_case（hooks.md Common input fields）
+    payload = json.dumps({
+        "tool_name": "Bash",
+        "tool_input": {"command": command},
+        "transcript_path": str(repo / "fake-transcript.jsonl"),
+        "session_id": "test-session",
+    })
     r = subprocess.run(
         [sys.executable, str(HOOK)],
         cwd=str(repo), input=payload, capture_output=True, text=True,
