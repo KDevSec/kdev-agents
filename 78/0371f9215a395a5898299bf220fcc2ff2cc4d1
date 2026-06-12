@@ -1,0 +1,23 @@
+plugins/kdev-hud/kdev_hud/__main__.py
+  s_2da0c01f3d2859::t_e0d251ce31cd5b 1-6
+plugins/kdev-hud/kdev_hud/cli.py
+  s_2da0c01f3d2859::t_3b4fedd4888448 1-94
+plugins/kdev-hud/tests/test_cli_smoke.py
+  s_2da0c01f3d2859::t_b62f54f25d258e 1-49
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "780371f9215a395a5898299bf220fcc2ff2cc4d1",
+  "prompts": {},
+  "sessions": {
+    "s_2da0c01f3d2859": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c152964b-6a98-427a-af88-706df4e6c77f",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
