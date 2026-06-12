@@ -395,3 +395,66 @@ def handoff_dir(workspace, slug, employee):
     p = _feature_dir(workspace, slug) / "handoffs" / employee
     p.mkdir(parents=True, exist_ok=True)
     return p
+
+
+HANDOFF_STATUSES = ("done", "blocked", "needs_context")
+
+
+def _handoff_status_path(workspace, slug, employee, node_id) -> Path:
+    return _feature_dir(workspace, slug) / "handoffs" / employee / f"{node_id}.handoff.json"
+
+
+def write_handoff_status(workspace, slug, employee, node_id, status, summary,
+                         artifacts=None, gate_input=None, reason=None):
+    """落一份结构化交接状态到 handoffs/<employee>/<node_id>.handoff.json。
+
+    业务 agent 收尾调它（经 CLI），主循环靠 read_handoff_status 读，
+    替代把大段 result 回灌主会话（B 轨压刷屏核心）。返回写入的 Path。
+    """
+    if status not in HANDOFF_STATUSES:
+        raise FlowStateError(
+            f"invalid handoff status {status!r}; "
+            f"must be one of {', '.join(HANDOFF_STATUSES)}")
+    if not node_id:
+        raise FlowStateError("node_id required")
+    if not summary:
+        raise FlowStateError("summary required (one-line human signal)")
+    if status != "done" and not reason:
+        raise FlowStateError(f"reason required when status={status!r}")
+    handoff_dir(workspace, slug, employee)  # mkdir -p（幂等）
+    path = _handoff_status_path(workspace, slug, employee, node_id)
+    payload = {
+        "node_id": node_id,
+        "employee": employee,
+        "status": status,
+        "summary": summary,
+        "artifacts": list(artifacts or []),
+        "gate_input": gate_input,
+        "reason": reason,
+    }
+    path.write_text(json.dumps(payload, ensure_ascii=False, indent=2) + "\n",
+                    encoding="utf-8")
+    return path
+
+
+def read_handoff_status(workspace, slug, employee, node_id):
+    """读 + 校验交接状态文件，返回 dict。
+
+    缺文件/坏 JSON/缺必填键 → FlowStateError，让"后台 agent 没写/写坏"
+    显式冒泡（主循环当作该节点未完成），不静默当成功。
+    """
+    path = _handoff_status_path(workspace, slug, employee, node_id)
+    if not path.exists():
+        raise FlowStateError(f"handoff status not found: {path}")
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except (ValueError, OSError) as exc:
+        raise FlowStateError(f"handoff status unreadable: {path}: {exc}") from exc
+    for key in ("node_id", "employee", "status", "summary"):
+        if key not in data:
+            raise FlowStateError(f"handoff status missing required key {key!r}: {path}")
+    if data["status"] not in HANDOFF_STATUSES:
+        raise FlowStateError(
+            f"handoff status invalid status {data['status']!r} "
+            f"(must be one of {', '.join(HANDOFF_STATUSES)}): {path}")
+    return data
