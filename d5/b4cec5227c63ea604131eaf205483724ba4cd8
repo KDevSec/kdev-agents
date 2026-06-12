@@ -1,0 +1,25 @@
+plugins/kdev-team/.claude-plugin/plugin.json
+  s_154b39c51ca5fd::t_d37b0d6fa35d8e 4
+plugins/kdev-design-flow/CHANGELOG.md
+  s_154b39c51ca5fd::t_0928add4f05aaa 3-10
+plugins/kdev-design-flow/.claude-plugin/plugin.json
+  s_154b39c51ca5fd::t_5091219b2bb940 4
+plugins/kdev-team/CHANGELOG.md
+  s_154b39c51ca5fd::t_acde10892b1373 1-26
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "d5b4cec5227c63ea604131eaf205483724ba4cd8",
+  "prompts": {},
+  "sessions": {
+    "s_154b39c51ca5fd": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "6258de54-e474-415d-8dd1-882f53c3de8b",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
