@@ -1,0 +1,24 @@
+plugins/kdev-core/tests/test_handoffs.py
+  s_34bc963bed7187::t_8c7feafc8b1484 22-68
+  s_34bc963bed7187::t_31f1517d08c6c4 2-9
+plugins/kdev-core/kdev_core/flow_state.py
+  s_34bc963bed7187::t_ec21eacc0527ea 457-459
+  s_34bc963bed7187::t_babbd63b734c51 398-415,418-456,460
+  s_34bc963bed7187::t_21aef2362fae5c 416-417
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "191664fc87205f5083ff767520d9e3b97c482035",
+  "prompts": {},
+  "sessions": {
+    "s_34bc963bed7187": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ee9954b3-0c1a-440e-9563-db0573135ca9",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": null
+    }
+  }
+}
