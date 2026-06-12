@@ -282,7 +282,7 @@ title_intent: <可选·一句话意图 hint，让 recorder 不把 side-quest 当
 # key_decision_pointers 也可省——recorder 能从 transcript 抽 Q/G 编号；留着只是给个锚
 ```
 
-recorder 从 state 文件取 `{transcript_path, range}` → 读该段 → 客观抽工具数/报错/绕路/文件/commit SHA/Q-G 决策 → 出 `### 模型他评`（§5.8）→ 写四段（model-only：用户评分段按 §3.3 留空 voided-faded）→ 一行返回。**主控真正必填的只有"触发"本身**；title_intent 是可选润滑，不是负担。
+recorder 从 state 文件取 `{transcript_path, range}` → 用 Bash `sed`+`jq` 切片（§5.6 spike 结论①）→ 客观抽：**工具数 / 报错(`is_error`+原文) / 绕路 / 文件 / commit SHA / Q-G 决策 + `skills_invoked`（调了哪些 skill / plugin / subagent，语义而非计数）+ `subject`（Step 主题；遇 skill 反馈走 F-NNN 评分裂解，承[蒸馏决策1「subject 必明」](../../../.claude/projects/-home-lyadmin-Projects-kdev-agents/memory/kdev-memory-distillation-design.md)；溯源使 L1/L2 自动推断变易——L2 定义就是"取最近调的 skill/工具"，transcript 全有）** → 出 `### 模型他评`（§5.8）→ 写四段（model-only：用户评分段按 §3.3 留空 voided-faded）→ 一行返回。**主控真正必填的只有"触发"本身**；title_intent 是可选润滑，不是负担。
 
 ### 5.3 为什么不做跨会话补录 / cron / claude -p（污染对比）
 
@@ -317,21 +317,21 @@ recorder 从 state 文件取 `{transcript_path, range}` → 读该段 → 客观
 
 **解法（不经 prompt 传路径）**：
 
-1. **hook 侧 stash**——commit-tracker（PostToolUse on Bash，已在每次 commit 写 `state/pending-commits.json`）**顺手把 `transcript_path` + 当前 offset 也写进同一 state 文件**。hook 的 stdin 本就含 `transcript_path`（subagent 拿不到、hook 拿得到——这正是必须由 hook 捕获的原因）。
-2. **recorder 侧自取**——recorder 从 state 文件读 `{transcript_path, last_recorded_offset → current_offset}`，自行 `Read` 该段 JSONL。主会话指针里**不出现路径**。
+1. **hook 侧 stash**——commit-tracker（PostToolUse on Bash）**顺手把 `transcript_path` + 当前 offset 写进 `state/pending-commits.json`**。hook 的 stdin 本就含 `transcript_path`（snake_case；subagent 拿不到、hook 拿得到——这正是必须由 hook 捕获的原因）。⚠️ 但 commit-tracker 现读 `toolInput`(驼峰)=bug，必须先修（spike 结论②）。
+2. **recorder 侧自取**——recorder 从 state 文件读 `{transcript_path, last_recorded_offset → current_offset}`，用 **Bash `sed -n 'A,Bp' <transcript> | jq`** 切片抽结构化事实（**不用 Read 工具**——spike 结论①）。主会话指针里**不出现路径**。
 3. **offset 语义**——transcript 是 JSONL（一行一 message）。offset 取行数（commit 那刻 `wc -l`）即可；range = [上次已记录, 当前]。粒度是工作单元（粗），±几条 message 的 slop 可容忍。
 
-**⚠️ spike-gate（实施前必跑，承 [G-008](../../../.kdev/memory/踩坑日志.md) / R-009「先核代码再信设计」）**——本项目实地发现 hooks 里 `toolInput`(commit-tracker) 与 `tool_input`/`session_id`(别处) **驼峰/蛇形混用**，是"hook 输入契约从没对真实 harness 核过"的直接物证。故 P-C1b 起 plan **前**先跑一个小 spike 实测三件事，过了再建：
+**✅ spike 已跑（2026-06-13，承 [G-008](../../../.kdev/memory/踩坑日志.md) / R-009「先核代码再信设计」）—— 整体 PASS（机制成立），但纠出 3 个设计修正**
 
-| # | 验什么 | 通过判据 |
-|---|---|---|
-| 1 | PostToolUse hook stdin 真有 `transcript_path`，且确认字段真名（顺带纠 `toolInput`/`tool_input` 混用）| 打印 stdin 见到该键且指向真实存在文件 |
-| 2 | transcript JSONL 能按 offset 切段读出该工作单元的工具调用/报错/文件 | 取一段已知工作单元，offset range 读出内容与记忆吻合 |
-| 3 | fire-and-forget 派出的 subagent 能 `Read` 那个路径（权限/路径可达）| subagent 成功读回该段并抽出 ≥1 个真实 commit SHA |
+实地验三件事 + claude-code-guide 核[官方 hook 契约](https://code.claude.com/docs/en/hooks.md)：
 
-spike FAIL（如路径不可达 / 格式不可解）→ P-C1b 退回讨论，不硬上。
+| # | 验什么 | 结果 | → 设计修正（已 banked） |
+|---|---|---|---|
+| ① | subagent 怎么读 transcript | **Read 工具不行**（25k 整文件 token 闸，offset/limit 也救不了 91k transcript→直接拒）；**Bash `sed`+`jq` 行**（实测子 agent 读 repo 外 `~/.claude/...` 无 sandbox 限制）| recorder **用 Bash sed/jq 切片+抽结构化事实**，不用 Read 工具 |
+| ② | stdin 真有 `transcript_path`？字段真名？ | ✅ **有**，指向 session JSONL；字段 **snake_case**（`transcript_path`/`tool_input`...）。**但 commit-tracker 读 `toolInput`(驼峰)=bug**→永拿 `{}`→从不识别 commit→**`pending-commits.json` 从未填→"🔔 pending dispatch" nudge 一直死的** | commit-tracker **先修 `toolInput`→`tool_input`**（load-bearing：不修连 transcript_path 都读不到；**顺带复活死掉的 nudge**，记 [G-010](../../../.kdev/memory/踩坑日志.md)）|
+| ③ | transcript 含的语义信号够不够 | ✅ 不只工具计数——**调了哪些 skill / subagent / MCP**、报错(`is_error`+原文)、文件、SHA 全抽得出（实证：本会话 `Skill→superpowers:brainstorming`、`Agent→general-purpose×3`）| §5.2/§5.8 **加 `skills_invoked` + `subject` 提取**（溯源还让 subject L1/L2 自动推断变易）|
 
-> 注：v0.4 后 recorder 不只抽事实、还**出他评**（§5.8），全程吃 transcript 且**无 YAML 回退**——本 spike 的"读得到、读得对"对 P-C1b 比 v0.3 更关键，spike #2 应连"他评所需的绕路/报错/返工信号能否从 transcript 读全"一起验。
+> 取证方式：① 两次子 agent 实测（Read FAIL / Bash PASS）；② claude-code-guide 拉官方 docs（[hooks.md](https://code.claude.com/docs/en/hooks.md) Common input fields）+ commit-probe 经验确认（想 instrument live hook 抓真 stdin 被 auto-mode 拦——改 repo 外 live hook=未授权持久化，合理，故走文档+探针非侵入路）；③ jq 抽本会话 transcript 实测。**spike PASS：transcript 可达可解、机制成立**，实施按修正后的设计走（不再有"退回讨论"风险）。
 
 **残留取舍**（机制确定后仍在的）：
 
@@ -344,8 +344,13 @@ spike FAIL（如路径不可达 / 格式不可解）→ P-C1b 退回讨论，不
 
 ### 5.7 预估工作量
 
-- **spike（gate，前置）**：~1-2h（实测 §5.6 三件事 + 他评所需绕路/报错/返工信号能否从 transcript 读全）
-- **实施（spike 过后）**：~7-9h —— commit-tracker stash transcript_path+offset 改造 + step-recorder prompt 改"读 transcript 抽事实 **+ 出他评**" + `### 模型自评`→`### 模型他评` schema 迁移（六类记录-schema / step_completeness / 模板）+ nudge 调参 + 测试
+- **spike（gate）**：✅ **done（2026-06-13）**——PASS + 3 修正（§5.6）
+- **实施（按修正后设计）**：~8-10h ——
+  ① **先修 commit-tracker `toolInput`→`tool_input`**（先决；顺带复活死掉的 nudge）+ stash `transcript_path`+offset 进 state
+  ② step-recorder 改 **Bash `sed`/`jq` 切 transcript** 抽事实（含 `skills_invoked` / `subject`）**+ 出他评**
+  ③ `### 模型自评`→`### 模型他评` schema 迁移（六类记录-schema / step_completeness / 模板）
+  ④ nudge 调参（以 age 为主）
+  ⑤ 测试：commit-tracker 字段名回归 + transcript 切片抽取（mock JSONL）+ 他评 schema + skill/subject 抽取
 
 ### 5.8 评估 = 模型他评（替换自评）+ 两层他评对齐 Q-016 评审专家
 
