@@ -1,0 +1,19 @@
+docs/superpowers/plans/2026-06-13-评审专家reviewer-tdd实施.md
+  s_c6a2827fd70228::t_dcf1631f567424 1-570
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "1dd1297f12a174324339fe6036d2692c773f4a87",
+  "prompts": {},
+  "sessions": {
+    "s_c6a2827fd70228": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5a71ffa4-4bc3-4dc5-a321-ecbdeae4dcf6",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
