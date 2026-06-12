@@ -1,0 +1,34 @@
+plugins/kdev-design-flow/tests/test_skill_base_migration.py
+  s_154b39c51ca5fd::t_5284c62209f282 1-37
+plugins/kdev-design-flow/skills/kdev-design-flow/SKILL.md
+  s_154b39c51ca5fd::t_e633a6b0025a0d 64-72,75,78
+  s_154b39c51ca5fd::t_c69067356c0301 214
+  s_154b39c51ca5fd::t_15497427fa17a8 106
+  s_154b39c51ca5fd::t_064ad719a735ad 231,237
+  s_154b39c51ca5fd::t_224c0f21d4a061 113-114,117,126-127,135,140,142,144,147,149-150,152,154-158
+  s_154b39c51ca5fd::t_9c15181c503f92 176
+  s_154b39c51ca5fd::t_55b399a1262061 279
+  s_154b39c51ca5fd::t_16745e73d7fcd2 254,256,260,263,272-275
+  s_154b39c51ca5fd::t_ce77cdce362e93 25,27-28,30
+  s_154b39c51ca5fd::t_72d75b3acc1271 248-249
+  s_154b39c51ca5fd::t_51b36d17838fa7 82-83,87
+  s_154b39c51ca5fd::t_d53637f6b762c4 184
+  s_154b39c51ca5fd::t_0040aab838bc73 14-20
+  s_154b39c51ca5fd::t_9b7d9874056d4f 164
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "f81ac75b25ac6655f51935da58bfa5325bdd62f8",
+  "prompts": {},
+  "sessions": {
+    "s_154b39c51ca5fd": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "6258de54-e474-415d-8dd1-882f53c3de8b",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
