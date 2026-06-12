@@ -430,3 +430,28 @@ def test_inline_status_with_trailing_comment_token():
     """`status: voided-faded   # 注释` 应只取第一个非空 token。"""
     log = "## Step main-33: x\nstatus: voided-faded   # note\n日期：2026-06-11\n"
     assert step_completeness.parse_steps(log)[0]["status"] == "voided-faded"
+
+
+# ---- P-C1b task 6: 模型他评段（替换模型自评）半残检测 ----
+
+def test_model_peer_review_empty_deduction_is_half(tmp_path):
+    log = tmp_path / "执行日志.md"
+    log.write_text(
+        "## Step main-90: x\n日期：2026-06-13\nstatus: scored\n\n"
+        "### 模型他评\n- 执行质量：4/5\n- 扣分项：\n",
+        encoding="utf-8",
+    )
+    res = step_completeness.run_check(log, "2026-06-13", rating_mode="model-only")
+    assert res["status"] == "has_half_complete"
+    assert any("扣分项" in i for s in res["half_complete_steps"] for i in s["issues"])
+
+
+def test_model_peer_review_with_deduction_is_ok(tmp_path):
+    log = tmp_path / "执行日志.md"
+    log.write_text(
+        "## Step main-91: y\n日期：2026-06-13\nstatus: scored\n\n"
+        "### 模型他评\n- 执行质量：4/5\n- 扣分项：第3段 Edit 报错后重读才过\n",
+        encoding="utf-8",
+    )
+    res = step_completeness.run_check(log, "2026-06-13", rating_mode="model-only")
+    assert res["status"] == "ok"

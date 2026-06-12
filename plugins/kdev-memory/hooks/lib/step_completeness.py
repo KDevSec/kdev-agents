@@ -13,7 +13,7 @@ Step 完整度扫描
 **"半残"判定**（任一命中即算）：
 - 用户评分段的「完成时间」字段值为 `—` / 空 / 关键词（待补 / 污染样本 / TBD / TODO）
 - 用户评分段的「顺畅度」字段值为 `—` / 空 / 关键词
-- 模型自评段有头但无扣分项（"扣分项：" 后面没实质内容）
+- 模型自评段有头但无扣分项（"扣分项：" 后面没实质内容）（P-C1b 后为模型他评段，同检扣分项）
 
 **不算半残**（刻意）：
 - 执行事实段可以粗略估算，只要字段存在就认
@@ -170,8 +170,11 @@ def check_step(step: dict[str, Any], rating_mode: str = "user-required") -> list
         ):
             issues.append("有模型自评段但无用户评分段（Step 未完整闭环）")
 
-    # 2. 模型自评段的扣分项
-    self_section = _extract_section(body, "### 模型自评") or _extract_section(body, "## 模型自评")
+    # 2. 模型自评 / 模型他评段的扣分项（P-C1b：他评替换自评，两名都查）
+    self_section = (
+        _extract_section(body, "### 模型他评") or _extract_section(body, "## 模型他评")
+        or _extract_section(body, "### 模型自评") or _extract_section(body, "## 模型自评")
+    )
     if self_section is not None:
         # "扣分项：xxx" —— 冒号后面实质为空或仅占位
         deduction_m = re.search(r"^[\-\*\s]*(?:本步最值得)?扣分项[:：]\s*(.*?)$", self_section, re.MULTILINE)
@@ -240,7 +243,7 @@ def _describe_placeholder(val: str | None) -> str:
 
 
 def _has_model_self_review(body: str) -> bool:
-    return "### 模型自评" in body or "## 模型自评" in body
+    return any(h in body for h in ("### 模型他评", "## 模型他评", "### 模型自评", "## 模型自评"))
 
 
 def run_check(log_path: Path, today: str, lookback_days: int = DEFAULT_LOOKBACK_DAYS, rating_mode: str = "user-required") -> dict[str, Any]:
