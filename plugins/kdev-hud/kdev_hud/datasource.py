@@ -57,3 +57,81 @@ def list_feature_slugs(workspace):
         if (sub / "flow-state.json").exists():
             out.append(sub.name)
     return out
+
+
+# ---------------------------------------------------------------------------
+# Task 3: derivation layer — build_feature_view
+# ---------------------------------------------------------------------------
+
+def _completion(stories):
+    total = len(stories)
+    done = sum(1 for s in stories if s.get("status") == "done")
+    pct = round(100 * done / total) if total else 0
+    return done, total, pct
+
+
+def _gate_views(events):
+    """events 里的 gate 行 → 渲染用摘要（无 score，FF-3）。"""
+    out = []
+    for e in events:
+        if e.get("type") != "gate":
+            continue
+        out.append({
+            "gate": e.get("gate"), "kind": e.get("kind"), "node": e.get("node"),
+            "verdict": e.get("verdict"), "iter": e.get("iter"), "by": e.get("by"),
+            "issues_count": len(e.get("issues", []) or []),
+            "ts": e.get("ts"),
+        })
+    return out
+
+
+def _active_view(doc):
+    a = doc.get("active")
+    if not a:
+        return None
+    return {
+        "flow": a.get("flow"), "run": a.get("run"),
+        "current_node": a.get("current_node"), "status": a.get("status"),
+        "blocked_reason": a.get("blocked_reason"), "started_at": a.get("started_at"),
+    }
+
+
+def _alerts(active_view, gate_views):
+    out = []
+    if active_view and active_view.get("status") == "blocked":
+        out.append({"kind": "blocked",
+                    "detail": active_view.get("blocked_reason") or "在跑棒次阻塞",
+                    "ts": active_view.get("started_at")})
+    for g in gate_views:
+        if g.get("verdict") == "FAIL":
+            out.append({"kind": "gate_fail",
+                        "detail": f"{g.get('gate') or g.get('node')} 第{g.get('iter')}轮 FAIL"
+                                  f"（{g['issues_count']} issues）",
+                        "ts": g.get("ts")})
+    return out
+
+
+def build_feature_view(workspace, slug):
+    """单 feature → 归一化 view-model；feature 不存在 → None。"""
+    doc = read_flow_state(workspace, slug)
+    if doc is None:
+        return None
+    events = read_events(workspace, slug)
+    stories = doc.get("stories", []) or []
+    done, total, pct = _completion(stories)
+    active_view = _active_view(doc)
+    gate_views = _gate_views(events)
+    alerts = _alerts(active_view, gate_views)
+    return {
+        "slug": doc.get("slug", slug),
+        "display_name": doc.get("display_name") or slug,
+        "feature_status": doc.get("status"),
+        "stories": stories,
+        "stories_done": done, "stories_total": total, "completion_pct": pct,
+        "active": active_view,
+        "runs": doc.get("runs", []) or [],
+        "gates": gate_views,
+        "alerts": alerts, "alert_count": len(alerts),
+        "events": events,             # 原始 tail，渲染层自行截断
+        "updated_at": doc.get("updated_at"),
+    }

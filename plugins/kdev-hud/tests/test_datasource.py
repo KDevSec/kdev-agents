@@ -54,3 +54,66 @@ def test_seed_writes_real_format(tmp_workspace, seed):
     assert [s["status"] for s in doc["stories"]] == ["done", "pending"]
     line = json.loads(ev.read_text(encoding="utf-8").splitlines()[0])
     assert line["type"] == "gate" and line["verdict"] == "PASS" and "score" not in line
+
+
+def test_read_events_oldest_first(tmp_workspace, seed):
+    slug = seed(tmp_workspace,
+                transitions=[{"from": "a", "to": "b", "reflow": False, "forced_fail": False,
+                              "reason": "r1", "entered_at": "2026-06-12T07:00:00+00:00"},
+                             {"from": "b", "to": "c", "reflow": False, "forced_fail": False,
+                              "reason": "r2", "entered_at": "2026-06-12T07:10:00+00:00"}])
+    evs = ds.read_events(tmp_workspace, slug)
+    assert [e["to"] for e in evs] == ["b", "c"]  # oldest first contract
+
+
+def test_build_feature_view_completion(tmp_workspace, seed):
+    slug = seed(tmp_workspace, display_name="用户管理模块",
+                stories=[{"id": "s1", "title": "列表", "status": "done"},
+                         {"id": "s2", "title": "新增", "status": "done"},
+                         {"id": "s3", "title": "角色", "status": "in_progress"},
+                         {"id": "s4", "title": "导入", "status": "pending"}])
+    v = ds.build_feature_view(tmp_workspace, slug)
+    assert v["display_name"] == "用户管理模块"
+    assert v["stories_done"] == 2 and v["stories_total"] == 4
+    assert v["completion_pct"] == 50
+    assert v["active"]["current_node"] == "code-review"
+    assert v["active"]["status"] == "in_progress"
+
+
+def test_build_feature_view_gates_no_score(tmp_workspace, seed):
+    slug = seed(tmp_workspace,
+                gates=[{"gate": "g-cr", "kind": "review", "node": "code-review",
+                        "verdict": "PASS", "iter": 1, "by": "ai",
+                        "issues": [], "ts": "2026-06-12T08:00:00+00:00"},
+                       {"gate": "g-cr", "kind": "review", "node": "code-review",
+                        "verdict": "FAIL", "iter": 2, "by": "ai",
+                        "issues": ["命名", "边界"], "ts": "2026-06-12T08:05:00+00:00"}])
+    v = ds.build_feature_view(tmp_workspace, slug)
+    assert len(v["gates"]) == 2
+    g = v["gates"][1]
+    assert g["verdict"] == "FAIL" and g["iter"] == 2 and g["issues_count"] == 2
+    assert "score" not in g  # FF-3：无 score
+
+
+def test_build_feature_view_alerts_blocked_and_fail(tmp_workspace, seed):
+    slug = seed(tmp_workspace, run_status="blocked", blocked_reason="连续 FAIL 超上限",
+                gates=[{"gate": "g", "kind": "review", "node": "n", "verdict": "FAIL",
+                        "iter": 1, "by": "ai", "issues": ["x"],
+                        "ts": "2026-06-12T08:00:00+00:00"}])
+    v = ds.build_feature_view(tmp_workspace, slug)
+    kinds = sorted(a["kind"] for a in v["alerts"])
+    assert kinds == ["blocked", "gate_fail"]
+    assert v["alert_count"] == 2
+
+
+def test_build_feature_view_no_active(tmp_workspace, seed):
+    slug = seed(tmp_workspace)
+    from kdev_core import flow_state
+    flow_state.complete_run(tmp_workspace, slug, status="completed", close_feature=True)
+    v = ds.build_feature_view(tmp_workspace, slug)
+    assert v["active"] is None
+    assert v["feature_status"] == "completed"
+
+
+def test_build_feature_view_missing_returns_none(tmp_workspace):
+    assert ds.build_feature_view(tmp_workspace, "ghost") is None
