@@ -1,0 +1,23 @@
+docs/framework/01-design/2026-06-06-01-数字员工整体设计路线图roadmap-v1.0.md
+  s_154b39c51ca5fd::t_c3331e3d884fe2 100
+  s_154b39c51ca5fd::t_a159a63d978c37 61
+  s_154b39c51ca5fd::t_002c354544e7a7 83
+docs/superpowers/plans/2026-06-12-阶段2-P-A-req-architect-接底座.md
+  s_154b39c51ca5fd::t_c86011fd35266a 1-933
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "018f622d244cb499b33cd4d980e58c3513b050e2",
+  "prompts": {},
+  "sessions": {
+    "s_154b39c51ca5fd": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "6258de54-e474-415d-8dd1-882f53c3de8b",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
