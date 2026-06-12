@@ -2,6 +2,15 @@
 
 本插件遵循 [语义化版本](https://semver.org/lang/zh-CN/)。
 
+## 0.3.0 — 2026-06-12
+
+**B 轨文件交接协议：交接状态读写（落 handoff_dir 旁，承 test_handoffs.py「协议留 P-B」预留）**
+
+- `flow_state.write_handoff_status` / `read_handoff_status`：结构化交接状态落 `.kdev/features/<slug>/handoffs/<员工>/<node_id>.handoff.json`；schema = node_id/employee/status(done|blocked|needs_context)/summary/artifacts/gate_input/reason。读端缺文件/坏 JSON/缺键 → FlowStateError（显式冒泡，不静默）。
+- CLI 新增 `handoff-write` / `handoff-read`（仿 `handoff-path`）：业务 agent 收尾 write、主循环 read，替代大段 result 回灌主会话。
+- 给 kdev-flow-driver B 轨（run_in_background 派单 + 文件交接）用；R2/R3 纯函数零改。
+- 测试：test_handoffs.py +6（真读写 + 校验），test_new_cli.py +1（CLI round-trip）。
+
 ## [0.2.0] - 2026-06-11
 
 ### 重大变更（P-Core-FF：R1 存储层 feature-first 重构）

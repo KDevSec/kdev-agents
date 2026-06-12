@@ -1,7 +1,7 @@
 {
   "name": "kdev-core",
   "description": "KDev 数字员工编排底座（R1 状态记录 / R2 流转引擎 / R3 三类关卡）。feature-first 存储：.kdev/features/<slug>/（台账 runs[] + 用户故事 stories[] + 单棒控制态 active{} + 事实流水 events.jsonl）。薄引擎只记账+流转、不做判断；R2/R3 纯函数、断点续跑、有界回流 + escalate 不降级。被 kdev-team orchestrator 经 `python -m kdev_core` CLI 驱动。",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "author": { "name": "ly" },
   "license": "MIT",
   "keywords": ["orchestration", "state-machine", "feature-first", "flow-state", "events", "kdev"]
