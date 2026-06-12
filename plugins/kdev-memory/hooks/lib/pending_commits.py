@@ -20,7 +20,7 @@ from pathlib import Path
 from typing import Optional
 
 FILENAME = "pending-commits.json"
-DEFAULT_THRESHOLD_COUNT = 3
+DEFAULT_THRESHOLD_COUNT = 3  # P-C1b：age 为主，count 仅极端兜底（见 format_brief_hint 默认 12）
 DEFAULT_THRESHOLD_AGE_SEC = 1800  # 30 min
 
 
@@ -127,17 +127,22 @@ def oldest_age(state_dir: Path, now: int) -> int:
 def format_brief_hint(
     state_dir: Path,
     now: int,
-    threshold_count: int = DEFAULT_THRESHOLD_COUNT,
+    threshold_count: int = 12,          # P-C1b：count 调高（TDD 爆量不刷屏），age 为主
     threshold_age_sec: int = DEFAULT_THRESHOLD_AGE_SEC,
 ) -> Optional[str]:
-    """SessionStart/Stop brief 注入的 hint 字符串。不到阈值返回 None。"""
+    """SessionStart/Stop brief 注入的 hint 字符串。不到阈值返回 None。
+
+    P-C1b：age 为主——只有 age 跨过时间阈值才 nudge；count 仅作很高的兜底
+    （TDD/subagent 一个工作单元爆多个 commit 时不再被 count 触发刷屏）。
+    """
     data = read(state_dir)
     commits = data["commits"]
     if not commits:
         return None
     n = len(commits)
     age = now - commits[0]["ts"]
-    if n < threshold_count and age < threshold_age_sec:
+    # age 为主：未到 age 阈值且 count 未到（很高的）兜底值 → 不 nudge
+    if age < threshold_age_sec and n < threshold_count:
         return None
     age_min = age // 60
     latest = commits[-1]

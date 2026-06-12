@@ -37,16 +37,17 @@ def test_stop_hook_silent_when_no_pending(tmp_path):
     assert "pending step-recorder" not in out
 
 
-def test_stop_hook_warns_when_3_pending(tmp_path):
+def test_stop_hook_warns_when_pending_age_exceeded(tmp_path):
+    # P-C1b：age 为主——最早 commit 超过 age 阈值（> 1800s）才 nudge
     repo = _setup_repo(tmp_path)
     state = repo / ".kdev" / "memory" / "state"
     now = int(time.time())
     state.joinpath("pending-commits.json").write_text(json.dumps({
         "since_step_id": "main-15",
-        "since_ts": now - 100,
+        "since_ts": now - 2000,
         "commits": [
-            {"sha": "a"*40, "subject": "s1", "ts": now - 100},
-            {"sha": "b"*40, "subject": "s2", "ts": now - 50},
+            {"sha": "a"*40, "subject": "s1", "ts": now - 2000},  # age=2000 > 1800
+            {"sha": "b"*40, "subject": "s2", "ts": now - 1000},
             {"sha": "c"*40, "subject": "s3", "ts": now - 10},
         ],
     }), encoding="utf-8")

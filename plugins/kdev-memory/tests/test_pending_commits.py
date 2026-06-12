@@ -75,18 +75,34 @@ def test_format_brief_hint_silent_when_empty(tmp_path):
 def test_format_brief_hint_silent_below_threshold(tmp_path):
     append(tmp_path, "a", "subj-a", 1000)
     append(tmp_path, "b", "subj-b", 1100)
-    # count=2 < 3, age=200 < 1800 → silent
+    # count=2 < 12(backstop), age=200 < 1800 → silent
     assert format_brief_hint(tmp_path, now=1200) is None
 
 
-def test_format_brief_hint_fires_by_count(tmp_path):
-    append(tmp_path, "a", "subj-a", 1000)
-    append(tmp_path, "b", "subj-b", 1100)
-    append(tmp_path, "c", "subj-c", 1200)
-    hint = format_brief_hint(tmp_path, now=1300)
+def test_format_brief_hint_fires_by_count_backstop(tmp_path):
+    # P-C1b：age 为主，count 仅极端兜底（>=12）。爆 12 个 fresh commit → 触发兜底
+    for i in range(12):
+        append(tmp_path, f"sha{i}", f"subj-{i}", 1000 + i)
+    hint = format_brief_hint(tmp_path, now=1100)  # age 仍 < 1800，靠 count 兜底
     assert hint is not None
-    assert "3 commit" in hint
-    assert "subj-c" in hint or "subj-a" in hint
+    assert "12 commit" in hint
+    assert "subj-11" in hint or "subj-0" in hint
+
+
+def test_nudge_age_primary_suppresses_fresh_burst(tmp_path):
+    sd = tmp_path / "state"
+    now = 1000
+    for i in range(8):  # TDD 爆 8 个 commit，但都在 now 前 60s 内
+        append(sd, f"sha{i}", f"t {i}", now - 60)
+    # age=60s 远小于 age 阈值 → 不 nudge（age 为主，count 不再单独触发）
+    assert format_brief_hint(sd, now) is None
+
+
+def test_nudge_age_primary_fires_when_old(tmp_path):
+    sd = tmp_path / "state"
+    now = 100000
+    append(sd, "sha", "t", now - 2000)  # age=2000s > 1800
+    assert format_brief_hint(sd, now) is not None
 
 
 def test_format_brief_hint_fires_by_age(tmp_path):
