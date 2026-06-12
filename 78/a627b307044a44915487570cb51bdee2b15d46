@@ -1,0 +1,24 @@
+plugins/kdev-hud/kdev_hud/dashboard.py
+  s_2da0c01f3d2859::t_694ac181f36e30 165
+  s_2da0c01f3d2859::t_3e75c37eeee6f5 8-9
+  s_2da0c01f3d2859::t_bd627185bf9bd8 94
+  s_2da0c01f3d2859::t_669244b2e0d8bd 105
+plugins/kdev-hud/tests/test_dashboard.py
+  s_2da0c01f3d2859::t_839323bafd2d3c 52-83
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "78a627b307044a44915487570cb51bdee2b15d46",
+  "prompts": {},
+  "sessions": {
+    "s_2da0c01f3d2859": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c152964b-6a98-427a-af88-706df4e6c77f",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
