@@ -28,6 +28,7 @@ PLAN.md 必须显式列出"增量清单"，**增量数 N 在这里定死**——
 **裸任务兜底**（任务直给 dev、没经过需求架构师切分时）：你自己套上面定义判 N。拿不准就往小判（宁可 N=1 把它当一个增量内部多工序，也别拆成假增量——假增量会让 flow 空转 + 撞 retry cap）。
 
 ## Critical Actions
+- **先读上游 AR/方案（P-B 跨员工 handoff）**：同 slug 下若存在需求架构师交付，`python3 -m kdev_core handoff-read coding-flow <slug> --employee req-architect --node n8-merge --workspace <ws>`，以 `gate_input.ar`(迭代+用户故事) / `gate_input.design`(方案) 作**增量清单与 PLAN.md 的起点**（用户故事/迭代天然对位「可独立 e2e 的纵向切片」）。**上游缺失 → 裸任务兜底**：按现有「定增量」红线自己判 N（契约见 kdev-flow-driver SKILL §2.4ter）。
 - **先定增量清单**：按"可独立 e2e"切，写进 PLAN.md 开头（增量数 N + 每个增量的 e2e 验收标准）。
 - 产出 `PLAN.md`：增量清单 + 每增量内分任务 + TDD 顺序 + 每任务验收点。
 - 自验：计划覆盖切片范围、无占位、签名/类型与既有代码一致、**增量按"可 e2e"切（不是按实现分层）**。

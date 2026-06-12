@@ -69,3 +69,19 @@ def test_routing_dev_engineer_reads_upstream_at_n0_and_n3():
     assert "req-architect" in dev_sec
     # 读发生在入口节点
     assert "n0-env" in dev_sec and "n3-plan" in dev_sec
+
+
+def test_dev_env_agent_reads_upstream_sr():
+    """dev-engineer-env persona：读上游 req-architect 交付（SR+背景），缺失裸任务。"""
+    t = _t(DEV_ENV)
+    assert "handoff-read" in t
+    assert "req-architect" in t
+    assert ("裸任务" in t) or ("缺失" in t)
+
+
+def test_dev_plan_agent_seeds_increments_from_upstream_ar():
+    """dev-engineer-plan persona：上游 AR/方案在则以其用户故事/迭代切增量。"""
+    t = _t(DEV_PLAN)
+    assert "handoff-read" in t
+    assert "req-architect" in t
+    assert ("AR" in t) or ("用户故事" in t)
