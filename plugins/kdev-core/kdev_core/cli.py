@@ -150,6 +150,22 @@ def cmd_handoff_path(args):
     return 0
 
 
+def cmd_handoff_write(args):
+    gi = json.loads(args.gate_input) if args.gate_input else None
+    p = flow_state.write_handoff_status(
+        args.workspace, args.slug, args.employee, args.node, args.status,
+        args.summary, artifacts=args.artifact, gate_input=gi, reason=args.reason)
+    print(str(p))
+    return 0
+
+
+def cmd_handoff_read(args):
+    data = flow_state.read_handoff_status(
+        args.workspace, args.slug, args.employee, args.node)
+    print(json.dumps(data, ensure_ascii=False, indent=2))
+    return 0
+
+
 def cmd_migrate(args):
     from kdev_core import migrate
     report = migrate.migrate_workspace(args.workspace, dry_run=args.dry_run,
@@ -313,6 +329,22 @@ def build_parser():
     php = _common(sub, "handoff-path")
     php.add_argument("--employee", required=True)
     php.set_defaults(func=cmd_handoff_path)
+
+    phw = _common(sub, "handoff-write")
+    phw.add_argument("--employee", required=True)
+    phw.add_argument("--node", required=True)
+    phw.add_argument("--status", required=True,
+                     choices=["done", "blocked", "needs_context"])
+    phw.add_argument("--summary", required=True)
+    phw.add_argument("--artifact", action="append", default=[])
+    phw.add_argument("--gate-input", default=None, dest="gate_input")
+    phw.add_argument("--reason", default=None)
+    phw.set_defaults(func=cmd_handoff_write)
+
+    phr = _common(sub, "handoff-read")
+    phr.add_argument("--employee", required=True)
+    phr.add_argument("--node", required=True)
+    phr.set_defaults(func=cmd_handoff_read)
 
     plf2 = sub.add_parser("list-features")
     plf2.add_argument("--workspace", default=".",

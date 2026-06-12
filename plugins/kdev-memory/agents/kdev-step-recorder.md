@@ -215,17 +215,15 @@ EOF
 
 ## Return format
 
-On success（**只回一行确认 + 极简审计字段，不再回传 APPENDED_BLOCK 长文**——详细内容已写进 执行日志.md 文件本身）:
-```
-STATUS: DONE
-MINTED_ID: Step main-NN
-COUNTER: NN
-SCOPE: <scope>
-RATING_MODE: <model-only|user-opt-in|user-required>
-TARGET: <执行日志 path appended to>
-```
+On success（**只回一句人话确认**——详情已写进 执行日志.md 文件本身，不回机器块；这是 MQ-1：机器块回灌主会话被反馈"突兀"）:
 
-On reject:
+> 已落 Step <ID> → 执行日志.md（<scope> scope）；当前状态已同步、pending-commits 已清。
+
+例：`已落 Step main-70 → 执行日志.md（shared scope）；当前状态已同步、pending 已清。`
+
+（员工 scope 时省略"当前状态已同步"——员工 Step 不动主线 当前状态.md。）
+
+On reject（保留结构化——主会话需照此修正后重派）:
 ```
 STATUS: NEEDS_CONTEXT
 RULE_VIOLATED: <number>
@@ -240,4 +238,4 @@ SUGGESTED_FIX: <what main session should add/change>
 - Do NOT touch `kdev-memory plugin` code; you're a consumer of the lib, not a developer.
 - Do NOT silently fix problems in the input — REJECT and let main session fix.
 - Keep your own context lean; do not Read 执行日志.md unless needed for the Edit operation (you may need to read the last few lines to construct an Edit anchor).
-- 返回精简：成功时只回上述 6 行审计字段，**不要**把写入的 4 段内容再贴回 stdout（主会话已知意图，详情在文件里）。
+- 返回精简：成功时**只回一句人话确认**（MQ-1），不回机器审计块、不贴 4 段内容（主会话已知意图，详情在文件里）。

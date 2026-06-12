@@ -265,3 +265,20 @@ def test_cli_handoff_path(tmp_workspace, run_cli):
     assert out.endswith("/.kdev/features/f/handoffs/req-architect")
     from pathlib import Path
     assert Path(out).is_dir()
+
+
+def test_cli_handoff_write_read_roundtrip(tmp_workspace, run_cli):
+    out = run_cli(["handoff-write", "coding-flow", "f",
+                   "--employee", "dev-engineer", "--node", "n3-plan",
+                   "--status", "done", "--summary", "PLAN done",
+                   "--artifact", "delivery/PLAN.md",
+                   "--gate-input", '{"build":"pass"}']).strip()
+    assert out.endswith("/n3-plan.handoff.json")
+    read = run_cli(["handoff-read", "coding-flow", "f",
+                    "--employee", "dev-engineer", "--node", "n3-plan"])
+    data = json.loads(read)
+    assert data["status"] == "done"
+    assert data["summary"] == "PLAN done"
+    assert data["artifacts"] == ["delivery/PLAN.md"]
+    assert data["gate_input"] == {"build": "pass"}
+    assert data["reason"] is None

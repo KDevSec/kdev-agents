@@ -1,5 +1,20 @@
 # kdev-memory CHANGELOG
 
+## [0.15.1] — 2026-06-12
+
+**MQ-1：kdev-step-recorder 收尾返回 6 行机器块 → 一句人话确认。**
+
+### 🔄 变更
+
+- `agents/kdev-step-recorder.md` Return format：成功分支从 `STATUS/MINTED_ID/COUNTER/SCOPE/RATING_MODE/TARGET` 6 行审计块，改为一句人话确认（如"已落 Step main-70 → 执行日志.md；当前状态已同步、pending 已清"）。fire-and-forget subagent 的 final text 即返回值、会回显主会话——机器块被反馈"突兀"（§1.5.7 MQ-1）。拒绝分支保留结构化（主会话需照此修正重派）。
+- 直接配合 §1.5.6 B 轨：B 轨复用 fire-and-forget 批量派单，recorder 机器块回灌会抵消 B 轨"压刷屏"收益。
+- 测试：新增 `test_recorder_return_oneline.py`（成功无机器块 + 一句人话 + 拒绝仍结构化）。
+
+### 🧱 约束
+
+- 不碰 lib 契约（mint/写盘/clear pending 不变，e2e 测试不受影响）；不碰 scope/评分模式逻辑。
+- ⚠️ G-004：bump `0.15.0 → 0.15.1`，用户须刷 marketplace + 重启 session 才生效。
+
 ## [0.15.0] — 2026-06-11
 
 **kdev-memory 减痛轨 P-C0.5 + P-C1a：评分模式可配 + brief 分级 + subagent 输出精简。**
