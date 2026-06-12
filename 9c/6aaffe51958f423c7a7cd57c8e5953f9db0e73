@@ -1,0 +1,27 @@
+plugins/kdev-team/orchestration/dev-engineer.node-table.yml
+  s_c6a2827fd70228::t_4e9b460372b49a 39
+  s_c6a2827fd70228::t_35390aaab093b2 42
+  s_c6a2827fd70228::t_788d911650f184 3-5
+  s_c6a2827fd70228::t_049e8425f69d1b 36
+plugins/kdev-team/.claude-plugin/plugin.json
+  s_c6a2827fd70228::t_94723f8a070c2e 4
+plugins/kdev-team/CHANGELOG.md
+  s_c6a2827fd70228::t_bf6e8c89df6f53 10
+  s_c6a2827fd70228::t_81fabe0ec020fb 3-9,11-14
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "9c6aaffe51958f423c7a7cd57c8e5953f9db0e73",
+  "prompts": {},
+  "sessions": {
+    "s_c6a2827fd70228": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5a71ffa4-4bc3-4dc5-a321-ecbdeae4dcf6",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": null
+    }
+  }
+}
