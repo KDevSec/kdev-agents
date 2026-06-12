@@ -197,6 +197,44 @@ STOP——等用户决定是否 unblock 后重新启动。
 - **主循环怎么读**：`handoff-read`（见 §2.4 step 5）。
 - **为什么文件而非 result 回灌**：result 回灌刷屏主会话（连 recorder 的机器块都被反馈嫌吵，见 MQ-1）；文件交接 = 主循环只读它要的几个字段，编排叙述清爽。**gate 判断仍在主循环**（B 轨守界：执行甩后台、决策留主控）。
 
+### 2.4ter 跨员工 handoff（上游交付 → 下游 spec 输入）
+
+§2.4bis 是**同一 flow 内**主循环↔业务 agent 的交接（按 `current_node` 读）。本段是**跨员工跨 flow**的交接：上游员工（如需求架构师 req-architect）design-flow 的交付，喂给下游员工（开发工程师 dev-engineer）coding-flow 的 spec/plan 输入。**机制纯复用 B 轨 `handoff-write`/`handoff-read`，不新增原语。**
+
+**join 键 = 同一 feature slug。** 一个 feature 一个 slug：req-architect 在 slug X 上跑 design-flow、落产物到 `.kdev/features/X/handoffs/req-architect/`；dev-engineer 在**同一 slug X** 上跑 coding-flow，读这里当输入。
+
+**生产方（上游）落交付 manifest**：在其**聚合/交付节点**收尾时调一次：
+
+```bash
+python3 -m kdev_core handoff-write design-flow <slug> --workspace <ws> \
+  --employee req-architect --node n8-merge --status done \
+  --summary "<一句话：交付了什么>" \
+  --artifact .kdev/features/<slug>/handoffs/req-architect/sr.md \
+  --artifact .kdev/features/<slug>/handoffs/req-architect/ar.md \
+  --artifact .kdev/features/<slug>/handoffs/req-architect/prototype/ \
+  --artifact .kdev/features/<slug>/handoffs/req-architect/design.md \
+  --gate-input '{"sr":"<sr 路径>","ar":"<ar 路径>","prototype":"<prototype 路径>","design":"<design 路径>"}'
+```
+- `artifacts` = 产物路径列表（人/机都能顺着取）；`gate_input` = role→path 结构化指针（消费方按角色精确取 sr/ar/prototype/design）。
+
+**生产方 → 交付节点映射**（消费方据此知道读哪个 `--node`）：
+
+| 生产方（员工）| 交付节点 `--node` | 交付内容 |
+|---|---|---|
+| `req-architect` | `n8-merge` | SR / AR(迭代+用户故事) / 原型 / 方案 |
+
+**消费方（下游）读上游交付**：下游员工在其入口节点按上表读**同 slug** 的上游交付：
+
+```bash
+python3 -m kdev_core handoff-read coding-flow <slug> --workspace <ws> \
+  --employee req-architect --node n8-merge
+# → {node_id, employee, status, summary, artifacts, gate_input, reason}
+```
+- `status=done` → 取 `gate_input` 的 role→path 指针 / `artifacts` 作下游 spec/plan 输入（dev-engineer n0-env 读 SR+背景；n3-plan 读 AR+方案切增量）。
+- **上游缺失**（`handoff-read` 报 `handoff status not found` = FlowStateError）→ 该 slug 没有上游交付，**回退裸任务**：dev-engineer 按现状（clone+蒸馏 / 自己定增量）走，不阻断、不报错。
+
+**为什么不另起原语**：B 轨 `write/read_handoff_status` 已是「谁产了啥+路径+状态」结构化指针，跨员工只是换 `employee`/`slug` join 维度，零扩展即覆盖（守「复用别重造」）。**gate 判断仍在主循环**（同 §2.4bis 边界：执行甩文件、决策留主控）。
+
 ### 2.5 gate 节点 → 判断
 
 从 `next-step` 返回的 `gate_spec` 确定判断逻辑。四种情况：
