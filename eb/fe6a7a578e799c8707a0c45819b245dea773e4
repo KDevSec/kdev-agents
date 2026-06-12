@@ -1,0 +1,33 @@
+plugins/kdev-team/standards/reviewer/SR需求评审.md
+  s_c6a2827fd70228::t_d3ea93f551015c 1-58
+plugins/kdev-team/tests/test_reviewer_dispatch.py
+  s_c6a2827fd70228::t_53772b5325d5e7 69-90
+plugins/kdev-team/standards/reviewer/原型评审.md
+  s_c6a2827fd70228::t_9fcfef5e2e4ee3 1-58
+plugins/kdev-team/standards/reviewer/通用评分模板.md
+  s_c6a2827fd70228::t_a89996f5554e8c 1-91
+plugins/kdev-team/standards/reviewer/方案架构评审.md
+  s_c6a2827fd70228::t_529abac07b9c79 1-76
+plugins/kdev-team/standards/reviewer/用户故事评审.md
+  s_c6a2827fd70228::t_a841a7a0d1bbcd 1-58
+plugins/kdev-team/standards/reviewer/安全评审.md
+  s_c6a2827fd70228::t_65e4059a392631 1-58
+plugins/kdev-team/standards/reviewer/代码质量评审.md
+  s_c6a2827fd70228::t_945944c0c71aa2 1-60
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "ebfe6a7a578e799c8707a0c45819b245dea773e4",
+  "prompts": {},
+  "sessions": {
+    "s_c6a2827fd70228": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5a71ffa4-4bc3-4dc5-a321-ecbdeae4dcf6",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
