@@ -1,0 +1,21 @@
+plugins/kdev-team/agents/reviewer-orchestrator.md
+  s_c6a2827fd70228::t_8bf28a77e3244d 1-57
+plugins/kdev-team/tests/test_agents.py
+  s_c6a2827fd70228::t_c0f72fcae063b5 68-109
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "9672981f05698d6f585b528ed369c04256d83768",
+  "prompts": {},
+  "sessions": {
+    "s_c6a2827fd70228": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5a71ffa4-4bc3-4dc5-a321-ecbdeae4dcf6",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
