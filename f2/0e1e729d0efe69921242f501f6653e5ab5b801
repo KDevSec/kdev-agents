@@ -1,0 +1,21 @@
+plugins/kdev-hud/kdev_hud/datasource.py
+  s_2da0c01f3d2859::t_4e935b92eb406f 138-164
+plugins/kdev-hud/tests/test_datasource.py
+  s_2da0c01f3d2859::t_b8b3a015cb673a 120-147
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "f20e1e729d0efe69921242f501f6653e5ab5b801",
+  "prompts": {},
+  "sessions": {
+    "s_2da0c01f3d2859": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c152964b-6a98-427a-af88-706df4e6c77f",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
