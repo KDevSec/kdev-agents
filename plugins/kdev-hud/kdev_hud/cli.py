@@ -57,15 +57,23 @@ def _now_iso():
 def cmd_statusline(args):
     raw = _consume_stdin()
     ws = _resolve_workspace(args, raw)
-    model = datasource.build_hud_model(ws)
-    sys.stdout.write(statusline.render(model))
+    try:
+        model = datasource.build_hud_model(ws)
+        line = statusline.render(model)
+    except Exception:
+        # HUD 铁律：观测层永不崩用户视图（派生非真相，坏数据降级）
+        line = statusline.safe_fallback()
+    sys.stdout.write(line)
     return 0
 
 
 def cmd_render(args):
     raw = _consume_stdin()
     ws = _resolve_workspace(args, raw)
-    model = datasource.build_hud_model(ws)
+    try:
+        model = datasource.build_hud_model(ws)
+    except Exception:
+        model = {"features": [], "feature_count": 0, "primary": None}
     html = dashboard.render(model, generated_at=_now_iso())
     out = Path(args.out) if args.out else Path(ws) / ".kdev" / "hud.html"
     out.parent.mkdir(parents=True, exist_ok=True)

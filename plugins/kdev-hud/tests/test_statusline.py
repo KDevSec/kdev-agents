@@ -44,3 +44,8 @@ def test_statusline_truncates_long_name(tmp_workspace, seed):
     plain = _plain(sl.render(model))
     # 可见字符（不含 ANSI）控制在合理宽度
     assert len(plain) <= 90
+
+
+def test_safe_fallback_single_line():
+    line = sl.safe_fallback()
+    assert "\n" not in line and "KDev 团队" in _plain(line)

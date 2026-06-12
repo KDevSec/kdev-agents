@@ -58,3 +58,8 @@ def render(model):
     parts.append(f"{_GOLD}待处理 {alerts}{_TXT}" if alerts else f"{_TXT}无告警")
 
     return _SEP.join(parts) + _R
+
+
+def safe_fallback():
+    """坏数据/异常兜底：永不抛、永不多行。"""
+    return f"{_BRAND}KDev 团队{_DIM} │ {_TXT}HUD 数据读取降级{_R}"
