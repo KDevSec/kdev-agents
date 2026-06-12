@@ -28,9 +28,9 @@ Agent({subagent_type: "kdev-team:dev-engineer-env"})  ✅
 
 | 节点 id | 节点名称 | subagent_type | agent 中文名 | 干什么 | 需传的上下文 |
 |---|---|---|---|---|---|
-| n0-env | 项目背景对齐 | `kdev-team:dev-engineer-env` | 开发工程师·环境准备 | clone 仓库、栈版本对齐、蒸馏 UED materials → rules.md | repo_url, materials_path（含 AGENTS.md / design-tokens.json / ued-v6.css）, workspace 路径 |
+| n0-env | 项目背景对齐 | `kdev-team:dev-engineer-env` | 开发工程师·环境准备 | clone 仓库、栈版本对齐、蒸馏 UED materials → rules.md；**先读同 slug 上游交付**：`kdev_core handoff-read coding-flow <slug> --employee req-architect --node n8-merge`，存在则取 SR+背景作项目背景对齐输入，缺失则裸任务（SKILL §2.4ter） | repo_url, materials_path（含 AGENTS.md / design-tokens.json / ued-v6.css）, workspace 路径, **上游 req-architect 交付 handoff（若同 slug 存在）** |
 | n2-worktree | 新建 worktree | `kdev-team:dev-engineer-env` | 开发工程师·环境准备 | 在 worktree 里做（关联度低时走此分支） | repo_url, workspace 路径, 分支名 |
-| n3-plan | 写 implementation-plan | `kdev-team:dev-engineer-plan` | 开发工程师·实施计划 | 写 PLAN.md：任务拆解、TDD 序列、验收标准 | 任务描述, gate_a_verdict（high/low）, 考题或 spec 文件路径, workspace 路径 |
+| n3-plan | 写 implementation-plan | `kdev-team:dev-engineer-plan` | 开发工程师·实施计划 | 写 PLAN.md：任务拆解、TDD 序列、验收标准；**上游存在时**以 `handoff-read --employee req-architect --node n8-merge` 的 AR(迭代+用户故事)/方案切增量清单与 PLAN 起点，缺失则裸任务自定增量（SKILL §2.4ter） | 任务描述, gate_a_verdict（high/low）, 考题或 spec 文件路径, workspace 路径, **上游 req-architect AR/方案 handoff（若同 slug 存在）** |
 | n6a-impl-inline | 主控直接实现 | **不派 agent** | — | 主控自己写代码（simple 任务时走此分支） | 任务描述, PLAN.md 路径, workspace 路径 |
 | n6b-impl-subagent | subagent 派单实现(含TDD) | `kdev-team:dev-engineer-frontend` | 开发工程师·前端实现 | 改 src：视觉改造（token 对齐 + 页面逐页走查）。**当前增量内部的实现工序（T0→T4 这种分层）在这一个节点里做完，可多次派 frontend 分批建，中间不跑 gate 链** | 任务描述, PLAN.md 路径, rules.md 路径, prototype 图路径, **当前是第几个增量（纵向切片）**, workspace 路径, src 项目路径 |
 | n11-merge | 合并主分支 | `kdev-team:dev-engineer-deploy` | 开发工程师·部署上线 | 合并分支 + 起测试环境 + release notes（**收尾链，整任务只跑一次，真合并不空过**） | 分支名, workspace 路径, 项目路径 |
@@ -107,7 +107,7 @@ Gate 节点由编排器（你）自行判断，不派业务 agent。具体判据
 | n3-decompose | 需求拆解 AR | `kdev-team:req-architect-decompose` | 需求架构师·需求拆解 | 迭代拆分 + 用户故事（调 spec-kit:specify）；用户故事回编排 `add-story` 填 stories[] | sr.md 路径, 产物根 |
 | n4-prototype | 高保真原型 | `kdev-team:req-architect-prototype` | 需求架构师·原型设计 | 高保真原型（先抽宪法 UI 约束再调 frontend-design）→ prototype/ | AR 路径, `.specify/memory/constitution.md`, 产物根 |
 | n6-design | 方案设计 | `kdev-team:req-architect-design` | 需求架构师·方案设计 | 概要+详细方案（调 spec-kit:plan）→ design.md | AR+prototype 路径, 产物根 |
-| n8-merge | 产物聚合+合并交付 | **编排自做（不派）** | 需求架构师·编排 | 阶段聚合报告 + 合并交付（参 design-flow output-merge-rules.md）→ docs/design-flow/<slug>/ | 各阶段终版路径 |
+| n8-merge | 产物聚合+合并交付 | **编排自做（不派）** | 需求架构师·编排 | 阶段聚合报告 + 合并交付（参 design-flow output-merge-rules.md）→ docs/design-flow/<slug>/；**收尾落跨员工交付 handoff**：`kdev_core handoff-write design-flow <slug> --employee req-architect --node n8-merge --status done --summary ... --artifact sr/ar/prototype/design --gate-input '{"sr":..,"ar":..,"prototype":..,"design":..}'`（供下游 coding-flow 同 slug 读，见 SKILL §2.4ter）| 各阶段终版路径 |
 
 ## Gate 节点（n2-sr-review / n5-ar-proto-review / n7-design-review）
 

@@ -46,3 +46,26 @@ def test_skill_maps_producer_to_delivery_node():
     sec = t[start:end]
     # 映射行同时出现生产方与其交付节点
     assert PRODUCER in sec and DELIVERY_NODE in sec
+
+
+def test_routing_req_architect_n8_writes_delivery_handoff():
+    """node-agent-routing req-architect n8-merge 行：编排自做 + 写交付 handoff。"""
+    t = _t(ROUTING)
+    # 取 req-architect 路由段（"# req-architect" 标题之后）
+    start = t.index("req-architect（需求架构师）design-flow 路由")
+    sec = t[start:]
+    assert "n8-merge" in sec
+    assert "handoff-write" in sec
+    assert "--node n8-merge" in sec
+
+
+def test_routing_dev_engineer_reads_upstream_at_n0_and_n3():
+    """dev-engineer n0-env / n3-plan 上下文列加「读上游 req-architect 交付」。"""
+    t = _t(ROUTING)
+    # dev-engineer 段在 req-architect 段之前（文件上半部）
+    end = t.index("req-architect（需求架构师）design-flow 路由")
+    dev_sec = t[:end]
+    assert "handoff-read" in dev_sec
+    assert "req-architect" in dev_sec
+    # 读发生在入口节点
+    assert "n0-env" in dev_sec and "n3-plan" in dev_sec
