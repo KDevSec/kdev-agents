@@ -1,0 +1,24 @@
+plugins/kdev-memory/tests/test_pending_commits.py
+  s_ccdfa58bf5ccb2::t_ca46759f5fac72 11-12,18-24
+  s_ccdfa58bf5ccb2::t_6cbedd07ebad13 98-128
+plugins/kdev-memory/hooks/lib/pending_commits.py
+  s_ccdfa58bf5ccb2::t_b722b7e6ccefe3 69-79,83-84,89-96,100-101,106-112
+  s_ccdfa58bf5ccb2::t_6e8c88c68d5cdc 7-8
+  s_ccdfa58bf5ccb2::t_a13b3a259739e5 32-38,51-53
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "b3a0fc37a59d78bbb7e3c628900616deae635648",
+  "prompts": {},
+  "sessions": {
+    "s_ccdfa58bf5ccb2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "da13d5ac-244c-4571-b947-8ac7ae860e02",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
