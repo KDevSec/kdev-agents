@@ -90,6 +90,12 @@
       "description": "数字员工编排底座（R1 状态/R2 流转/R3 关卡）：feature-first 存储 + events.jsonl 流水。被 kdev-team 经 python -m kdev_core 驱动。",
       "category": "development",
       "source": "./plugins/kdev-core"
+    },
+    {
+      "name": "kdev-hud",
+      "description": "数字员工观测层（第 4 plugin，纯只读）：把 kdev-core feature-first 账本渲染成通道①命令行状态栏 + 通道②自包含网页仪表盘 hud.html。不写 features/，底座可 headless 单装。",
+      "category": "development",
+      "source": "./plugins/kdev-hud"
     }
   ]
 }

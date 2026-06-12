@@ -1,0 +1,8 @@
+{
+  "name": "kdev-hud",
+  "description": "KDev 数字员工观测层（第 4 plugin，纯只读）：把 kdev-core feature-first 账本（.kdev/features/<slug>/ 的 flow-state.json + events.jsonl）渲染成通道①命令行状态栏 + 通道②自包含网页仪表盘 hud.html。不记账、不流转、不判断，绝不写 features/；底座 headless 单装、无反向依赖。",
+  "version": "0.1.0",
+  "author": { "name": "ly" },
+  "license": "MIT",
+  "keywords": ["hud", "observability", "statusline", "dashboard", "read-only", "feature-first", "kdev"]
+}
