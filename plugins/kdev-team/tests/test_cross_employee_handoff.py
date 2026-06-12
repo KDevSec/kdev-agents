@@ -39,13 +39,17 @@ def test_skill_cross_section_documents_producer_consumer_contract():
 
 
 def test_skill_maps_producer_to_delivery_node():
-    """SKILL 明确生产方→交付节点映射（req-architect → n8-merge），消费方据此读。"""
+    """SKILL 含「生产方→交付节点」映射表行（req-architect | n8-merge），消费方据此读。
+
+    断言映射表行本身存在（两 cell 相邻），而非仅两字符串各自出现——
+    否则映射表被删、字符串散落别处时会假绿。
+    """
     t = _t(SKILL)
     start = t.index("2.4ter")
     end = t.index("### 2.5")
     sec = t[start:end]
-    # 映射行同时出现生产方与其交付节点
-    assert PRODUCER in sec and DELIVERY_NODE in sec
+    # markdown 表行：`req-architect` | `n8-merge` 两 cell 相邻
+    assert f"`{PRODUCER}` | `{DELIVERY_NODE}`" in sec
 
 
 def test_routing_req_architect_n8_writes_delivery_handoff():
@@ -80,11 +84,14 @@ def test_dev_env_agent_reads_upstream_sr():
 
 
 def test_dev_plan_agent_seeds_increments_from_upstream_ar():
-    """dev-engineer-plan persona：上游 AR/方案在则以其用户故事/迭代切增量。"""
+    """dev-engineer-plan persona：上游 AR/方案在则以其用户故事/迭代切增量。
+
+    断言新 bullet 特有的 `gate_input.ar` 指针（"AR"/"用户故事" 在旧正文已出现，会假绿）。
+    """
     t = _t(DEV_PLAN)
     assert "handoff-read" in t
     assert "req-architect" in t
-    assert ("AR" in t) or ("用户故事" in t)
+    assert "gate_input.ar" in t
 
 
 def test_req_orchestrator_n8_writes_cross_employee_handoff():
