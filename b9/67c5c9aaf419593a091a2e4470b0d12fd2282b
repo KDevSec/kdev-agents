@@ -1,0 +1,28 @@
+plugins/kdev-team/CHANGELOG.md
+  s_34bc963bed7187::t_d49d6150381140 3-14
+plugins/kdev-team/skills/kdev-flow-driver/references/node-agent-routing.md
+  s_34bc963bed7187::t_e6d8ec96ff7aac 19-26
+plugins/kdev-team/tests/test_bg_dispatch.py
+  s_34bc963bed7187::t_56b091a25779f7 1-35
+plugins/kdev-team/skills/kdev-flow-driver/SKILL.md
+  s_34bc963bed7187::t_03bb418f96df21 321-342
+  s_34bc963bed7187::t_b883f86ebf7f2d 142,144,147-153,155-159,161-172,179-198
+plugins/kdev-team/.claude-plugin/plugin.json
+  s_34bc963bed7187::t_26cdffd95cd1bc 4
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "b967c5c9aaf419593a091a2e4470b0d12fd2282b",
+  "prompts": {},
+  "sessions": {
+    "s_34bc963bed7187": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ee9954b3-0c1a-440e-9563-db0573135ca9",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
