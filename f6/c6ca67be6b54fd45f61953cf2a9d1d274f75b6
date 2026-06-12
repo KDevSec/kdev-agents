@@ -1,0 +1,19 @@
+docs/superpowers/plans/2026-06-12-kdev-hud.md
+  s_2da0c01f3d2859::t_aaf1ef14a25026 1-1402
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "f6c6ca67be6b54fd45f61953cf2a9d1d274f75b6",
+  "prompts": {},
+  "sessions": {
+    "s_2da0c01f3d2859": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c152964b-6a98-427a-af88-706df4e6c77f",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
