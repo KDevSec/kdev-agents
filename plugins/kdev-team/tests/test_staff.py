@@ -25,3 +25,32 @@ def test_req_architect_entry():
     assert len(emp["agents"]) == 6
     for a in emp["agents"]:
         assert (AGENTS / f"{a}.md").exists(), f"花名册引用的 agent 不存在: {a}"
+
+
+def test_kind_discriminator_on_all_employees():
+    d = yaml.safe_load(STAFF.read_text(encoding="utf-8"))
+    emps = d["employees"]
+    assert emps["dev-engineer"]["kind"] == "flow-owner"
+    assert emps["req-architect"]["kind"] == "flow-owner"
+    assert emps["reviewer"]["kind"] == "callee"
+
+
+def test_reviewer_callee_entry():
+    d = yaml.safe_load(STAFF.read_text(encoding="utf-8"))
+    emp = d["employees"]["reviewer"]
+    assert emp["display"] == "评审专家"
+    assert emp["kind"] == "callee"
+    assert emp["dispatch_table"] == "orchestration/reviewer.dispatch-table.yml"
+    assert "node_table" not in emp, "callee 不应有 node_table（用 dispatch_table）"
+    assert emp["flow_skill"] is None, "callee 无方法论 flow-skill"
+    assert emp["standards_dir"] == "standards/reviewer/"
+    assert len(emp["agents"]) == 7  # orchestrator + 6 cap
+    for a in emp["agents"]:
+        assert (AGENTS / f"{a}.md").exists(), f"花名册引用的 agent 不存在: {a}"
+
+
+def test_flow_owner_keeps_node_table_callee_has_none():
+    d = yaml.safe_load(STAFF.read_text(encoding="utf-8"))
+    for fid in ("dev-engineer", "req-architect"):
+        assert "node_table" in d["employees"][fid]
+        assert "dispatch_table" not in d["employees"][fid]
