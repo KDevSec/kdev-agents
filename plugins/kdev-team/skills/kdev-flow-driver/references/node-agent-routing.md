@@ -16,6 +16,14 @@ Agent({subagent_type: "kdev-team:dev-engineer-env"})  ✅
 因此：**本路由表 `subagent_type` 列、SKILL/orchestrator 里所有派单示例，统一写成 `kdev-team:<agent-id>`**。
 （注意：agent `.md` frontmatter 的 `name:`、`staff.yml` 的 `agents:` 花名册仍是裸 canonical id —— 那是文件名/身份标识，插件系统负责在派单时加前缀；只有「派单调用值」需要写全名。）
 
+## 🔵 派单方式：后台 + 文件交接（B 轨）
+
+业务派单一律 `run_in_background: true`，agent 收尾把状态写到
+`.kdev/features/<slug>/handoffs/<员工>/<node_id>.handoff.json`（`kdev_core handoff-write`），
+主控靠 completion 通知 + `handoff-read` 拿结果，**不读 subagent 内联返回**。
+协议 schema + 派单步骤见 `SKILL.md` §2.4 / §2.4bis / §4。
+（本表的产物落位规则——dev-engineer 落 `delivery/`、req-architect 落 `handoffs/`——不变；交接**状态文件**统一落 `handoffs/<员工>/`，内部用 `artifacts` 指向真实产物路径。）
+
 ## 路由映射
 
 | 节点 id | 节点名称 | subagent_type | agent 中文名 | 干什么 | 需传的上下文 |

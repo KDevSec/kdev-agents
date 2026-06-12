@@ -139,29 +139,63 @@ python3 -m kdev_core complete $FLOW <slug> --workspace <workspace>
 
 STOP——等用户决定是否 unblock 后重新启动。
 
-### 2.4 action 节点 → 派业务 agent
+### 2.4 action 节点 → 派业务 agent（后台 + 文件交接）
 
-从 `next_actions` 得到下一步节点 id，但当前 action 节点本身需要先完成工作。派单逻辑：
+从 `next_actions` 得到下一步节点 id，但当前 action 节点本身需要先完成工作。派单逻辑（B 轨：执行甩后台、决策留主控）：
 
 1. **读 Node→Agent 路由表**（见 `references/node-agent-routing.md`）确定当前节点对应哪个 `subagent_type`
-2. **构造派单上下文**：给 agent 的 prompt 里必须包含：
-   - 任务描述（`--task` 参数的内容，或从考题文件读取）
-   - 当前节点目标（node_name + 在 SOP 中的位置说明）
-   - 前序产物路径（如 env.md / rules.md / PLAN.md 的位置）
-   - 工作目录 / 项目路径
-   - 相关约束（UED 规范路径、原型图路径等）
-3. **派 agent**（🔴 `subagent_type` 必须是插件全名 `kdev-team:<agent-id>`，裸 id 会 not-found——详见 `references/node-agent-routing.md` 顶部「派单标识」规则）：
+2. **算交接目录**：
+   ```bash
+   python3 -m kdev_core handoff-path $FLOW <slug> --employee <canonical-id> --workspace <workspace>
+   # → .kdev/features/<slug>/handoffs/<员工>/
    ```
-   Agent({subagent_type: "kdev-team:dev-engineer-env", prompt: "<构造的上下文>"})
+3. **构造派单上下文**（§4 模板）：prompt 里必含——任务描述、当前节点目标、前序产物路径、工作目录、相关约束（UED/原型图等），**末尾必含「完成后写交接文件」指令**（见 §2.4bis + §4 模板）
+4. **后台派 agent**（🔴 `subagent_type` 必须是插件全名 `kdev-team:<agent-id>`，裸 id not-found——见 `references/node-agent-routing.md` 顶部「派单标识」；🔴 `run_in_background: true` 是 B 轨核心）：
    ```
-   runtime_model 按 staff.yml 的设定选（当前阶段1统一 opus）
-4. **等 agent 返回**，检查结果是否合理
-5. **推进到下一节点**：
+   Agent({
+     subagent_type: "kdev-team:dev-engineer-env",
+     run_in_background: true,
+     prompt: "<构造的上下文 + 写交接文件指令>"
+   })
+   ```
+   `run_in_background: true` 让 subagent 的工具调用、内联渲染、大段 result 全在后台 sidechain，**不灌主会话**——这是 B 轨压掉"派单刷屏"的核心。runtime_model 按 staff.yml（当前阶段1统一 opus）。
+5. **等完成通知 → 读交接文件**（不读 subagent 内联返回）：
+   - 后台 agent 完成时主循环收到 **completion 通知**。
+   - 读结构化状态：
+     ```bash
+     python3 -m kdev_core handoff-read $FLOW <slug> --employee <id> --node <current_node> --workspace <workspace>
+     # → {node_id, employee, status, summary, artifacts, gate_input, reason}
+     ```
+   - `status=done` → 取 `artifacts` / `gate_input` 作下一步（gate）输入。
+   - `status=blocked` / `needs_context` → **不 advance**，按 BLOCKED 处理（§2.3，或带 `reason` 升人）。
+   - ⚠️ **可观测**：completion 通知 + 交接文件 `status` 双信号；`handoff-read` 报 `handoff status not found / unreadable`（FlowStateError）= 该节点没干完，**不静默 advance**——按未完成处理（重派或升人）。
+6. **推进到下一节点**（仅 `status=done`）：
    ```bash
    python3 -m kdev_core advance $FLOW <slug> <to_node> --table $NT \
      --reason "<node_name> 完成" --workspace <workspace>
    ```
    `to_node` 取 `next_actions[0].to_node`（action 节点通常只有一个 next）
+
+### 2.4bis 文件交接协议（B 轨核心，最小够用）
+
+业务 agent **不把产出大段 result 回灌主会话**，而是写一个结构化状态文件，主循环读它。
+
+- **路径**：`.kdev/features/<slug>/handoffs/<员工 canonical-id>/<node_id>.handoff.json`（目录由 kdev-core `handoff_dir` 约定，P-Core-FF 已建；**不自创新目录**）。
+- **schema**（kdev-core `write_handoff_status` 落、`read_handoff_status` 校验）：
+
+  | 字段 | 含义 |
+  |---|---|
+  | `node_id` | 当前节点 id |
+  | `employee` | 员工 canonical id |
+  | `status` | `done` / `blocked` / `needs_context` |
+  | `summary` | 一句人话（必填） |
+  | `artifacts` | 产物路径列表（可空） |
+  | `gate_input` | 给下一 gate 的结构化信号，可 `null` |
+  | `reason` | `status != done` 时必填 |
+
+- **agent 怎么写**：派单 prompt 末尾注入指令（见 §4 模板），让 agent 收尾调 `kdev_core handoff-write ...`。
+- **主循环怎么读**：`handoff-read`（见 §2.4 step 5）。
+- **为什么文件而非 result 回灌**：result 回灌刷屏主会话（连 recorder 的机器块都被反馈嫌吵，见 MQ-1）；文件交接 = 主循环只读它要的几个字段，编排叙述清爽。**gate 判断仍在主循环**（B 轨守界：执行甩后台、决策留主控）。
 
 ### 2.5 gate 节点 → 判断
 
@@ -283,6 +317,28 @@ g-complexity gate 判断：
 ## 工作目录
 <workspace 路径>
 ```
+
+派 agent 时，在上面模板**末尾追加**下面这段「写交接文件」指令（B 轨文件交接，REQUIRED）：
+
+```
+## 完成后写交接文件（REQUIRED）
+
+完成本节点工作后，你【必须】把结构化状态写到交接文件（**不要**把大段产出回灌——产出落 artifacts，主控只读交接文件）：
+
+PYTHONPATH=<FRAMEWORK_REPO>/plugins/kdev-core python3 -m kdev_core handoff-write <flow> <slug> \
+  --employee <你的 canonical id> --node <当前 node_id> \
+  --status done \
+  --summary "<一句话：这步干完了什么>" \
+  --artifact <产物路径> [--artifact <更多产物>] \
+  [--gate-input '<给下一 gate 的 JSON，如 {"build":"pass","lint":"clean"}>'] \
+  --workspace <workspace>
+
+若未完成 / 被阻塞：把 --status 改成 blocked（或 needs_context）并加 --reason "<为什么>"。
+
+你的 final message 只回一句话确认（如"n3-plan 完成，详见交接文件"）——详情在交接文件 + artifacts 里，**不要长篇回灌**。
+```
+
+（主控构造 prompt 时把 `<FRAMEWORK_REPO>` / `<flow>` / `<slug>` / `<node_id>` / `<canonical id>` / `<workspace>` 全部替换成实际值再派单。）
 
 ---
 

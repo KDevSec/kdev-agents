@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.4.0 — 2026-06-12
+
+**B 轨：编排派单 run_in_background 化 + 文件交接（§1.5.6 B done）**
+
+- `kdev-flow-driver/SKILL.md` §2.4 业务派单：前台同步 `Agent({...})` → `run_in_background: true` + 约定路径 JSON 文件交接，去掉内联渲染 + 大段 result 回灌（~80% 混杂），压"派单刷屏主会话"主痛点。
+- 新增 §2.4bis 文件交接协议（schema + 路径 + 读写 CLI），复用 kdev-step-recorder 已验 fire-and-forget 思路 + kdev-core `handoff-write`/`handoff-read`（v0.3.0）。
+- §4 上下文模板加「完成后写交接文件」指令（注入派单 prompt 末尾；**不改 agent persona 定义**）。
+- 主循环靠 completion 通知 + `handoff-read` 拿"干完没 + 产物路径 + gate 输入"；交接文件缺/坏 = 显式失败不静默 advance。
+- **gate 判断仍在主循环**（§2.5 不后台化）——守 §1.5.6 B 轨边界：执行甩后台、决策留主控。
+- 测试：新增 `test_bg_dispatch.py`（4 散文不变量，含「gate 不被后台化」硬守）。
+- ⚠️ G-004：用户须刷 marketplace（`/plugin` 更新/重装）+ 重启 session 才生效。
+
 ## 0.3.1 — 2026-06-12
 
 **修复：派单 `subagent_type` 裸名 → 插件全名 `kdev-team:<id>`（员工起不来 BUG）**
