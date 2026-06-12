@@ -1,0 +1,21 @@
+plugins/kdev-memory/tests/test_commit_tracker.py
+  s_ccdfa58bf5ccb2::t_ea5e063a4ec1f8 28-34
+plugins/kdev-memory/hooks/commit-tracker.py
+  s_ccdfa58bf5ccb2::t_56fa71a013d18a 77
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "d89c57c157818f62deeede54b65787053233b837",
+  "prompts": {},
+  "sessions": {
+    "s_ccdfa58bf5ccb2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "da13d5ac-244c-4571-b947-8ac7ae860e02",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
