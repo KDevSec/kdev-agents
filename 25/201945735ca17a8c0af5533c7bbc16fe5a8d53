@@ -1,0 +1,30 @@
+plugins/kdev-memory/hooks/lib/step_completeness.py
+  s_ccdfa58bf5ccb2::t_73ec1afd5775cd 246
+  s_ccdfa58bf5ccb2::t_56606394c8bcb7 16
+  s_ccdfa58bf5ccb2::t_7bb94f4fb00753 173-177
+plugins/kdev-memory/tests/test_step_completeness.py
+  s_ccdfa58bf5ccb2::t_7456f4219f0cf9 433-457
+plugins/kdev-memory/skills/kdev-memory/references/六类记录-schema.md
+  s_ccdfa58bf5ccb2::t_05671d4779cca2 6
+  s_ccdfa58bf5ccb2::t_c69fe4c82f28a3 245-246,248
+  s_ccdfa58bf5ccb2::t_6d1babda4d0309 146
+  s_ccdfa58bf5ccb2::t_47b5df8441584b 143
+  s_ccdfa58bf5ccb2::t_1ae6ef964ec05f 135,137-139,141
+  s_ccdfa58bf5ccb2::t_f378c0fb77f724 272
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "25201945735ca17a8c0af5533c7bbc16fe5a8d53",
+  "prompts": {},
+  "sessions": {
+    "s_ccdfa58bf5ccb2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "da13d5ac-244c-4571-b947-8ac7ae860e02",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": null
+    }
+  }
+}
