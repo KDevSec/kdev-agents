@@ -71,3 +71,28 @@ Gate 节点由编排器（你）自行判断，不派业务 agent。具体判据
 7. **当前范围**：特别是 frontend agent，明确"这一轮做哪个 increment"
 
 详见 SKILL.md §4 上下文构造模板。
+
+---
+
+# req-architect（需求架构师）design-flow 路由
+
+适用于 `req-architect` 员工的 design-flow（node-table=`orchestration/req-architect.node-table.yml`）。
+
+## 路由映射
+
+| 节点 id | 节点名称 | subagent_type | agent 中文名 | 干什么 | 需传的上下文 |
+|---|---|---|---|---|---|
+| n0-clarify | 需求澄清 IR | `req-architect-clarify` | 需求架构师·需求澄清 | 澄清原始需求 → ir.md | 原始需求文本/路径, **产物根=`<workspace>/.kdev/features/<slug>/handoffs/req-architect/`** |
+| n1-spec | 需求计划 SR | `req-architect-spec` | 需求架构师·需求计划 | 写 SR（参 design-flow stage1-sr-prompt/template）→ sr.md | ir.md 路径, 产物根 |
+| n3-decompose | 需求拆解 AR | `req-architect-decompose` | 需求架构师·需求拆解 | 迭代拆分 + 用户故事（调 spec-kit:specify）；用户故事回编排 `add-story` 填 stories[] | sr.md 路径, 产物根 |
+| n4-prototype | 高保真原型 | `req-architect-prototype` | 需求架构师·原型设计 | 高保真原型（先抽宪法 UI 约束再调 frontend-design）→ prototype/ | AR 路径, `.specify/memory/constitution.md`, 产物根 |
+| n6-design | 方案设计 | `req-architect-design` | 需求架构师·方案设计 | 概要+详细方案（调 spec-kit:plan）→ design.md | AR+prototype 路径, 产物根 |
+| n8-merge | 产物聚合+合并交付 | **编排自做（不派）** | 需求架构师·编排 | 阶段聚合报告 + 合并交付（参 design-flow output-merge-rules.md）→ docs/design-flow/<slug>/ | 各阶段终版路径 |
+
+## Gate 节点（n2-sr-review / n5-ar-proto-review / n7-design-review）
+
+由编排器（你）按 design-flow 判据自判，不派业务 agent。判据见 `gate-decision-logic.md` 的 req-architect 段。
+
+## ⚠️ 产物落 handoffs/req-architect/（同 dev-engineer 的 delivery/ 教训，G-006）
+
+派 req-architect 业务 agent 时，**必须在上下文写死「产物根 = `<workspace>/.kdev/features/<slug>/handoffs/req-architect/`」**，所有 ir/sr/ar/prototype/design 都落这里，不套用全局 `screenshots/` 规则。最终合并交付落 `docs/design-flow/<slug>/`。

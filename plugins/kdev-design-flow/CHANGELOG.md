@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.3.0 — 2026-06-12
+
+**接 kdev-core 底座：SKILL 回归方法论参考，自带 flow_state 退役**
+
+- 删除自带 `lib/flow_state.py` + `tests/test_flow_state.py`——编排状态迁到 kdev-core 引擎（feature-first `.kdev/features/<slug>/`，kdev-core 是 golden seed 的泛化超集，已含 review_mode/escalate/stories）。保留 `lib/slug.py`（slug 仍本地生成）。
+- SKILL.md 回归**方法论参考**（各 Stage prompt/模板、Gate 判据、合并规则），**不再自跑状态机**；运行时编排由 kdev-team 通用 `kdev-flow-driver` + `req-architect.node-table.yml` 驱动。
+- SOP 行为不破：3 评审闸门 / 3 retry / 宪法 UI 抽取 / 恢复模式错误处理 均保留（lint + 迁移断言兜）。
+
 ## 0.2.0 — 2026-05-19
 
 **Stage 3 反发散修复：原型生成必须吃项目宪法 UI 规范**

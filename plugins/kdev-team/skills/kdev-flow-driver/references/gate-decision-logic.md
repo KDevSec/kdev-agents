@@ -154,3 +154,29 @@
 
 回流最多 2 次（总共 3 次尝试），第 3 次引擎自动 escalate 为 blocked。
 g-increment 的 more 循环**不算回流**（decision gate，不碰 cap），可循环 N 次。
+
+---
+
+# req-architect（需求架构师）gate 判据
+
+适用于 `req-architect` 员工的 design-flow。3 评审 gate 复刻 kdev-design-flow 的 3 闸门，**阶段1 全 `reviewer=self`**——主控按 design-flow `skills/kdev-design-flow/references/review-gate-prompt.md` 的成功标准自评，`config.review_mode` 控档：
+
+- **ai**（默认）：主控自评 → 输出 VERDICT/ISSUES → PASS/FAIL，直接 record-gate。
+- **both**：自评后 `AskUserQuestion` 让用户确认/覆盖，再 record-gate。
+- **human**：直接 `AskUserQuestion` 让用户判 PASS/FAIL。
+
+| Gate | 节点 | 复刻 design-flow | 评审对象 | 判据来源 |
+|---|---|---|---|---|
+| g-sr-review | n2-sr-review | Gate1 | sr.md | review-gate-prompt.md Stage1 成功标准 |
+| g-ar-proto-review | n5-ar-proto-review | Gate2（AR+原型共评）| ar + prototype/ | review-gate-prompt.md Stage2 成功标准（含 C-2.6 宪法合规）|
+| g-design-review | n7-design-review | Gate3 | design.md | review-gate-prompt.md Stage3/4 成功标准 |
+
+## 回流有界（复刻 design-flow「3 次 FAIL → 升人」）
+
+FAIL 时引擎自动 `gate_iters++`；达 `max_retries(3)` → `status=blocked` 留原地升人（不强过、不冒充第三方）。回流目标：
+
+- g-sr-review FAIL → n1-spec（重写 SR）
+- g-ar-proto-review FAIL → n4-prototype（重做原型；AR 本身要返工时编排升级回 n3-decompose）
+- g-design-review FAIL → n6-design（重做方案）
+
+> 注：这是 review gate 的 R3 escalate（→ blocked），不是 R2 机械 reflow（→ terminal_fail n-fail）。req-architect 全 review gate，正常不触达 n-fail。

@@ -11,16 +11,23 @@ description: Use when 用户明确请求"把这个需求走一遍设计流程 / 
 
 通常通过 `/kdev-design-flow` 斜杠命令触发，不是 description 自动捕获（除非用户语气非常明确）。
 
+## 本 SKILL 的定位（接底座后）
+
+本 SKILL 是**需求设计方法论参考**（各 Stage 的 prompt/模板、Gate 判据、合并规则），**不再自带状态机、不充当编排器**。运行时编排由 kdev-team 的**通用 `kdev-flow-driver` skill**（顶层主控执行循环）按 `req-architect`（需求架构师）员工的 `orchestration/req-architect.node-table.yml` 驱动 **kdev-core 引擎**完成；状态落 feature-first 存储 `.kdev/features/<slug>/`（含 `handoffs/req-architect/` 产物）。
+
+- 直接跑设计流：`/kdev-flow-driver req-architect --task "<需求>"`（通用 driver 路由 req-architect）。
+- 本 SKILL 被 `req-architect-*` 业务 agent 当方法论参考读（怎么写 SR / 怎么调 frontend-design / 评审判据）。
+
 ## 工作流总览
 
 | 阶段 | 用什么 | 输入 | 输出位置 |
 |------|--------|------|----------|
-| Stage 1 | 内置 prompt（references/stage1-sr-prompt.md） | 用户原始需求 | `.kdev/design-flow/<slug>/stage-1-sr/iter-N.md` |
+| Stage 1 | 内置 prompt（references/stage1-sr-prompt.md） | 用户原始需求 | `.kdev/features/<slug>/handoffs/req-architect/stage-1-sr/iter-N.md` |
 | Gate 1 | 评审机制 | SR 文档 | (PASS / FAIL + 反馈) |
-| Stage 2 | `Skill` 调 `spec-kit:specify` | 上一步通过的 SR 文档 | `.kdev/design-flow/<slug>/stage-2-ar/iter-N.md` |
-| Stage 3 | `Skill` 调 `frontend-design:frontend-design` | 上一步通过的 AR 用户故事 | `.kdev/design-flow/<slug>/stage-3-prototype/iter-N/` |
+| Stage 2 | `Skill` 调 `spec-kit:specify` | 上一步通过的 SR 文档 | `.kdev/features/<slug>/handoffs/req-architect/stage-2-ar/iter-N.md` |
+| Stage 3 | `Skill` 调 `frontend-design:frontend-design` | 上一步通过的 AR 用户故事 | `.kdev/features/<slug>/handoffs/req-architect/stage-3-prototype/iter-N/` |
 | Gate 2 | 评审机制 | AR + 原型 | (PASS / FAIL + 反馈) |
-| Stage 4 | `Skill` 调 `spec-kit:plan` | 上一步通过的 AR + 原型 | `.kdev/design-flow/<slug>/stage-4-plan/iter-N.md` |
+| Stage 4 | `Skill` 调 `spec-kit:plan` | 上一步通过的 AR + 原型 | `.kdev/features/<slug>/handoffs/req-architect/stage-4-plan/iter-N.md` |
 | Gate 3 | 评审机制 | 设计方案 | (PASS / FAIL + 反馈) |
 | Merge | 见 references/output-merge-rules.md | 各阶段最终通过版本 | `docs/design-flow/<slug>/` |
 
@@ -54,29 +61,30 @@ description: Use when 用户明确请求"把这个需求走一遍设计流程 / 
 
 `frontend-design` 缺失 → 警告但允许用户选择是否继续（Stage 3 没它会跳到"手动占位"模式）。
 
-### 步骤 2：初始化状态
+### 步骤 2：初始化状态（接 kdev-core 引擎）
+
+> 接底座后状态由 kdev-core 引擎管，不再用本 skill 自带的 flow_state。slug 仍由 `lib.slug.slugify(feature_name)` 生成（kdev-core 的 slug 由调用方直传）。
 
 ```bash
-python3 -c "
-from pathlib import Path
-import sys
-sys.path.insert(0, '${CLAUDE_PLUGIN_ROOT}')
-from lib.slug import slugify
-from lib.flow_state import init_state
-slug = slugify('${feature_name}')
-init_state(Path.cwd(), slug, review_mode='${review_mode}', feature_name='${feature_name}')
-print(slug)
-"
+python3 -c "import sys; sys.path.insert(0,'${CLAUDE_PLUGIN_ROOT}'); from lib.slug import slugify; print(slugify('${feature_name}'))"
 ```
 
-记录返回的 `slug`，后续所有路径用它。
+拿到 slug 后，由通用 kdev-flow-driver / req-architect 编排调 kdev-core 立项：
+
+```bash
+python3 -m kdev_core init design-flow <slug> --display-name "${feature_name}" --review-mode ${review_mode} --initial-node n0-clarify
+```
+
+节点机 / gate 推进 / 回流 / blocked 升人全由 kdev-core 引擎承载，见 `req-architect.node-table.yml`。记录返回的 `slug`，后续所有路径用它。
 
 ### 步骤 3：自动 .gitignore
+
+> 接底座后运行时状态落 kdev-core 的 feature-first 存储 `.kdev/features/`，gitignore 也对齐到这里。
 
 检查仓库根 `.gitignore`：
 
 ```bash
-grep -qE "^/?\.kdev/design-flow/?$" .gitignore || echo "/.kdev/design-flow/" >> .gitignore
+grep -qE "^/?\.kdev/features/?$" .gitignore || echo "/.kdev/features/" >> .gitignore
 ```
 
 如果改了 `.gitignore`，提示用户"已自动追加 .gitignore（建议本次提交带上）"，但**不自动 commit**——交给用户决定何时提交。
@@ -95,16 +103,18 @@ grep -qE "^/?\.kdev/design-flow/?$" .gitignore || echo "/.kdev/design-flow/" >> 
 2. Read `references/stage1-sr-template.md`
 3. 把模板中的 `{{user_input}}` / `{{slug}}` / `{{iter}}` / `{{feature_name}}` / `{{date}}` 占位符填好
 4. 按 prompt 指示产出 SR 文档
-5. Write 到 `.kdev/design-flow/<slug>/stage-1-sr/iter-<iter>.md`
+5. Write 到 `.kdev/features/<slug>/handoffs/req-architect/stage-1-sr/iter-<iter>.md`
 6. 进入 Gate 1
 
 ---
 
 ## 评审闸门通用机器（适用于 Gate 1/2/3）
 
+> 接底座后**状态机不在本 SKILL 自跑**：当前在哪个节点 / 哪个 Gate / 第几次回流，都由 kdev-core 引擎据 `req-architect.node-table.yml` 维护；本段是**评审判据方法论**（怎么判 PASS/FAIL），由 req-architect agent 自评时用，结论通过编排的 `record-gate` 回报引擎，引擎据 node-table 的 `on_pass`/`on_reflow` 推进或回流。
+
 每次到一个 Gate：
 
-1. 从 `flow-state.json` 读 `review_mode`、`current_stage`、`current_iter`
+1. 从引擎状态拿 `review_mode`（立项时定，由 kdev-core 维护；本段的 `current_stage`/`current_iter` 上下文同样由引擎提供，本 SKILL 不再自增）
 2. Read `references/review-gate-prompt.md`
 3. 找到本 stage 对应的"成功标准"段
 4. 把待评审产物（上一步的输出文件）读进来
@@ -113,9 +123,8 @@ grep -qE "^/?\.kdev/design-flow/?$" .gitignore || echo "/.kdev/design-flow/" >> 
 ### 5a. `--review=ai`（默认）
 
 - Claude **自身**按 prompt 输出 VERDICT + UNCHECKED_CRITERIA + ISSUES + REVISIONS
-- 把这段输出保存到 `.kdev/design-flow/<slug>/stage-<N>/iter-<iter>-review.md`
-- 在 `flow-state.json` 的 `history` 数组追加：
-  `{"stage": N, "iter": iter, "verdict": "PASS"|"FAIL", "reviewer": "claude-self"}`
+- 把这段输出保存到 `.kdev/features/<slug>/handoffs/req-architect/stage-<N>/iter-<iter>-review.md`
+- 把结论 `{"stage": N, "iter": iter, "verdict": "PASS"|"FAIL", "reviewer": "claude-self"}` 通过编排 `record-gate` 回报 kdev-core 引擎（历史落引擎 events，不再由本 SKILL 写 `flow-state.json`）
 
 ### 5b. `--review=both`
 
@@ -123,60 +132,36 @@ grep -qE "^/?\.kdev/design-flow/?$" .gitignore || echo "/.kdev/design-flow/" >> 
 - 然后用 `AskUserQuestion` 弹窗：
   - 问题: "Claude 自评结论：{{verdict}}。{{issues_summary if FAIL}}。你是否同意？"
   - 选项: "同意 Claude 判断" / "我有不同意见（手填）"
-- 用户最终结论覆盖 Claude 的，写到 review.md，记录 `reviewer: "claude-self+human"` 或 `reviewer: "human-override"`
+- 用户最终结论覆盖 Claude 的，写到 review.md，结论以 `reviewer: "claude-self+human"` 或 `reviewer: "human-override"` 通过 `record-gate` 回报引擎
 
 ### 5c. `--review=human`
 
 - 直接用 `AskUserQuestion` 让用户判 PASS/FAIL + 给反馈
-- 写到 review.md，记录 `reviewer: "human"`
+- 写到 review.md，结论以 `reviewer: "human"` 通过 `record-gate` 回报引擎
 
-### 5d. PASS 后行为
+### 5d. PASS 后果（引擎承载）
 
-- 在 `flow-state.json` 设 `current_stage += 1`, `current_iter = 1`
+- 编排 `record-gate` 报 PASS，引擎据 node-table 的 `on_pass` 推进到下一节点（不再由本 SKILL 在 `flow-state.json` 自增 `current_stage`）
 - 继续下一 Stage
 
-### 5e. FAIL 后行为
+### 5e. FAIL 后果（引擎承载）
 
-- 在 `flow-state.json` 设 `current_iter += 1`
-- 如果 `current_iter > 3`：进入"中断"分支
-- 否则：回到当前 Stage，重新跑（新 iter 会读上一轮的 review.md 作为反馈）
+- 编排 `record-gate` 报 FAIL，引擎据 node-table 的 `on_reflow` 回流到当前 Stage 重跑（不再由本 SKILL 自增 `current_iter`）
+- 新一轮会读上一轮的 review.md 作为反馈
 
-### 5f. 中断（3 次仍 FAIL）
+### 5f. 连续 FAIL 达上限（引擎 escalate 升人）
 
-- 在 `flow-state.json` 设 `status = "aborted"`, `aborted_at = now`, `aborted_reason = "review failed 3 times at gate <N>"`
-- Write `.kdev/design-flow/<slug>/aborted.md`：
-
-```markdown
-# Aborted: {{feature_name}}
-
-**Slug:** {{slug}}
-**Aborted at:** {{date}} (Gate {{N}})
-**Reason:** review FAILed 3 times in a row
-
-## 最后一轮的 review
-
-(粘贴 iter-3-review.md 的全文)
-
-## 三次迭代的产物
-
-- iter-1: `.kdev/design-flow/{{slug}}/stage-{{N}}/iter-1.md`
-- iter-2: ...
-- iter-3: ...
-
-## 接下来怎么办
-
-1. 读三次 review，找到 Claude 始终绕不过去的那条 criterion
-2. 决定：是降低标准（修改 review-gate-prompt.md 里的 criterion）、还是手动接管这个 stage、还是终止 feature
-3. 决定后用 `/kdev-design-flow --resume {{slug}}` 继续（注意先把 flow-state 里 status 改回 in_progress）
-```
-
-- 通知用户中断 + 给出 aborted.md 路径，停止流程。
+- 连续 FAIL 达 3 次，引擎不再回流，自动 `escalate` 把节点标 `status=blocked` 升人（这是引擎的 review-gate cap 行为，不是本 SKILL 写 `aborted.md`）
+- req-architect agent 此时该向用户汇报阻塞点：
+  - 哪个 Gate / 哪条 criterion 始终绕不过去（读三次 review 找）
+  - 候选处置：降低标准（改 `review-gate-prompt.md` 里的 criterion）、人工接管这个 stage、或终止 feature
+  - 决定后由通用 kdev-flow-driver 走 `python3 -m kdev_core unblock` 解除 blocked 再续跑
 
 ---
 
 ## Stage 2: 进一步需求分析（spec-kit:specify）
 
-1. Read 上一步通过的 SR 文档：`.kdev/design-flow/<slug>/stage-1-sr/iter-<last_pass>.md`
+1. Read 上一步通过的 SR 文档：`.kdev/features/<slug>/handoffs/req-architect/stage-1-sr/iter-<last_pass>.md`
 2. 调 `Skill` 工具，name=`spec-kit:specify`，提示词模板：
 
 ```
@@ -188,7 +173,7 @@ grep -qE "^/?\.kdev/design-flow/?$" .gitignore || echo "/.kdev/design-flow/" >> 
 >>>
 
 输出落盘路径建议（spec-kit 自己决定即可）：
-.kdev/design-flow/<slug>/stage-2-ar/iter-<iter>.md
+.kdev/features/<slug>/handoffs/req-architect/stage-2-ar/iter-<iter>.md
 
 约束：
 - 用户故事覆盖每个 SR
@@ -196,7 +181,7 @@ grep -qE "^/?\.kdev/design-flow/?$" .gitignore || echo "/.kdev/design-flow/" >> 
 - 不要重复 SR 文档里已经有的"显式不做"清单
 ```
 
-3. spec-kit:specify 完成后，确认产物文件存在于 `.kdev/design-flow/<slug>/stage-2-ar/iter-<iter>.md`。如果落到了别的位置（spec-kit 默认路径），用 `mv` 移过来。
+3. spec-kit:specify 完成后，确认产物文件存在于 `.kdev/features/<slug>/handoffs/req-architect/stage-2-ar/iter-<iter>.md`。如果落到了别的位置（spec-kit 默认路径），用 `mv` 移过来。
 4. **此处不评审**——Stage 2 + Stage 3 共用 Gate 2，等 Stage 3 跑完一起评。
 
 ## Stage 3: 原型设计（frontend-design）
@@ -226,7 +211,7 @@ grep -qE "^/?\.kdev/design-flow/?$" .gitignore || echo "/.kdev/design-flow/" >> 
 1. Read `references/stage3-prototype-prompt.md`
 2. 把模板中的 `{{ar_content}}` / `{{constitution_ui_block}}` / `{{design_system_refs_block}}` / `{{slug}}` / `{{iter}}` / `{{prev_iter}}` 占位符**全部填好**（不允许保留空占位符发给 frontend-design）
 3. 调 `Skill` 工具，name=`frontend-design:frontend-design`，把**填充完的 prompt 全文**作为 args 传入
-4. frontend-design 完成后，确认产物在 `.kdev/design-flow/<slug>/stage-3-prototype/iter-<iter>/`，至少有 `index.html` + `self-check.md`。如果不在，用 `mv` 移过来；如果 `self-check.md` 缺失，记录到 flow-state.json 的 `history` 数组里（`stage3_selfcheck_missing: true`），Gate 2 评审会据此扣分但不阻断。
+4. frontend-design 完成后，确认产物在 `.kdev/features/<slug>/handoffs/req-architect/stage-3-prototype/iter-<iter>/`，至少有 `index.html` + `self-check.md`。如果不在，用 `mv` 移过来；如果 `self-check.md` 缺失，在 Gate 2 评审输出里标 `stage3_selfcheck_missing: true`（由引擎 events 记录），Gate 2 评审会据此扣分但不阻断。
 5. **进入 Gate 2**（共评 AR + 原型；评审 prompt 把 stage-2-ar 和 stage-3-prototype 的产物 + 步骤 0 抽出的宪法约束块都喂进去）
 
 ## Stage 4: 实现方案设计（spec-kit:plan）
@@ -243,13 +228,13 @@ grep -qE "^/?\.kdev/design-flow/?$" .gitignore || echo "/.kdev/design-flow/" >> 
 >>>
 
 原型路径：
-.kdev/design-flow/<slug>/stage-3-prototype/iter-<last_pass>/
+.kdev/features/<slug>/handoffs/req-architect/stage-3-prototype/iter-<last_pass>/
 
 输出要求：
 - 概要设计：架构图（Mermaid 也行）/ 模块划分 / 数据流
 - 详细设计：关键接口签名 / 数据模型（schema）/ 关键算法或状态机
 - 实现风险 ≥ 3 项 + 缓解
-- 输出落盘到 `.kdev/design-flow/<slug>/stage-4-plan/iter-<iter>.md`
+- 输出落盘到 `.kdev/features/<slug>/handoffs/req-architect/stage-4-plan/iter-<iter>.md`
 ```
 
 3. spec-kit:plan 完成后，确认产物文件位置正确。
@@ -260,22 +245,22 @@ grep -qE "^/?\.kdev/design-flow/?$" .gitignore || echo "/.kdev/design-flow/" >> 
 1. Read `references/output-merge-rules.md`
 2. 严格按规则执行（包括幂等性检查、`status = completed` 标记）
 3. 完成后用一段中文向用户汇报：
-   - 流程总耗时（用 `created_at` - `completed_at` 计算）
-   - 三个 Gate 各自跑了多少 iter（从 history 聚合）
+   - 流程总耗时（从 kdev-core 引擎 events 的起止时间算）
+   - 三个 Gate 各自跑了多少 iter（从引擎 events 聚合）
    - 最终交付物路径（`docs/design-flow/<slug>/`）
 
 ## 恢复模式（`--resume <slug>`）
 
-如果用户带 `--resume <slug>`：
+接底座后断点续跑由 kdev-core 引擎承载：`python3 -m kdev_core resume design-flow <slug>`。
 
-0. **先确认 flow-state.json 存在**——尝试 `read_state(workspace, slug)`。如果抛 `FlowStateError`（文件不存在），向用户输出（**不要继续执行**）：
+0. **先确认流程存在**——若引擎抛 `FlowStateError`（`no flow-state.json at .kdev/features/<slug>/`），向用户输出（**不要继续执行**）：
 
    ```
    ❌ 找不到 slug "<slug>" 的流程记录。
-   预期路径：.kdev/design-flow/<slug>/flow-state.json
+   预期路径：.kdev/features/<slug>/flow-state.json
    
    请检查：
-   - slug 拼写是否正确（参考 .kdev/design-flow/ 下的子目录名）
+   - slug 拼写是否正确（参考 .kdev/features/ 下的子目录名）
    - 是否在错误的工作目录下执行（应在项目根目录）
    
    如要新建流程，去掉 --resume 并提供 feature_name：
@@ -284,14 +269,14 @@ grep -qE "^/?\.kdev/design-flow/?$" .gitignore || echo "/.kdev/design-flow/" >> 
 
    提示用户后停止本次调用。
 
-1. Read `flow-state.json`（已确认存在），按 `status` 分支：
-   - `status == "in_progress"`：正常继续——读 `current_stage` + `current_iter`，跳到主循环对应位置接着跑
-   - `status == "aborted"`：提示用户"流程被标记为 aborted，先手动改 flow-state.json 里 status 字段（aborted → in_progress）才能继续"，然后停止
-   - `status == "completed"`：提示用户"该流程已完成，最终交付物在 docs/design-flow/<slug>/。如需重跑，请先删除或重命名 flow-state.json"，然后停止
+1. resume 成功 → 由通用 kdev-flow-driver 从引擎给的 `current_node` 接着跑：
+   - 正常进行中：引擎直接给回当前节点，driver 接着编排
+   - `status == "blocked"`（review-gate 连续 FAIL 升人后的状态）：先按上面 5f 的处置向用户对齐，再 `python3 -m kdev_core unblock` 解除后续跑
+   - `status == "completed"`：提示用户"该流程已完成，最终交付物在 docs/design-flow/<slug>/。如需重跑请新建（换 slug）"，然后停止
 
 ## 显式不做的事（v0.1）
 
-- ❌ 不会主动去删 `.kdev/design-flow/<slug>/`（即使流程完成）——保留迭代历史是 B 方案的训练数据
+- ❌ 不会主动去删 `.kdev/features/<slug>/`（即使流程完成）——保留迭代历史是 B 方案的训练数据
 - ❌ 不会跨会话续跑评审中的 `AskUserQuestion`（所以 `both`/`human` 模式中途断会话，需要 `--resume` 重新进入这一 Gate）
 - ❌ 不支持自定义 stage 顺序、跳过 stage、并行多 feature
 
