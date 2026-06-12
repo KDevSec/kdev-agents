@@ -1,0 +1,19 @@
+docs/superpowers/plans/2026-06-12-b轨-后台派单+文件交接.md
+  s_34bc963bed7187::t_89851df71d76e6 1-762
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "aca9a9702e399f038e4bc819c3bfaac5a243fa4b",
+  "prompts": {},
+  "sessions": {
+    "s_34bc963bed7187": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ee9954b3-0c1a-440e-9563-db0573135ca9",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
