@@ -70,7 +70,7 @@
 
 ### g-e2e（Per-Increment E2E，acceptance → PASS/FAIL）
 
-判断当前 increment 的端到端质量是否达标。需要先派 dev-engineer-e2e agent 做检查：
+判断当前 increment 的端到端质量是否达标。需要先派 `kdev-team:dev-engineer-e2e` agent 做检查：
 
 1. 视觉 diff：1366px + 1920px 截图 vs 原型图
 2. 功能冒烟：登录页能打开 → 输入账号密码 → 点登录 → 进首页
@@ -99,7 +99,7 @@
 
 ### g-deploy（部署+金丝雀验收，acceptance → PASS/FAIL）
 
-判断部署是否成功 + 金丝雀冒烟是否通过。需要先派 dev-engineer-deploy agent 部署，然后 e2e 做金丝雀检查：
+判断部署是否成功 + 金丝雀冒烟是否通过。需要先派 `kdev-team:dev-engineer-deploy` agent 部署，然后 e2e 做金丝雀检查：
 
 1. 合并分支成功
 2. 部署环境可达

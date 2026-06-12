@@ -29,10 +29,10 @@ flow=`design-flow`，table=`orchestration/req-architect.node-table.yml`。每过
 ## Capabilities
 | 节点 | 派哪个业务 Agent（subagent_type）| 干什么 |
 |---|---|---|
-| n0-clarify | `req-architect-clarify`（需求澄清）| 澄清原始需求 → ir.md |
-| n1-spec | `req-architect-spec`（需求计划）| SR 需求规格 → sr.md |
-| n3-decompose | `req-architect-decompose`（需求拆解）| 迭代拆分 + 用户故事 → ar |
-| n4-prototype | `req-architect-prototype`（原型设计）| 高保真原型 → prototype/ |
-| n6-design | `req-architect-design`（方案设计）| 技术方案 → design.md |
+| n0-clarify | `kdev-team:req-architect-clarify`（需求澄清）| 澄清原始需求 → ir.md |
+| n1-spec | `kdev-team:req-architect-spec`（需求计划）| SR 需求规格 → sr.md |
+| n3-decompose | `kdev-team:req-architect-decompose`（需求拆解）| 迭代拆分 + 用户故事 → ar |
+| n4-prototype | `kdev-team:req-architect-prototype`（原型设计）| 高保真原型 → prototype/ |
+| n6-design | `kdev-team:req-architect-design`（方案设计）| 技术方案 → design.md |
 | n2/n5/n7 | 自判（不派 agent）| 评审 gate：按 design-flow 判据自评 PASS/FAIL |
 | n8-merge | 自做（编排聚合）| 阶段聚合报告 + 合并交付（output-merge-rules.md）|

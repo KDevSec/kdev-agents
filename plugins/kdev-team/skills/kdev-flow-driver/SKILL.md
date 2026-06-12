@@ -150,9 +150,9 @@ STOP——等用户决定是否 unblock 后重新启动。
    - 前序产物路径（如 env.md / rules.md / PLAN.md 的位置）
    - 工作目录 / 项目路径
    - 相关约束（UED 规范路径、原型图路径等）
-3. **派 agent**：
+3. **派 agent**（🔴 `subagent_type` 必须是插件全名 `kdev-team:<agent-id>`，裸 id 会 not-found——详见 `references/node-agent-routing.md` 顶部「派单标识」规则）：
    ```
-   Agent({subagent_type: "dev-engineer-env", prompt: "<构造的上下文>"})
+   Agent({subagent_type: "kdev-team:dev-engineer-env", prompt: "<构造的上下文>"})
    ```
    runtime_model 按 staff.yml 的设定选（当前阶段1统一 opus）
 4. **等 agent 返回**，检查结果是否合理
@@ -249,7 +249,7 @@ python3 -m kdev_core unblock $FLOW <slug> --to-node <回到哪个节点>
 
 g-complexity gate 判断：
 - `simple` → n6a-impl-inline（主控直接实现，不派 subagent）
-- `complex` → n6b-impl-subagent（派 dev-engineer-frontend subagent）
+- `complex` → n6b-impl-subagent（派 `kdev-team:dev-engineer-frontend` subagent）
 
 绝大多数视觉改造考题是 `complex`，走 n6b。
 
