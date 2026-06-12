@@ -66,3 +66,25 @@ def test_review_gates_covered_by_some_cap():
         claimed |= set(c["caller_gate"])
     missing = review_gates - claimed
     assert not missing, f"这些 review gate 没有 cap 认领: {missing}"
+
+
+STD = ROOT / "standards/reviewer"
+COMMON = STD / "通用评分模板.md"
+CAP_STANDARDS = ["SR需求评审", "用户故事评审", "原型评审", "方案架构评审", "代码质量评审", "安全评审"]
+
+
+def test_common_scoring_template_has_required_sections():
+    text = COMMON.read_text(encoding="utf-8")
+    for need in ["双重通过条件", "总分", "🔴", "🟡", "⚪", "评分表"]:
+        assert need in text, f"通用评分模板缺: {need}"
+    # 双重通过条件必须明确「总分≥阈值 AND 🔴阻断=0」语义
+    assert "阈值" in text and "阻断" in text
+
+
+def test_each_cap_standards_has_dimensions_and_threshold():
+    for name in CAP_STANDARDS:
+        f = STD / f"{name}.md"
+        assert f.exists(), f"缺 standards: {name}"
+        text = f.read_text(encoding="utf-8")
+        for need in ["评审对象", "评分维度", "阈值", "问题分级", "评分表"]:
+            assert need in text, f"{name} 缺 standards 段: {need}"
