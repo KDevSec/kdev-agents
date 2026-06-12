@@ -74,3 +74,38 @@ def test_cli_render_degrades_on_malformed(tmp_workspace):
     assert rc == 0
     out_path = tmp_workspace / ".kdev" / "hud.html"
     assert out_path.exists() and "<html" in out_path.read_text(encoding="utf-8")
+
+
+def test_cli_statusline_skips_stdin_when_workspace_given(tmp_workspace, monkeypatch, seed):
+    # --workspace 已给时绝不读 stdin（否则无 EOF 管道会挂）
+    seed(tmp_workspace, display_name="用户管理模块")
+
+    class _BoomStdin:
+        def isatty(self):
+            return False
+
+        def read(self):
+            raise AssertionError("stdin must NOT be read when --workspace is given")
+
+    monkeypatch.setattr("sys.stdin", _BoomStdin())
+    rc, out = _run(["statusline", "--workspace", str(tmp_workspace)])
+    assert rc == 0
+    # 若误读了 stdin，会触发 AssertionError → 被 safe_fallback 兜底 → 名字消失
+    # 故名字仍在 == 没读 stdin
+    assert "用户管理模块" in out
+
+
+def test_cli_render_skips_stdin_when_workspace_given(tmp_workspace, monkeypatch, seed):
+    seed(tmp_workspace, display_name="用户管理模块")
+
+    class _BoomStdin:
+        def isatty(self):
+            return False
+
+        def read(self):
+            raise AssertionError("stdin must NOT be read when --workspace is given")
+
+    monkeypatch.setattr("sys.stdin", _BoomStdin())
+    rc, out = _run(["render", "--workspace", str(tmp_workspace)])
+    assert rc == 0
+    assert (tmp_workspace / ".kdev" / "hud.html").exists()

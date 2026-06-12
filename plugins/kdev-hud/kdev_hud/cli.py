@@ -41,13 +41,13 @@ def _workspace_from_stdin(raw):
     return None
 
 
-def _resolve_workspace(args, stdin_raw):
+def _resolve_workspace(args):
+    """--workspace > stdin JSON cwd > cwd。stdin 惰性消费：仅 --workspace 缺省时才读，
+    避免 statusline（每键一跑）在无 EOF 管道上阻塞挂死。"""
     if getattr(args, "workspace", None):
         return args.workspace
-    from_stdin = _workspace_from_stdin(stdin_raw)
-    if from_stdin:
-        return from_stdin
-    return str(Path.cwd())
+    from_stdin = _workspace_from_stdin(_consume_stdin())
+    return from_stdin or str(Path.cwd())
 
 
 def _now_iso():
@@ -55,8 +55,7 @@ def _now_iso():
 
 
 def cmd_statusline(args):
-    raw = _consume_stdin()
-    ws = _resolve_workspace(args, raw)
+    ws = _resolve_workspace(args)
     try:
         model = datasource.build_hud_model(ws)
         line = statusline.render(model)
@@ -68,8 +67,7 @@ def cmd_statusline(args):
 
 
 def cmd_render(args):
-    raw = _consume_stdin()
-    ws = _resolve_workspace(args, raw)
+    ws = _resolve_workspace(args)
     try:
         model = datasource.build_hud_model(ws)
     except Exception:
