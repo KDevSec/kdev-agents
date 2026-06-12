@@ -1,0 +1,26 @@
+plugins/kdev-memory/tests/test_session_start_brief_prefix.py
+  s_ccdfa58bf5ccb2::t_7757bd3fdf1b8f 56,63,65-66
+plugins/kdev-memory/tests/test_pending_commits.py
+  s_ccdfa58bf5ccb2::t_7445e0b972199b 78,82-86,88-105
+plugins/kdev-memory/hooks/lib/pending_commits.py
+  s_ccdfa58bf5ccb2::t_a52e90dc628b2a 23
+  s_ccdfa58bf5ccb2::t_37174bfb39eb57 130,133-137,144-145
+plugins/kdev-memory/tests/test_stop_check_pending.py
+  s_ccdfa58bf5ccb2::t_5d333b617a4126 40-41,47,49-50
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "15e0970ed233accec0cef761fcf5bf973a3df1a5",
+  "prompts": {},
+  "sessions": {
+    "s_ccdfa58bf5ccb2": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "da13d5ac-244c-4571-b947-8ac7ae860e02",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
