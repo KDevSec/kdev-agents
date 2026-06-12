@@ -8,13 +8,20 @@ LIB_DIR = Path(__file__).parent.parent / "hooks" / "lib"
 sys.path.insert(0, str(LIB_DIR))
 
 from pending_commits import (  # noqa: E402
-    append, clear, count, format_brief_hint, oldest_age, read,
+    append, clear, count, format_brief_hint, get_transcript_marker, oldest_age,
+    read,
 )
 
 
 def test_read_missing_file_returns_empty(tmp_path):
     out = read(tmp_path)
-    assert out == {"since_step_id": "", "since_ts": 0, "commits": []}
+    assert out == {
+        "since_step_id": "",
+        "since_ts": 0,
+        "since_offset": 0,
+        "transcript_path": "",
+        "commits": [],
+    }
 
 
 def test_append_creates_file_and_initializes_since(tmp_path):
@@ -88,3 +95,34 @@ def test_format_brief_hint_fires_by_age(tmp_path):
     hint = format_brief_hint(tmp_path, now=5000)
     assert hint is not None
     assert "1 commit" in hint
+
+
+def test_append_stashes_transcript_path(tmp_path):
+    sd = tmp_path / "state"
+    append(sd, "abc1234", "fix: x", 100, transcript_path="/t/sess.jsonl")
+    data = read(sd)
+    assert data["transcript_path"] == "/t/sess.jsonl"
+
+
+def test_clear_sets_since_offset(tmp_path):
+    sd = tmp_path / "state"
+    append(sd, "abc1234", "fix: x", 100, transcript_path="/t/sess.jsonl")
+    clear(sd, "main-9", 200, new_since_offset=640)
+    data = read(sd)
+    assert data["since_offset"] == 640
+    assert data["commits"] == []
+
+
+def test_get_transcript_marker(tmp_path):
+    sd = tmp_path / "state"
+    clear(sd, "main-9", 200, new_since_offset=640)
+    append(sd, "abc1234", "fix: x", 100, transcript_path="/t/sess.jsonl")
+    m = get_transcript_marker(sd)
+    assert m == {"transcript_path": "/t/sess.jsonl", "since_offset": 640}
+
+
+def test_empty_state_has_new_fields(tmp_path):
+    sd = tmp_path / "state"
+    data = read(sd)
+    assert data["transcript_path"] == ""
+    assert data["since_offset"] == 0
