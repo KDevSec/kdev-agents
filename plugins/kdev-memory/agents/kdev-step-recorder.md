@@ -127,6 +127,17 @@ print('RATING_MODE:', read_rating_mode())
 ```
 Capture `MINTED:` (e.g. `Step dev-engineer-3`) and `TARGET:` (the 执行日志 path to append to). The counter file is now incremented (side effect). Capture `RATING_MODE：决定用户评分段的写法（见 step 2）。`
 
+### 读真 transcript 抽客观事实（P-C1b 溯源）
+
+主会话 dispatch 时**不再喂事实 YAML**，你自己从真 transcript 抽：
+
+1. 取范围：`python3 -c "import sys; sys.path.insert(0,'plugins/kdev-memory/hooks/lib'); import pending_commits as pc, json; print(json.dumps(pc.get_transcript_marker(__import__('pathlib').Path('.kdev/memory/state'))))"` → `{transcript_path, since_offset}`。
+2. **用 Bash 调确定性抽取 helper**（⚠️ 不要用 Read 工具读 transcript——它有 25k 整文件 token 闸，offset/limit 也救不了大文件，直接拒）：
+   `python3 plugins/kdev-memory/hooks/lib/transcript_extract.py "<transcript_path>" <since_offset>` → stdout JSON（`tools_invoked` / `tools_invoked_count` / `errors_hit` / `error_samples` / `files_touched` / `commit_shas` / `skills_invoked` / `subagents_dispatched`）。这些直接填进 Step 的 `key_facts`（commit_shas 已锚定 git 真实输出，不会有 ghost SHA；空工具名已滤，tools_invoked_count 真实）。
+3. 需要他评所需的"绕路/返工原文"时，再 `sed -n 'A,Bp' "<transcript_path>" | jq -r '...'` 取具体几条（同样别用 Read 工具）。
+4. `subject`：Step 主题默认 `project`；若该段含用户对某 skill/plugin 的反馈，按 subject 三级推断（L1 显式名 / L2 取 `skills_invoked` 最近项 / L3 候选询问）裂解出 F-NNN（subject:plugin:X, verbatim 原话）——沿用现有 F-NNN 流程不变。
+5. transcript 不可达（`unreadable:true` / `transcript_path` 空 / 跨会话）→ 降级：据 dispatch summary + `git log` 写，since_offset 当 0，**不硬卡**。
+
 2. **Compose 4-section Step entry** matching SKILL.md §"Step 完成硬闸门":
 
 ```markdown
@@ -150,8 +161,8 @@ about: <about value>
   - <decision 2>
 - 相关条目：<references>
 
-### 模型自评
-- 顺畅度：<self_eval_score>/5
+### 模型他评
+- 执行质量：<self_eval_score>/5
 - 本步最值得扣分项：<self_eval_deduction>
 
 ### 用户评分
@@ -160,6 +171,18 @@ about: <about value>
 ### 评分差异分析
 （按 RATING_MODE 填写）
 ```
+
+### 写 `### 模型他评`（替换自评，P-C1b）
+
+你是**独立于主会话的 recorder**，据上一步抽到的**真事实**写他评（不是主会话自夸，也不据 summary 反推 → 防 MQ-2 confabulate）。`self_eval_score` → `执行质量`，`self_eval_deduction` → `扣分项`，并补 helper 的 `skills_invoked` / `subagents_dispatched`：
+
+````markdown
+### 模型他评
+- 执行质量：N/5（客观：目标达成度 / 绕路返工 / 报错恢复 / 是否一遍过）
+- 扣分项：<必填，且须引 transcript 证据，如"第 X 段 Edit 报错 'modified since read' 后重读才过（见 error_samples）"。无证据时写"未见明显问题"，**不要据 summary 编造**>
+- skills_invoked：<helper 的 skills_invoked 清单>
+- subagents：<helper 的 subagents_dispatched 清单>
+````
 
 **用户评分段 + 评分差异分析段（按 RATING_MODE）**：
 
@@ -170,7 +193,7 @@ about: <about value>
   triggers: [...]
   日期：<today>
   about: <about value>
-  ...（执行事实 + 模型自评同上）...
+  ...（执行事实 + 模型他评同上）...
   ### 用户评分
   - 完成时间：—
   - 顺畅度：—/5
@@ -196,22 +219,24 @@ triggers: [<keywords>]
 EOF
 ```
 
-**Why heredoc append over Edit (v0.2 reasoning)**: 执行日志.md has many highly repetitive `### 评分差异分析` / `### 模型自评` headers across historical entries, so Edit's old_string uniqueness requirement is fragile. Append-only file mutation is naturally safer via shell append — preserves all existing content, adds at end, no anchor-matching needed. Quote the heredoc delimiter (`<< 'EOF'`) to disable variable interpolation so YAML/Chinese content passes through verbatim.
+**Why heredoc append over Edit (v0.2 reasoning)**: 执行日志.md has many highly repetitive `### 评分差异分析` / `### 模型自评`（历史条目）/ `### 模型他评`（P-C1b 起新条目）headers across historical entries, so Edit's old_string uniqueness requirement is fragile. Append-only file mutation is naturally safer via shell append — preserves all existing content, adds at end, no anchor-matching needed. Quote the heredoc delimiter (`<< 'EOF'`) to disable variable interpolation so YAML/Chinese content passes through verbatim.
 
 4. **Update frontmatter — shared scope only**: 仅当 `scope` = shared/缺省时更新 `当前状态.md` frontmatter（`current_step` + `last_updated`；scoped 布局下该文件在 `shared/`，用 `shared_dir` 解析 → `python3 -c "import sys; sys.path.insert(0,'plugins/kdev-memory/hooks/lib'); from scope import shared_dir; from pathlib import Path; print(shared_dir(Path('.kdev/memory'))/'当前状态.md')"`）。**员工 scope（staff）跳过本步**——当前状态.md 是项目主线 CEO 状态，员工 Step 不污染它。
 
-5. **Clear pending-commits.json**: regardless of whether it existed before, call
+5. **Clear pending-commits.json（带 since_offset 续读点，P-C1b）**: regardless of whether it existed before, 先算当前 transcript EOF 行数当作下一个 Step 的续读起点，再 call clear。
+
+   落盘收尾：`EOF=$(wc -l < "<transcript_path>")`（`<transcript_path>` 来自上一步"读真 transcript"取到的值；为空则 `EOF=0`），把它作为 `new_since_offset` 传进 `clear`——下一个 Step 从这里续读，不重复抽已记过的范围。
 
    ```python
    import sys; sys.path.insert(0, "plugins/kdev-memory/hooks/lib")
    from pending_commits import clear
    from pathlib import Path
    import time
-   clear(Path(".kdev/memory/state"), "<minted_id>", int(time.time()))
+   clear(Path(".kdev/memory/state"), "<minted_id>", int(time.time()), new_since_offset=<EOF>)
    ```
 
    This signals the soft-reminder loop that step is up to date. `<minted_id>` is the
-   `Step <slug>-<N>` string you just minted in step 1.
+   `Step <slug>-<N>` string you just minted in step 1. `<EOF>` 是上面 `wc -l` 算出的整数（transcript 不可达时传 0）。
 
 ## Return format
 
