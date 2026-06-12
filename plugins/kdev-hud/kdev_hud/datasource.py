@@ -135,3 +135,30 @@ def build_feature_view(workspace, slug):
         "events": events,             # 原始 tail，渲染层自行截断
         "updated_at": doc.get("updated_at"),
     }
+
+
+# ---------------------------------------------------------------------------
+# Task 4: aggregate layer — build_hud_model
+# ---------------------------------------------------------------------------
+
+def _pick_primary(features):
+    """状态栏主角：优先有在跑棒次的；否则 updated_at 最新；都没有 → None。"""
+    if not features:
+        return None
+    active = [f for f in features if f.get("active")]
+    pool = active or features
+    return max(pool, key=lambda f: f.get("updated_at") or "")
+
+
+def build_hud_model(workspace):
+    """全景：扫所有 feature → view-model 列表 + 选 primary。"""
+    features = []
+    for slug in list_feature_slugs(workspace):
+        v = build_feature_view(workspace, slug)
+        if v is not None:
+            features.append(v)
+    return {
+        "features": features,
+        "feature_count": len(features),
+        "primary": _pick_primary(features),
+    }

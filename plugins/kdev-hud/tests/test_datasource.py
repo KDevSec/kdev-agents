@@ -117,3 +117,31 @@ def test_build_feature_view_no_active(tmp_workspace, seed):
 
 def test_build_feature_view_missing_returns_none(tmp_workspace):
     assert ds.build_feature_view(tmp_workspace, "ghost") is None
+
+
+def test_build_hud_model_multi_feature_and_primary(tmp_workspace, seed):
+    # bbb 有在跑棒次 → 应被选为 primary（aaa 无 active）
+    s_a = seed(tmp_workspace, slug="aaa")
+    from kdev_core import flow_state
+    flow_state.complete_run(tmp_workspace, s_a, status="completed", close_feature=True)
+    seed(tmp_workspace, slug="bbb", display_name="在跑的")
+    model = ds.build_hud_model(tmp_workspace)
+    assert [f["slug"] for f in model["features"]] == ["aaa", "bbb"]
+    assert model["primary"]["slug"] == "bbb"
+    assert model["feature_count"] == 2
+
+
+def test_build_hud_model_empty(tmp_workspace):
+    model = ds.build_hud_model(tmp_workspace)
+    assert model["features"] == [] and model["primary"] is None and model["feature_count"] == 0
+
+
+def test_build_hud_model_primary_fallback_recent(tmp_workspace, seed):
+    # 都无 active → primary 取 updated_at 最新
+    s1 = seed(tmp_workspace, slug="aaa")
+    s2 = seed(tmp_workspace, slug="bbb")
+    from kdev_core import flow_state
+    flow_state.complete_run(tmp_workspace, s1, status="completed", close_feature=True)
+    flow_state.complete_run(tmp_workspace, s2, status="completed", close_feature=True)
+    model = ds.build_hud_model(tmp_workspace)
+    assert model["primary"] is not None  # 不报错、有兜底
