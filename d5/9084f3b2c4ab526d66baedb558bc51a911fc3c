@@ -1,0 +1,21 @@
+plugins/kdev-hud/tests/test_statusline.py
+  s_2da0c01f3d2859::t_2fd636cf493775 1-46
+plugins/kdev-hud/kdev_hud/statusline.py
+  s_2da0c01f3d2859::t_8ba7f3f7e0090c 1-60
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "d59084f3b2c4ab526d66baedb558bc51a911fc3c",
+  "prompts": {},
+  "sessions": {
+    "s_2da0c01f3d2859": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "c152964b-6a98-427a-af88-706df4e6c77f",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
