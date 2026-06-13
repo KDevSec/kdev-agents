@@ -1,6 +1,8 @@
 # 开发工程师 coding-flow — 14 节点 SOP 的 node-table（L0 默认编排）。
 # kind=action|gate|terminal；gate 节点带 gate id 指向 gate_specs。
-# reviewer: self=开发工程师自评 / reviewer-expert=评审专家第三方（阶段1 deferred）。
+# reviewer: self=开发工程师自评 / reviewer-expert=评审专家第三方（已建 spec 2026-06-12 v0.2 / Q-016：
+#   3 评审闸 g-plan-review/g-code-review/g-sec-review 编排发函 `kdev-team:reviewer-orchestrator`，
+#   见 gate-decision-logic.md dev 段；L1 flow-config 可回退 self）。
 #
 # 增量循环（n9c-increment）：增量 = 能独立过 e2e 的纵向切片（非实现分层！T0-T4 这种横向
 # 分层是单个增量内部的实现工序，归 n6b，不在这循环）。逐增量循环 n6b→n8→n9a→n9b→n9c，
@@ -31,11 +33,11 @@ nodes:
 
 gate_specs:
   g-relevance:   {kind: decision, branches: {high: n3-plan, low: n2-worktree}, reviewer: self}
-  g-plan-review: {kind: review, on_pass: n5-complexity, on_reflow: n3-plan, reviewer: reviewer-expert, stage1: deferred}
+  g-plan-review: {kind: review, on_pass: n5-complexity, on_reflow: n3-plan, reviewer: reviewer-expert}
   g-complexity:  {kind: decision, branches: {simple: n6a-impl-inline, complex: n6b-impl-subagent}, reviewer: self}
   g-verify:      {kind: review, on_pass: n9a-code-review, on_reflow: n6b-impl-subagent, reviewer: self}
-  g-code-review: {kind: review, on_pass: n9b-e2e, on_reflow: n6b-impl-subagent, reviewer: reviewer-expert, stage1: deferred}
+  g-code-review: {kind: review, on_pass: n9b-e2e, on_reflow: n6b-impl-subagent, reviewer: reviewer-expert}
   g-e2e:         {kind: acceptance, on_pass: n9c-increment, on_reflow: n6b-impl-subagent, reviewer: self}
   g-increment:   {kind: decision, branches: {more: n6b-impl-subagent, done: n10-sec}, reviewer: self}
-  g-sec-review:  {kind: review, on_pass: n11-merge, on_reflow: n6b-impl-subagent, reviewer: reviewer-expert, stage1: deferred}
+  g-sec-review:  {kind: review, on_pass: n11-merge, on_reflow: n6b-impl-subagent, reviewer: reviewer-expert}
   g-deploy:      {kind: acceptance, on_pass: n13-done, on_reflow: n6b-impl-subagent, reviewer: self}

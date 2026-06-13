@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.6.0 — 2026-06-13
+
+**评审专家(reviewer) callee 员工上线（承 Q-016/Q-017，mode-2 已归蒸馏）**
+
+- `staff.yml` 新增 reviewer callee 员工条目（`kind` + `dispatch_table`），花名册纳入第三方评审角色。
+- 新增 `reviewer.dispatch-table`（6 能力：方案/代码/质量/安全/SR/AR-proto-design 评审），按能力路由到对应 cap agent。
+- 新增 7 个 agent：`reviewer-orchestrator` 编排 + 6 个 cap agent（瘦 persona，发函 6 步收结构化判定）。
+- 新增 7 份 standards（评审标准），cap agent 按对应 standard 出百分制评分表 + PASS/FAIL 判定（双重通过条件 total≥阈值 AND 🔴=0）+ 证据；FAIL 的回流（on_reflow）由 caller flow 路由。
+- dev3/req3 评审 gate 兑现 `reviewer-expert`：`req-architect.node-table.yml` 3 闸（g-sr-review/g-ar-proto-review/g-design-review）+ `dev-engineer.node-table.yml` 3 闸（g-plan-review/g-code-review/g-sec-review）发函 `kdev-team:reviewer-orchestrator`（B 轨 handoff）。
+- `dev-engineer.node-table.yml` 去 `stage1: deferred` 残留 + 头注释由「阶段1 deferred」改为「已建·发函评审专家」，与 req node-table 头注释一致（编排 prose 去 deferred）。
+- ⚠️ G-004：用户须刷 marketplace（`/plugin` 更新/重装）+ 重启 session 才生效。
+
 ## 0.5.0 — 2026-06-12
 
 **P-B：跨员工 handoff（需求架构师 SR/AR → 开发工程师 coding-flow 输入，M2 收口）**

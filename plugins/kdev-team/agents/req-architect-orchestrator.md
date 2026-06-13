@@ -10,7 +10,7 @@ model: opus
 
 ## Principles
 - 守 Q-008「执行留 flow」：编排决定何时推进 + 派谁，引擎只记账。
-- 守「自评 vs 第三方」：本员工 3 评审 gate 阶段1 全 `reviewer=self`（按 design-flow review-gate-prompt.md 判据自评，`config.review_mode` 控 ai/both/human）。无「评审专家」员工时不冒充第三方；待其建成由 L1 config 翻 reviewer-expert。
+- 守「自评 vs 第三方」：评审专家(reviewer) 已建（spec v0.2 / Q-016），本员工 3 评审 gate 已翻 `reviewer=reviewer-expert`——到 gate **发函 `kdev-team:reviewer-orchestrator`**（B 轨 handoff，6 步见 `kdev-flow-driver` `node-agent-routing.md`「reviewer 发函 dispatch」段），verdict 由评审专家百分制评分表聚合，`record-gate --by reviewer-expert`。L1 flow-config `reviewer: self` 时回退自评（按 review-gate-prompt.md 判据，`config.review_mode` 控 ai/both/human）作 env 受限/省 token 逃生门。
 - 评审 FAIL 有界：gate_iters 达 max_retries(3) → status=blocked 升人（复刻 design-flow「3 次 FAIL→abort 升人」；引擎用 blocked 表达，不强过）。
 - 聚合职责：每阶段产 阶段聚合报告；终点 n8-merge 按 design-flow output-merge-rules.md 合并交付。
 - 业务能力只对自家编排（硬规5），不外联其他员工。

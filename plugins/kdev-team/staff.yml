@@ -3,6 +3,7 @@
 employees:
   dev-engineer:
     display: 开发工程师
+    kind: flow-owner
     flow_skill: kdev-coding-flow          # 方法论参考（非编排器）
     node_table: orchestration/dev-engineer.node-table.yml
     runtime_model: opus
@@ -16,6 +17,7 @@ employees:
       - dev-engineer-sec
   req-architect:
     display: 需求架构师
+    kind: flow-owner
     flow_skill: kdev-design-flow          # 方法论参考（非编排器）
     node_table: orchestration/req-architect.node-table.yml
     runtime_model: opus
@@ -26,3 +28,18 @@ employees:
       - req-architect-decompose
       - req-architect-prototype
       - req-architect-design
+  reviewer:
+    display: 评审专家
+    kind: callee                              # 被 caller R3 review gate 发函调用，无自有 flow
+    flow_skill: null                          # callee 无方法论 flow-skill
+    dispatch_table: orchestration/reviewer.dispatch-table.yml   # 取代 node_table（互斥）
+    standards_dir: standards/reviewer/
+    runtime_model: opus
+    agents:
+      - reviewer-orchestrator
+      - reviewer-sr
+      - reviewer-story
+      - reviewer-prototype
+      - reviewer-design
+      - reviewer-code
+      - reviewer-security

@@ -17,7 +17,7 @@ kdev-core 引擎能记账（R1/R2/R3），node-table 能定义节点图，agent 
 
 2. **每个节点/gate 必须调 CLI 落账**：kdev-core 引擎是状态的唯一权威。跳过 CLI = 状态漂移 = 下次 resume 出错。这在循环中是自动化完成的，但你要确保不跳过。
 
-3. **第三方评审 gate 阶段1 全 deferred**：reviewer-expert 的 gate（g-plan-review / g-code-review / g-sec-review）阶段1没有真人评审，直接记 `PASS --by deferred:阶段3-评审专家`，不冒充第三方。
+3. **第三方评审 gate 已兑现发函评审专家**：reviewer-expert 的 gate（dev: g-plan/code/sec-review；req: g-sr/ar-proto/design-review）**不再 deferred 空过**——到 gate 写 `handoffs/reviewer/<gate>.request.json` → dispatch `kdev-team:reviewer-orchestrator`（run_in_background）→ handoff-read verdict → `record-gate --by reviewer-expert`（6 步见 `references/node-agent-routing.md`「reviewer 发函 dispatch」段 + `references/gate-decision-logic.md`「Reviewer-Expert Gate（已兑现）」）。L1 flow-config `reviewer: self` 时回退自评（逃生门）。
 
 4. **回流有界**：verify / e2e / deploy gate FAIL 后回流到 n6b 重做，最多重试 2 次（总共 3 次尝试），第 3 次引擎自动 escalate 为 blocked。blocked 时输出报告停住，不死循环。
 
@@ -257,21 +257,28 @@ python3 -m kdev_core record-gate $FLOW <slug> \
 
 先按 a 的逻辑自判，但**停下来问用户确认**："我判断 g-xxx = Y，你确认吗？" 用户确认后才调 record-gate。
 
-#### c. reviewer=reviewer-expert + stage1=deferred → 直接记 PASS
+#### c. reviewer=reviewer-expert → 发函评审专家（已兑现，非 deferred）
 
-不需要判断，直接记 PASS 并标注 deferred：
+评审专家(reviewer) 已建（spec v0.2 / Q-016）。不再记 deferred PASS——走**发函协作 6 步**（发函的派单/后台/handoff 机制详见 `references/node-agent-routing.md`「reviewer 发函 dispatch」段 + `references/gate-decision-logic.md`「Reviewer-Expert Gate（已兑现）」，与 verify/e2e/deploy gate「先派 agent 收证据再判」同 B 轨）：
+
+1. 写 `<workspace>/.kdev/features/<slug>/handoffs/reviewer/<gate>.request.json`（`{target_paths, caps, standards_refs, thresholds, request_id:<current_node>, caller:<员工id>, diff_range?}`）。
+2. 发函 `kdev-team:reviewer-orchestrator`（后台 B 轨，派单细节见 node-agent-routing.md），prompt 指向 request + slug + workspace。
+3. 收 completion → `handoff-read` 取 `<gate>.handoff.json` 的 `verdict`。
+4. 由你（主控）在主循环调 record-gate 入账（verdict 判定不下放，沿用评审专家聚合结论）：
 
 ```bash
 python3 -m kdev_core record-gate $FLOW <slug> \
   --gate <gate_id> --kind review \
-  --verdict PASS --request-id <current_node> \
-  --by "deferred:阶段3-评审专家" \
+  --verdict <PASS|FAIL> --request-id <current_node> \
+  --by reviewer-expert \
   --table $NT --workspace <workspace>
 ```
 
-#### d. reviewer=reviewer-expert + !deferred → 问用户
+FAIL 时按回流规则重做对应 action 节点（gate-decision-logic.md）。
 
-停下来问用户："这个第三方评审 gate 需要你的判断，PASS 还是 FAIL？" 用户给出 verdict 后调 record-gate。
+#### d. reviewer=reviewer-expert 但 L1 回退 self → 自评（逃生门）
+
+L1 flow-config 把该 gate 配成 `reviewer: self`（env 受限/省 token）时**不发函**，按 a/b 的 self 自评逻辑判 + record-gate。per-gate reviewer 的 engine 级 config-merge 待后续 plan，本期靠手改 node-table reviewer 字段回退。
 
 ### 2.6 回到 LOOP
 

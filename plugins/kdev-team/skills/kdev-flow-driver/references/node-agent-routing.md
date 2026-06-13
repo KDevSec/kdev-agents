@@ -116,3 +116,52 @@ Gate 节点由编排器（你）自行判断，不派业务 agent。具体判据
 ## ⚠️ 产物落 handoffs/req-architect/（同 dev-engineer 的 delivery/ 教训，G-006）
 
 派 req-architect 业务 agent 时，**必须在上下文写死「产物根 = `<workspace>/.kdev/features/<slug>/handoffs/req-architect/`」**，所有 ir/sr/ar/prototype/design 都落这里，不套用全局 `screenshots/` 规则。最终合并交付落 `docs/design-flow/<slug>/`。
+
+---
+
+# reviewer 发函 dispatch（review gate 发函评审专家）
+
+适用于**两员工**（dev-engineer + req-architect）所有 `reviewer: reviewer-expert` 的 review gate。评审专家(reviewer) 是 **callee 员工**（无自有 flow），不在上面 node→agent 路由表里——它**不是某个 action 节点的业务 agent**，而是 caller 编排**到 review gate 时发函**的协作方。判据逻辑见 `gate-decision-logic.md`「Reviewer-Expert Gate（已兑现）」；本段定义**发函时的上下文构造**。
+
+## 派单标识（全名，G-009）
+
+```
+Agent({subagent_type: "reviewer-orchestrator"})            ❌ not found
+Agent({subagent_type: "kdev-team:reviewer-orchestrator"})  ✅
+```
+
+发函只 dispatch **`kdev-team:reviewer-orchestrator`** 一个入口；它内部读 `orchestration/reviewer.dispatch-table.yml` 把 gate 反查成 in-scope 评审能力、再 fan-out `kdev-team:reviewer-<cap>`（caller 不直接派 cap agent）。
+
+## 派单方式：后台 + 文件交接（B 轨）
+
+`run_in_background: true`。caller 编排在 review gate **先写 request 文件**，再 dispatch，靠 completion 通知 + handoff-read 拿 verdict，**不读 subagent 内联返回**（同业务派单 B 轨）。
+
+## caller→reviewer 上下文构造（request schema）
+
+caller 编排到 review gate 时，写 `<workspace>/.kdev/features/<slug>/handoffs/reviewer/<gate>.request.json`：
+
+```json
+{
+  "target_paths": ["待评产物路径（如 src/, tests/, design.md, sr.md, prototype/）"],
+  "caps": ["in-scope 评审能力（编排可留空，reviewer-orchestrator 据 dispatch-table 反查 gate→caps）"],
+  "standards_refs": ["standards/reviewer/<cap>.md（reviewer 侧自取，caller 可省）"],
+  "thresholds": {"<cap>": 85},
+  "request_id": "<gate-node，如 n9a-code-review>",
+  "caller": "<员工 id：dev-engineer | req-architect>",
+  "diff_range": "<代码评审用的 git diff 区间，可选>",
+  "transcript_ref": "<可选 transcript 锚点>"
+}
+```
+
+**产物落位**：reviewer 全部产物落 `handoffs/reviewer/`——request（`<gate>.request.json`）、各 cap 评分表（`<gate>.<cap>.score.md`）、仲裁（`<gate>.arbitration.md`）、回函 verdict（`<gate>.handoff.json`）。与 caller 自己的 `handoffs/<员工>/` 平级，不混。
+
+## 发函 → 回收 6 步（caller 视角）
+
+1. 写 `handoffs/reviewer/<gate>.request.json`（上面 schema）。
+2. `Agent({subagent_type: "kdev-team:reviewer-orchestrator", run_in_background: true, ...})`，prompt 指向 request 文件 + slug + workspace。
+3.（reviewer-orchestrator handoff-read request → fan-out cap → 评分表 → 仲裁 → 聚合 verdict → 写 `<gate>.handoff.json`）。
+4. caller 收 completion 通知。
+5. `handoff-read` 取 `<gate>.handoff.json` 的 `verdict / counts / revisions / 仲裁`。
+6. `python3 -m kdev_core record-gate <flow> <slug> --gate <gate> --kind review --verdict <V> --request-id <node> --by reviewer-expert --table <caller node-table>`。FAIL 时按 caller 回流规则重做 action 节点（见 `gate-decision-logic.md`）。
+
+> **L1 回退**：L1 flow-config `reviewer: self` 时**不发函**，按本 gate 的 self 判据自评 record-gate（env 受限/省 token 逃生门）。per-gate reviewer 的 engine 级 config-merge 待后续 plan，本期 L0 node-table `reviewer` 字段生效。

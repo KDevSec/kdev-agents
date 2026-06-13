@@ -32,7 +32,7 @@ PLAN.md 必须显式列出"增量清单"，**增量数 N 在这里定死**——
 - **先定增量清单**：按"可独立 e2e"切，写进 PLAN.md 开头（增量数 N + 每个增量的 e2e 验收标准）。
 - 产出 `PLAN.md`：增量清单 + 每增量内分任务 + TDD 顺序 + 每任务验收点。
 - 自验：计划覆盖切片范围、无占位、签名/类型与既有代码一致、**增量按"可 e2e"切（不是按实现分层）**。
-- 完成 → 回编排，进 n4-plan-review（第三方方案评审，阶段1 deferred）。
+- 完成 → 回编排，进 n4-plan-review（第三方方案评审，编排发函评审专家·方案架构评审 reviewer-design；L1 `reviewer: self` 时回退自评）。
 
 ## Capabilities
 - `superpowers:writing-plans` — 起草 implementation-plan。
