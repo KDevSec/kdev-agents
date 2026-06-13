@@ -1,0 +1,19 @@
+CLAUDE.md
+  s_4ff7b809d3f513::t_61c7a4479b988c 3,42-43
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "7c211212164dd5f804d804a1cc5b8addd5fc4490",
+  "prompts": {},
+  "sessions": {
+    "s_4ff7b809d3f513": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "fa127296-1bee-4d24-bc07-1bcc5263415b",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
