@@ -123,6 +123,8 @@ Gate 节点由编排器（你）自行判断，不派业务 agent。具体判据
 
 适用于**两员工**（dev-engineer + req-architect）所有 `reviewer: reviewer-expert` 的 review gate。评审专家(reviewer) 是 **callee 员工**（无自有 flow），不在上面 node→agent 路由表里——它**不是某个 action 节点的业务 agent**，而是 caller 编排**到 review gate 时发函**的协作方。判据逻辑见 `gate-decision-logic.md`「Reviewer-Expert Gate（已兑现）」；本段定义**发函时的上下文构造**。
 
+> **发函硬规（who→whom / 结构化非自由对话 / 建议非拦截·caller 自主判断）见 `SKILL.md` §2.4quater 跨员工直接发函硬规（v1.5 硬规 2/7）。** 本段只管「上下文怎么构造」，硬规边界以 §2.4quater 为准，勿在两处各写一份免漂移。
+
 ## 派单标识（全名，G-009）
 
 ```

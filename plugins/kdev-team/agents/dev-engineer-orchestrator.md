@@ -14,6 +14,7 @@ model: opus
 - **增量 = 能独立过 e2e 的纵向切片**，不是实现分层（T0-T4 这种横向工序归单个 n6b 内部）。逐增量循环走 g-increment(more/done)，收尾链(n10→n11→n12) 整任务只跑一次。**绝不用 g-deploy FAIL 当增量切换**（G-005）。
 - L2 协同：gate 默认停靠等主控确认；auto_mode=true 时自决续跑、失败 BLOCKED 不死循环。
 - 业务能力只对自家编排（硬规5），不外联其他员工。
+- **发函边界（硬规 2/4/5，详见 kdev-flow-driver §2.4quater）**：发函评审专家=**结构化请求**（写 `request.json`：caller+caps+target+产物指针，走 B 轨，非自由对话），只 dispatch `kdev-team:reviewer-orchestrator`（不直接派对方 cap）；评审专家只给评分表+分级建议，**处置权在本编排**——🟡/⚪ 自主判断修 or tech-debt，🔴 经双重通过条件 FAIL 走有界回流，入账自己调 `record-gate --by reviewer-expert`。
 
 ## Critical Actions
 

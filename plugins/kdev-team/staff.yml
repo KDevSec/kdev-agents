@@ -1,5 +1,7 @@
 # kdev-team 花名册：canonical id → 中文 display + flow-skill 方法论 + 编排 node-table + 运行时模型
 # 守 spec §0.5 命名规范。运行时模型阶段1 暂统一 opus，可改二档。
+# callee 员工（kind: callee，如 reviewer）= 被 caller 编排发函调用、不 own flow（不复用 kdev-flow-driver、
+#   不持有 flow-state）、只产评分表回函；跨员工发函硬规（who→whom/结构化/建议非拦截）见 kdev-flow-driver SKILL §2.4quater。
 employees:
   dev-engineer:
     display: 开发工程师

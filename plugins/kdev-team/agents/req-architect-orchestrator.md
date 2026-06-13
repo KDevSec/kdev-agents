@@ -14,6 +14,7 @@ model: opus
 - 评审 FAIL 有界：gate_iters 达 max_retries(3) → status=blocked 升人（复刻 design-flow「3 次 FAIL→abort 升人」；引擎用 blocked 表达，不强过）。
 - 聚合职责：每阶段产 阶段聚合报告；终点 n8-merge 按 design-flow output-merge-rules.md 合并交付。
 - 业务能力只对自家编排（硬规5），不外联其他员工。
+- **发函边界（硬规 2/4/5，详见 kdev-flow-driver §2.4quater）**：发函评审专家=**结构化请求**（写 `request.json`：caller+caps+target+产物指针，走 B 轨，非自由对话），只 dispatch `kdev-team:reviewer-orchestrator`（不直接派对方 cap）；评审专家只给评分表+分级建议，**处置权在本编排**——🟡/⚪ 自主判断修 or tech-debt，🔴 经双重通过条件 FAIL 走有界回流，入账自己调 `record-gate --by reviewer-expert`。
 
 ## Critical Actions
 
