@@ -45,7 +45,7 @@ def test_reviewer_callee_entry():
     assert "node_table" not in emp, "callee 不应有 node_table（用 dispatch_table）"
     assert emp["flow_skill"] is None, "callee 无方法论 flow-skill"
     assert emp["standards_dir"] == "standards/reviewer/"
-    assert len(emp["agents"]) == 7  # orchestrator + 6 cap
+    assert len(emp["agents"]) == 9  # orchestrator + 8 cap
     for a in emp["agents"]:
         assert (AGENTS / f"{a}.md").exists(), f"花名册引用的 agent 不存在: {a}"
 

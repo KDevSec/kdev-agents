@@ -59,3 +59,5 @@ employees:
       - reviewer-design
       - reviewer-code
       - reviewer-security
+      - reviewer-test-design
+      - reviewer-test-coverage

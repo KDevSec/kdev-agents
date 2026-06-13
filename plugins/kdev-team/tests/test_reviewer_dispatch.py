@@ -7,14 +7,15 @@ AGENTS = ROOT / "agents"
 DEV_NT = ROOT / "orchestration/dev-engineer.node-table.yml"
 REQ_NT = ROOT / "orchestration/req-architect.node-table.yml"
 
-EXPECTED_CAPS = {"sr", "story", "prototype", "design", "code", "security"}
+EXPECTED_CAPS = {"sr", "story", "prototype", "design", "code", "security",
+                 "test-design", "test-coverage"}
 
 
 def _dt():
     return yaml.safe_load(DT.read_text(encoding="utf-8"))
 
 
-def test_dispatch_table_has_6_caps_with_schema():
+def test_dispatch_table_has_8_caps_with_schema():
     caps = _dt()["capabilities"]
     assert {c["cap"] for c in caps} == EXPECTED_CAPS
     for c in caps:
@@ -35,30 +36,36 @@ def test_each_cap_standards_file_exists():
 
 
 def test_caller_gate_refs_real_gates():
-    """dispatch-table 声明的 caller_gate 必须是真实存在的 gate（dev/req node-table 的 gate_specs）。"""
+    """dispatch-table 声明的 caller_gate 必须是真实存在的 gate（dev/req/test-engineer node-table 的 gate_specs）。"""
     dev = yaml.safe_load(DEV_NT.read_text(encoding="utf-8"))["gate_specs"]
     req = yaml.safe_load(REQ_NT.read_text(encoding="utf-8"))["gate_specs"]
-    known = {f"dev-engineer:{g}" for g in dev} | {f"req-architect:{g}" for g in req}
+    te_d = yaml.safe_load((ROOT / "orchestration/test-engineer.design.node-table.yml").read_text(encoding="utf-8"))["gate_specs"]
+    te_e = yaml.safe_load((ROOT / "orchestration/test-engineer.exec.node-table.yml").read_text(encoding="utf-8"))["gate_specs"]
+    known = ({f"dev-engineer:{g}" for g in dev} | {f"req-architect:{g}" for g in req}
+             | {f"test-engineer:{g}" for g in te_d} | {f"test-engineer:{g}" for g in te_e})
     for c in _dt()["capabilities"]:
         for cg in c["caller_gate"]:
             assert cg in known, f"{c['cap']} 引用了不存在的 caller_gate: {cg}"
 
 
 def test_review_gates_covered_by_some_cap():
-    """dev/req 的每个 review-kind gate 都至少被一个 cap 认领（无悬空 reviewer-expert gate）。
+    """dev/req/test-engineer 的每个 review-kind gate 都至少被一个 cap 认领（无悬空 reviewer-expert gate）。
 
     仅统计**委派 reviewer-expert** 的 review gate（reviewer != self）：`g-verify`
     是 kind=review 但 reviewer=self 的自验证 gate（TDD 真过/完成验证由被评审员工自检），
-    本就不该被评审专家 cap 认领（spec §4.1 只列 6 个第三方评审 gate）。
+    本就不该被评审专家 cap 认领（spec §4.1 只列第三方评审 gate）。
     """
-    dev = yaml.safe_load(DEV_NT.read_text(encoding="utf-8"))["gate_specs"]
-    req = yaml.safe_load(REQ_NT.read_text(encoding="utf-8"))["gate_specs"]
-    review_gates = {
-        f"dev-engineer:{g}" for g, s in dev.items()
-        if s["kind"] == "review" and s.get("reviewer") != "self"
+    specs_by_emp = {
+        "dev-engineer": yaml.safe_load(DEV_NT.read_text(encoding="utf-8"))["gate_specs"],
+        "req-architect": yaml.safe_load(REQ_NT.read_text(encoding="utf-8"))["gate_specs"],
+        "test-engineer": {
+            **yaml.safe_load((ROOT / "orchestration/test-engineer.design.node-table.yml").read_text(encoding="utf-8"))["gate_specs"],
+            **yaml.safe_load((ROOT / "orchestration/test-engineer.exec.node-table.yml").read_text(encoding="utf-8"))["gate_specs"],
+        },
     }
-    review_gates |= {
-        f"req-architect:{g}" for g, s in req.items()
+    review_gates = {
+        f"{emp}:{g}" for emp, specs in specs_by_emp.items()
+        for g, s in specs.items()
         if s["kind"] == "review" and s.get("reviewer") != "self"
     }
     claimed = set()
