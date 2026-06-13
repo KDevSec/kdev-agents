@@ -1,0 +1,21 @@
+plugins/kdev-team/.claude-plugin/plugin.json
+  s_af2ebae0bfaf45::t_b7b84ac0295154 4
+plugins/kdev-team/CHANGELOG.md
+  s_af2ebae0bfaf45::t_f67bad41608542 3-12
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "41a903a111212f0621564b33eb66c6a494a92a30",
+  "prompts": {},
+  "sessions": {
+    "s_af2ebae0bfaf45": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "737f5ec6-d909-4691-bd2d-3186f0dc8820",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
