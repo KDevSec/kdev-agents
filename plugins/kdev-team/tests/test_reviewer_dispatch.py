@@ -70,7 +70,8 @@ def test_review_gates_covered_by_some_cap():
 
 STD = ROOT / "standards/reviewer"
 COMMON = STD / "通用评分模板.md"
-CAP_STANDARDS = ["SR需求评审", "用户故事评审", "原型评审", "方案架构评审", "代码质量评审", "安全评审"]
+CAP_STANDARDS = ["SR需求评审", "用户故事评审", "原型评审", "方案架构评审", "代码质量评审", "安全评审",
+                 "测试设计评审", "测试覆盖评审"]
 
 
 def test_common_scoring_template_has_required_sections():
