@@ -235,6 +235,26 @@ python3 -m kdev_core handoff-read coding-flow <slug> --workspace <ws> \
 
 **为什么不另起原语**：B 轨 `write/read_handoff_status` 已是「谁产了啥+路径+状态」结构化指针，跨员工只是换 `employee`/`slug` join 维度，零扩展即覆盖（守「复用别重造」）。**gate 判断仍在主循环**（同 §2.4bis 边界：执行甩文件、决策留主控）。
 
+### 2.4quater 跨员工直接发函硬规（v1.5 硬规 2/7）⭐
+
+§2.4ter 给的是「**怎么发函**」（机制：B 轨 handoff write/read）。本段钉死「**谁能给谁发 / 发的是什么 / 对方说了算不算**」——把[概念模型合稿 §10.1 通信硬规](../../../../docs/framework/01-design/2026-06-10-02-KDev数字员工-概念模型与员工能力-合稿-v1.0.md) 的硬规 2/4/5 收口成**编排 runtime 契约**，全集群发函（caller→reviewer 评审、上游→下游交付）共守。canonical 声明在合稿 §10.1，本段是其运行时落地。
+
+**① 谁能给谁发函（who→whom）：**
+- 🔴 **员工编排能力之间直接发函、不经 CEO**（硬规 2）：员工 A 编排 → 员工 B 编排（3 跳：A 编排→B 编排→B 能力→回流）。CEO 只在 4 场景介入（阶段聚合 / 异常升级 / 用户问询 / 评审 3 次循环升级），日常协作不掺和。
+- 🔴 **业务/评审能力不直接对外**（硬规 4、硬规 5）：能力（`dev-engineer-frontend`、`reviewer-code`…）只跟自家编排对话；跨员工协作**必须走编排能力**，不能能力直连别家能力。发函**只 dispatch 对方的 `<employee>-orchestrator`**（评审专家即 `kdev-team:reviewer-orchestrator`），由它内部 fan-out 自家 cap——**caller 不直接派对方的 cap agent**。
+- 评审专家是 **callee**：被 caller review gate 发函调用，**只回函给请评审的那个 caller 编排**，从不反向命令 caller、不跨员工另联、不 halt caller flow。
+
+**② 发函 = 结构化请求，非自由对话：**
+- 发函落**结构化 request 文件**（`handoffs/reviewer/<gate>.request.json` 或交付 manifest），字段 = **谁发给谁**（`caller`）+ **评什么/要什么**（`caps` / `target_paths` / `gate_input`）+ **产物指针**（`standards_refs` / `artifacts` / `thresholds`）。**不是**往主会话糊一段自然语言指令。
+- 走 **B 轨**（`run_in_background` + 文件交接），**不读 subagent 内联返回**——执行甩后台、决策留主控（避免结果回灌刷屏，MQ-1）。回函同样落结构化文件（`<gate>.handoff.json` / handoff status），caller `handoff-read` 取字段。
+
+**③ 边界：评审给建议、caller 自主判断（非硬拦截）：**
+- 评审专家**只产出**评分表 + 🔴/🟡/⚪ 分级**建议** + verdict，**不直接命令** caller 改什么。🟡/⚪ 由 caller 编排 **自主判断**修 or tech-debt 化。
+- 🔴 阻断**有牙齿但经 gate**：经**双重通过条件**（`total≥阈值 AND 🔴=0`）强制该能力 FAIL（总分再高也不放行），但兑现路径是 **caller flow 的有界回流 + escalate**（kdev-core 执行），评审专家**不自己 halt/command** caller。
+- **处置权 + 入账都在 caller**：caller 读 verdict → 自主决定回流修哪些 → 自己调 `record-gate --by reviewer-expert` 入账（评审专家不碰 kdev-core 状态机）。3 次不过 → `status=blocked` 升 CEO → 用户拍板，escalate 不 force-accept。
+
+**守 [G-008]**：编排**仍走通用 `kdev-flow-driver`**——caller（flow-owner）用本 skill 驱动自己的 node-table，到 review gate 按 §2.5c 发函；评审专家（callee）**不复用本 driver、不持有自己的 `flow-state`、不写 `features/<slug>/` 流程账**，只产评分表寄生 caller flow 贡献一个 verdict。别给 callee 造假 node-table（spec §2.1）。
+
 ### 2.5 gate 节点 → 判断
 
 从 `next-step` 返回的 `gate_spec` 确定判断逻辑。四种情况：
