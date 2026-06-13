@@ -151,13 +151,13 @@ skill-feedback.md（F-NNN）的 `verbatim` 字段必须保留**用户原句**—
 
 | 触发时机 | 写入文件 | 编号 | 详细 schema |
 |---------|---------|------|------------|
-| 需要人做决策（有歧义、多选项、不可逆） | 决策日志.md | Q-NNN | `references/六类记录-schema.md` §1 |
-| 踩坑 / 绕路 / 报错 / 命令失败 | 踩坑日志.md | G-NNN | §2 |
-| 每步/每里程碑完成 | 执行日志.md（双评分） | `Step <scope-slug>-N`（shared→分支 slug，员工→canonical id） | §3 |
+| 需要人做决策（有歧义、多选项、不可逆） | 决策日志.md | Q（新：时间戳形，见下） | `references/六类记录-schema.md` §1 |
+| 踩坑 / 绕路 / 报错 / 命令失败 | 踩坑日志.md | G（新：时间戳形，见下） | §2 |
+| 每步/每里程碑完成 | 执行日志.md（双评分） | Step（新：时间戳形） | §3 |
 | 用户当场反馈体验/规则 | 执行日志.md 的评估区 | — | §3 |
 | 会话结束前 | 每日汇总/YYYY-MM-DD.md | — | §4 |
-| 评分差值 ≥ 2 或反复出现的感受信号（项目内方法论） | 改进建议.md | R-NNN | §5 |
-| **对外部 skill/插件/工具的 5 类语义反馈**（RFE/痛点/bug/表扬/困惑） | **skill-feedback.md**【新】 | **F-NNN** | **`references/skill-反馈通道-F.md`** |
+| 评分差值 ≥ 2 或反复出现的感受信号（项目内方法论） | 改进建议.md | R（新：时间戳形，见下） | §5 |
+| **对外部 skill/插件/工具的 5 类语义反馈**（RFE/痛点/bug/表扬/困惑） | **skill-feedback.md**【新】 | **F（新：时间戳形，见下）** | **`references/skill-反馈通道-F.md`** |
 | 流程状态变更 | 当前状态.md | — | §7（含 frontmatter 字段语义） |
 | （可选）项目自愿立硬规 | 方法论铁规.md | — | §6 |
 
@@ -362,7 +362,7 @@ F-NNN 的 `verbatim` 字段（用户原话）是最高价值的 RFE 信号源—
 
 只负责**把料备好**：写记录、推断 subject、采集 verbatim、产出切片包。**下游训练管道、聚类归纳、产出新 skill 是别的 skill 或人工要做的事。** 本 skill 不管训练、不管 fine-tuning、不管 RM/DPO 实际配置——只管原料的采集、归属和导出。
 
-## 多 worktree / 多 scope 并发：Step ID 加 scope 前缀（v0.11 分支 / v0.14 员工 scope）
+## 多 worktree / 多 scope 并发：时间戳记录 ID（v0.17 / Q-020）
 
 ### 何时触发
 
@@ -372,67 +372,73 @@ F-NNN 的 `verbatim` 字段（用户原话）是最高价值的 RFE 信号源—
 - 主仓库 + 镜像/挂载点同时 Claude 会话
 - 多员工 scoped 布局下，各员工有独立的 `staff/<canonical-id>/` scope（v0.14+，见§记忆 scope 分离）
 
-### 新 ID 格式（v0.11+）
+### 新 ID 格式（v0.17+，Q-020）
 
-`Step <scope-slug>-N`，其中 **scope-slug** 取值规则：
-- **shared / 主线**（flat 默认 或 scoped 布局的 shared/ scope）→ 分支 slug（`main`、`cluster-x1` 等），由 `step_id.compute_branch_slug()` 计算
-- **员工 scope**（scoped 布局 `staff/<canonical-id>/` 下的执行 rollup）→ 该员工的 canonical id（如 `dev-engineer`、`req-architect`）
+`<Type> <YYYYMMDD-HHMMSS>-<who>[.<n>]`，其中：
+- **Type**：`Step` / `Q` / `G` / `R` / `F`
+- **YYYYMMDD-HHMMSS**：**本地时间戳**，由 `mint_record_id` 在落盘时自动生成
+- **who**：git email 本地部分（`@` 前），无 git 环境时省略整个 `-<who>` 后缀（不写 `-None`）
+- **[.<n>]**：同一写手同一秒内第二条起 `.2`、`.3`…（去重兜底）
 
-**slug 由 `scope.resolve_step_slug(scope)` 统一选取**；底层仍调用 `step_id.mint_next_step_id(state_dir, slug=...)`；计数器文件 `step-counter-<slug>.txt` 天然按 slug 命名空间，互不干扰。
+**协调自由**：时间戳 + who 组合，worktree / 多机同时落盘也不会撞号（G-011 修复）。slug/counter 机制已**退役**（不再用于新记录 minting）。
 
 举例：
-- `Step main-9`（主线 / shared scope，主分支第 9 条）
-- `Step cluster-x1-1`（feature/cluster-x1 分支第 1 条）
-- `Step bugfix-issue-42-3`（bugfix/issue-42 分支第 3 条）
-- `Step dev-engineer-1`（开发工程师员工 scope 第 1 条）
-- `Step req-architect-3`（需求架构师员工 scope 第 3 条）
+- `Step 20260613-142301-ly`（主线，ly 落盘）
+- `Step 20260613-142301-ly.2`（同秒第二条）
+- `Step 20260613-142301`（无 git 环境，省略 who）
+- `Q 20260613-150000-ly`（决策日志条目）
+- `G 20260613-150100-ly`（踩坑日志条目）
+- `R 20260613-150200-ly`（改进建议条目）
+- `F 20260613-150300-ly`（skill 反馈条目）
 
-### Slug 规则（分支 slug 由 [step_id.compute_branch_slug()](../../hooks/lib/step_id.py) 实现，不手算）
+### 智能体落 Step / Q/G/R/F 时的标准流程
 
-- `main` / `master` → 原样
-- `feature/X` / `feat/X` → 去前缀
-- 其他 `A/B` → `A-B`
-- 非 ASCII / 特殊字符 → sanitize 成 `[a-zA-Z0-9\-_]+`
-- 不在 git → `unknown`
-- detached HEAD → `detached`
-
-员工 scope slug 取 canonical id（经 `sanitize_slug` 规范化，对合法 canonical id 为 no-op）。
-
-### 智能体落 Step 时的标准流程
+**Step + Q/G/R/F 全部走 `mint_record_id` 时间戳形**（Q-020 决策）。新编条目统一用此接口，**不要**手写 `Q-NNN` / `G-NNN` 等旧顺序 ID。
 
 ```python
 import sys
 sys.path.insert(0, "plugins/kdev-memory/hooks/lib")
-from step_id import mint_next_step_id
+from step_id import mint_record_id
 from pathlib import Path
-step_id = mint_next_step_id(Path(".kdev/memory/state"))
-# step_id = "Step main-9"（主线）
-# 员工 scope 时：mint_next_step_id(state_dir, slug="dev-engineer") → "Step dev-engineer-1"
+
+# Step 条目
+record_id = mint_record_id("Step", Path(".kdev/memory/state"))
+# record_id = "Step 20260613-142301-ly"
+
+# Q / G / R / F 同样写法，改 Type 参数即可
+q_id = mint_record_id("Q", Path(".kdev/memory/state"))
+# q_id = "Q 20260613-150000-ly"
+
+g_id = mint_record_id("G", Path(".kdev/memory/state"))
+r_id = mint_record_id("R", Path(".kdev/memory/state"))
+f_id = mint_record_id("F", Path(".kdev/memory/state"))
 ```
 
-然后用这个 ID 作为 Step 条目的标题：
+然后用这个 ID 作为条目的标题：
 
 ```markdown
-## Step main-9: 实现 step_id.py
+## Step 20260613-142301-ly: 实现 mint_record_id
 triggers: [...]
-日期：2026-05-28
+日期：2026-06-13
+...
+
+## Q 20260613-150000-ly: 是否引入 Docker？
+日期：2026-06-13
+...
+
+## G 20260613-150100-ly: pnpm install 漏装子包依赖
+triggers: [...]
+日期：2026-06-13
 ...
 ```
 
 智能体可以直接读 [step_id.py](../../hooks/lib/step_id.py) 实现细节；本节只规范"用哪个接口"。
 
-### 历史兼容
+### 历史兼容（旧顺序 ID 冻结 + 双认）
 
-`step_id_prefix_since: <date>` 是 `执行日志.md` 第二段后面的 HTML 注释，标识切换时点。该日期之前的 Step 保持无前缀格式（`Step 1` ~ `Step 8` 等）；之后的全部带前缀。SessionStart brief 显示「本次 Step ID 前缀：`<slug>-`」帮助智能体确认。
-
-### 子文件位置
-
-- 计数器：`.kdev/memory/state/step-counter-<slug>.txt`，纯整数
-- 切换点注释：在 `执行日志.md` header 段（搜索 `step_id_prefix_since`）
-
-### main 分支特殊性
-
-main 分支的计数器初始化为「历史 Step 1~N 的最大编号」（本仓库为 9 — 验证用 `grep -c "^## Step " .kdev/memory/执行日志.md`），让 main 上下一条新 Step = `Step main-10`，保持时间线连贯。**新建分支的计数器从 0 起**，下一条 = `Step <scope-slug>-1`。
+- 现存 `Step main-N` / `Step <slug>-N` / `Q-NNN` / `G-NNN` / `R-NNN` / `F-NNN` 等顺序 ID **冻结**，不再 mint 新顺序 ID，但继续被 `parse_record_id` 解析（向后兼容）。
+- `parse_record_id` 同时认时间戳格式（新）和顺序格式（旧），可安全混用于同一日志文件。
+- `step_id_prefix_since` HTML 注释保留在 `执行日志.md` 作为历史标识，不再驱动 minting。
 
 ## 记忆 scope 分离（v0.14, P-C1）
 

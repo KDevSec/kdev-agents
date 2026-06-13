@@ -88,12 +88,13 @@ def recorder_target_log(scope: Optional[str], root: PathLike = DEFAULT_ROOT) -> 
 def resolve_step_slug(scope: Optional[str], root: PathLike = DEFAULT_ROOT) -> str:
     """scope → Step ID slug。
 
-    - shared/default/project/None/空 → 分支 slug（复用 step_id.compute_branch_slug，
-      保持 main 单轨现状 `Step main-N`）
-    - 其它（员工 canonical id）→ sanitize 后的 id（`Step dev-engineer-N`）
+    ⚠️ Q-020：本函数已废弃用于 minting。新记录 ID 走 step_id.mint_record_id（时间戳原语）；
+    本函数仅留向后兼容/历史解析（parse_record_id 双认旧形式）。
 
-    Step ID 形态恒为 `Step <slug>-N`；P-C1b 的 transcript 溯源是 Step 条目里
-    独立字段，不折进 slug。
+    - shared/default/project/None/空 → 分支 slug（复用 step_id.compute_branch_slug，
+      产出如 `main`、`cluster-x1`；已废弃 for minting，Q-020；仅历史/兼容）
+    - 其它（员工 canonical id）→ sanitize 后的 id（如 `dev-engineer`；
+      已废弃 for minting，Q-020；仅历史/兼容）
     """
     # `root` is accepted for API symmetry with the rest of this module and is
     # reserved for future scope validation (e.g. checking scope_id ∈ list_staff(root));

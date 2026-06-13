@@ -52,15 +52,17 @@ class Entry:
 
 # ==================== 文件扫描 + 条目切分 ====================
 
-# heading 正则（Step / Q-NNN / G-NNN / F-NNN / R-NNN）
+# heading 正则（Step / Q-NNN / G-NNN / F-NNN / R-NNN，以及新时间戳形式）
 # MULTILINE 让 ^/$ 跨行匹配（finditer 扫整个文件文本）
 # 冒号 + 标题部分是可选 —— 容错"## Step 1"（无冒号无标题）和"## Step 1: 标题"两种格式
+# 新时间戳形（P-C2）：`<T> <YYYYMMDD-HHMMSS>[-who][.n]`，用 _TS 子模式匹配
+_TS = r"\d{8}-\d{6}(?:-[\w-]+)?(?:\.\d+)?"
 HEAD_PATTERNS: dict[str, tuple[str, re.Pattern[str]]] = {
-    "Step": ("执行日志.md", re.compile(r"^##\s+(Step\s+\S+)(?:\s*[：:]\s*(.+?))?\s*$", re.MULTILINE)),
-    "Q":    ("决策日志.md", re.compile(r"^##\s+(Q-\d+)(?:\s*[：:]\s*(.+?))?\s*$", re.MULTILINE)),
-    "G":    ("踩坑日志.md", re.compile(r"^##\s+(G-\d+)(?:\s*[：:]\s*(.+?))?\s*$", re.MULTILINE)),
-    "F":    ("skill-feedback.md", re.compile(r"^##\s+(F-\d+)(?:\s*[：:]\s*(.+?))?\s*$", re.MULTILINE)),
-    "R":    ("改进建议.md", re.compile(r"^##\s+(R-\d+)(?:\s*[：:]\s*(.+?))?\s*$", re.MULTILINE)),
+    "Step": ("执行日志.md", re.compile(r"^##\s+(Step\s+\S+?)(?:\s*[：:]\s*(.+?))?\s*$", re.MULTILINE)),
+    "Q":    ("决策日志.md", re.compile(rf"^##\s+(Q(?:-\d+|\s+{_TS}))(?:\s*[：:]\s*(.+?))?\s*$", re.MULTILINE)),
+    "G":    ("踩坑日志.md", re.compile(rf"^##\s+(G(?:-\d+|\s+{_TS}))(?:\s*[：:]\s*(.+?))?\s*$", re.MULTILINE)),
+    "F":    ("skill-feedback.md", re.compile(rf"^##\s+(F(?:-\d+|\s+{_TS}))(?:\s*[：:]\s*(.+?))?\s*$", re.MULTILINE)),
+    "R":    ("改进建议.md", re.compile(rf"^##\s+(R(?:-\d+|\s+{_TS}))(?:\s*[：:]\s*(.+?))?\s*$", re.MULTILINE)),
 }
 
 # inline frontmatter 行（key: value）—— 用于解析 date / subject / status 等
@@ -360,10 +362,10 @@ def export_markdown_slices(
     stats = ExportStats()
     stats.counts["total"] = len(entries)
     stats.counts["step"] = sum(1 for e in entries if e.entry_id.startswith("Step"))
-    stats.counts["q"] = sum(1 for e in entries if e.entry_id.startswith("Q-"))
-    stats.counts["g"] = sum(1 for e in entries if e.entry_id.startswith("G-"))
-    stats.counts["f"] = sum(1 for e in entries if e.entry_id.startswith("F-"))
-    stats.counts["r"] = sum(1 for e in entries if e.entry_id.startswith("R-"))
+    stats.counts["q"] = sum(1 for e in entries if e.entry_id.startswith("Q-") or e.entry_id.startswith("Q "))
+    stats.counts["g"] = sum(1 for e in entries if e.entry_id.startswith("G-") or e.entry_id.startswith("G "))
+    stats.counts["f"] = sum(1 for e in entries if e.entry_id.startswith("F-") or e.entry_id.startswith("F "))
+    stats.counts["r"] = sum(1 for e in entries if e.entry_id.startswith("R-") or e.entry_id.startswith("R "))
 
     out_dir.mkdir(parents=True, exist_ok=True)
     by_subject_dir = out_dir / "dataset-skill-feedback-by-subject"

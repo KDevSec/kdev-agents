@@ -46,10 +46,20 @@
 
 强制改写就是数据贬值。智能体看到用户吐槽时的本能改写冲动（"嗯，意思是用户希望召回有 demote 机制"）必须抑制——**原话原样落盘**。
 
+## v0.17+ ID 格式
+
+**新编 F 条目用 `mint_record_id("F", state_dir)` 生成时间戳 ID**（如 `F 20260613-150300-ly`），不再手写 `F-NNN` 顺序号。现存 `F-NNN` 冻结、`parse_record_id` 双认。
+
+```python
+from step_id import mint_record_id
+from pathlib import Path
+f_id = mint_record_id("F", Path(".kdev/memory/state"))  # => "F 20260613-150300-ly"
+```
+
 ## schema
 
 ```yaml
-## F-NNN: <简短标题>
+## F-NNN: <简短标题>  <!-- legacy 顺序 ID 示例，冻结；新编用时间戳形 ## F 20260613-150300-ly: 标题 -->
 日期: YYYY-MM-DD
 subject: <subject>                                    # 铁规 1：必填
 subject_inferred_by: L1-显式提及 | L2-上下文 | L3-用户选择

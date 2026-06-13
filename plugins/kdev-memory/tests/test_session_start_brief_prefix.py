@@ -1,4 +1,4 @@
-"""test session-start-brief 注入 Step ID 前缀提示。"""
+"""test session-start-brief 分支显示（Step ID 前缀行已移除，v0.17+）。"""
 from __future__ import annotations
 
 import json
@@ -32,20 +32,25 @@ def _run_hook(repo: Path, source: str = "startup") -> dict:
     return json.loads(r.stdout) if r.stdout.strip() else {}
 
 
-def test_brief_shows_main_prefix(tmp_path):
+def test_brief_shows_branch_name(tmp_path):
+    """brief 显示当前分支名，但不再显示 Step ID 前缀行（v0.17+ 时间戳方案）。"""
     repo = _init_repo_with_kdev(tmp_path, "main")
     out = _run_hook(repo)
     ctx = out.get("hookSpecificOutput", {}).get("additionalContext", "")
-    assert "本次 Step ID 前缀" in ctx
-    assert "main-" in ctx
+    assert "当前分支" in ctx
+    assert "main" in ctx
+    # v0.17+：brief 不再显示「本次 Step ID 前缀」
+    assert "本次 Step ID 前缀" not in ctx
 
 
-def test_brief_shows_feature_branch_prefix(tmp_path):
+def test_brief_shows_feature_branch_name(tmp_path):
+    """feature 分支名出现在 brief 中，但无前缀行。"""
     repo = _init_repo_with_kdev(tmp_path, "main")
     subprocess.run(["git", "checkout", "-q", "-b", "feature/cluster-x1"], cwd=repo, check=True)
     out = _run_hook(repo)
     ctx = out.get("hookSpecificOutput", {}).get("additionalContext", "")
-    assert "cluster-x1-" in ctx
+    assert "feature/cluster-x1" in ctx
+    assert "本次 Step ID 前缀" not in ctx
 
 
 import json as _json

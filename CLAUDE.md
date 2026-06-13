@@ -34,7 +34,7 @@
 
 - `.kdev/memory/` 下的记录文件**不需要逐条请示**即可写入——这是制度，不是每次询问的一次性操作
 - 每完成 Step 要顺手更新 `.kdev/memory/当前状态.md` 的 frontmatter（`current_step` + `last_updated`），不要攒到每日汇总时才改
-- **v0.11+ Step ID 加分支前缀**：新建 Step 用 `Step <branch-slug>-N` 格式（main 上是 `Step main-N`），通过 `step_id.mint_next_step_id()` 自动算。具体规则见 skill 里的「多 worktree 并发场景」段。
+- **v0.17+ 记录 ID 时间戳化（Q-020）**：新建 Step + Q/G/R/F 用 `<Type> <YYYYMMDD-HHMMSS>-<who>` 格式（who=git email 前缀，无 git 则省略后缀不写 None；同秒同写手 `.N` 兜底），通过 `step_id.mint_record_id()` 算。现存顺序 ID（`Step main-N`/`Q-NNN`）冻结、解析双认。slug/counter 退役（修 G-011 worktree 撞号）。详见 [P-C2 spec §11](docs/superpowers/specs/2026-06-13-P-C2-JSONL操作层+token优化-design.md) / Q-020。
 
 ---
 

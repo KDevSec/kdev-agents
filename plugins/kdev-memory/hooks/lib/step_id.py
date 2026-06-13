@@ -11,6 +11,7 @@
 
 from __future__ import annotations
 
+import datetime
 import os
 import re
 import subprocess
@@ -166,3 +167,113 @@ def mint_next_step_id(state_dir: Path, slug: Optional[str] = None) -> str:
         slug = compute_branch_slug()
     n = increment_counter(slug, state_dir)
     return f"Step {slug}-{n}"
+
+
+# ── P-C2 Group A: timestamp-based record ID primitive ─────────────────────────
+
+RECORD_TYPES = ("Step", "Q", "G", "R", "F")
+
+
+def _now_stamp(when: "datetime.datetime | None" = None) -> str:
+    """Return a YYYYMMDD-HHMMSS timestamp string for the given (or current) datetime."""
+    when = when or datetime.datetime.now()
+    return when.strftime("%Y%m%d-%H%M%S")
+
+
+def _who_suffix() -> str:
+    """Return git-email local-part (sanitized) or empty string if unavailable."""
+    email = _git_query("config", "user.email")
+    if not email:
+        return ""
+    local = email.split("@", 1)[0]
+    s = _sanitize_slug(local)
+    return "" if s == "unknown" else s
+
+
+def _dup_index(rec_type: str, base: str, state_dir: Path) -> int:
+    """Atomically return and increment the collision counter for (rec_type, base).
+
+    First call returns 0 (no suffix needed); subsequent calls with the same
+    arguments return 1, 2, ... enabling `.N` deduplication.
+    Uses flock for concurrent safety.
+    """
+    state_dir.mkdir(parents=True, exist_ok=True)
+    safe = _sanitize_slug(f"{rec_type}-{base}")
+    p = state_dir / f"dupidx-{safe}.txt"
+    fd = os.open(str(p), os.O_RDWR | os.O_CREAT, 0o644)
+    try:
+        _flock_exclusive(fd)
+        os.lseek(fd, 0, os.SEEK_SET)
+        raw = os.read(fd, 64).decode("utf-8", errors="replace").strip()
+        try:
+            cur = int(raw) if raw else 0
+        except ValueError:
+            cur = 0
+        os.lseek(fd, 0, os.SEEK_SET)
+        os.ftruncate(fd, 0)
+        os.write(fd, f"{cur + 1}\n".encode("utf-8"))
+        os.fsync(fd)
+        return cur
+    finally:
+        _flock_release(fd)
+        os.close(fd)
+
+
+def mint_record_id(
+    rec_type: str,
+    state_dir: Path,
+    when: "datetime.datetime | None" = None,
+    who: "str | None" = None,
+) -> str:
+    """Mint a new timestamp-based record ID for the given type.
+
+    Format: ``<Type> <YYYYMMDD-HHMMSS>[-<who>][.<n>]``
+
+    - If ``who`` is not provided, uses ``_who_suffix()`` (git email local-part).
+    - If no git / email is available, the ``-who`` suffix is omitted entirely.
+    - Collisions within the same second get a ``.1``, ``.2``, … suffix (atomic).
+
+    Raises ``ValueError`` for unknown record types.
+    """
+    if rec_type not in RECORD_TYPES:
+        raise ValueError(f"unknown record type: {rec_type!r}")
+    ts = _now_stamp(when)
+    who = _who_suffix() if who is None else who
+    base = f"{ts}-{who}" if who else ts
+    n = _dup_index(rec_type, base, state_dir)
+    core = base if n == 0 else f"{base}.{n}"
+    return f"{rec_type} {core}"
+
+
+# ── parse_record_id: dual-scheme recognition (legacy + timestamp) ──────────────
+
+_TS_PAT = r"\d{8}-\d{6}"  # YYYYMMDD-HHMMSS
+
+# New timestamp scheme: "<Type> <YYYYMMDD-HHMMSS>[-<who>][.<dup>]"
+# who has no dots (sanitized); dup is .<digits> and is independent of who.
+_RE_NEW = re.compile(rf"^(Step|Q|G|R|F)\s+({_TS_PAT}(?:-[\w-]+)?(?:\.\d+)?)$")
+
+# Legacy Step form: "Step main-87" / "Step cluster-x1-2"
+_RE_OLD_STEP = re.compile(r"^(Step)\s+([\w\-\.]+-\d+)$")
+
+# Legacy compact forms: "Q-018", "G-003", "R-001", "F-007"
+_RE_OLD_QGRF = re.compile(r"^(Q|G|R|F)-(\d+)$")
+
+
+def parse_record_id(label: str) -> "dict | None":
+    """Parse a record-ID label, returning a dict with keys ``type``, ``id``, ``scheme``.
+
+    Recognises both the new timestamp scheme and the legacy forms.
+    Returns ``None`` for lines that are not record IDs.
+    """
+    label = label.strip()
+    m = _RE_NEW.match(label)
+    if m:
+        return {"type": m.group(1), "id": m.group(2), "scheme": "timestamp"}
+    m = _RE_OLD_STEP.match(label)
+    if m:
+        return {"type": m.group(1), "id": m.group(2), "scheme": "legacy"}
+    m = _RE_OLD_QGRF.match(label)
+    if m:
+        return {"type": m.group(1), "id": m.group(2), "scheme": "legacy"}
+    return None
