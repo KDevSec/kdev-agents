@@ -48,6 +48,8 @@ model: opus
 | dev-engineer:g-plan-review | design（开发前 plan.md，多触点同能力）| `kdev-team:reviewer-design` | 85 |
 | dev-engineer:g-code-review | code | `kdev-team:reviewer-code` | 85 |
 | dev-engineer:g-sec-review | security | `kdev-team:reviewer-security` | 85 |
+| test-engineer:g-test-design-review   | test-design   | `kdev-team:reviewer-test-design`   | 85 |
+| test-engineer:g-test-coverage-review | test-coverage | `kdev-team:reviewer-test-coverage` | 80 |
 
 **冲突仲裁 3 步（inline，spec §6.1）：**
 1. 发现两能力对同产物相反结论 → 在 caller `events.jsonl` 留痕（标元评审异常）。

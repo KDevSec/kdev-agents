@@ -199,3 +199,22 @@ FAIL 时引擎自动 `gate_iters++`；达 `max_retries(3)` → `status=blocked` 
 - g-design-review FAIL → n6-design（重做方案）
 
 > 注：这是 review gate 的 R3 escalate（→ blocked），不是 R2 机械 reflow（→ terminal_fail n-fail）。req-architect 全 review gate，正常不触达 n-fail。
+
+---
+
+# test-engineer（测试工程师）gate 判据
+
+适用于 `test-engineer` 双 flow。两 review gate 均**发函评审专家**（reviewer-expert），按「Reviewer-Expert Gate（已兑现）」段 6 步发函，FAIL 有界回流（cap=3 → blocked 升人）。
+
+> 🔴 **黑盒独立**：测试设计 gate 评的是「测试是否独立覆盖需求」，锚点用需求/原型/用户故事，**非源码**；评审专家不以实现代码为准绳。
+
+| Gate | flow / 节点 | Kind | Reviewer | 处理 |
+|---|---|---|---|---|
+| g-test-design-review | design / n2-design-review | review | reviewer-expert | 发函 cap=test-design（阈值 85）；FAIL→回流 n0-points 重设计 |
+| g-test-coverage-review | exec / n1-coverage-review | review | reviewer-expert | 发函 cap=test-coverage（阈值 80）；FAIL→回流 n0-ui-auto 重跑 |
+
+**追加到「Reviewer-Expert Gate（已兑现）」总表**：
+| 员工:Gate | 评审对象 | 派给（in-scope cap）|
+|---|---|---|
+| test-engineer:g-test-design-review | test-points.md + test-cases.md | test-design |
+| test-engineer:g-test-coverage-review | ui-results + 覆盖报告 | test-coverage |

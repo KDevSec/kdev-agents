@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.8.0 — 第 4 个数字员工：测试工程师 test-engineer + 评审专家测试维度补齐
+
+- **test-engineer（flow-owner，多 flow）**：staff.yml `node_tables`(test-design-flow ⊥ test-exec-flow) + `default_flow`；4 agent（orchestrator + 测试点设计/用例渲染/UI自动化，call kdev-test-points/cases/ui-autotest）。
+- 🔴 **黑盒独立硬规**：测试设计只读需求/原型禁读 src；dev-engineer ⊥ test-engineer 并行不延续（写进 orchestrator/points agent/routing/gate-decision-logic/SKILL §2.4ter）。
+- **2 个 node-table**：design-flow（黑盒设计 6 节点 1 评审闸，无 env）+ exec-flow（对被测环境执行 5 节点 1 评审闸，env-gated）。
+- **评审专家解锁 2 测试能力（核心 10 余 4 → 余 2）**：dispatch-table +test-design(85)/test-coverage(80)；reviewer-orchestrator 路由 +2；reviewer-test-design/test-coverage agent + 2 standards；staff reviewer agents 7→9。
+- env 边界用拆 flow 表达（design 永远可跑 / exec 需被测环境 URL）；本期"建好 + 单测绿"，exec-flow 实跑待真实测试任务（诚实标注）。
+- kdev-core 零改。依赖声明/packaging（装员工连带装 skill）defer 进 roadmap Q-018。
+- 测试：test_test_engineer_orchestration + test_test_engineer_wiring 新增；staff/agents/reviewer_dispatch 扩展。
+
 ## 0.7.0 — 2026-06-13
 
 **跨员工直接发函硬规收口（v1.5 硬规 2/7）+ 评审专家活体 dogfood 验证**

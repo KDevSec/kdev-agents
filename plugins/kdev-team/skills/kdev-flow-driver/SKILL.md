@@ -55,6 +55,7 @@ FRAMEWORK_REPO=$(find ~ -maxdepth 3 -name "kdev-agents" -type d 2>/dev/null | he
 - `agents`：可用业务 agent 列表
 - `runtime_model`：推荐模型
 - `flow_skill`：方法论参考（只作知识引用，不调用）
+- **多 flow flow-owner**（如 test-engineer）：staff.yml 用 `node_tables`(复数 map：flow→table 路径) + `default_flow`，按要跑的 flow 取对应 table；单 flow 员工仍用 `node_table`(单数)。
 
 设定关键路径：
 ```bash
@@ -222,6 +223,10 @@ python3 -m kdev_core handoff-write design-flow <slug> --workspace <ws> \
 | 生产方（员工）| 交付节点 `--node` | 交付内容 |
 |---|---|---|
 | `req-architect` | `n8-merge` | SR / AR(迭代+用户故事) / 原型 / 方案 |
+| `test-engineer` | `n3-merge`（design-flow）| test-points / test-cases（黑盒设计产出）|
+| `test-engineer` | `n2-report`（exec-flow）| ui-results / 覆盖报告 |
+
+> 🔴 **test-engineer 黑盒独立**：消费方=`handoff-read req-architect n8-merge` 取需求/原型作设计输入（缺失裸任务）；**显式不建 dev-engineer→test-engineer 边**——test 不读 dev 代码/flow，避免"代码自测"污染。被测环境 URL 是运行时输入（非 handoff 依赖）。
 
 **消费方（下游）读上游交付**：下游员工在其入口节点按上表读**同 slug** 的上游交付：
 
