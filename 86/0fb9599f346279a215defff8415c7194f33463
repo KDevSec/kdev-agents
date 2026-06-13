@@ -1,0 +1,21 @@
+plugins/kdev-memory/tests/test_status_schema.py
+  s_4ff7b809d3f513::t_9bb7068a69aed3 1-65
+plugins/kdev-memory/hooks/lib/status_schema.py
+  s_4ff7b809d3f513::t_00198071614ce9 1-61
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "860fb9599f346279a215defff8415c7194f33463",
+  "prompts": {},
+  "sessions": {
+    "s_4ff7b809d3f513": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "fa127296-1bee-4d24-bc07-1bcc5263415b",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
