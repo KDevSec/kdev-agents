@@ -1,0 +1,30 @@
+plugins/kdev-team/tests/test_reviewer_dispatch.py
+  s_af2ebae0bfaf45::t_7bb97b0072aaee 52,56,58-64,66-68
+  s_af2ebae0bfaf45::t_3731d90abdccc4 18
+  s_af2ebae0bfaf45::t_c25fa41fd2400b 10-11
+  s_af2ebae0bfaf45::t_a0b6d13375c3b1 39,42-45
+plugins/kdev-team/tests/test_staff.py
+  s_af2ebae0bfaf45::t_8e50a1e6becc3d 48
+plugins/kdev-team/orchestration/reviewer.dispatch-table.yml
+  s_af2ebae0bfaf45::t_63863fe4e904fd 9-11
+plugins/kdev-team/agents/reviewer-orchestrator.md
+  s_af2ebae0bfaf45::t_1afaa19130435a 51-52
+plugins/kdev-team/staff.yml
+  s_af2ebae0bfaf45::t_371dc4f4b5eeea 62-63
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "8e40db7b21bc42d22f81a5e469531e814fc3f415",
+  "prompts": {},
+  "sessions": {
+    "s_af2ebae0bfaf45": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "737f5ec6-d909-4691-bd2d-3186f0dc8820",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
