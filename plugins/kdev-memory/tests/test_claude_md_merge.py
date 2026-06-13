@@ -76,5 +76,34 @@ class TestScenario3AppendWhenAbsent(unittest.TestCase):
         self.assertEqual(once, twice)
 
 
+class TestHalfMarkerRecovery(unittest.TestCase):
+    def test_lone_begin_no_duplicate_one_pair_body_kept(self):
+        src = f"# 标题\n\n{BEGIN}\n## 智能体自动记录规则\n\n用户正文\n"
+        out = merge(src, BODY_V2)
+        self.assertEqual(out.count(BEGIN), 1)
+        self.assertEqual(out.count(END), 1)
+        self.assertIn("用户正文", out)  # 孤儿 BEGIN 归一化为 retrofit，正文保留
+
+    def test_lone_begin_idempotent_no_marker_growth(self):
+        src = f"{BEGIN}\n## 智能体自动记录规则\n\n用户正文\n"
+        once = merge(src, BODY_V2)
+        twice = merge(once, BODY_V2)
+        self.assertEqual(twice.count(BEGIN), 1)
+        self.assertEqual(twice.count(END), 1)
+
+    def test_lone_end_normalized(self):
+        src = f"# 标题\n\n## 智能体自动记录规则\n\n用户正文\n{END}\n"
+        out = merge(src, BODY_V2)
+        self.assertEqual(out.count(BEGIN), 1)
+        self.assertEqual(out.count(END), 1)
+        self.assertIn("用户正文", out)
+
+    def test_reversed_markers_normalized(self):
+        src = f"# 标题\n\n{END}\n## 智能体自动记录规则\n\n用户正文\n{BEGIN}\n"
+        out = merge(src, BODY_V2)
+        self.assertEqual(out.count(BEGIN), 1)
+        self.assertEqual(out.count(END), 1)
+
+
 if __name__ == "__main__":
     unittest.main()

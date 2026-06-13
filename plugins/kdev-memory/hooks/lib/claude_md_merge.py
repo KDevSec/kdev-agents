@@ -46,8 +46,8 @@ def wrap_with_markers(body: str) -> str:
 def _find_bare_section_span(text: str) -> tuple[int, int] | None:
     """找裸 `## 智能体自动记录规则` 段的 [start, end) 字符区间。
 
-    end = 下一个同级/更高级标题（`# ` 或 `## `，且不是本段标题）行首，或文末。
-    找不到返回 None。
+    end = 该标题之后出现的下一个 `# ` / `## ` 标题行首（搜索从本段标题之后开始，
+    故不会误匹配本段标题自身），或文末。找不到返回 None。
     """
     m = _RE_SECTION_HEAD.search(text)
     if not m:
@@ -62,16 +62,39 @@ def _find_bare_section_span(text: str) -> tuple[int, int] | None:
     return (start, end)
 
 
+def _strip_match(pattern: "re.Pattern[str]", text: str) -> str:
+    """删除 text 中首个 pattern 匹配（含其后紧跟的一个换行，避免留空行）。无匹配原样返回。"""
+    m = pattern.search(text)
+    if not m:
+        return text
+    end = m.end()
+    if end < len(text) and text[end] == "\n":
+        end += 1
+    return text[:m.start()] + text[end:]
+
+
 def merge_managed_section(claude_md_text: str, managed_body: str) -> str:
-    """insert-or-replace 托管块，幂等。三分支见模块 docstring。"""
+    """insert-or-replace 托管块，幂等。三分支见模块 docstring。
+
+    入参可含**孤儿/逆序 marker**（只有 BEGIN、只有 END、或 END 在 BEGIN 之前——
+    来自手工误删 / 中断写入的损坏态）：先剥掉孤儿 marker 归一化，再走正常三分支，
+    保证输出**恰好一对** marker、绝不嵌套重复（守住幂等契约「绝不破坏 marker 外内容」）。
+    """
     bm = _RE_BEGIN.search(claude_md_text)
     em = _RE_END.search(claude_md_text)
 
-    # 场景 1：有配对 marker（BEGIN 在 END 之前）→ 替换块内正文
-    if bm and em and bm.start() < em.end():
+    # 场景 1：配对 marker（BEGIN 完整在 END 之前）→ 替换块内正文
+    if bm and em and bm.end() < em.start():
         before = claude_md_text[:bm.start()]
         after = claude_md_text[em.end():]
         return before + wrap_with_markers(managed_body) + after
+
+    # 孤儿/逆序 marker 归一化：剥掉残留 marker（HTML 注释，安全移除）后递归一次。
+    # 每次递归至少移除一个 marker，剥完无 marker → 必落场景 2/3，不会无限递归。
+    if bm or em:
+        cleaned = _strip_match(_RE_END, claude_md_text)
+        cleaned = _strip_match(_RE_BEGIN, cleaned)
+        return merge_managed_section(cleaned, managed_body)
 
     # 场景 2：无 marker 但有裸段 → retrofit 包住（正文不动）
     span = _find_bare_section_span(claude_md_text)
