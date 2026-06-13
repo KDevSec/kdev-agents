@@ -1,0 +1,19 @@
+docs/superpowers/plans/2026-06-13-测试工程师test-engineer-tdd实施.md
+  s_af2ebae0bfaf45::t_0417c8eaa509ae 1-1096
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "4787e6a0a28fe7ad49100a3905fec3fd83f15cd1",
+  "prompts": {},
+  "sessions": {
+    "s_af2ebae0bfaf45": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "737f5ec6-d909-4691-bd2d-3186f0dc8820",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
