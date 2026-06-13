@@ -455,3 +455,58 @@ def test_model_peer_review_with_deduction_is_ok(tmp_path):
     )
     res = step_completeness.run_check(log, "2026-06-13", rating_mode="model-only")
     assert res["status"] == "ok"
+
+
+# ---------------------------------------------------------------------------
+# T6 characterization: parse_steps handles new timestamp-form Step IDs
+# ---------------------------------------------------------------------------
+
+def test_parse_steps_timestamp_form():
+    """parse_steps must split Steps using new timestamp-based record IDs (P-C2 T6)."""
+    text = (
+        "## Step 20260613-101432-ly: 标题甲\n"
+        "日期：2026-06-13\n"
+        "### 执行\n"
+        "- a\n"
+        "## Step 20260613-101500-ly.1: 标题乙\n"
+        "日期：2026-06-13\n"
+        "### 执行\n"
+        "- b\n"
+    )
+    steps = step_completeness.parse_steps(text)
+    assert [s["label"] for s in steps] == [
+        "Step 20260613-101432-ly",
+        "Step 20260613-101500-ly.1",
+    ]
+
+
+def test_parse_steps_timestamp_no_git():
+    """Timestamp Step without -who suffix is parsed correctly."""
+    text = (
+        "## Step 20260613-101432: 无git形式\n"
+        "日期：2026-06-13\n"
+        "### 执行\n"
+        "- x\n"
+    )
+    steps = step_completeness.parse_steps(text)
+    assert len(steps) == 1
+    assert steps[0]["label"] == "Step 20260613-101432"
+    assert steps[0]["title"] == "无git形式"
+
+
+def test_parse_steps_mixed_legacy_and_timestamp():
+    """Legacy slug Steps and new timestamp Steps coexist in one file."""
+    text = (
+        "## Step main-6: 旧的\n"
+        "日期：2026-06-10\n"
+        "### 执行\n"
+        "- 旧内容\n"
+        "## Step 20260613-101432-ly: 新的\n"
+        "日期：2026-06-13\n"
+        "### 执行\n"
+        "- 新内容\n"
+    )
+    steps = step_completeness.parse_steps(text)
+    assert len(steps) == 2
+    assert steps[0]["label"] == "Step main-6"
+    assert steps[1]["label"] == "Step 20260613-101432-ly"

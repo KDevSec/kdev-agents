@@ -480,8 +480,8 @@ def main() -> int:
     state_unresolved = read_state_field("unresolved_gotchas")
 
     recent_step = _last_heading(log_file, "## Step ")
-    recent_q = _last_heading(shared / "决策日志.md", "## Q-")
-    recent_g = _last_heading(shared / "踩坑日志.md", "## G-")
+    recent_q = _last_heading(shared / "决策日志.md", "## Q")   # "## Q" catches both "Q-NNN" and "Q YYYYMMDD-..."
+    recent_g = _last_heading(shared / "踩坑日志.md", "## G")   # "## G" catches both "G-NNN" and "G YYYYMMDD-..."
     staff_block = _staff_scope_block(kdev_dir)
 
     # pending-commits hint
