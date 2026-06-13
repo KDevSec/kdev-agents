@@ -30,6 +30,20 @@ employees:
       - req-architect-decompose
       - req-architect-prototype
       - req-architect-design
+  test-engineer:
+    display: 测试工程师
+    kind: flow-owner
+    flow_skill: null                 # 方法论分散在 kdev-test-points/cases/ui-autotest 能力 skill，无统一 flow-skill
+    node_tables:                     # 多 flow flow-owner：2 个 relay flow（同 slug 接力 baton）。dev/req 仍用 node_table 单数
+      test-design-flow: orchestration/test-engineer.design.node-table.yml
+      test-exec-flow:   orchestration/test-engineer.exec.node-table.yml
+    default_flow: test-design-flow   # driver 默认入口（黑盒设计，无 env、永远可跑）
+    runtime_model: opus
+    agents:
+      - test-engineer-orchestrator
+      - test-engineer-points
+      - test-engineer-cases
+      - test-engineer-ui
   reviewer:
     display: 评审专家
     kind: callee                              # 被 caller R3 review gate 发函调用，无自有 flow
