@@ -1,0 +1,27 @@
+plugins/kdev-team/agents/test-engineer-orchestrator.md
+  s_af2ebae0bfaf45::t_fba8b448c077c2 1-39
+plugins/kdev-team/tests/test_agents.py
+  s_af2ebae0bfaf45::t_089df6b119a41c 110-152
+plugins/kdev-team/agents/test-engineer-cases.md
+  s_af2ebae0bfaf45::t_29f907d93456dc 1-26
+plugins/kdev-team/agents/test-engineer-points.md
+  s_af2ebae0bfaf45::t_c43149638bb7d1 1-27
+plugins/kdev-team/agents/test-engineer-ui.md
+  s_af2ebae0bfaf45::t_cc728c57a0951c 1-28
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "f95a4163dbb967d2ef132d7742edc6fb64b34158",
+  "prompts": {},
+  "sessions": {
+    "s_af2ebae0bfaf45": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "737f5ec6-d909-4691-bd2d-3186f0dc8820",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
