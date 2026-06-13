@@ -15,7 +15,7 @@ LIB_DIR = Path(__file__).parent.parent / "hooks" / "lib"
 sys.path.insert(0, str(LIB_DIR))
 
 from pending_commits import append as pc_append, clear as pc_clear, read as pc_read  # noqa: E402
-from step_id import mint_next_step_id  # noqa: E402
+from step_id import mint_record_id, parse_record_id  # noqa: E402
 
 
 def _init_repo(tmp_path: Path) -> Path:
@@ -45,9 +45,12 @@ def test_recorder_lifecycle_mint_step_clear_pending(tmp_path, monkeypatch):
     pc_append(state, "c"*40, "fix(x): c", now - 10)
     assert len(pc_read(state)["commits"]) == 3
 
-    # Recorder action: mint next ID (slug=main)
-    minted = mint_next_step_id(state, slug="main")
-    assert minted == "Step main-1"
+    # Recorder action: mint next ID via timestamp primitive (Q-020)
+    minted = mint_record_id("Step", state)
+    assert minted.startswith("Step ")
+    parsed = parse_record_id(minted)
+    assert parsed is not None
+    assert parsed["scheme"] == "timestamp"
 
     # Recorder action: write step entry (we just simulate the append here)
     log = repo / ".kdev" / "memory" / "执行日志.md"
@@ -61,9 +64,9 @@ def test_recorder_lifecycle_mint_step_clear_pending(tmp_path, monkeypatch):
     # Verify final state
     pending = pc_read(state)
     assert pending["commits"] == []
-    assert pending["since_step_id"] == "main-1"
+    # since_step_id is the timestamp ID portion (strip "Step " prefix)
+    assert pending["since_step_id"] == minted[len("Step "):]
     assert minted in log.read_text(encoding="utf-8")
 
-    # counter should now read 1 (1 mint happened)
-    counter = state.joinpath("step-counter-main.txt").read_text(encoding="utf-8").strip()
-    assert counter == "1"
+    # No counter file written — timestamp IDs have no counter (Q-020)
+    assert not list(state.glob("step-counter-*.txt"))

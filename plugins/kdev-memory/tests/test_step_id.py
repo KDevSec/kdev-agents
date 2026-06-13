@@ -349,3 +349,13 @@ def test_mint_no_who_same_second_is_parseable(tmp_path, monkeypatch):
 
 def test_parse_who_and_dup_roundtrips():
     assert parse_record_id("Q 20260613-101432-ly.2") == {"type": "Q", "id": "20260613-101432-ly.2", "scheme": "timestamp"}
+
+
+# ── Q-020: recorder mint path produces timestamp ID, no counter file ──────────
+
+def test_recorder_mint_path_is_timestamp_no_counter(tmp_path):
+    """Recorder mint path (Q-020): mint_record_id returns a timestamp-scheme ID
+    and writes NO step-counter-*.txt file (counter retired from minting)."""
+    rid = mint_record_id("Step", tmp_path)
+    assert parse_record_id(rid)["scheme"] == "timestamp"
+    assert not list(tmp_path.glob("step-counter-*.txt"))

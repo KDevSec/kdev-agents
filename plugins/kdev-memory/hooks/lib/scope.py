@@ -92,8 +92,8 @@ def resolve_step_slug(scope: Optional[str], root: PathLike = DEFAULT_ROOT) -> st
       保持 main 单轨现状 `Step main-N`）
     - 其它（员工 canonical id）→ sanitize 后的 id（`Step dev-engineer-N`）
 
-    Step ID 形态恒为 `Step <slug>-N`；P-C1b 的 transcript 溯源是 Step 条目里
-    独立字段，不折进 slug。
+    # Q-020: deprecated for minting — 记录 ID 改走 step_id.mint_record_id（时间戳）；
+    # 本函数仅留向后兼容/历史解析。
     """
     # `root` is accepted for API symmetry with the rest of this module and is
     # reserved for future scope validation (e.g. checking scope_id ∈ list_staff(root));
