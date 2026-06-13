@@ -1,0 +1,21 @@
+plugins/kdev-memory/tests/test_claude_md_merge.py
+  s_4ff7b809d3f513::t_39b1e96dc9240e 1-80
+plugins/kdev-memory/hooks/lib/claude_md_merge.py
+  s_4ff7b809d3f513::t_4cf20d84567434 1-118
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "c2b12e4639f8f8ddef6652e5b1f185297a1b7118",
+  "prompts": {},
+  "sessions": {
+    "s_4ff7b809d3f513": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "fa127296-1bee-4d24-bc07-1bcc5263415b",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
