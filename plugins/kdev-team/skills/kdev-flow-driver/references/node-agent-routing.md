@@ -119,9 +119,33 @@ Gate 节点由编排器（你）自行判断，不派业务 agent。具体判据
 
 ---
 
+# test-engineer（测试工程师）test-flow 路由
+
+适用于 `test-engineer` 员工的双 flow（`node_tables`：test-design-flow / test-exec-flow）。
+
+> 🔴 **黑盒独立硬规**：测试设计（n0-points/n1-cases）只读「需求文档 + 原型图 + 用户故事」，**禁读业务源码 `src/`、禁读 dev-engineer handoff/flow**。读代码设计测试 = 代码自测。dev-engineer ⊥ test-engineer 并行独立、流程不延续。UI 自动化脚本期读运行时 DOM 拿选择器(黑盒)允许，不读源码逻辑。
+
+## 路由映射（test-design-flow，无 env）
+| 节点 id | subagent_type | 干什么 | 需传上下文 |
+|---|---|---|---|
+| n0-points | `kdev-team:test-engineer-points` | 读需求/原型(禁读src)设计测试点 → test-points.md；**先** `handoff-read test-design-flow <slug> --employee req-architect --node n8-merge` 取 SR/用户故事/原型，缺失则裸任务 | 需求文档/原型路径, 产物根=`<ws>/.kdev/features/<slug>/handoffs/test-engineer/`, 上游 req-architect 交付(若同 slug) |
+| n1-cases | `kdev-team:test-engineer-cases` | 1:1 渲染 → test-cases.md | test-points.md 路径, 产物根 |
+| n3-merge | 编排自做（不派）| handoff-write 设计交付(test-points/test-cases) | — |
+
+## 路由映射（test-exec-flow，env-gated）
+| 节点 id | subagent_type | 干什么 | 需传上下文 |
+|---|---|---|---|
+| n0-ui-auto | `kdev-team:test-engineer-ui` | 读 test-cases + 被测环境 URL → Playwright+pytest → ui-results | test-cases.md(handoff-read n3-merge), **被测环境 URL(运行时输入)**, recon/menu_list.md, 产物根 |
+| n2-report | 编排自做（不派）| handoff-write 测试报告(ui-results/覆盖) | — |
+
+## Gate 节点（n2-design-review / n1-coverage-review）
+均 `reviewer: reviewer-expert`，按「reviewer 发函 dispatch」段发函 `kdev-team:reviewer-orchestrator`（cap=test-design / test-coverage）。无 env 时 exec-flow 不 start-run，止于 design 交付。
+
+---
+
 # reviewer 发函 dispatch（review gate 发函评审专家）
 
-适用于**两员工**（dev-engineer + req-architect）所有 `reviewer: reviewer-expert` 的 review gate。评审专家(reviewer) 是 **callee 员工**（无自有 flow），不在上面 node→agent 路由表里——它**不是某个 action 节点的业务 agent**，而是 caller 编排**到 review gate 时发函**的协作方。判据逻辑见 `gate-decision-logic.md`「Reviewer-Expert Gate（已兑现）」；本段定义**发函时的上下文构造**。
+适用于**三员工**（dev-engineer + req-architect + test-engineer）所有 `reviewer: reviewer-expert` 的 review gate。评审专家(reviewer) 是 **callee 员工**（无自有 flow），不在上面 node→agent 路由表里——它**不是某个 action 节点的业务 agent**，而是 caller 编排**到 review gate 时发函**的协作方。判据逻辑见 `gate-decision-logic.md`「Reviewer-Expert Gate（已兑现）」；本段定义**发函时的上下文构造**。
 
 > **发函硬规（who→whom / 结构化非自由对话 / 建议非拦截·caller 自主判断）见 `SKILL.md` §2.4quater 跨员工直接发函硬规（v1.5 硬规 2/7）。** 本段只管「上下文怎么构造」，硬规边界以 §2.4quater 为准，勿在两处各写一份免漂移。
 
@@ -149,7 +173,7 @@ caller 编排到 review gate 时，写 `<workspace>/.kdev/features/<slug>/handof
   "standards_refs": ["standards/reviewer/<cap>.md（reviewer 侧自取，caller 可省）"],
   "thresholds": {"<cap>": 85},
   "request_id": "<gate-node，如 n9a-code-review>",
-  "caller": "<员工 id：dev-engineer | req-architect>",
+  "caller": "<员工 id：dev-engineer | req-architect | test-engineer>",
   "diff_range": "<代码评审用的 git diff 区间，可选>",
   "transcript_ref": "<可选 transcript 锚点>"
 }
@@ -167,3 +191,18 @@ caller 编排到 review gate 时，写 `<workspace>/.kdev/features/<slug>/handof
 6. `python3 -m kdev_core record-gate <flow> <slug> --gate <gate> --kind review --verdict <V> --request-id <node> --by reviewer-expert --table <caller node-table>`。FAIL 时按 caller 回流规则重做 action 节点（见 `gate-decision-logic.md`）。
 
 > **L1 回退**：L1 flow-config `reviewer: self` 时**不发函**，按本 gate 的 self 判据自评 record-gate（env 受限/省 token 逃生门）。per-gate reviewer 的 engine 级 config-merge 待后续 plan，本期 L0 node-table `reviewer` 字段生效。
+
+## caller→cap 对应（各员工 review gate 反查）
+
+caller 编排到 review gate 时，`caps` 字段据此填：
+
+| caller:gate | 对应 cap（dispatcher 反查 dispatch-table 得出）|
+|---|---|
+| dev-engineer:g-plan-review | design |
+| dev-engineer:g-code-review | code |
+| dev-engineer:g-sec-review | security |
+| req-architect:g-sr-review | sr |
+| req-architect:g-ar-proto-review | story + prototype |
+| req-architect:g-design-review | design |
+| test-engineer:g-test-design-review | test-design |
+| test-engineer:g-test-coverage-review | test-coverage |
