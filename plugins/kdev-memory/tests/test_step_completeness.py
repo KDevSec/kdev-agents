@@ -317,6 +317,20 @@ class TestStatusDefense(unittest.TestCase):
         self.assertTrue(issues)               # 非枚举 status 不被当销账放过：仍走半残检查
         self.assertIn("非枚举", buf.getvalue())
 
+    def test_voided_r_digit_short_circuits_residual_rating_section(self):
+        # 判别测试：voided-r-003 + 半残用户评分段。
+        # 新代码 is_voided_status 命中 → 短路返回 []；旧字面集 {voided-faded, voided-r-nnn}
+        # 不含 voided-r-003 → 会落到半残检查报「完成时间/顺畅度」issue。两路径结果不同。
+        step = {
+            "label": "Step x-9", "title": "t", "date": "2026-06-13",
+            "body": (
+                "## Step x-9: t\nstatus: voided-r-003\n\n"
+                "### 用户评分\n- 完成时间：—\n- 顺畅度：—/5\n"
+            ),
+            "status": "voided-r-003",
+        }
+        self.assertEqual(step_completeness.check_step(step, rating_mode="user-required"), [])
+
 
 if __name__ == "__main__":
     unittest.main()
