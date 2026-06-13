@@ -214,3 +214,120 @@ def test_mint_concurrent_main_and_secondary_no_collision(tmp_path, monkeypatch):
     t1.start(); t2.start(); t1.join(); t2.join()
     assert main_ids == [f"Step main-{i}" for i in range(1, 11)]
     assert sec_ids == [f"Step cluster-x1-{i}" for i in range(1, 11)]
+
+
+# ── P-C2 Group A: timestamp-based record ID primitive ─────────────────────────
+
+import datetime
+
+from step_id import _now_stamp, _who_suffix  # noqa: E402
+
+
+def test_now_stamp_format():
+    assert _now_stamp(when=datetime.datetime(2026, 6, 13, 10, 14, 32)) == "20260613-101432"
+
+
+def test_who_suffix_from_email(monkeypatch):
+    monkeypatch.setattr("step_id._git_query", lambda *a: "ly1989abc@126.com")
+    assert _who_suffix() == "ly1989abc"
+
+
+def test_who_suffix_no_git_returns_empty(monkeypatch):
+    monkeypatch.setattr("step_id._git_query", lambda *a: None)
+    assert _who_suffix() == ""   # NEVER 'None'
+
+
+def test_who_suffix_sanitizes(monkeypatch):
+    monkeypatch.setattr("step_id._git_query", lambda *a: "Ly.Dev+test@x.com")
+    assert _who_suffix() == "Ly-Dev-test"
+
+
+# ── _dup_index ────────────────────────────────────────────────────────────────
+
+from step_id import _dup_index  # noqa: E402
+
+
+def test_dup_index_first_is_zero(tmp_path):
+    assert _dup_index("Step", "20260613-101432-ly", tmp_path) == 0
+
+
+def test_dup_index_increments_on_same_base(tmp_path):
+    assert _dup_index("Step", "20260613-101432-ly", tmp_path) == 0
+    assert _dup_index("Step", "20260613-101432-ly", tmp_path) == 1
+    assert _dup_index("Step", "20260613-101432-ly", tmp_path) == 2
+
+
+def test_dup_index_independent_per_base(tmp_path):
+    assert _dup_index("Step", "20260613-101432-ly", tmp_path) == 0
+    assert _dup_index("Step", "20260613-101433-ly", tmp_path) == 0
+
+
+def test_dup_index_concurrent_no_collision(tmp_path):
+    import threading
+    out = []
+    def worker(): out.append(_dup_index("Step", "20260613-101432-ly", tmp_path))
+    ts = [threading.Thread(target=worker) for _ in range(20)]
+    [t.start() for t in ts]; [t.join() for t in ts]
+    assert sorted(out) == list(range(20))
+
+
+# ── mint_record_id ────────────────────────────────────────────────────────────
+
+from step_id import mint_record_id  # noqa: E402
+
+
+def test_mint_step_with_who(tmp_path, monkeypatch):
+    monkeypatch.setattr("step_id._who_suffix", lambda: "ly1989abc")
+    assert mint_record_id("Step", tmp_path, when=datetime.datetime(2026,6,13,10,14,32)) == "Step 20260613-101432-ly1989abc"
+
+
+def test_mint_q_same_grammar(tmp_path, monkeypatch):
+    monkeypatch.setattr("step_id._who_suffix", lambda: "ly1989abc")
+    assert mint_record_id("Q", tmp_path, when=datetime.datetime(2026,6,13,10,14,32)) == "Q 20260613-101432-ly1989abc"
+
+
+def test_mint_no_git_omits_suffix(tmp_path, monkeypatch):
+    monkeypatch.setattr("step_id._who_suffix", lambda: "")
+    assert mint_record_id("Step", tmp_path, when=datetime.datetime(2026,6,13,10,14,32)) == "Step 20260613-101432"
+
+
+def test_mint_same_second_appends_dup(tmp_path, monkeypatch):
+    monkeypatch.setattr("step_id._who_suffix", lambda: "ly")
+    w = datetime.datetime(2026,6,13,10,14,32)
+    assert mint_record_id("Step", tmp_path, when=w) == "Step 20260613-101432-ly"
+    assert mint_record_id("Step", tmp_path, when=w) == "Step 20260613-101432-ly.1"
+
+
+def test_mint_unknown_type_raises(tmp_path):
+    import pytest
+    with pytest.raises(ValueError):
+        mint_record_id("X", tmp_path)
+
+
+# ── parse_record_id ────────────────────────────────────────────────────────────
+
+from step_id import parse_record_id  # noqa: E402
+
+
+def test_parse_old_step_slug_n():
+    assert parse_record_id("Step main-87") == {"type": "Step", "id": "main-87", "scheme": "legacy"}
+
+
+def test_parse_old_q_n():
+    assert parse_record_id("Q-018") == {"type": "Q", "id": "018", "scheme": "legacy"}
+
+
+def test_parse_new_timestamp_with_who():
+    assert parse_record_id("Step 20260613-101432-ly1989abc") == {"type": "Step", "id": "20260613-101432-ly1989abc", "scheme": "timestamp"}
+
+
+def test_parse_new_timestamp_dup():
+    assert parse_record_id("Q 20260613-101432-ly.2") == {"type": "Q", "id": "20260613-101432-ly.2", "scheme": "timestamp"}
+
+
+def test_parse_new_no_who():
+    assert parse_record_id("Step 20260613-101432") == {"type": "Step", "id": "20260613-101432", "scheme": "timestamp"}
+
+
+def test_parse_non_id_returns_none():
+    assert parse_record_id("随便一行标题") is None
