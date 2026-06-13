@@ -1,0 +1,24 @@
+plugins/kdev-team/tests/test_agents.py
+  s_af2ebae0bfaf45::t_020c78ea13bced 73
+  s_af2ebae0bfaf45::t_69daa51cd99b75 107-108
+plugins/kdev-team/agents/reviewer-test-design.md
+  s_af2ebae0bfaf45::t_9b6d05c43ecd53 1-28
+plugins/kdev-team/agents/reviewer-test-coverage.md
+  s_af2ebae0bfaf45::t_133b0e27e2efea 1-28
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "c91a82f688a40686ade15f0382b4ca7757d13c52",
+  "prompts": {},
+  "sessions": {
+    "s_af2ebae0bfaf45": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "737f5ec6-d909-4691-bd2d-3186f0dc8820",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
