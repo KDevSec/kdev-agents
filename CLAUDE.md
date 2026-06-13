@@ -1,5 +1,6 @@
 # kdev-agents 项目 Claude Code 指引
 
+<!-- BEGIN kdev-memory:智能体自动记录规则 (managed · 勿手改正文，升级会覆盖) -->
 ## 智能体自动记录规则
 
 本项目启用 kdev-memory 工程记忆制度。**本段只讲何时召唤 skill 和 Claude 必须时刻在场的 3 条铁规；具体 schema / 格式 / 流程 / 边缘处理都在 skill 里**（用户召唤时自然读到，不在本段复述）。
@@ -39,3 +40,4 @@
 ---
 
 **详细 schema、格式、流程、边缘处理**：都在 skill 里，用户召唤后读即可。本规则段故意不复述，以避免跟 skill 演进漂移。
+<!-- END kdev-memory:智能体自动记录规则 -->
