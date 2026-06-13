@@ -1,0 +1,19 @@
+docs/superpowers/plans/2026-06-13-P-C2-记录ID时间戳化-tdd实施.md
+  s_f262242c9db8c5::t_84a4a978d506b1 1-547
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "3387f991ea0ffbf3ef0d2de87d9d23103250cf62",
+  "prompts": {},
+  "sessions": {
+    "s_f262242c9db8c5": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b6d449dd-daa8-4ade-9772-a27e53e28fe5",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
