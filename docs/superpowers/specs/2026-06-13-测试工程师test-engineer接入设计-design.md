@@ -275,6 +275,7 @@ driver SKILL §2.4ter 生产方映射表**追加** test-engineer 两棒，并注
 - **不建** `kdev-api-autotest` 执行层 skill（API 业务 agent + exec-flow T4 节点 deferred 到该 skill 建成）。
 - **不改** dev-engineer / req-architect 的 flow；**不建** dev→test handoff 边。
 - **不做** exec-flow 活体验证（需被测环境）；本步只到"建好 + 单测绿"。
+- **不做依赖声明 / packaging**（Q-018 已 defer 进 roadmap §1.5.8）：装数字员工时连带安装其用到的全部 skill（kdev-team `plugin.json` 补 `dependencies` 自动传递安装 + 修 marketplace 条目名 `-v1` 错配 + 外部 marketplace skill 前置）属 kdev-team 全局 packaging 关注，单列专项（宜与 FF-2 合并），**本期 test-engineer 工作不碰** `kdev-team/plugin.json` 的 dependencies / marketplace.json。机制已查实：CC 支持 `dependencies` 自动安装，**声明不 bundle**。
 - per-flow / per-gate reviewer 的 engine 级 config-merge 沿用现状（L0 node-table 字段生效，L1 手改回退 self）。
 - 后续：reviewer 余 2 能力（need-direction / iteration-split）随 req-architect 加 R1.5/R2.5 gate 再补。
 
