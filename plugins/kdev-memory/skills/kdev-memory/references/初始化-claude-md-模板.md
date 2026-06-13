@@ -17,7 +17,7 @@ claude_md_contract:
     - "切档 / 归档一下 / 整理主文件"
     - "这条以后都要遵守 / 加到项目规则 / 升级成铁规"
     - "昨天做到哪了 / 继续上次的工作 / 恢复上下文"
-  version_hint: "本契约若变（新增 hook tag / 改贯穿铁规 / 改 summon keywords），老项目的 CLAUDE.md 规则段需手工 patch 对应行。实现级变更（schema / 编号 / 评分机制细节）不触及本契约，CLAUDE.md 不用改。"
+  version_hint: "本契约若变（新增 hook tag / 改贯穿铁规 / 改 summon keywords），老项目的 CLAUDE.md 规则段需手工 patch 对应行。实现级变更（schema / 编号 / 评分机制细节）不触及本契约，CLAUDE.md 不用改。v0.18 起托管段用 BEGIN/END marker 包住，升级走 claude_md_merge.merge_managed_section() 幂等 insert-or-replace；老项目无 marker 时 lint 回退标题切块。"
 ---
 
 # 初始化时贴进项目 CLAUDE.md 的触发规则段
@@ -56,17 +56,30 @@ CLAUDE.md 规则段扮演的是 skill 的**对外接口**——只列出 Claude 
 
 **好处**：skill 升级 schema / 评分 / 编号 / hook 细节时，CLAUDE.md 规则段**一字不动**——从根源避免"CLAUDE.md 漂移"。
 
-## CLAUDE.md 合并策略
+## CLAUDE.md 合并策略（v0.18+ marker 化 insert-or-replace）
 
-- 若项目已有 `CLAUDE.md` → **追加**章节 `## 智能体自动记录规则`，不要覆盖也不要改写已有内容
-- 已有同名章节 → 暂停，向用户展示两个版本的差异，由用户裁决（不要自作主张合并）
-- 若项目无 `CLAUDE.md` → 新建，只放触发规则段即可
+托管规则段用一对 marker 包住，升级走**幂等 insert-or-replace**（实现见
+`hooks/lib/claude_md_merge.py` 的 `merge_managed_section()`，可直接 `python3` 调用）：
+
+| 项目现状 | 动作 | 结果 |
+|---|---|---|
+| 已有配对 BEGIN/END marker | **替换块内正文**为最新模板正文 | 升级；marker 外内容（含用户自定义行）一字不动 |
+| 无 marker 但有裸 `## 智能体自动记录规则` 段 | **retrofit**：原样用 marker 包住 | 只加 marker，**正文语义不动**；下次升级再走「替换块内」 |
+| 无 marker 无裸段 | 末尾**追加** marker 块 | 新装 |
+
+- **marker（稳定标识，勿手改）**：
+  - `<!-- BEGIN kdev-memory:智能体自动记录规则 (managed · 勿手改正文，升级会覆盖) -->`
+  - `<!-- END kdev-memory:智能体自动记录规则 -->`
+- **幂等保证**：对已 marker 化的 CLAUDE.md 反复跑合并，结果稳定、绝不重复 marker、不破坏 marker 外内容；孤儿/逆序 marker 会先归一化再合并。
+- **老项目兼容**：lint（`claude_md_lint.extract_kdev_section`）无 marker 时回退到按 `## 智能体自动记录规则` 标题切块，旧项目不报错。
+- **用户手动加入 marker 块内的自定义行**：升级会被「替换块内正文」覆盖——用户自定义内容应放在 **marker 块外**（END 之后另起章节）。
 
 ---
 
 ## 触发规则段模板（整段贴入 CLAUDE.md）
 
 ```markdown
+<!-- BEGIN kdev-memory:智能体自动记录规则 (managed · 勿手改正文，升级会覆盖) -->
 ## 智能体自动记录规则
 
 本项目启用 kdev-memory 工程记忆制度。**本段只讲何时召唤 skill 和 Claude 必须时刻在场的 3 条铁规；具体 schema / 格式 / 流程 / 边缘处理都在 skill 里**（用户召唤时自然读到，不在本段复述）。
@@ -106,6 +119,7 @@ CLAUDE.md 规则段扮演的是 skill 的**对外接口**——只列出 Claude 
 ---
 
 **详细 schema、格式、流程、边缘处理**：都在 skill 里，用户召唤后读即可。本规则段故意不复述，以避免跟 skill 演进漂移。
+<!-- END kdev-memory:智能体自动记录规则 -->
 ```
 
 ---
