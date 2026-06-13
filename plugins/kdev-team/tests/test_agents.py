@@ -70,6 +70,7 @@ def test_req_orchestrator_drives_via_cli_and_node_table():
 REVIEWER_AGENTS = [
     "reviewer-orchestrator", "reviewer-sr", "reviewer-story",
     "reviewer-prototype", "reviewer-design", "reviewer-code", "reviewer-security",
+    "reviewer-test-design", "reviewer-test-coverage",
 ]
 
 
@@ -103,7 +104,8 @@ def test_reviewer_orchestrator_callee_shape():
 
 def test_cap_reviewers_are_read_only():
     for a in ["reviewer-sr", "reviewer-story", "reviewer-prototype",
-              "reviewer-design", "reviewer-code", "reviewer-security"]:
+              "reviewer-design", "reviewer-code", "reviewer-security",
+              "reviewer-test-design", "reviewer-test-coverage"]:
         text = (AGENTS / f"{a}.md").read_text(encoding="utf-8")
         assert "只读" in text or "不改产物" in text or "不修改产物" in text, \
             f"{a} 须声明只读（守生产者隔离）"
