@@ -1,0 +1,19 @@
+plugins/kdev-team/tests/test_dispatch_hard_rule.py
+  s_6b1d2a7d2fe212::t_2da4d549619ea0 1-111
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "e4ccd74cf3e552d020c0d4c31e53b6acf4bee13b",
+  "prompts": {},
+  "sessions": {
+    "s_6b1d2a7d2fe212": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "0fe2ee5f-843f-4b6f-9957-6adee0da7cab",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
