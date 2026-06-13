@@ -1,0 +1,22 @@
+plugins/kdev-memory/skills/kdev-memory/references/初始化-claude-md-模板.md
+  s_4ff7b809d3f513::t_cf39c87b1dcb1e 59,61-75
+  s_4ff7b809d3f513::t_c22c1cc608e0f4 122
+  s_4ff7b809d3f513::t_d885109459c588 20
+  s_4ff7b809d3f513::t_e7837628229bd6 82
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "b0cfb88db96e6808df6713197db07f00a7b2ad48",
+  "prompts": {},
+  "sessions": {
+    "s_4ff7b809d3f513": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "fa127296-1bee-4d24-bc07-1bcc5263415b",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
