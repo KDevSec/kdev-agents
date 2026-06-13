@@ -1,0 +1,42 @@
+plugins/kdev-memory/skills/kdev-memory/references/初始化-claude-md-模板.md
+  s_f262242c9db8c5::t_462b5fd14bf615 104
+CLAUDE.md
+  s_f262242c9db8c5::t_76bc2303e151de 37
+docs/framework/01-design/2026-06-10-05-KDev数字员工-记忆底座-合稿-v1.0.md
+  s_f262242c9db8c5::t_6bcf2ae8d0737b 263
+  s_f262242c9db8c5::t_75fdf7b26d26c7 113
+plugins/kdev-memory/README.md
+  s_f262242c9db8c5::t_7e36729d262ba9 87,89,92-93,100,102,105-110
+plugins/kdev-memory/skills/kdev-memory/references/subject-推断与评分裂解.md
+  s_f262242c9db8c5::t_b3874e326d1154 147
+plugins/kdev-memory/skills/kdev-memory/references/六类记录-schema.md
+  s_f262242c9db8c5::t_15636cfddd660a 233,235,237-238
+plugins/kdev-memory/hooks/lib/scope.py
+  s_f262242c9db8c5::t_619d793755ce2d 91-92,94-97
+plugins/kdev-memory/skills/kdev-memory/SKILL.md
+  s_f262242c9db8c5::t_3be29e57748507 365,375,377-381,383,386-389,391,396,398-399,402,405,407,413,415-417
+plugins/kdev-memory/skills/kdev-memory/references/切档与归档.md
+  s_f262242c9db8c5::t_44358de0901a4b 80
+plugins/kdev-memory/skills/kdev-memory/references/triggers-写法.md
+  s_f262242c9db8c5::t_d4dc537bce882b 29
+plugins/kdev-memory/CHANGELOG.md
+  s_f262242c9db8c5::t_28858999227a65 3-27
+plugins/kdev-memory/.claude-plugin/plugin.json
+  s_f262242c9db8c5::t_8d22230ed9b333 4
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "e289510bd747df8352586acce909ca32dd867320",
+  "prompts": {},
+  "sessions": {
+    "s_f262242c9db8c5": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b6d449dd-daa8-4ade-9772-a27e53e28fe5",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
