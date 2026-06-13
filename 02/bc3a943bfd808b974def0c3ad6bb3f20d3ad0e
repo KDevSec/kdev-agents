@@ -1,0 +1,19 @@
+plugins/kdev-memory/tests/test_step_completeness.py
+  s_4ff7b809d3f513::t_2a0eeaba047f25 320-333
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "02bc3a943bfd808b974def0c3ad6bb3f20d3ad0e",
+  "prompts": {},
+  "sessions": {
+    "s_4ff7b809d3f513": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "fa127296-1bee-4d24-bc07-1bcc5263415b",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
