@@ -311,6 +311,24 @@ class TestExtractByMarker(unittest.TestCase):
         self.assertIsNotNone(section)
         self.assertIn("实时落盘", section)
 
+    def test_marker_slicing_includes_inner_h2_that_heading_logic_truncates(self):
+        # marker 块内含一个非托管 H2 子标题：heading 回退逻辑会在此截断，
+        # marker 切块则应包含到 END 之前的全部内容 —— 真正区分两条路径的判别测试
+        text = (
+            "# proj\n\n"
+            f"{_MK_BEGIN}\n"
+            "## 智能体自动记录规则\n"
+            "🔴 实时落盘\n"
+            "## 块内子章节（非托管标题）\n"
+            "MARKER_ONLY_SENTINEL 仅 marker 切块能保留\n"
+            f"{_MK_END}\n\n"
+            "## 外部章节\n外部内容\n"
+        )
+        section = claude_md_lint.extract_kdev_section(text)
+        self.assertIsNotNone(section)
+        self.assertIn("MARKER_ONLY_SENTINEL", section)  # heading 回退会在「## 块内子章节」截断 → 缺这句
+        self.assertNotIn("外部章节", section)
+
 
 if __name__ == "__main__":
     unittest.main()
