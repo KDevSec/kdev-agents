@@ -183,7 +183,7 @@ skill-feedback.md（F-NNN）的 `verbatim` 字段必须保留**用户原句**—
 
 ## 条目状态与沉淀字段（v0.7+）
 
-条目 frontmatter 支持 `status`（销账：open / scored / voided-faded / voided-r-nnn）和 `promote_*`（沉淀：pending / done / skipped + 目标路径 + 日期）两组字段。Hook 扫描时优先读 `status`，未填等价于 `open`；`voided-*` 跳过欠评扫描。
+条目 frontmatter 支持 `status`（**评分/销账态** only：open / scored / voided-faded / voided-r-NNN；**≠修复态**——修复进展写 body「解决」段，不新增 fix_status）和 `promote_*`（沉淀：pending / done / skipped + 目标路径 + 日期）两组字段。Hook 扫描时优先读 `status`，未填等价于 `open`；`voided-*` 跳过欠评扫描；遇非枚举 status 由 `status_schema.warn_unknown_status` 告警。
 
 > 完整取值语义、Hook 行为、沉淀阈值逻辑见 **`references/六类记录-schema.md`** 各 § 的"条目状态与沉淀字段"段。
 
