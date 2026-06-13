@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.7.0 — 2026-06-13
+
+**跨员工直接发函硬规收口（v1.5 硬规 2/7）+ 评审专家活体 dogfood 验证**
+
+- `kdev-flow-driver/SKILL.md` 新增 §2.4quater「跨员工直接发函硬规」：把概念合稿 §10.1 通信硬规 2/4/5 + spec §8 从设计稿收口成**编排 runtime 契约**，钉三不变量——① who→whom（编排↔编排直接发函不经 CEO；业务/评审能力不直接对外、跨员工走编排，只 dispatch 对方 `<employee>-orchestrator`）② 发函=结构化 request（caller+caps+target+产物指针，走 B 轨，非自由对话）③ 边界=评审给建议非拦截、🔴 经双重通过条件 FAIL 走 caller 有界回流+escalate、**处置权+入账都在 caller**。
+- `references/node-agent-routing.md` reviewer 发函段 + `staff.yml` 头注释（callee 语义）+ `dev-engineer-orchestrator.md`/`req-architect-orchestrator.md` Principles 补对称指针/边界 prose（防散落漂移，硬规边界单一权威=§2.4quater）。
+- 新增 `tests/test_dispatch_hard_rule.py`（9 用例）硬校验三不变量 + G-008 + canonical 回链（TDD 红→绿，全量 61 passed）。
+- 守 **G-008 / YAGNI**：编排仍走通用 kdev-flow-driver，reviewer callee 不复用 driver/不 own flow；**不建任意「员工 A 主动发函员工 B」新原语**（现无调用方）。
+- 附 **评审专家 reviewer 活体接线轻 dogfood 跑通**：临时 workspace 跑一条真实 `req-architect:g-sr-review` → 发函真实 `kdev-team:reviewer-sr` → 百分制评分表(84/100，双重条件 PASS) → caller `record-gate --by reviewer-expert` advance（验 callee 不 own flow / 评分落位 / caller 消费）。验证记录见 `docs/superpowers/specs/2026-06-13-评审专家reviewer-dogfood验证.md`。
+- ⚠️ G-004：用户须刷 marketplace（`/plugin` 更新/重装）+ 重启 session 才生效（本期 prose+测试改动；dogfood 已在 v0.6.0 激活态跑过，不依赖 v0.7.0 激活）。
+
 ## 0.6.0 — 2026-06-13
 
 **评审专家(reviewer) callee 员工上线（承 Q-016/Q-017，mode-2 已归蒸馏）**
