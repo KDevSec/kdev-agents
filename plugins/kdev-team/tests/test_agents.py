@@ -107,3 +107,46 @@ def test_cap_reviewers_are_read_only():
         text = (AGENTS / f"{a}.md").read_text(encoding="utf-8")
         assert "只读" in text or "不改产物" in text or "不修改产物" in text, \
             f"{a} 须声明只读（守生产者隔离）"
+
+
+TEST_AGENTS = [
+    "test-engineer-orchestrator", "test-engineer-points",
+    "test-engineer-cases", "test-engineer-ui",
+]
+
+
+def test_all_4_test_engineer_agents_exist():
+    names = {p.stem for p in AGENTS.glob("test-engineer-*.md")}
+    for a in TEST_AGENTS:
+        assert a in names, f"缺 agent: {a}"
+
+
+def test_each_test_engineer_agent_has_frontmatter_and_sections():
+    for a in TEST_AGENTS:
+        text = (AGENTS / f"{a}.md").read_text(encoding="utf-8")
+        fm = _frontmatter(text)
+        assert fm, f"{a} 缺 YAML frontmatter"
+        assert f"name: {a}" in fm, f"{a} frontmatter name 不匹配文件名"
+        assert "description:" in fm and "model:" in fm, f"{a} frontmatter 缺 description/model"
+        for sec in SECTIONS:
+            assert sec in text, f"{a} 缺段落 {sec}"
+
+
+def test_test_engineer_orchestrator_drives_dual_flow_via_cli():
+    text = (AGENTS / "test-engineer-orchestrator.md").read_text(encoding="utf-8")
+    assert "node-table" in text
+    assert "kdev_core" in text and "record-gate" in text
+    assert "test-design-flow" in text and "test-exec-flow" in text
+
+
+def test_points_agent_enforces_blackbox_independence():
+    text = (AGENTS / "test-engineer-points.md").read_text(encoding="utf-8")
+    assert "黑盒" in text
+    assert "需求" in text and "原型" in text
+    assert "禁读" in text or "不读" in text  # 禁读 src
+    assert "kdev-test-points" in text
+
+
+def test_business_agents_reference_capability_skills():
+    assert "kdev-test-cases" in (AGENTS / "test-engineer-cases.md").read_text(encoding="utf-8")
+    assert "kdev-ui-autotest" in (AGENTS / "test-engineer-ui.md").read_text(encoding="utf-8")
