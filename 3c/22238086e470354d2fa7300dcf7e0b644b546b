@@ -1,0 +1,19 @@
+plugins/kdev-memory/tests/test_claude_md_lint.py
+  s_4ff7b809d3f513::t_d35d0fc65e6182 314-331
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "3c22238086e470354d2fa7300dcf7e0b644b546b",
+  "prompts": {},
+  "sessions": {
+    "s_4ff7b809d3f513": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "fa127296-1bee-4d24-bc07-1bcc5263415b",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
