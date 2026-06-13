@@ -1,0 +1,25 @@
+plugins/kdev-team/agents/req-architect-orchestrator.md
+  s_6b1d2a7d2fe212::t_a3f9f0be64cd94 17
+plugins/kdev-team/skills/kdev-flow-driver/references/node-agent-routing.md
+  s_6b1d2a7d2fe212::t_b2065abc2ea8b6 126-127
+plugins/kdev-team/staff.yml
+  s_6b1d2a7d2fe212::t_49ce1db9a9e3e2 3-4
+plugins/kdev-team/agents/dev-engineer-orchestrator.md
+  s_6b1d2a7d2fe212::t_aa7211bcb95fc3 17
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "e6a7d1ff0d69368b90d8443964c81030cd294c70",
+  "prompts": {},
+  "sessions": {
+    "s_6b1d2a7d2fe212": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "0fe2ee5f-843f-4b6f-9957-6adee0da7cab",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
