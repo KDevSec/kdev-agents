@@ -255,5 +255,62 @@ class TestFormatHint(unittest.TestCase):
         self.assertIn("修 CLAUDE.md 漂移", hint)
 
 
+# marker 块常量（与 claude_md_merge 对齐）
+_MK_BEGIN = "<!-- BEGIN kdev-memory:智能体自动记录规则 (managed · 勿手改正文，升级会覆盖) -->"
+_MK_END = "<!-- END kdev-memory:智能体自动记录规则 -->"
+
+
+class TestExtractByMarker(unittest.TestCase):
+    def test_extracts_block_between_markers(self):
+        text = (
+            "# proj\n\n"
+            f"{_MK_BEGIN}\n"
+            "## 智能体自动记录规则\n\n"
+            "🔴 实时落盘到 .kdev/memory/\n"
+            "🔴 文件聚合不翻会话\n"
+            "🔴 优先处理 hook 产出：\n"
+            "- `<kdev-memory-brief>` 注入\n"
+            "- `<kdev-memory-recall>` 注入\n"
+            "- `.kdev/memory/WARN-未记录-*.md`\n"
+            "- `.kdev/memory/checkpoints/压缩前-*.md`\n"
+            f"{_MK_END}\n\n"
+            "## 用户自定义章节\n这里有 <kdev-memory-brief> 字样但在 marker 块外\n"
+        )
+        section = claude_md_lint.extract_kdev_section(text)
+        self.assertIsNotNone(section)
+        self.assertIn("实时落盘", section)
+        self.assertNotIn("用户自定义章节", section)
+
+    def test_marker_block_passes_drift_when_complete(self):
+        contract = claude_md_lint.parse_contract(MINIMAL_CONTRACT)
+        text = (
+            f"{_MK_BEGIN}\n"
+            "## 智能体自动记录规则\n"
+            "🔴 实时落盘到 .kdev/memory/\n"
+            "🔴 文件聚合不翻会话\n"
+            "🔴 优先处理 hook 产出：\n"
+            "- `<kdev-memory-brief>` 注入\n"
+            "- `<kdev-memory-recall>` 注入\n"
+            "- `.kdev/memory/WARN-未记录-*.md`\n"
+            "- `.kdev/memory/checkpoints/压缩前-*.md`\n"
+            f"{_MK_END}\n"
+        )
+        section = claude_md_lint.extract_kdev_section(text)
+        result = claude_md_lint.check_drift(contract, section)
+        self.assertFalse(result["drift"])
+
+    def test_no_marker_falls_back_to_heading(self):
+        section = claude_md_lint.extract_kdev_section(FULL_KDEV_SECTION)
+        self.assertIsNotNone(section)
+        self.assertIn("优先处理 hook 产出", section)
+        self.assertNotIn("其他章节", section)
+
+    def test_begin_without_end_falls_back(self):
+        text = f"{_MK_BEGIN}\n## 智能体自动记录规则\n🔴 实时落盘\n"
+        section = claude_md_lint.extract_kdev_section(text)
+        self.assertIsNotNone(section)
+        self.assertIn("实时落盘", section)
+
+
 if __name__ == "__main__":
     unittest.main()

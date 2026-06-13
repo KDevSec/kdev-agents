@@ -41,6 +41,10 @@ RULE_THEME_KEYWORDS = {
     "优先处理 hook 产出": ["优先处理", "hook 产出", "WARN", "kdev-memory-brief", "kdev-memory-recall"],
 }
 
+# marker 切块（v0.18 / spec-kit 风格托管块）——与 claude_md_merge 对齐，本文件自包含不 import
+_RE_MARK_BEGIN = re.compile(r"<!--\s*BEGIN kdev-memory:智能体自动记录规则.*?-->")
+_RE_MARK_END = re.compile(r"<!--\s*END kdev-memory:智能体自动记录规则\s*-->")
+
 
 def parse_contract(contract_text: str) -> dict[str, list[str]] | None:
     """从 frontmatter 里抽取 claude_md_contract 的三个列表字段。
@@ -116,10 +120,19 @@ def _extract_list(key: str, yaml_block: str) -> list[str]:
 
 
 def extract_kdev_section(claude_md_text: str) -> str | None:
-    """从 CLAUDE.md 里抽出 `## 智能体自动记录规则` 章节正文。
+    """从 CLAUDE.md 里抽出托管规则段正文。
 
-    找不到返回 None（表示项目未装过 kdev-memory 规则段）。
+    v0.18+：优先按 BEGIN/END marker 切块（spec-kit 风格托管块）。
+    无 marker（老项目）或 marker 半残时，回退到按 `## 智能体自动记录规则`
+    标题边界抽取。找不到返回 None（项目未装过 kdev-memory 规则段）。
     """
+    # 优先：marker 切块（含配对 marker 时）
+    bm = _RE_MARK_BEGIN.search(claude_md_text)
+    em = _RE_MARK_END.search(claude_md_text)
+    if bm and em and bm.end() < em.start():
+        return claude_md_text[bm.start():em.end()]
+
+    # 回退：按标题抽段（无 marker / marker 半残的老项目）
     lines = claude_md_text.split("\n")
     start = None
     for i, line in enumerate(lines):
@@ -129,7 +142,6 @@ def extract_kdev_section(claude_md_text: str) -> str | None:
     if start is None:
         return None
 
-    # 一直收到下一个同级（或更高级）标题
     end = len(lines)
     for j in range(start + 1, len(lines)):
         if re.match(r"^#{1,2}\s+\S", lines[j]) and not re.match(r"^##\s+智能体自动记录规则", lines[j]):
