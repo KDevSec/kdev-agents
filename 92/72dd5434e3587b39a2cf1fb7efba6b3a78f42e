@@ -1,0 +1,22 @@
+plugins/kdev-memory/tests/test_step_id.py
+  s_f262242c9db8c5::t_19fce200e79558 334-351
+plugins/kdev-memory/hooks/lib/step_id.py
+  s_f262242c9db8c5::t_1cda28ea0d5cec 252-254
+  s_f262242c9db8c5::t_ea1e2f70020fb6 208-211
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "9272dd5434e3587b39a2cf1fb7efba6b3a78f42e",
+  "prompts": {},
+  "sessions": {
+    "s_f262242c9db8c5": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b6d449dd-daa8-4ade-9772-a27e53e28fe5",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
