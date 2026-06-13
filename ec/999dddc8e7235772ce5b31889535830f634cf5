@@ -1,0 +1,26 @@
+plugins/kdev-memory/hooks/lib/distill.py
+  s_f262242c9db8c5::t_e2d132cce10448 55,58-59,61-65
+  s_f262242c9db8c5::t_0d469f4a173d2d 365-368
+plugins/kdev-memory/tests/test_distill_record_id.py
+  s_f262242c9db8c5::t_06ff642eab685d 1-186
+plugins/kdev-memory/hooks/session-start-brief.py
+  s_f262242c9db8c5::t_765aa569ad3851 483-484
+plugins/kdev-memory/tests/test_step_completeness.py
+  s_f262242c9db8c5::t_33b3dc37c3bce1 458-512
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "ec999dddc8e7235772ce5b31889535830f634cf5",
+  "prompts": {},
+  "sessions": {
+    "s_f262242c9db8c5": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b6d449dd-daa8-4ade-9772-a27e53e28fe5",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
