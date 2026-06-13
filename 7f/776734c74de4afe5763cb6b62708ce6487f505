@@ -1,0 +1,20 @@
+plugins/kdev-team/skills/kdev-flow-driver/SKILL.md
+  s_6b1d2a7d2fe212::t_65261d55bd06e6 244
+  s_6b1d2a7d2fe212::t_0c9c319ad01ae3 238-243,245-257
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "7f776734c74de4afe5763cb6b62708ce6487f505",
+  "prompts": {},
+  "sessions": {
+    "s_6b1d2a7d2fe212": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "0fe2ee5f-843f-4b6f-9957-6adee0da7cab",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
