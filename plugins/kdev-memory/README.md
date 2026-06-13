@@ -84,25 +84,30 @@ touch .kdev/memory/strict
 ### 周总结
 > "/kdev-memory-weekly" —— 滚动 7 天周总结（汇报四段骨架：过程资产/经验总结/问题教训/开发进展）
 
-### v0.11+ 多 worktree 并发：Step ID 加分支前缀
+### v0.17+ 多 worktree / 多机并发：时间戳记录 ID（Q-020）
 
-为支持 secondary worktree 通过 symlink 共享 `.kdev/` 的并发场景，Step ID 从 v0.11 起加分支前缀：
+从 v0.17 起，记录 ID（Step + Q/G/R/F）改为**时间戳格式**，天然 coordination-free，worktree / 多机同时落盘不再撞号（G-011 修复）：
 
 ```
-## Step main-9: 主分支第 9 条
-## Step cluster-x1-1: feature/cluster-x1 分支第 1 条
+## Step 20260613-142301-ly: 主线落盘
+## Step 20260613-142305-other: 另一 worktree 同时落盘（时间戳不同，不撞）
 ```
 
 智能体落 Step 前调用：
 
 ```python
 import sys; sys.path.insert(0, "plugins/kdev-memory/hooks/lib")
-from step_id import mint_next_step_id
+from step_id import mint_record_id
 from pathlib import Path
-print(mint_next_step_id(Path(".kdev/memory/state")))  # → "Step main-10"
+print(mint_record_id("Step", Path(".kdev/memory/state")))  # → "Step 20260613-142301-ly"
 ```
 
-历史 Step 不迁移，由 `执行日志.md` 头部 `<!-- step_id_prefix_since: <date> -->` 注释标识切换点。详见 [SKILL.md](skills/kdev-memory/SKILL.md) 的「多 worktree 并发场景」一节和 [Q-003 决策](../../.kdev/memory/决策日志.md)。
+- **who**：git email 本地部分，无 git 时省略（不写 `-None`）
+- **同秒去重**：同写手同秒 `.2`、`.3`… 兜底
+- **旧顺序 ID 冻结**：`Step main-N` / `Q-NNN` 等历史条目继续解析（`parse_record_id` 双认），不再 mint 新顺序 ID
+- **slug/counter 退役**：`mint_next_step_id` / `step-counter-*.txt` 退出 minting 主路径
+
+详见 [SKILL.md](skills/kdev-memory/SKILL.md) 的「多 worktree 并发场景」一节和 [Q-020 决策](../../.kdev/memory/决策日志.md)。
 
 ## 七类记录
 

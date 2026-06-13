@@ -26,7 +26,7 @@
 | 条目类型 | Claude 写入时顺手做 |
 |---|---|
 | 新 G-NNN 踩坑 | 在 `## G-NNN: 标题` 下一行加 `triggers: [...]` |
-| 新 Step（完成时顺手） | 在 `## Step <branch-slug>-N: 标题` 下一行加 `triggers: [...]` |
+| 新 Step（完成时顺手） | 在 `## Step <ts>-<who>: 标题` 下一行加 `triggers: [...]` |
 | 方法论铁规 新规则 | 在 `## 规则名` 下一行加 `triggers: [...]` |
 | 项目级 spec（`constitution.md`/`spec.md` 等） | 人写，放文件 frontmatter 或每条规则下 |
 

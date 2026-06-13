@@ -1,5 +1,30 @@
 # kdev-memory CHANGELOG
 
+## [0.17.0] — 2026-06-13
+
+**P-C2 Phase A：记录 ID 时间戳化（Q-019 / Q-020）。**
+
+### ✨ 新增
+
+- **`step_id.mint_record_id(type, state_dir)`** — 统一记录 ID 铸造接口：格式 `<Type> <YYYYMMDD-HHMMSS>-<who>[.<n>]`（who = git email 本地部分；无 git 省略后缀，不写 `-None`；同秒同写手 `.N` atomic 去重）。Step / Q / G / R / F 全部走此接口。
+- **`step_id.parse_record_id(id_str)`** — 解析双认：同时识别新时间戳格式（`<Type> <ts>-<who>`）与旧顺序格式（`Step <slug>-N` / `Q-NNN` 等），向后兼容现存日志。
+
+### 🔄 变更
+
+- **kdev-step-recorder** — `mint_record_id` 替换 `mint_next_step_id` 作为 Step ID 铸造主路径；per-slug counter drift guard 退役（时间戳无 counter，不需要 drift 检测）。
+- **session-start-brief / distill / brief** — `parse_record_id` 双认旧/新形式；brief 不再显示「本次 Step ID 前缀」（时间戳无前缀概念）。
+- **`scope.resolve_step_slug`** — 标记为 deprecated for minting（Q-020）；仅留向后兼容/历史解析。slug/counter 机制退出 minting 主路径。
+
+### 🐛 修复
+
+- **G-011**：worktree 并发撞号——时间戳 + who 组合 coordination-free，多 worktree/多机同时落盘不再产生重复 ID。
+
+### 🧱 向后兼容 / 约束
+
+- 现存顺序 ID（`Step main-N` / `Q-NNN` 等）**冻结**：不再 mint，但 `parse_record_id` 持续识别（双认）。
+- `mint_next_step_id` 保留在代码库但退出主路径；现有测试锁定其行为不变（backward-compat 层）。
+- ⚠️ G-004：bump `0.16.0 → 0.17.0`，用户须刷 marketplace + 重启 session 才生效。
+
 ## [0.16.0] — 2026-06-13
 
 **P-C1b：Step 落盘 transcript 溯源 + 模型他评。**
