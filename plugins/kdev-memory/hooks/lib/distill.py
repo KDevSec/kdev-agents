@@ -32,6 +32,7 @@ force_utf8_stdio()
 
 from sanitize import sanitize_text, verify_no_leaks  # noqa: E402
 from scope import shared_dir, staff_log_files  # noqa: E402
+from status_schema import is_voided_status, warn_unknown_status  # noqa: E402
 
 
 # ==================== Entry 数据结构 ====================
@@ -214,7 +215,9 @@ def is_misalignment_step(entry: Entry, threshold: float = 1.5) -> bool:
         return False
     if step_about(entry) != "project":
         return False
-    if entry.fields.get("status", "").startswith("voided-"):
+    _status = entry.fields.get("status", "")
+    warn_unknown_status(_status, entry_id=entry.entry_id)
+    if is_voided_status(_status):
         return False
     diff = diff_score(entry.raw)
     return diff is not None and diff >= threshold

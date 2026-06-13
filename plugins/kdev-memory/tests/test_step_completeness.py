@@ -296,6 +296,28 @@ class TestStrictModeShouldBlock(unittest.TestCase):
         self.assertFalse(step_completeness.strict_mode_should_block({"today_half_complete": 0, "status": "ok"}))
 
 
+class TestStatusDefense(unittest.TestCase):
+    def test_voided_r_nnn_digit_treated_as_voided(self):
+        step = {
+            "label": "Step x-1", "title": "t", "date": "2026-06-13",
+            "body": "## Step x-1: t\nstatus: voided-r-003\n", "status": "voided-r-003",
+        }
+        self.assertEqual(step_completeness.check_step(step, rating_mode="user-required"), [])
+
+    def test_non_enum_status_warns_and_not_silently_voided(self):
+        import io, contextlib
+        step = {
+            "label": "Step y-2", "title": "t", "date": "2026-06-13",
+            "body": "## Step y-2: t\nstatus: fixed\n\n### 用户评分\n- 完成时间：—\n- 顺畅度：—/5\n",
+            "status": "fixed",
+        }
+        buf = io.StringIO()
+        with contextlib.redirect_stderr(buf):
+            issues = step_completeness.check_step(step, rating_mode="user-required")
+        self.assertTrue(issues)               # 非枚举 status 不被当销账放过：仍走半残检查
+        self.assertIn("非枚举", buf.getvalue())
+
+
 if __name__ == "__main__":
     unittest.main()
 
