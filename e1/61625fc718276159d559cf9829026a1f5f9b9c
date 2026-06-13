@@ -1,0 +1,28 @@
+plugins/kdev-team/skills/kdev-flow-driver/SKILL.md
+  s_af2ebae0bfaf45::t_2c2215922c04b0 226-229
+  s_af2ebae0bfaf45::t_67c72063940202 58
+plugins/kdev-team/skills/kdev-flow-driver/references/node-agent-routing.md
+  s_af2ebae0bfaf45::t_f8122a5fb21da0 176
+  s_af2ebae0bfaf45::t_1a0aba0743b16b 122-145,148
+  s_af2ebae0bfaf45::t_152e32da0b1e22 193-208
+plugins/kdev-team/skills/kdev-flow-driver/references/gate-decision-logic.md
+  s_af2ebae0bfaf45::t_ed10467734ef7d 201-220
+plugins/kdev-team/tests/test_test_engineer_wiring.py
+  s_af2ebae0bfaf45::t_5a1d08a79da2c4 1-37
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "e161625fc718276159d559cf9829026a1f5f9b9c",
+  "prompts": {},
+  "sessions": {
+    "s_af2ebae0bfaf45": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "737f5ec6-d909-4691-bd2d-3186f0dc8820",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
