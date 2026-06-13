@@ -1,0 +1,33 @@
+plugins/kdev-memory/tests/test_step_recorder_e2e.py
+  s_f262242c9db8c5::t_217f980a5ad362 67-68,71-72
+  s_f262242c9db8c5::t_8da879757c7c62 48-53
+  s_f262242c9db8c5::t_67dde4ce9e1785 18
+plugins/kdev-memory/tests/test_step_id.py
+  s_f262242c9db8c5::t_7e2c03a7e14253 352-361
+plugins/kdev-memory/hooks/lib/scope.py
+  s_f262242c9db8c5::t_bf2bd9606c109e 95-96
+plugins/kdev-memory/agents/kdev-step-recorder.md
+  s_f262242c9db8c5::t_af4cf1a44c4330 34
+  s_f262242c9db8c5::t_78fde688017295 36
+  s_f262242c9db8c5::t_964317357a84e8 49
+  s_f262242c9db8c5::t_d9b9c94e0a1280 56,58,61,63
+  s_f262242c9db8c5::t_c655d455f966fb 118,120,123,128
+  s_f262242c9db8c5::t_5b4ff110b32324 239
+  s_f262242c9db8c5::t_61cc05a232537c 247
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "3f624996e5bf23202118ee00d2d5d882064756a5",
+  "prompts": {},
+  "sessions": {
+    "s_f262242c9db8c5": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b6d449dd-daa8-4ade-9772-a27e53e28fe5",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
