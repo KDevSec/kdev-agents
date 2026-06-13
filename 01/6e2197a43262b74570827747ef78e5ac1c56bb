@@ -1,0 +1,20 @@
+docs/superpowers/specs/2026-06-13-测试工程师test-engineer接入设计-design.md
+  s_af2ebae0bfaf45::t_e287230ac426a9 249-253
+  s_af2ebae0bfaf45::t_a71bafe47b61f2 1-248,254-285
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "016e2197a43262b74570827747ef78e5ac1c56bb",
+  "prompts": {},
+  "sessions": {
+    "s_af2ebae0bfaf45": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "737f5ec6-d909-4691-bd2d-3186f0dc8820",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
