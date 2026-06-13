@@ -1,0 +1,21 @@
+docs/superpowers/specs/2026-06-13-测试工程师test-engineer接入设计-design.md
+  s_af2ebae0bfaf45::t_28c801d133d57d 278
+docs/framework/01-design/2026-06-06-01-数字员工整体设计路线图roadmap-v1.0.md
+  s_af2ebae0bfaf45::t_2b61f97955c21e 193
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "ea19dd2fa3292fe4474e3e2f3dfe5430dcb0a906",
+  "prompts": {},
+  "sessions": {
+    "s_af2ebae0bfaf45": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "737f5ec6-d909-4691-bd2d-3186f0dc8820",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
