@@ -1,0 +1,24 @@
+plugins/kdev-memory/skills/kdev-memory/references/六类记录-schema.md
+  s_4ff7b809d3f513::t_9ec9148b04ace2 34-58
+  s_4ff7b809d3f513::t_24613426a54e72 131
+  s_4ff7b809d3f513::t_af06d0f315c7b7 273
+  s_4ff7b809d3f513::t_156a393ecabbbe 89
+plugins/kdev-memory/skills/kdev-memory/SKILL.md
+  s_4ff7b809d3f513::t_7cb88487ed8cd6 186
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "2ee66eb89030eee9b9f5701192e454d7feac6e84",
+  "prompts": {},
+  "sessions": {
+    "s_4ff7b809d3f513": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "fa127296-1bee-4d24-bc07-1bcc5263415b",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
