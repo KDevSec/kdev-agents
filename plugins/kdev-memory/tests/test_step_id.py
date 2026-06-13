@@ -331,3 +331,21 @@ def test_parse_new_no_who():
 
 def test_parse_non_id_returns_none():
     assert parse_record_id("随便一行标题") is None
+
+
+def test_parse_new_no_who_with_dup_roundtrips():
+    assert parse_record_id("Step 20260613-101432.1") == {"type": "Step", "id": "20260613-101432.1", "scheme": "timestamp"}
+
+
+def test_mint_no_who_same_second_is_parseable(tmp_path, monkeypatch):
+    monkeypatch.setattr("step_id._who_suffix", lambda: "")
+    w = datetime.datetime(2026, 6, 13, 10, 14, 32)
+    r1 = mint_record_id("Step", tmp_path, when=w)   # "Step 20260613-101432"
+    r2 = mint_record_id("Step", tmp_path, when=w)   # "Step 20260613-101432.1"
+    assert parse_record_id(r1) is not None
+    assert parse_record_id(r2) is not None
+    assert parse_record_id(r2)["id"] == "20260613-101432.1"
+
+
+def test_parse_who_and_dup_roundtrips():
+    assert parse_record_id("Q 20260613-101432-ly.2") == {"type": "Q", "id": "20260613-101432-ly.2", "scheme": "timestamp"}

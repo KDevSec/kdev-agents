@@ -205,7 +205,10 @@ def _dup_index(rec_type: str, base: str, state_dir: Path) -> int:
         _flock_exclusive(fd)
         os.lseek(fd, 0, os.SEEK_SET)
         raw = os.read(fd, 64).decode("utf-8", errors="replace").strip()
-        cur = int(raw) if raw.isdigit() else 0
+        try:
+            cur = int(raw) if raw else 0
+        except ValueError:
+            cur = 0
         os.lseek(fd, 0, os.SEEK_SET)
         os.ftruncate(fd, 0)
         os.write(fd, f"{cur + 1}\n".encode("utf-8"))
@@ -246,8 +249,9 @@ def mint_record_id(
 
 _TS_PAT = r"\d{8}-\d{6}"  # YYYYMMDD-HHMMSS
 
-# New timestamp scheme: "Step 20260613-101432-ly1989abc" / "Q 20260613-101432"
-_RE_NEW = re.compile(rf"^(Step|Q|G|R|F)\s+({_TS_PAT}(?:-[\w.\-]+)?)$")
+# New timestamp scheme: "<Type> <YYYYMMDD-HHMMSS>[-<who>][.<dup>]"
+# who has no dots (sanitized); dup is .<digits> and is independent of who.
+_RE_NEW = re.compile(rf"^(Step|Q|G|R|F)\s+({_TS_PAT}(?:-[\w-]+)?(?:\.\d+)?)$")
 
 # Legacy Step form: "Step main-87" / "Step cluster-x1-2"
 _RE_OLD_STEP = re.compile(r"^(Step)\s+([\w\-\.]+-\d+)$")
