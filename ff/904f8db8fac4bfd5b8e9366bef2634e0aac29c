@@ -1,0 +1,29 @@
+plugins/kdev-memory/skills/kdev-memory/SKILL.md
+  s_f262242c9db8c5::t_ddff6eace15200 159-160
+  s_f262242c9db8c5::t_f7b6920a403797 379,390-392,396-397,403-404,407-414,424-432,439
+  s_f262242c9db8c5::t_516fdf4276a722 154-156
+plugins/kdev-memory/skills/kdev-memory/references/skill-反馈通道-F.md
+  s_f262242c9db8c5::t_b259a7d887c6d3 49-58,62
+plugins/kdev-memory/skills/kdev-memory/references/六类记录-schema.md
+  s_f262242c9db8c5::t_16b749ffe8f98e 74,78,80
+  s_f262242c9db8c5::t_15cc0c8b692112 17-34,38,40
+  s_f262242c9db8c5::t_c081daf3af98c0 331,337,339
+plugins/kdev-memory/tests/test_session_start_brief_prefix.py
+  s_f262242c9db8c5::t_0cf564efa37efc 1,35-36,40-43,46-47,52-53
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "ff904f8db8fac4bfd5b8e9366bef2634e0aac29c",
+  "prompts": {},
+  "sessions": {
+    "s_f262242c9db8c5": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b6d449dd-daa8-4ade-9772-a27e53e28fe5",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
