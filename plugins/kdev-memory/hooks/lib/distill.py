@@ -33,6 +33,7 @@ force_utf8_stdio()
 from sanitize import sanitize_text, verify_no_leaks  # noqa: E402
 from scope import shared_dir, staff_log_files  # noqa: E402
 from status_schema import is_voided_status, warn_unknown_status  # noqa: E402
+from step_id import id_label_fragment  # noqa: E402
 
 
 # ==================== Entry 数据结构 ====================
@@ -56,14 +57,23 @@ class Entry:
 # heading 正则（Step / Q-NNN / G-NNN / F-NNN / R-NNN，以及新时间戳形式）
 # MULTILINE 让 ^/$ 跨行匹配（finditer 扫整个文件文本）
 # 冒号 + 标题部分是可选 —— 容错"## Step 1"（无冒号无标题）和"## Step 1: 标题"两种格式
-# 新时间戳形（P-C2）：`<T> <YYYYMMDD-HHMMSS>[-who][.n]`，用 _TS 子模式匹配
-_TS = r"\d{8}-\d{6}(?:-[\w-]+)?(?:\.\d+)?"
+# ID 文法（双认 legacy + 时间戳）由 step_id.id_label_fragment 单一托管，避免漂移。
+_HEAD_FILES = {
+    "Step": "执行日志.md",
+    "Q":    "决策日志.md",
+    "G":    "踩坑日志.md",
+    "F":    "skill-feedback.md",
+    "R":    "改进建议.md",
+}
 HEAD_PATTERNS: dict[str, tuple[str, re.Pattern[str]]] = {
-    "Step": ("执行日志.md", re.compile(r"^##\s+(Step\s+\S+?)(?:\s*[：:]\s*(.+?))?\s*$", re.MULTILINE)),
-    "Q":    ("决策日志.md", re.compile(rf"^##\s+(Q(?:-\d+|\s+{_TS}))(?:\s*[：:]\s*(.+?))?\s*$", re.MULTILINE)),
-    "G":    ("踩坑日志.md", re.compile(rf"^##\s+(G(?:-\d+|\s+{_TS}))(?:\s*[：:]\s*(.+?))?\s*$", re.MULTILINE)),
-    "F":    ("skill-feedback.md", re.compile(rf"^##\s+(F(?:-\d+|\s+{_TS}))(?:\s*[：:]\s*(.+?))?\s*$", re.MULTILINE)),
-    "R":    ("改进建议.md", re.compile(rf"^##\s+(R(?:-\d+|\s+{_TS}))(?:\s*[：:]\s*(.+?))?\s*$", re.MULTILINE)),
+    kind: (
+        filename,
+        re.compile(
+            rf"^##\s+({id_label_fragment(kind)})(?:\s*[：:]\s*(.+?))?\s*$",
+            re.MULTILINE,
+        ),
+    )
+    for kind, filename in _HEAD_FILES.items()
 }
 
 # inline frontmatter 行（key: value）—— 用于解析 date / subject / status 等

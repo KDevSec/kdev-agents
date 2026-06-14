@@ -1,5 +1,19 @@
 # kdev-memory CHANGELOG
 
+## [0.18.1] — 2026-06-14
+
+**召回扫描器双认补全：时间戳形 G 条目不再静默漏召 + 记录 ID 文法单一真相源。**
+
+### 🐛 修复
+
+- **`trigger-match.scan_g_entries` 漏召时间戳形 G（核心修复）**：heading 正则原为 `^##\s+(G-\d+)…`，只认旧顺序号 `G-NNN`，v0.17（Q-020）起新铸造的时间戳形 `## G <YYYYMMDD-HHMMSS>-<who>` 被**静默 MISS**。踩坑召回是「防重踩」核心通道，漏召 = 用户再撞同类坑时 recall 不提示。现改为双认（旧顺序号 + 时间戳）。当前 .kdev 里 G 全为旧形，属**潜伏 bug**，下一条时间戳 G 铸造即触发。
+
+### 🔄 变更（治根因：消除三处正则漂移）
+
+- **`step_id.id_label_fragment(type)`（新增，单一真相源）** + **`TS_ID_CORE`** 常量 —— 记录 ID 文法（legacy↔时间戳双认）集中托管。`trigger-match` / `distill` / `step_completeness` 三处 heading 正则统一从此构建，杜绝各自维护副本漂移（本次 bug 的根因）。`parse_record_id` 的 `_RE_NEW` 也改从 `TS_ID_CORE` 构建（行为不变）。
+- **`trigger-match.scan_step_entries`** —— Step 正则去掉脆弱的 `[\w.-]+` 通配（原靠它"碰巧"兼容时间戳形），改为显式双认 fragment（枚举 `\d+` / `\d+.\d+` / `前缀-N` + 时间戳；覆盖全部历史 Step 形，无回归）。
+- **`distill.HEAD_PATTERNS` / `step_completeness.parse_steps`** —— 各自的 `_TS` / `[\w\-\.]+` 局部正则改用 `id_label_fragment`，行为等价。
+
 ## [0.18.0] — 2026-06-14
 
 **Schema / 数据完整性整顿：CLAUDE.md 托管块 marker 化 + status 语义去漂移。**

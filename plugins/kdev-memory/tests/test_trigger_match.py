@@ -386,6 +386,31 @@ class GlobScanTests(unittest.TestCase):
         entries = tm.scan_g_entries()
         self.assertEqual(entries, [])
 
+    def test_g_entries_recall_timestamp_form(self):
+        """v0.17(Q-020) 时间戳形 G 条目（## G <YYYYMMDD-HHMMSS>-who）也要能被召回。
+
+        旧扫描器 heading_re 只认顺序号 `G-\\d+`，时间戳形静默 MISS——踩坑防重踩
+        是核心通道，漏召 = 用户再撞同类坑时 recall 不提示（静默失败）。
+        """
+        (self.kdev_dir / "踩坑日志.md").write_text(
+            "## G 20260613-101432-ly: 时间戳形踩坑\ntriggers: [\"时间戳召回\"]\n日期：2026-06-13\n\n",
+            encoding="utf-8",
+        )
+        entries = tm.scan_g_entries()
+        ids = [e["id"] for e in entries]
+        self.assertEqual(ids, ["G 20260613-101432-ly"])
+        self.assertEqual(entries[0]["title"], "时间戳形踩坑")
+
+    def test_g_entries_recall_both_legacy_and_timestamp(self):
+        """新旧双认：同一文件里 G-NNN（旧）和时间戳形（新）都要召回。"""
+        (self.kdev_dir / "踩坑日志.md").write_text(
+            "## G-003: 旧顺序号坑\ntriggers: [\"旧坑\"]\n日期：2026-06-13\n\n"
+            "## G 20260613-101432-ly1989abc: 时间戳形坑\ntriggers: [\"新坑\"]\n日期：2026-06-13\n\n",
+            encoding="utf-8",
+        )
+        ids = sorted(e["id"] for e in tm.scan_g_entries())
+        self.assertEqual(ids, ["G 20260613-101432-ly1989abc", "G-003"])
+
     def test_step_entries_date_filter_excludes_archive(self):
         """执行日志归档里的老 Step 被今日/昨日过滤剔除。"""
         today = datetime_today_str()
@@ -412,6 +437,20 @@ class GlobScanTests(unittest.TestCase):
         )
         entries = tm.scan_step_entries()
         self.assertEqual([e["id"] for e in entries], ["Step 22"])
+
+    def test_step_entries_recall_timestamp_form(self):
+        """时间戳形 Step（## Step <YYYYMMDD-HHMMSS>-who）今日条目要被召回。
+
+        回归守卫：当前靠宽松 `[\\w.-]+` 通配"碰巧"命中；改为显式双认（去通配）后
+        仍须命中——锁住时间戳形 Step 不被重构误伤。
+        """
+        today = datetime_today_str()
+        (self.kdev_dir / "执行日志.md").write_text(
+            f"## Step 20260614-101432-ly1989abc: 时间戳形 Step\ntriggers: [\"时间戳step\"]\n日期：{today}\n\n",
+            encoding="utf-8",
+        )
+        ids = [e["id"] for e in tm.scan_step_entries()]
+        self.assertEqual(ids, ["Step 20260614-101432-ly1989abc"])
 
 
 def datetime_today_str() -> str:

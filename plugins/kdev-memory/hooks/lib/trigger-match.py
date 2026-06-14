@@ -45,6 +45,7 @@ STATE_FILE = KDEV_DIR / "state" / "trigger-sessions.json"
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from scope import shared_dir, staff_log_files  # noqa: E402
+from step_id import id_label_fragment  # noqa: E402
 
 # 约定的项目级 spec 文件扫描路径
 SPEC_PATHS = [
@@ -233,7 +234,8 @@ def scan_g_entries() -> list[dict]:
     踩坑召回要覆盖全部历史档——老坑也要防重踩。
     """
     entries = []
-    heading_re = re.compile(r"^##\s+(G-\d+)[：:]\s*(.+?)\s*$")
+    # 双认：G-NNN（旧顺序号）+ G <时间戳>（v0.17/Q-020）——grammar 由 step_id 单一托管
+    heading_re = re.compile(rf"^##\s+({id_label_fragment('G')})[：:]\s*(.+?)\s*$")
     for path in _iter_memory_files("踩坑日志"):
         lines = _read_file(path)
         if lines is None:
@@ -267,7 +269,8 @@ def scan_step_entries() -> list[dict]:
     date_ok = lambda d: d in (today, yesterday)
 
     entries = []
-    heading_re = re.compile(r"^##\s+(Step\s+[\w.-]+)[：:]\s*(.+?)\s*$")
+    # 双认（显式，去掉旧的脆弱 [\w.-]+ 通配）：Step <时间戳> + 旧顺序号/前缀-N
+    heading_re = re.compile(rf"^##\s+({id_label_fragment('Step')})[：:]\s*(.+?)\s*$")
     # shared / flat 主线
     for path in _iter_memory_files("执行日志"):
         lines = _read_file(path)

@@ -68,6 +68,7 @@ _LIB_DIR = Path(__file__).resolve().parent
 if str(_LIB_DIR) not in sys.path:
     sys.path.insert(0, str(_LIB_DIR))
 from status_schema import is_voided_status, warn_unknown_status  # noqa: E402
+from step_id import id_label_fragment  # noqa: E402
 
 
 def _extract_inline_status(body: str) -> str | None:
@@ -93,10 +94,11 @@ def parse_steps(log_text: str) -> list[dict[str, Any]]:
     每条 Step 以 `## Step <N>:` 开头，到下一个 `## Step ` 或文件结束为止。
     """
     steps: list[dict[str, Any]] = []
-    # 匹配 "## Step 8: ..." / "## Step 5.5 ..." / "## Step M-7 meta 回补" 等变体
-    # label 是 Step + [\w\-\.]+，之后可选空格 + 冒号/或直接跟 title（含空格的多词标题）
+    # 匹配 "## Step 8: ..." / "## Step 5.5 ..." / "## Step M-7 meta 回补" / 时间戳形等变体；
+    # label 文法（双认 legacy + 时间戳）由 step_id.id_label_fragment 单一托管，避免漂移。
+    # 之后可选空格 + 冒号/或直接跟 title（含空格的多词标题）
     pattern = re.compile(
-        r"^##\s+(Step\s+[\w\-\.]+)(?:\s*[:：]\s*(.+)|\s+(.+))?$",
+        rf"^##\s+({id_label_fragment('Step')})(?:\s*[:：]\s*(.+)|\s+(.+))?$",
         re.MULTILINE,
     )
 

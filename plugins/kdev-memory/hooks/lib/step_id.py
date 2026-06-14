@@ -245,15 +245,51 @@ def mint_record_id(
     return f"{rec_type} {core}"
 
 
+# ── Record-ID grammar: single source of truth ────────────────────────────────
+# These fragments are the ONE place the record-ID grammar lives. trigger-match,
+# distill, and step_completeness all build their heading regexes from
+# id_label_fragment(), so the legacy↔timestamp dual recognition can never drift
+# between modules again — the drift that silently dropped timestamp-form G
+# entries from trigger recall before this was centralized.
+
+_TS_PAT = r"\d{8}-\d{6}"  # bare YYYYMMDD-HHMMSS
+
+# Timestamp id core: YYYYMMDD-HHMMSS[-<who>][.<dup>]
+#   who: word/dash, sanitized (no dots);  dup: .<digits>, independent of who.
+TS_ID_CORE = rf"{_TS_PAT}(?:-[\w-]+)?(?:\.\d+)?"
+
+# Legacy Step id core — enumerated (NOT a catch-all wildcard), covering every
+# historical form in 执行日志: "1"/"9" (sequence), "5.5" (decimal),
+# "main-90"/"kdev-hud-1"/"M-7" (prefix-N).
+_LEGACY_STEP_CORE = r"(?:\d+(?:\.\d+)?|[\w-]+-\d+)"
+
+
+def id_label_fragment(rec_type: str) -> str:
+    """Regex fragment matching a full record-ID *label* of ``rec_type``,
+    dual-recognizing the timestamp scheme and the legacy forms.
+
+    The fragment is **unanchored** and has **no capturing groups of its own**
+    (all internal groups are non-capturing), so a caller can wrap it in a
+    heading regex — ``rf"^##\\s+({id_label_fragment('G')})..."`` — and rely on
+    its own ``(...)`` being group 1 with no surprises.
+
+    Raises ``ValueError`` for unknown record types.
+    """
+    if rec_type == "Step":
+        return rf"Step\s+(?:{TS_ID_CORE}|{_LEGACY_STEP_CORE})"
+    if rec_type in ("Q", "G", "R", "F"):
+        return rf"{rec_type}(?:-\d+|\s+{TS_ID_CORE})"
+    raise ValueError(f"unknown record type: {rec_type!r}")
+
+
 # ── parse_record_id: dual-scheme recognition (legacy + timestamp) ──────────────
 
-_TS_PAT = r"\d{8}-\d{6}"  # YYYYMMDD-HHMMSS
-
 # New timestamp scheme: "<Type> <YYYYMMDD-HHMMSS>[-<who>][.<dup>]"
-# who has no dots (sanitized); dup is .<digits> and is independent of who.
-_RE_NEW = re.compile(rf"^(Step|Q|G|R|F)\s+({_TS_PAT}(?:-[\w-]+)?(?:\.\d+)?)$")
+_RE_NEW = re.compile(rf"^(Step|Q|G|R|F)\s+({TS_ID_CORE})$")
 
-# Legacy Step form: "Step main-87" / "Step cluster-x1-2"
+# Legacy Step classifier (canonical mintable prefix-N forms): "Step main-87" /
+# "Step cluster-x1-2". Intentionally stricter than _LEGACY_STEP_CORE — the
+# heading scanners accept the broader historical zoo, this only classifies IDs.
 _RE_OLD_STEP = re.compile(r"^(Step)\s+([\w\-\.]+-\d+)$")
 
 # Legacy compact forms: "Q-018", "G-003", "R-001", "F-007"

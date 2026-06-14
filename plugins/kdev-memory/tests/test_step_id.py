@@ -359,3 +359,61 @@ def test_recorder_mint_path_is_timestamp_no_counter(tmp_path):
     rid = mint_record_id("Step", tmp_path)
     assert parse_record_id(rid)["scheme"] == "timestamp"
     assert not list(tmp_path.glob("step-counter-*.txt"))
+
+
+# ── id_label_fragment: single-source-of-truth heading grammar ────────────────
+# step_id owns the record-ID grammar; trigger-match / distill / step_completeness
+# build their heading regexes from this fragment so legacy↔timestamp dual
+# recognition can never drift between modules again.
+
+import re as _re
+
+from step_id import id_label_fragment  # noqa: E402
+
+
+def _full(rec_type: str, label: str) -> bool:
+    """fullmatch the bare label against the (unanchored) fragment."""
+    return _re.fullmatch(id_label_fragment(rec_type), label) is not None
+
+
+def test_fragment_g_matches_legacy_and_timestamp():
+    assert _full("G", "G-003")                       # legacy 顺序号
+    assert _full("G", "G 20260613-101432-ly")        # 时间戳 + who
+    assert _full("G", "G 20260613-101432")           # 时间戳 no-who
+    assert _full("G", "G 20260613-101432-ly.2")      # 时间戳 + who + dup
+
+
+def test_fragment_g_rejects_non_g():
+    assert not _full("G", "G-")                       # 顺序号缺数字
+    assert not _full("G", "G随便")                     # 非 ID
+    assert not _full("G", "Q-003")                    # 别的类型
+
+
+def test_fragment_step_covers_all_real_legacy_forms():
+    # 真实历史 Step 形（来自 .kdev 执行日志）：纯数字 / prefix-N / 时间戳
+    for label in [
+        "Step 1", "Step 9", "Step 5.5",
+        "Step main-90", "Step kdev-hud-1", "Step p-a-req-architect-1",
+        "Step worktree-feat-l3-review-dogfood-1",
+        "Step 20260614-101432-ly1989abc",
+    ]:
+        assert _full("Step", label), label
+
+
+def test_fragment_qrf_dual():
+    for t in ("Q", "R", "F"):
+        assert _full(t, f"{t}-001")
+        assert _full(t, f"{t} 20260613-101432-ly1989abc")
+
+
+def test_fragment_unknown_type_raises():
+    with pytest.raises(ValueError):
+        id_label_fragment("Step ")  # 带空格的非法类型
+    with pytest.raises(ValueError):
+        id_label_fragment("X")
+
+
+def test_fragment_has_no_capturing_groups():
+    """fragment 内部全部非捕获组——调用方包一层 (...) 取 id 时 group 编号不被打乱。"""
+    assert _re.compile(id_label_fragment("G")).groups == 0
+    assert _re.compile(id_label_fragment("Step")).groups == 0
