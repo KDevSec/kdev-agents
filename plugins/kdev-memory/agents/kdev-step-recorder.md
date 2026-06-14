@@ -32,6 +32,7 @@ scope: shared | <canonical-employee-id>   # 落哪个 scope；缺省 shared（= 
 `commits_batch_id` (v0.3 新增, optional): 反向溯源信号。当 dispatch 由 plan-driven batch 触发（commit subject 含 `(Q-XXX task N/M)` 模式），设为 batch 标识；否则 null。不参与 hard-gate 校验。
 
 `scope` (v0.14 新增, optional, default `shared`): 决定 Step 落哪个记忆 scope。`shared`/缺省 = 项目主线（落 `shared/执行日志.md`，flat 下即 `执行日志.md`）。员工 canonical id（如 `dev-engineer` / `req-architect`）= 该员工 scope（落 `staff/<id>/执行日志.md`）。**flat 布局（无 `shared/`）下任何 scope 都落 root 执行日志**（向后兼容）。记录 ID 统一为时间戳形（`Step <ts>-<who>`），与 scope 无关（Q-020）。不参与 hard-gate 校验。
+> ⚠️ **STALE（P-C2/Q-019），待 Phase B/C 重构**：scope 收窄后**叙事仅 CEO/shared，员工 = events + handoffs（无 per-员工叙事 Step）**——dev/req 等不再写 `staff/<id>/执行日志.md`，staff 稀疏化为仅 `reviewer`/`cqo`。上面 dev-engineer/req-architect 落 staff scope 的说法是旧 P-C1 模型，defer 窗口期勿据此为员工建叙事 scope。详见 P-C2 spec §0.5 / §8.2。
 
 记录 ID 为时间戳形 `Step <ts>-<who>`（Q-020；slug/counter 退役）。本 recorder 的 ID/路径解析已为此留好结构。
 

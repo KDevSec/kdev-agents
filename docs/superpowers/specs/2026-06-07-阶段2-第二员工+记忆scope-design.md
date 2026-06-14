@@ -32,7 +32,7 @@
 - 开发工程师：`dev-engineer-orchestrator` `dev-engineer-env` `dev-engineer-plan` `dev-engineer-frontend` `dev-engineer-e2e` `dev-engineer-deploy` `dev-engineer-sec`
 - 需求架构师：`req-architect-orchestrator` `req-architect-clarify` `req-architect-spec` `req-architect-decompose` `req-architect-prototype` `req-architect-design`
 
-**带员工名的机器路径（全用 canonical id）**：node-table `kdev-team/orchestration/<id>.node-table.yml` · 记忆 scope `.kdev/memory/staff/<id>/` · Step `Step <id>-N` · handoff `.kdev/handoffs/<id>/`。
+**带员工名的机器路径（全用 canonical id）**：node-table `kdev-team/orchestration/<id>.node-table.yml` · 记忆 scope `.kdev/memory/staff/<id>/` · Step `Step <id>-N` · handoff `.kdev/features/<slug>/handoffs/<id>/`（⚠️ **以 Q-012 feature-first 为准**；本稿原写扁平 `.kdev/handoffs/<id>/` 早于翻转，已陈旧）。
 
 > **命名消歧**：员工插件 = `plugins/kdev-team/`（agent 定义）；记忆分区 = `.kdev/memory/staff/<id>/`（kdev-memory 管）。二者不同物、不同命名空间（plugin 改名 kdev-team 即为避开 staff 撞名）。
 
@@ -145,7 +145,7 @@ kdev-design-flow 已有 SR→评审 gate→prototype 多阶段 SOP + **自带 fl
 
 ## 6. P-B 跨员工 handoff
 
-- 需求架构师 SR/AR → `.kdev/handoffs/req-architect/`（kdev-core 运行时，记忆架构 §5.3 #12）→ 开发工程师 coding-flow 节点0/3 把 SR/AR 当 spec 输入读。
+- 需求架构师 SR/AR → `.kdev/features/<slug>/handoffs/req-architect/`（⚠️ **路径以 Q-012 feature-first 为准**；本稿原写扁平 `.kdev/handoffs/req-architect/` 早于翻转。kdev-core 运行时，记忆底座 §5.3 #12）→ 开发工程师 coding-flow 节点0/3 把 SR/AR 当 spec 输入读。
 - **handoff = 结构化产物指针**（谁产了啥 + 路径 + 状态）；coding-flow 入口接受"上游 SR/AR"作 spec.md/plan.md 来源（阶段1 coding-flow 节点0 本就吃 spec+plan+prototype 三件套，SR/AR/prototype 正好对位）。
 - handoff 格式 + 读写接口 writing-plans 细化（最小：一个 manifest 指针文件 + 产物路径约定）。
 

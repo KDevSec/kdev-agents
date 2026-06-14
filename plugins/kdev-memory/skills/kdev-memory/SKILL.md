@@ -470,6 +470,8 @@ python3 plugins/kdev-memory/hooks/lib/migrate_scope.py --staff dev-engineer,req-
 
 ### staff/\<canonical-id\>/ — 员工专属执行 rollup
 
+> ⚠️ **STALE（P-C2/Q-019），待 Phase B/C 重构**：staff 叙事 scope 已收窄——叙事仅 CEO/shared，**员工 = events + handoffs（无 per-员工叙事 Step）**，staff 目录稀疏化为仅 `reviewer`（评审经验）/ `cqo`（审计），dev/req 机器侧无 kdev-memory 足迹。本节仍是旧 P-C1「员工各有执行 rollup」模型；defer 窗口期勿照此为 dev/req 建 scope。详见 P-C2 spec §8.2 / §0.5、记忆底座合稿 §5.3。
+
 每位员工有独立目录（如 `staff/dev-engineer/`、`staff/req-architect/`），存放：
 - 执行日志.md（该员工的 Step rollup，ID = `Step <canonical-id>-N`，如 `Step dev-engineer-1`）
 

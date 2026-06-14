@@ -36,6 +36,10 @@ _SHARED_ITEMS = [
     "归档",
 ]
 
+# ⚠️ STALE（P-C2/Q-019）：staff 叙事 scope 已收窄——叙事仅 CEO/shared，员工 = events + handoffs
+# （无 per-员工叙事 Step），staff 目录稀疏化为仅 reviewer/cqo（dev/req 机器侧无足迹）。
+# 此 DEFAULT_STAFF 仍是旧 P-C1「全家桶」模型，待 P-C2 Phase B/C 重构。
+# defer 窗口期勿照此启用 scoped，否则会建出已判死的 dev/req 目录。见 P-C2 spec §8.2 / §0.5。
 DEFAULT_STAFF = ["dev-engineer", "req-architect"]
 
 
