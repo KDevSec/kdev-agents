@@ -1,0 +1,38 @@
+plugins/kdev-memory/hooks/lib/trigger-match.py
+  s_1400aa749f431a::t_8b2f646aa5e6ed 48
+  s_1400aa749f431a::t_d1d1c11a08b664 272-273
+  s_1400aa749f431a::t_b37cdd3cecd5d3 237-238
+plugins/kdev-memory/.claude-plugin/plugin.json
+  s_1400aa749f431a::t_ac8f5c2a614dcb 4
+plugins/kdev-memory/CHANGELOG.md
+  s_1400aa749f431a::t_5200df370365c9 3-16
+plugins/kdev-memory/tests/test_step_id.py
+  s_1400aa749f431a::t_1f3bf56f536941 362-419
+plugins/kdev-memory/hooks/lib/step_id.py
+  s_1400aa749f431a::t_b6fd597dc40692 248-269,271-285,288,290-292
+plugins/kdev-memory/hooks/lib/distill.py
+  s_1400aa749f431a::t_3ef1d8148d3251 60-67,69-76
+  s_1400aa749f431a::t_6b74f9a7a0df9a 36
+plugins/kdev-memory/tests/test_trigger_match.py
+  s_1400aa749f431a::t_8d27348c6f36ac 389-413
+  s_1400aa749f431a::t_9ed5c108e504f4 441-454
+plugins/kdev-memory/hooks/lib/step_completeness.py
+  s_1400aa749f431a::t_c878cee944b333 71
+  s_1400aa749f431a::t_ef1227b1b25545 97-99,101
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "d9be67e5eb048bcec7fc7200f7a93b717eea1622",
+  "prompts": {},
+  "sessions": {
+    "s_1400aa749f431a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5376c04e-38ec-4f4f-b2ba-1f1c5893229b",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
