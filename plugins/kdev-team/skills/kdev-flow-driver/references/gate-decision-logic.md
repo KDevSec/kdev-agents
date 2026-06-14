@@ -129,10 +129,10 @@
 
 1. 写 review 请求 → `handoffs/reviewer/<gate>.request.json`（`{target_paths[], caps[], standards_refs[], thresholds, request_id:<gate-node>, caller:<员工id>, diff_range?, transcript_ref?}`）。
 2. 发函 dispatch `kdev-team:reviewer-orchestrator`（`run_in_background: true`，B 轨）。
-3. reviewer-orchestrator handoff-read request → 并行 fan-out 对应 `kdev-team:reviewer-<cap>` → 各出百分制评分表。
+3. reviewer-orchestrator 普通 `Read` request（裸文件，不走 CLI handoff reader）→ 并行 fan-out 对应 `kdev-team:reviewer-<cap>` → 各出百分制评分表。
 4. inline 仲裁冲突 + 双重通过条件聚合 gate verdict。
-5. 写结果 → `handoffs/reviewer/<gate>.handoff.json`（`{verdict:PASS|FAIL, scores, counts, revisions, 仲裁, by:reviewer-expert}`）。
-6. caller 收 completion → handoff-read → `record-gate --gate <gate> --kind review --verdict <V> --request-id <node> --by reviewer-expert`。
+5. 裸 `Write` 结果 → `handoffs/reviewer/<gate>.handoff.json`（`{verdict:PASS|FAIL, scores, counts, revisions, 仲裁, anomaly?, by:reviewer-expert}`）。
+6. caller 收 completion → 普通 `Read` 取 `verdict`（裸文件交接，不走 CLI handoff reader）→ `record-gate --gate <gate> --kind review --verdict <V> --request-id <node> --by reviewer-expert`；回函若含 `anomaly` 字段，caller 自行决定是否在自己的 `events.jsonl` 记一条事件。
 
 **FAIL 回流**：`gate_iters<3` → 编排读修订建议、自主判断修哪些（🔴 必处置 / 🟡⚪ 可 tech-debt 化）→ 重做 action → 增量评（只评修订部分）；`≥3` → `status=blocked` 升 CEO，escalate 不 force-accept。
 

@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.8.1 — reviewer 回函契约收口：裸文件交接 ≠ CLI flow-state handoff（Q 候选 2 + G 候选 3）
+
+- 🔴 **修契约混用（Q 候选 2）**：reviewer 发函回函文件族（`handoffs/reviewer/<gate>.{request,*.score.md,arbitration.md,handoff.json}`）是 **裸 `Write`/`Read` 文件**，schema 自定义、**不含** CLI flow-state handoff 的 `node_id/employee/status/summary` 必填键。原文档让 caller 用 CLI `handoff-read` 取回函 verdict——真走会 `FlowStateError: missing required key 'node_id'`。统一改成 **caller/reviewer 用普通 `Read` 取**，CLI `handoff-write/read` 只服务 intra-flow(a) / P-B 跨员工(b) 两用（生产方持 `node_id` 的 flow-owner 节点）。
+- **契约注落地**：`kdev-flow-driver/references/node-agent-routing.md`「reviewer 发函 dispatch」段加「一机三用」对照表 + 禁用 `kdev_core handoff-read` 读裸文件；`reviewer-orchestrator.md` / `gate-decision-logic.md` / `SKILL.md` / `dev-engineer-orchestrator.md` 措辞统一为 `Read`；reviewer 接入 spec §5 流程图勘误 + 决策说明落 `docs/superpowers/reviews/2026-06-14-Q候选2-reviewer-handoff契约-决策.md`。
+- **修悬空指令（G 候选 3）**：`reviewer-orchestrator.md` 原「两能力相反结论 → 在 caller `events.jsonl` 留痕」无落地通道（callee 不碰 kdev-core 状态机、core 无 anomaly 事件类型）。改为异常落 `<gate>.arbitration.md` + 回函新增 `anomaly?` 结构化字段，**由 caller 决定**是否转 kdev-core 事件。
+- **测试**：`tests/test_reviewer_wiring.py` +6（裸回函喂 CLI reader 必 `FlowStateError` 钉死契约方向 / 文档不得指令 CLI 读裸文件 / 契约注存在 / G 候选 3 anomaly 通道）。kdev-core **零改**。
+
 ## 0.8.0 — 第 4 个数字员工：测试工程师 test-engineer + 评审专家测试维度补齐
 
 - **test-engineer（flow-owner，多 flow）**：staff.yml `node_tables`(test-design-flow ⊥ test-exec-flow) + `default_flow`；4 agent（orchestrator + 测试点设计/用例渲染/UI自动化，call kdev-test-points/cases/ui-autotest）。

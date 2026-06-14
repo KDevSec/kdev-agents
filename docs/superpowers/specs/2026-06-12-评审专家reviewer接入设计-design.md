@@ -8,7 +8,7 @@
 | 范围 | 把第 4 个员工**评审专家**从 sketch（搬 X3 的 checklist + 冲突仲裁）补到**实施级接入设计**：① 形态=canonical callee 员工 ② 本期实现「有 caller gate」的 6 评审能力子集 ③ 兑现 dev-engineer 3 deferred + req-architect 3 self gate 翻 reviewer-expert ④ 定位 = **项目产物评审单 mode**（记忆 Step 深度他评已由 [Q-017](../../../.kdev/memory/决策日志.md) 移交蒸馏 audit stage，**非评审专家职责**）⑤ 发函边界硬规。**defer**：核心 10 余 4（需求方向/迭代拆分/测试设计/测试执行）随 caller 员工建成补 · 扩展 6 默认关|
 | 承 | [Q-011 阶段2 接入打法](../../../.kdev/memory/决策日志.md) · **[Q-016 本设计拍板](../../../.kdev/memory/决策日志.md)** · **[Q-017](../../../.kdev/memory/决策日志.md)**（修订 Q-016 fork-2：摘 mode-2，记忆 Step 他评移交蒸馏管道质量闸）· [Q-015 P-C1b 三层他评](../../../.kdev/memory/决策日志.md)（层1 基线 recorder / 层2 蒸馏闸）|
 | 配套 | [概念模型与员工能力 合稿 v1.0 §8/§9/§12](../../framework/01-design/2026-06-10-02-KDev数字员工-概念模型与员工能力-合稿-v1.0.md) · [编排底座 合稿 v1.0 §2.1/§2.5/R3](../../framework/01-design/2026-06-10-03-KDev数字员工-编排底座-合稿-v1.0.md) · [记忆底座 合稿 v1.0 §5.2](../../framework/01-design/2026-06-10-05-KDev数字员工-记忆底座-合稿-v1.0.md) · [roadmap §6/§1.5.7/§1.5.8](../../framework/01-design/2026-06-06-01-数字员工整体设计路线图roadmap-v1.0.md) · [阶段2 接入设计 §0.5](./2026-06-07-阶段2-第二员工+记忆scope-design.md) |
-| 复用 | 阶段1/2 已验证：kdev-core 底座(R1/R2/R3 + record-gate) · B 轨 handoff 协议（request/handoff json + run_in_background + handoff-read）· 通用 kdev-flow-driver（**仅 caller 复用，reviewer 自身不复用**）· canonical 员工形态（staff.yml + agents + standards） |
+| 复用 | 阶段1/2 已验证：kdev-core 底座(R1/R2/R3 + record-gate) · B 轨**派单形态**（request/handoff json 文件 + run_in_background；但 reviewer 文件族走**裸 `Write`/`Read`**，非 CLI `handoff-write/read`——见 §5 契约勘误）· 通用 kdev-flow-driver（**仅 caller 复用，reviewer 自身不复用**）· canonical 员工形态（staff.yml + agents + standards） |
 | X3 参考 | spike `/home/lyadmin/Projects/kdev-agents-x3/plugins/kdev-cluster-x3/`：12 评审节点 · 10 评审员 checklist · 冲突仲裁 SOP（搬范式，**不照抄二元 1-FAIL=总 FAIL**，用合稿百分制双重条件）|
 
 ---
@@ -215,17 +215,19 @@ caller 编排（产物 COMPLETE，到 review gate，merged config reviewer=revie
       caller:<员工id>, diff_range?, transcript_ref?}
  ② 发函 dispatch kdev-team:reviewer-orchestrator（run_in_background:true，B 轨）
  ──────────────────────── reviewer-orchestrator ────────────────────────
- ③ handoff-read request → 并行 fan-out 对应 kdev-team:reviewer-<cap>
+ ③ Read request（裸文件，非 CLI handoff-read）→ 并行 fan-out 对应 kdev-team:reviewer-<cap>
      每 cap: Read 产物 + standards + recall(/staff/reviewer, subject:review:<cap>)
              → 出百分制评分表（§4.2）
  ④ 收齐评分表 → inline 仲裁冲突（§6）→ 双重条件聚合 gate verdict
- ⑤ 写结果 → handoffs/reviewer/<gate>.handoff.json
-     {verdict:PASS|FAIL, scores:[refs], counts:{🔴,🟡,⚪}, revisions:[分级建议], 仲裁:[...], by:reviewer-expert}
+ ⑤ 裸 Write 结果 → handoffs/reviewer/<gate>.handoff.json
+     {verdict:PASS|FAIL, scores:[refs], counts:{🔴,🟡,⚪}, revisions:[分级建议], 仲裁:[...], anomaly?, by:reviewer-expert}
  ────────────────────────────────────────────────────────────────────────
- caller（completion 通知）⑥ handoff-read →
+ caller（completion 通知）⑥ 普通 Read 取 verdict（裸文件，非 CLI handoff-read）→
      python3 -m kdev_core record-gate <flow> <slug> --gate g-xxx --kind review
        --verdict PASS|FAIL --request-id <node> --by reviewer-expert --table <caller node-table>
 ```
+
+> 🔴 **契约勘误（2026-06-14，Q 候选 2）**：reviewer 回函/请求/评分/仲裁文件整族是 **裸 `Write`/`Read` 文件**，schema 自定义、**不含** CLI flow-state handoff 的 `node_id/employee/status/summary` 必填键——故 caller/reviewer 用普通 `Read` 取，**绝不可走 `kdev_core handoff-read`**（会 `FlowStateError`）。CLI `handoff-write/read` 仅服务 intra-flow / P-B 两用（生产方持 `node_id` 的 flow-owner 节点）。原 §5 流程图把读取写成 CLI `handoff-read` 是契约混用，已勘误。决策详见 `docs/superpowers/reviews/2026-06-14-Q候选2-reviewer-handoff契约-决策.md`，契约注落 `kdev-flow-driver/references/node-agent-routing.md`「reviewer 发函 dispatch」段，`tests/test_reviewer_wiring.py` 钉死。
 
 **caller 侧改写（设计层，不实施）**：
 

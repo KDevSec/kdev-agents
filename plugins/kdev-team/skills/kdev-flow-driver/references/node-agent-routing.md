@@ -160,7 +160,7 @@ Agent({subagent_type: "kdev-team:reviewer-orchestrator"})  ✅
 
 ## 派单方式：后台 + 文件交接（B 轨）
 
-`run_in_background: true`。caller 编排在 review gate **先写 request 文件**，再 dispatch，靠 completion 通知 + handoff-read 拿 verdict，**不读 subagent 内联返回**（同业务派单 B 轨）。
+`run_in_background: true`。caller 编排在 review gate **先写 request 文件**，再 dispatch，靠 completion 通知 + 普通 `Read` 拿 verdict，**不读 subagent 内联返回**（同业务派单 B 轨）。
 
 ## caller→reviewer 上下文构造（request schema）
 
@@ -181,14 +181,30 @@ caller 编排到 review gate 时，写 `<workspace>/.kdev/features/<slug>/handof
 
 **产物落位**：reviewer 全部产物落 `handoffs/reviewer/`——request（`<gate>.request.json`）、各 cap 评分表（`<gate>.<cap>.score.md`）、仲裁（`<gate>.arbitration.md`）、回函 verdict（`<gate>.handoff.json`）。与 caller 自己的 `handoffs/<员工>/` 平级，不混。
 
+## 🔴 契约注：`handoffs/reviewer/` 是裸文件交接，不是 CLI flow-state handoff
+
+handoff 机制现"一机三用"，**前两用走 CLI、第三用走裸文件，schema 不同物**：
+
+| 用法 | 生产方 | 机制 | schema |
+|---|---|---|---|
+| (a) 同流主循环↔业务 agent | flow-owner 节点（持 `node_id`）| CLI `handoff-write/read` | `node_id/employee/status/summary[…]` |
+| (b) P-B 跨员工交付 | flow-owner n8-merge（持 `node_id`）| CLI `handoff-write/read` | 同上 |
+| (c) reviewer 发函回函 | **无 flow-state 的 callee** | **裸 `Write`/`Read`** | `{verdict, scores, counts, revisions, 仲裁, anomaly?, by, request_id}` |
+
+因此对 reviewer 本族文件（`<gate>.request.json` / `.<cap>.score.md` / `.arbitration.md` / `.handoff.json`）：
+
+- caller 与 reviewer 一律用普通 `Read`（json 解析）取字段；**绝不可用 `kdev_core handoff-read` 读本族文件**——它缺 `node_id/employee/status/summary`，CLI reader 会 `FlowStateError: missing required key 'node_id'`。
+- CLI `handoff-write/read` 只服务 (a)/(b)——生产方是持 `node_id` 的 flow-owner 节点，schema 对得上；reviewer 无 flow-state，故走裸文件，与 CLI 机制**平级而不同物**（不是漏写键，是另一种东西）。
+- 这条契约由 `tests/test_reviewer_wiring.py` 钉死（裸回函喂 CLI reader 必失败 + 文档不得指令 CLI 读裸文件）。
+
 ## 发函 → 回收 6 步（caller 视角）
 
 1. 写 `handoffs/reviewer/<gate>.request.json`（上面 schema）。
 2. `Agent({subagent_type: "kdev-team:reviewer-orchestrator", run_in_background: true, ...})`，prompt 指向 request 文件 + slug + workspace。
-3.（reviewer-orchestrator handoff-read request → fan-out cap → 评分表 → 仲裁 → 聚合 verdict → 写 `<gate>.handoff.json`）。
+3.（reviewer-orchestrator 普通 `Read` request → fan-out cap → 评分表 → 仲裁 → 聚合 verdict → 裸 `Write` `<gate>.handoff.json`）。
 4. caller 收 completion 通知。
-5. `handoff-read` 取 `<gate>.handoff.json` 的 `verdict / counts / revisions / 仲裁`。
-6. `python3 -m kdev_core record-gate <flow> <slug> --gate <gate> --kind review --verdict <V> --request-id <node> --by reviewer-expert --table <caller node-table>`。FAIL 时按 caller 回流规则重做 action 节点（见 `gate-decision-logic.md`）。
+5. 普通 `Read` `<gate>.handoff.json` 取 `verdict / counts / revisions / 仲裁 / anomaly?`（裸文件交接，不走 CLI handoff reader——见上「契约注」）。
+6. `python3 -m kdev_core record-gate <flow> <slug> --gate <gate> --kind review --verdict <V> --request-id <node> --by reviewer-expert --table <caller node-table>`。FAIL 时按 caller 回流规则重做 action 节点（见 `gate-decision-logic.md`）；回函若含 `anomaly`，caller 自行决定是否在自己的 `events.jsonl` 记一条事件（callee 不碰）。
 
 > **L1 回退**：L1 flow-config `reviewer: self` 时**不发函**，按本 gate 的 self 判据自评 record-gate（env 受限/省 token 逃生门）。per-gate reviewer 的 engine 级 config-merge 待后续 plan，本期 L0 node-table `reviewer` 字段生效。
 

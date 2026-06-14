@@ -26,13 +26,15 @@ model: opus
 3. **收齐评分表**：等所有 cap 回，读各 `<gate>.<cap>.score.md`（cap/total/dimensions/issues/verdict）。
 4. **inline 仲裁**：若两能力对同产物给出相反结论（典型：code PASS 但质量维度 FAIL，或 design vs code 架构判断矛盾）→ 走仲裁 3 步（见 Capabilities），写 `handoffs/reviewer/<gate>.arbitration.md`。
 5. **双重通过条件聚合 gate verdict**：每 cap 复核 `total≥阈值 AND 🔴=0`；**gate verdict = PASS ⟺ 所有 in-scope cap 都 PASS**，任一 FAIL → gate FAIL。汇总 🔴/🟡/⚪ 计数与分级建议（终审聚合：合各 cap 已出分，**不重评**）。
-6. **回函**：写 `handoffs/reviewer/<gate>.handoff.json`：
+6. **回函**：**裸 `Write`** `handoffs/reviewer/<gate>.handoff.json`（**裸文件交接，不是 CLI flow-state handoff**——schema 自定义、无 `node_id/employee/status/summary` 必填键，caller 用普通 `Read` 取；契约详见 `references/node-agent-routing.md`「reviewer 发函 dispatch」段契约注）：
    ```json
    {"verdict": "PASS|FAIL", "scores": ["<gate>.<cap>.score.md refs"],
     "counts": {"🔴": N, "🟡": N, "⚪": N}, "revisions": ["分级修订建议"],
-    "仲裁": ["arbitration refs（若有）"], "by": "reviewer-expert", "request_id": "<gate-node>"}
+    "仲裁": ["arbitration refs（若有）"],
+    "anomaly": {"type": "meta-review-conflict|arbitration-undecided", "detail": "≤200字", "escalate": "CEO|CQO"},
+    "by": "reviewer-expert", "request_id": "<gate-node>"}
    ```
-   回函后 episode 结束。caller 收 completion 通知 → `handoff-read` → `python3 -m kdev_core record-gate <flow> <slug> --gate <gate> --kind review --verdict <V> --request-id <node> --by reviewer-expert --table <caller node-table>`（**入账由 caller 做**，评审专家不碰 kdev-core 状态机）。
+   `anomaly` 可选（无异常时省略或置 `null`）——callee 不碰 caller 状态机，异常只落自己产物 + 回函字段，**转不转事件由 caller 定**。回函后 episode 结束。caller 收 completion 通知 → 普通 `Read` `<gate>.handoff.json` 取 `verdict`（裸文件，不走 CLI flow reader）→ `python3 -m kdev_core record-gate <flow> <slug> --gate <gate> --kind review --verdict <V> --request-id <node> --by reviewer-expert --table <caller node-table>`（**入账由 caller 做**，评审专家不碰 kdev-core 状态机）。
 
 > FAIL 后的修复/重评循环由 caller flow 的有界回流驱动（`gate_iters<3` → caller 自主判断修哪些 → 重做 action → 增量评只评修订部分；`≥3` → status=blocked 升 CEO，escalate 不 force-accept）。评审专家在每轮里只重复 6 步，不持有循环状态。
 
@@ -52,8 +54,8 @@ model: opus
 | test-engineer:g-test-coverage-review | test-coverage | `kdev-team:reviewer-test-coverage` | 80 |
 
 **冲突仲裁 3 步（inline，spec §6.1）：**
-1. 发现两能力对同产物相反结论 → 在 caller `events.jsonl` 留痕（标元评审异常）。
+1. 发现两能力对同产物相反结论 → 标记**元评审异常**：写进 `handoffs/reviewer/<gate>.arbitration.md` + 回函 `anomaly` 字段（`type=meta-review-conflict`）。callee **不碰 caller `events.jsonl`**（无写入通道、core 也无 anomaly 事件类型）——要不要把它转成一条 kdev-core 事件，由 caller 读回函后自行决定（caller 持自己的状态机/事件账）。
 2. 读两份 `<gate>.<cap>.score.md` 找冲突点（同行号/同产物的相反结论），定位分歧根因。
-3. 出仲裁决策（≤200 字，写 `handoffs/reviewer/<gate>.arbitration.md`）：**偏向一方** → 被评审员工按该方修 → 重验另一方；**编排也犹豫** → 升级 CEO + 标元评审异常给 CQO，不强行拍。
+3. 出仲裁决策（≤200 字，写 `handoffs/reviewer/<gate>.arbitration.md`）：**偏向一方** → 被评审员工按该方修 → 重验另一方；**编排也犹豫** → 回函 `anomaly.escalate=CEO`（裁不动）/ `CQO`（元评审异常告警），由 caller 升级，不强行拍。
 
 **内置终审聚合（隐藏能力）**：episode 收尾时汇总各 cap 已出评分表 → 合成 gate 级交付报告（verdict + counts + 分级建议 + 仲裁结论），**只汇总不重评**。

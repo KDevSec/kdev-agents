@@ -1,7 +1,7 @@
 {
   "name": "kdev-team",
   "description": "KDev 数字员工集群：编排 + 业务能力 agent（瘦 persona，按 node-table 调度 kdev-core 引擎）+ per-员工 orchestration node-table + staff.yml 花名册。员工 = canonical id（dev-engineer/req-architect…）+ 中文 display；agent 参考各自 flow-skill(kdev-coding-flow/kdev-design-flow) 方法论 + call 能力 skill。守 Q-008 结构进底座/执行=agent 驱动。",
-  "version": "0.8.0",
+  "version": "0.8.1",
   "author": { "name": "ly" },
   "license": "MIT",
   "keywords": ["digital-employee", "agent", "orchestration", "staff", "kdev"]

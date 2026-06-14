@@ -17,7 +17,7 @@ kdev-core 引擎能记账（R1/R2/R3），node-table 能定义节点图，agent 
 
 2. **每个节点/gate 必须调 CLI 落账**：kdev-core 引擎是状态的唯一权威。跳过 CLI = 状态漂移 = 下次 resume 出错。这在循环中是自动化完成的，但你要确保不跳过。
 
-3. **第三方评审 gate 已兑现发函评审专家**：reviewer-expert 的 gate（dev: g-plan/code/sec-review；req: g-sr/ar-proto/design-review）**不再 deferred 空过**——到 gate 写 `handoffs/reviewer/<gate>.request.json` → dispatch `kdev-team:reviewer-orchestrator`（run_in_background）→ handoff-read verdict → `record-gate --by reviewer-expert`（6 步见 `references/node-agent-routing.md`「reviewer 发函 dispatch」段 + `references/gate-decision-logic.md`「Reviewer-Expert Gate（已兑现）」）。L1 flow-config `reviewer: self` 时回退自评（逃生门）。
+3. **第三方评审 gate 已兑现发函评审专家**：reviewer-expert 的 gate（dev: g-plan/code/sec-review；req: g-sr/ar-proto/design-review）**不再 deferred 空过**——到 gate 写 `handoffs/reviewer/<gate>.request.json` → dispatch `kdev-team:reviewer-orchestrator`（run_in_background）→ 普通 `Read` `<gate>.handoff.json` 取 verdict（裸文件交接，不走 CLI handoff reader）→ `record-gate --by reviewer-expert`（6 步见 `references/node-agent-routing.md`「reviewer 发函 dispatch」段 + `references/gate-decision-logic.md`「Reviewer-Expert Gate（已兑现）」）。L1 flow-config `reviewer: self` 时回退自评（逃生门）。
 
 4. **回流有界**：verify / e2e / deploy gate FAIL 后回流到 n6b 重做，最多重试 2 次（总共 3 次尝试），第 3 次引擎自动 escalate 为 blocked。blocked 时输出报告停住，不死循环。
 
@@ -251,7 +251,7 @@ python3 -m kdev_core handoff-read coding-flow <slug> --workspace <ws> \
 
 **② 发函 = 结构化请求，非自由对话：**
 - 发函落**结构化 request 文件**（`handoffs/reviewer/<gate>.request.json` 或交付 manifest），字段 = **谁发给谁**（`caller`）+ **评什么/要什么**（`caps` / `target_paths` / `gate_input`）+ **产物指针**（`standards_refs` / `artifacts` / `thresholds`）。**不是**往主会话糊一段自然语言指令。
-- 走 **B 轨**（`run_in_background` + 文件交接），**不读 subagent 内联返回**——执行甩后台、决策留主控（避免结果回灌刷屏，MQ-1）。回函同样落结构化文件（`<gate>.handoff.json` / handoff status），caller `handoff-read` 取字段。
+- 走 **B 轨**（`run_in_background` + 文件交接），**不读 subagent 内联返回**——执行甩后台、决策留主控（避免结果回灌刷屏，MQ-1）。回函同样落结构化文件，但 **reviewer 回函是裸文件交接**（`<gate>.handoff.json`，自定义 schema、无 CLI 必填键）caller 用普通 `Read` 取，**不同于** intra-flow/P-B 业务 agent 的 handoff status（走 CLI flow reader，schema 含 `node_id` 等必填键）——契约见 `references/node-agent-routing.md`「reviewer 发函 dispatch」段。
 
 **③ 边界：评审给建议、caller 自主判断（非硬拦截）：**
 - 评审专家**只产出**评分表 + 🔴/🟡/⚪ 分级**建议** + verdict，**不直接命令** caller 改什么。🟡/⚪ 由 caller 编排 **自主判断**修 or tech-debt 化。
@@ -288,7 +288,7 @@ python3 -m kdev_core record-gate $FLOW <slug> \
 
 1. 写 `<workspace>/.kdev/features/<slug>/handoffs/reviewer/<gate>.request.json`（`{target_paths, caps, standards_refs, thresholds, request_id:<current_node>, caller:<员工id>, diff_range?}`）。
 2. 发函 `kdev-team:reviewer-orchestrator`（后台 B 轨，派单细节见 node-agent-routing.md），prompt 指向 request + slug + workspace。
-3. 收 completion → `handoff-read` 取 `<gate>.handoff.json` 的 `verdict`。
+3. 收 completion → 普通 `Read` `<gate>.handoff.json` 取 `verdict`（裸文件交接，不走 CLI handoff reader；契约见 `references/node-agent-routing.md`「reviewer 发函 dispatch」段）。
 4. 由你（主控）在主循环调 record-gate 入账（verdict 判定不下放，沿用评审专家聚合结论）：
 
 ```bash
