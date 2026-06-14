@@ -455,5 +455,38 @@ class TestEndToEnd(unittest.TestCase):
             self.assertNotIn("lyadmin", full)
 
 
+class TestDistillStatusDefense(unittest.TestCase):
+    def _step_entry(self, status_val):
+        raw = (
+            "## Step z-1: t\n"
+            f"status: {status_val}\n"
+            "about: project\n\n"
+            "### 评分差异分析\n"
+            "- 模型 vs 用户差值：+2\n"
+        )
+        # NOTE: distill.Entry real field names: entry_id, title, date, source_file, raw, fields
+        return distill.Entry(
+            entry_id="Step z-1",
+            title="t",
+            date="2026-06-13",
+            source_file="执行日志.md",
+            raw=raw,
+            fields={"status": status_val, "about": "project"},
+        )
+
+    def test_voided_r_digit_filtered_from_misalignment(self):
+        e = self._step_entry("voided-r-001")
+        self.assertFalse(distill.is_misalignment_step(e))
+
+    def test_non_enum_status_warns_and_stays_in_misalignment(self):
+        import io, contextlib
+        e = self._step_entry("fixed")
+        buf = io.StringIO()
+        with contextlib.redirect_stderr(buf):
+            keep = distill.is_misalignment_step(e)
+        self.assertTrue(keep)                 # fixed 不是 voided- → 不过滤
+        self.assertIn("非枚举", buf.getvalue())
+
+
 if __name__ == "__main__":
     unittest.main()

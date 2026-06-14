@@ -1,5 +1,25 @@
 # kdev-memory CHANGELOG
 
+## [0.18.0] — 2026-06-14
+
+**Schema / 数据完整性整顿：CLAUDE.md 托管块 marker 化 + status 语义去漂移。**
+
+### ✨ 新增
+
+- **`hooks/lib/claude_md_merge.py`** — CLAUDE.md 托管段 marker 化合并：`merge_managed_section()` 幂等 insert-or-replace 三场景（有配对 marker→替换块内正文 / 无 marker 有裸段→retrofit 包住正文不动 / 都没有→末尾追加）；孤儿/逆序 marker 先归一化再合并，杜绝嵌套重复。marker（spec-kit 风格、稳定可正则、含 plugin 标识）：`<!-- BEGIN/END kdev-memory:智能体自动记录规则 ... -->`。
+- **`hooks/lib/status_schema.py`** — status 枚举谓词（`is_known_status` / `is_voided_status`）+ 非枚举告警（`warn_unknown_status`）。status = 评分/销账态 only（open|scored|voided-faded|voided-r-NNN）。
+
+### 🔄 变更
+
+- **`claude_md_lint.extract_kdev_section`** — 优先按 BEGIN/END marker 切块；无 marker / 半残 marker 回退按 `## 智能体自动记录规则` 标题切块（老项目兼容、不报错）。
+- **`step_completeness` / `distill`** — 用 `status_schema.is_voided_status` 替换硬编码 voided 判定；遇非枚举 status（如修复态 `fixed` 误写）告警一行，不静默当未评分。
+- **schema / SKILL / 初始化模板** — 钉死「status=评分/销账态，≠修复态；修复进展写 body「解决」段，不新增 fix_status」（Q `20260614-005123` 决策）；初始化模板段包 marker + 合并策略改 insert-or-replace 三场景；本仓 CLAUDE.md retrofit 包 marker（正文语义不动）。
+
+### 🐛 修复
+
+- **status drift**：清 G-005（fixed）/ G-006（mitigated）/ G-011（处置中）三条踩坑的 status 漂移——status 改回 `scored`，原修复信息移进各自 body「解决/处置进展」段（语义零丢失）。
+- **`step_completeness` voided-r-NNN 字面 bug**：原 `VOIDED_STATUSES={"voided-faded","voided-r-nnn"}` 字面集不匹配真实 `voided-r-003`；改用 `is_voided_status` 正则谓词（`voided-r-<digits>`）。
+
 ## [0.17.0] — 2026-06-13
 
 **P-C2 Phase A：记录 ID 时间戳化（Q-019 / Q-020）。**

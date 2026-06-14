@@ -64,7 +64,10 @@ VOIDED_HEURISTIC_PATTERNS = (
     "不计入差值",
 )
 
-VOIDED_STATUSES = {"voided-faded", "voided-r-nnn"}
+_LIB_DIR = Path(__file__).resolve().parent
+if str(_LIB_DIR) not in sys.path:
+    sys.path.insert(0, str(_LIB_DIR))
+from status_schema import is_voided_status, warn_unknown_status  # noqa: E402
 
 
 def _extract_inline_status(body: str) -> str | None:
@@ -138,8 +141,11 @@ def check_step(step: dict[str, Any], rating_mode: str = "user-required") -> list
     """返回该 Step 的 issues 列表（空表示无半残）。"""
     body = step["body"]
 
-    # v0.7+: status field priority (schema layer)
-    if step.get("status") in VOIDED_STATUSES:
+    # v0.7+/v0.18: status = 评分/销账态。非枚举值（修复态误写）→ 告警，不静默当销账
+    _status = step.get("status")
+    warn_unknown_status(_status, entry_id=step.get("label", "?"))
+    # 销账态（voided-faded / voided-r-<NNN>）跳过欠评扫描
+    if is_voided_status(_status):
         return []
 
     # v0.7+: heuristic voided markers (text layer — compat for historical entries)
