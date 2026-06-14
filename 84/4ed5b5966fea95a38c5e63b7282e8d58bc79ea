@@ -1,0 +1,46 @@
+docs/framework/01-design/2026-06-10-04-KDev数字员工-HUD驾驶舱-kdev-hud-设计-v1.0.md
+  s_6d9b9371174bce::t_0f1b6c916d0c07 89
+  s_6d9b9371174bce::t_095afbee9610dc 58
+  s_6d9b9371174bce::t_f8c149e04292d7 40
+  s_6d9b9371174bce::t_ae69dd495b1389 59
+  s_6d9b9371174bce::t_032aec2f8037c3 88
+plugins/kdev-memory/agents/kdev-step-recorder.md
+  s_6d9b9371174bce::t_518f146a99e98f 35
+docs/superpowers/specs/2026-06-07-阶段2-第二员工+记忆scope-design.md
+  s_6d9b9371174bce::t_36dcbcca905f39 35
+  s_6d9b9371174bce::t_28e13669e26e14 148
+docs/framework/01-design/2026-06-10-05-KDev数字员工-记忆底座-合稿-v1.0.md
+  s_6d9b9371174bce::t_243ebfe1c931de 155
+  s_6d9b9371174bce::t_1ad57d7ce0c0d4 102-106
+  s_6d9b9371174bce::t_2cf47ca7b778ca 119
+  s_6d9b9371174bce::t_d8f0f5327b90f0 144-146,148,150
+  s_6d9b9371174bce::t_40c08750540b4f 167
+  s_6d9b9371174bce::t_b508c6ef1f6f9b 194-195,198-199,201-202
+  s_6d9b9371174bce::t_2ed450643d5ca1 208
+  s_6d9b9371174bce::t_136359d09f5216 23-28
+  s_6d9b9371174bce::t_6cb617fe33bd76 11
+  s_6d9b9371174bce::t_1080b3527c6270 163
+  s_6d9b9371174bce::t_557df03fd5867e 116
+plugins/kdev-memory/hooks/lib/migrate_scope.py
+  s_6d9b9371174bce::t_d5df201de974ed 39-42
+CLAUDE.md
+  s_6d9b9371174bce::t_76b432078d7b8a 43-53
+plugins/kdev-memory/skills/kdev-memory/SKILL.md
+  s_6d9b9371174bce::t_70d9c4f53d7dc9 473-474
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "844ed5b5966fea95a38c5e63b7282e8d58bc79ea",
+  "prompts": {},
+  "sessions": {
+    "s_6d9b9371174bce": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "493381a9-f29b-4d7f-8e38-c8fdc3207aaa",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
