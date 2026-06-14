@@ -1,0 +1,46 @@
+plugins/kdev-team/tests/test_reviewer_wiring.py
+  s_ffd63c56960a6d::t_b85e46c5562040 87,89
+  s_ffd63c56960a6d::t_74236b9990b44b 17-18
+  s_ffd63c56960a6d::t_6703fc271f4ed2 74-77,80
+  s_ffd63c56960a6d::t_01669e721ad8f2 1,4-7,10-16,19,36-73,78-79,81-86,88,90-117
+plugins/kdev-team/.claude-plugin/plugin.json
+  s_ffd63c56960a6d::t_7318f8785f461a 4
+plugins/kdev-team/skills/kdev-flow-driver/references/node-agent-routing.md
+  s_ffd63c56960a6d::t_5a508264584b35 204,206-207
+  s_ffd63c56960a6d::t_c70772e75be203 163
+  s_ffd63c56960a6d::t_f200c0cb31266b 184-199
+plugins/kdev-team/skills/kdev-flow-driver/references/gate-decision-logic.md
+  s_ffd63c56960a6d::t_e6a7da49548c31 132,134-135
+docs/superpowers/specs/2026-06-12-评审专家reviewer接入设计-design.md
+  s_ffd63c56960a6d::t_b74d5241f4240f 11
+  s_ffd63c56960a6d::t_e330aba4b6adfa 218,222-223,225,230
+docs/superpowers/reviews/2026-06-14-Q候选2-reviewer-handoff契约-决策.md
+  s_ffd63c56960a6d::t_be49995b3c0432 1-53
+plugins/kdev-team/agents/reviewer-orchestrator.md
+  s_ffd63c56960a6d::t_0f4f8079108e50 57,59
+  s_ffd63c56960a6d::t_8637fadc1cd8d1 29,33-35,37
+plugins/kdev-team/agents/dev-engineer-orchestrator.md
+  s_ffd63c56960a6d::t_0414932ec451d8 27
+plugins/kdev-team/skills/kdev-flow-driver/SKILL.md
+  s_ffd63c56960a6d::t_23c40c9e6267fa 20
+  s_ffd63c56960a6d::t_ed9c95bfee40da 254
+  s_ffd63c56960a6d::t_98c16a530c72ce 291
+plugins/kdev-team/CHANGELOG.md
+  s_ffd63c56960a6d::t_4b7eeb865fb687 3-9
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.6",
+  "base_commit_sha": "4fea585c975ef52b0f4cda7cabbc757666fd216d",
+  "prompts": {},
+  "sessions": {
+    "s_ffd63c56960a6d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ea2b5e05-2261-44f7-88bc-62ba06baac0d",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
