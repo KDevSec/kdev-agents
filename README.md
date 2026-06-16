@@ -16,6 +16,7 @@ KDev 系列 Claude Code 插件集合 —— 工程记忆、流程辅助、代码
 | [kdev-test-points](plugins/kdev-test-points) | 测试点 / 测试设计文档生成 skill
 | [kdev-test-cases](plugins/kdev-test-cases) | 测试用例生成 skill：根据上游 测试点 .md 生成测试用例
 | [kdev-uicase-to-apicase](plugins/kdev-uicase-to-apicase) | UI→API 测试用例转换 skill：把已有 UI/Playwright 测试用例 .md批量改写为同结构的 API 测试用例 .md
+| [kdev-api-autotest](plugins/kdev-api-autotest) | 通用 API 自动化测试方法论 skill：pytest + HTTP 客户端 写/跑/诚实三分任意 RESTful 后端接口测试。6 工程规范 + 失败三分（framework/script/real-defect）+ 四件产物归档。第零原则：发现 BUG，不是刷通过率
 | [kdev-bugfix](plugins/kdev-bugfix) | Bug 修复 8 步流程 skill + `/kdev-bugfix` 斜杠命令：禅道双源 + OpenSpec 深集成 + 三档评审（AI/multi/human/both，P0/鉴权强制升级 multi）+ `--dry-run` 演练 + 统一三段交付摘要（【根因分析】/【影响范围】/【修复方案】）。8 个 core eval 首跑 8/8 PASS
 
 ## 安装方式
@@ -35,6 +36,7 @@ claude plugin install kdev-ui-autotest@kdev-agents
 claude plugin install kdev-test-points@kdev-agents
 claude plugin install kdev-test-cases@kdev-agents
 claude plugin install kdev-uicase-to-apicase@kdev-agents
+claude plugin install kdev-api-autotest@kdev-agents
 claude plugin install kdev-bugfix@kdev-agents
 ```
 
@@ -63,6 +65,7 @@ Claude Code 对官方 Anthropic marketplace 默认启用 auto-update，但对第
 /plugin update kdev-test-points@kdev-agents
 /plugin update kdev-test-cases@kdev-agents
 /plugin update kdev-uicase-to-apicase@kdev-agents
+/plugin update kdev-api-autotest@kdev-agents
 /plugin update kdev-bugfix@kdev-agents
 ```
 
@@ -186,10 +189,16 @@ kdev-agents/
     │       ├── SKILL.md                  # byte-equality + arithmetic-equality 渲染契约
     │       ├── references/               # output-skeleton / playwright-handoff
     │       └── evals/evals.json
-    └── kdev-uicase-to-apicase/           # UI→API 测试用例转换插件（一份 UI 用例驱动 UI + API 双流水线）
+    ├── kdev-uicase-to-apicase/           # UI→API 测试用例转换插件（一份 UI 用例驱动 UI + API 双流水线）
+    │   ├── .claude-plugin/plugin.json
+    │   └── skills/kdev-uicase-to-apicase/
+    │       └── SKILL.md                  # 7 条转换规则：基本流配套 / 纯前端跳过 / 必测断言 / 等价类回收
+    └── kdev-api-autotest/                # 通用 API 自动化测试方法论插件（pytest + 失败三分 + 四件产物）
         ├── .claude-plugin/plugin.json
-        └── skills/kdev-uicase-to-apicase/
-            └── SKILL.md                  # 7 条转换规则：基本流配套 / 纯前端跳过 / 必测断言 / 等价类回收
+        └── skills/kdev-api-autotest/
+            ├── SKILL.md                  # 6 工程规范 + 失败三分 + 四件产物（第零原则：发现 BUG 非刷通过率）
+            ├── references/               # pytest-toolbox / 断言纪律 / 账号对齐 / 传输层 / 失败三分 / 四件配方
+            └── evals/evals.json          # 3 eval + inputs fixtures
 ```
 
 新增插件：在 `plugins/` 下新建目录 + 在 `marketplace.json` 的 `plugins` 数组里追加条目。

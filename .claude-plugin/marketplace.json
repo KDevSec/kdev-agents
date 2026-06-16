@@ -56,22 +56,28 @@
       "source": "./plugins/kdev-ui-autotest"
     },
     {
-      "name": "kdev-test-points-v1",
-      "description": "测试点 / 测试设计文档生成 skill：基于 ISO/IEC/IEEE 29119-4（EP / BVA / 决策表 / 状态迁移 / pairwise / MC/DC / error guessing）与 GB/T 25000.51 ≡ ISO/IEC 25051（三域覆盖 + 8×31 质量子特性 + 符合/部分符合/不符合 verdict）双标准，从 spec / PRD / API 契约 / RUSP / COTS 源生成可审计测试点。四种模式：feature-spec / feature-spec-lite / api-contract / full-conformity。与 kdev-test-cases-v1 组合取代旧 kdev-test-case",
+      "name": "kdev-test-points",
+      "description": "测试点 / 测试设计文档生成 skill（production-default v2；前身 v1/old 已弃用，仅留迁移兼容）：基于 ISO/IEC/IEEE 29119-4（EP / BVA / 决策表 / 状态迁移 / pairwise / MC/DC / error guessing）与 GB/T 25000.51 ≡ ISO/IEC 25051（三域覆盖 + 8×31 质量子特性 + 符合/部分符合/不符合 verdict）双标准，从 spec / PRD / API 契约 / RUSP / COTS 源生成可审计测试点。四种模式：feature-spec / feature-spec-lite / api-contract / full-conformity。v2 Phase 5 硬规则：AR 前缀与角色从 --input spec grep、输出 AR 数不超 spec 物理 AR 数、输出末尾附「模式与生成元数据」段。与 kdev-test-cases 组合取代旧 kdev-test-case",
       "category": "development",
-      "source": "./plugins/kdev-test-points-v1"
+      "source": "./plugins/kdev-test-points"
     },
     {
-      "name": "kdev-test-cases-v1",
-      "description": "测试用例渲染 skill：把上游 测试点 .md 1:1 渲染成 Playwright 友好的 fielded 测试用例代码块（用例编号 / 名称 / 步骤 / 预期结果 等字段 + UI/API 自动化直通字段）。严格 byte-equality + arithmetic-equality 契约：用例名称逐字符相同、用例编号确定性 TC-AR<8 位>-<3 位>、预期结果同序保留。仅 测试步骤 / 前置条件 / 测试数据 生成式推断。与 kdev-test-points-v1 组合取代旧 kdev-test-case",
+      "name": "kdev-test-cases",
+      "description": "测试用例渲染 skill（production-default v2；前身 v1/old 已弃用，仅留迁移兼容）：把上游 测试点 .md（含 #### 测试范围 N h4 分组）1:1 渲染成 Playwright 友好的 fielded 测试用例代码块（用例编号 / 名称 / 步骤 / 预期结果 等字段 + UI/API 自动化直通字段）。严格 byte-equality + arithmetic-equality 契约：用例名称逐字符相同、用例编号确定性 TC-AR{数字段}-G{N}-{3 位}（G{N} 编码测试范围号）、预期结果同序保留。v2 变更：h4 测试范围分组承载、AR 前缀解锁、AR 编号 spec-verbatim、角色从 spec 取。仅 测试步骤 / 前置条件 / 测试数据 生成式推断。与 kdev-test-points 组合取代旧 kdev-test-case",
       "category": "development",
-      "source": "./plugins/kdev-test-cases-v1"
+      "source": "./plugins/kdev-test-cases"
     },
     {
       "name": "kdev-uicase-to-apicase",
       "description": "UI→API 测试用例转换 skill：把已有的 UI/Playwright 测试用例 .md（标准模板：含【测试用例信息】块、TC-AR{XX}{YYY}{ZZZ}-{NNN} 编号格式）沿 7 条转换规则批量改写为同结构的 API 测试用例 .md，让一份 UI 用例同时驱动 UI 与 API 两条自动化流水线。规则覆盖：基本流配套（规则 1/2）、纯前端跳过（规则 3/4/8）、必测断言（规则 5/6）、等价类回收（规则 7）。作为 spec-to-testcases-pipeline → kdev-api-test-scaffold 之间的桥接环节，与 testcases-to-playwright-pipeline 并行",
       "category": "development",
       "source": "./plugins/kdev-uicase-to-apicase"
+    },
+    {
+      "name": "kdev-api-autotest",
+      "description": "通用 API 自动化测试方法论 skill：用 pytest + HTTP 客户端 写 / 跑 / 诚实三分任意 RESTful 后端的接口自动化测试，与具体后端 / 框架 / 项目无关。固化 6 条工程规范——分层测试代码结构（薄接口封装 → 复合动作 → 参数化数据 → 用例）、正向/异常响应断言纪律、测试账号对齐真实预置、忠实断言不弱绿、传输层治理（登录复用/重试只治连接，不掩盖断言级 flaky）、四件产物归档 + 失败三分（framework / script / real-defect）。第零原则：测试脚本目的是执行测试、发现 BUG，不是生成通过率高的报告——红是产出不是失败。下游消费 kdev-test-cases / kdev-uicase-to-apicase 产出的接口用例 .md（旧称别名 kdev-api-test-scaffold）",
+      "category": "development",
+      "source": "./plugins/kdev-api-autotest"
     },
     {
       "name": "kdev-bugfix",

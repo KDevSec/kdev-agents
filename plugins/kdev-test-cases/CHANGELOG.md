@@ -1,5 +1,31 @@
 # kdev-test-cases CHANGELOG
 
+## [0.2.0] — 2026-06-16
+
+**同步 v2 canonical 渲染器：承载 h4 测试范围分组 + 新增 SOP_测试用例MODv2 资产 + eval 更新。**
+
+### ✨ 新增
+
+- **`assets/SOP_测试用例MODv2.md`** — v2 测试用例渲染 SOP，承载 4 项 v2 传播（h4 测试范围分组 / AR 前缀解锁 / AR 编号 spec-verbatim / 角色解锁）。
+- `references/output-skeleton.md` 扩写以支持 `#### 测试范围 N` h4 分组与 `TC-AR{数字段}-G{N}-{NNN}` 编号（`G{N}` 编码测试范围号）。
+
+### 🔄 变更
+
+- **SKILL.md 升级为 production-default v2**（前身 kdev-test-cases-old / v1 弃用，仅留迁移兼容）：用例编号从 `TC-AR<8 位>-<3 位>` 升级为 `TC-AR{数字段}-G{N}-{NNN}`（承载上游 `#### 测试范围 N` h4 分组）；AR 前缀解锁（不再硬编码 `AR-SATP-`，接受 spec 任意前缀）；AR 编号 spec-verbatim 不造 sub-AR；角色从上游 测试点 .md 取，不再默认「超级管理员」。byte-equality / arithmetic-equality 契约不变。
+- `evals/evals.json` 同步对齐 v2。
+
+### 来源
+
+- 内容同步自 `Functional-Test-Skill/kdev-test-cases`（canonical 源），逐字一致；`references/playwright-handoff.md` 无变化。
+
+## [0.1.1] — 2026-06-16
+
+**marketplace 注册名纠偏：`-v1` 旧名纠正为规范名。**
+
+### 🐛 修复
+
+- **marketplace 注册名/源纠偏**：`kdev-agents/.claude-plugin/marketplace.json` 里本插件条目原登记为 `kdev-test-cases-v1` + `source: ./plugins/kdev-test-cases-v1`（该目录不存在，真目录为 `./plugins/kdev-test-cases`），导致安装命令无法解析、真插件未被注册。现 name / source 纠正为规范名 `kdev-test-cases`，description 去残留 `-v1` 文案；与配套插件 kdev-test-points 同批修复。
+
 ## [0.1.0] — 2026-05-19
 
 **首次发布**：从 `kdev-test-case` 拆分出的纯渲染器——1:1 把上游 测试点 .md 渲染为 Playwright 友好的 fielded 测试用例代码块。

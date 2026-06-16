@@ -1,5 +1,33 @@
 # kdev-test-points CHANGELOG
 
+## [0.2.0] — 2026-06-16
+
+**同步 v2 canonical 测试点引擎：Phase 5 三条硬规则入核心 + 新增 SOP_测试点MODv2 资产 + eval 扩到 5 条。**
+
+### ✨ 新增
+
+- **`assets/SOP_测试点MODv2.md`（431 行）** — v2 测试点设计 SOP，承载 4 项 v2 传播（h4 测试范围分组 / AR 前缀解锁 / AR 编号 spec-verbatim 不造 sub-AR / 角色解锁），作为 SKILL.md 的规则依据资产。
+- **eval `cross-project-vfadmin-spec-no-AR-SATP-pollution`** — 跨项目回归：验证不向 vfadmin spec 注入 `AR-SATP-` 前缀污染。evals 由 4 条增至 5 条。
+
+### 🔄 变更
+
+- **SKILL.md 升级为 production-default v2**（前身 kdev-test-points-old / v1 弃用，仅留迁移兼容）。Phase 5 三条硬规则入核心：① AR-编号 prefix 与 role term 一律从 `--input` spec grep，缺失即停下来要 `--ar-prefix` / `--role` override，不再从 example / MOD / 默认值取；② R-NEW51 输出 AR 数不得超过 spec 物理 AR 数（`grep -cE '^# 需求 AR-|^### AR-'`），禁止从 preamble / 原型 JS / 推断 BR 编号 / 对称权限点补 AR；③ deliverable-hygiene / 命名 / dual-lane（标题写内容不写操作、边界须 UI+API 双验、评审过程不留痕进产物）。每次输出末尾新增「模式与生成元数据」段供审计追溯。
+- **eval 重命名对齐 v2 语义**：`spec-with-sp15-template`→`spec-with-kdev-mod-example-v2`、`spec-default-format`→`spec-no-example-must-stop-and-ask`、`small-api-contract`→`small-api-contract-no-project-anchors`、`rejects-testpoints-input`→`rejects-testpoints-input-unchanged-from-v1`。
+- 触发关键词扩充（AR-count gate 组 + deliverable-hygiene 组，KDevSec 2026-06）。
+
+### 来源
+
+- 内容同步自 `Functional-Test-Skill/kdev-test-points`（canonical 源），逐字一致；`references/*` 四文件无变化。
+
+## [0.1.1] — 2026-06-16
+
+**marketplace 注册名纠偏：`-v1` 旧名纠正为规范名，安装命令恢复可解析。**
+
+### 🐛 修复
+
+- **marketplace 注册名/源纠偏**：`kdev-agents/.claude-plugin/marketplace.json` 里本插件条目原登记为 `kdev-test-points-v1` + `source: ./plugins/kdev-test-points-v1`（该目录不存在，真目录为 `./plugins/kdev-test-points`），导致 README 文档化的安装命令 `claude plugin install kdev-test-points@kdev-agents` 无法解析、真插件未被注册。现 name / source 纠正为规范名 `kdev-test-points` 并指向真实目录；配套插件 `kdev-test-cases` 同症一并修复。
+- **description 残留 `-v1` 文案清理**：marketplace 两条 description 中 `与 kdev-test-cases-v1 组合` / `与 kdev-test-points-v1 组合` 的 `-v1` 后缀去除，与规范名对齐。
+
 ## [0.1.0] — 2026-05-19
 
 **首次发布**：从 `kdev-test-case` 拆分出的测试设计引擎——judgment-heavy upstream half，基于 ISO/IEC/IEEE 29119-4 × GB/T 25000.51 双标准，从 spec / PRD / API 契约 / RUSP / COTS 源生成可审计测试点。

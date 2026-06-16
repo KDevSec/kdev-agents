@@ -1,0 +1,10 @@
+{
+  "name": "kdev-api-autotest",
+  "description": "通用 API 自动化测试方法论 skill：用 pytest + HTTP 客户端 写 / 跑 / 诚实三分任意 RESTful 后端的接口自动化测试，与具体后端 / 框架 / 项目无关。固化 6 条工程规范——分层测试代码结构（薄接口封装 → 复合动作 → 参数化数据 → 用例）、正向/异常响应断言纪律、测试账号对齐真实预置、忠实断言不弱绿、传输层治理（登录复用/重试只治连接，不掩盖断言级 flaky）、四件产物归档 + 失败三分（framework / script / real-defect）。第零原则：测试脚本目的是执行测试、发现 BUG，不是生成通过率高的报告——红是产出不是失败。下游消费 kdev-test-cases / kdev-uicase-to-apicase 产出的接口用例 .md（旧称别名 kdev-api-test-scaffold）",
+  "version": "0.1.0",
+  "author": {
+    "name": "ly"
+  },
+  "license": "MIT",
+  "keywords": ["api-testing", "pytest", "rest-api", "test-automation", "failure-triage", "evidence-archive", "kdev"]
+}
