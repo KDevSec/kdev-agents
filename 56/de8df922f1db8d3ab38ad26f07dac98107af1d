@@ -1,0 +1,90 @@
+plugins/kdev-test-cases/skills/kdev-test-cases/evals/evals.json
+  s_16790a2fc31c2e::t_e3258d2e8c5ba2 6-8,13-15,20-22,27-43
+plugins/kdev-test-cases/skills/kdev-test-cases/assets/SOP_测试用例MODv2.md
+  s_16790a2fc31c2e::t_e3258d2e8c5ba2 1-337
+plugins/kdev-test-cases/skills/kdev-test-cases/references/output-skeleton.md
+  s_16790a2fc31c2e::t_e3258d2e8c5ba2 1,5-14,17,21-22,24,28-30,40,42,46-50,56,63,66,68-69,73-77,80,87,90,92,94-98,100,103,106-108,110-183,188-189,194-195,200-207,212-215,223-226
+plugins/kdev-test-cases/skills/kdev-test-cases/SKILL.md
+  s_16790a2fc31c2e::t_e3258d2e8c5ba2 3,7,9,11,13-21,27,31-36,38-39,47,49,53-55,57,59,63,65,68,73-77,79-88,96-98,100,103,106-111,113,115-120,122-139,144-148,151-152,155,165,170,175-180,182,184,186,199-205,207,213-214,216-225,227,229,231,233-234,238-242,253,258-267,269,278-279,289,292-295,302-314,318-327,329-330,332,334-335,337,339-343,347-352,358-364,366
+plugins/kdev-test-points/README.md
+  s_16790a2fc31c2e::t_afdaef24641943 113
+  s_16790a2fc31c2e::t_7f9c5d449215dd 111-112
+plugins/kdev-api-autotest/skills/kdev-api-autotest/references/positive-negative-assertions.md
+  s_16790a2fc31c2e::t_46bff578b351f3 1-63
+plugins/kdev-test-points/CHANGELOG.md
+  s_16790a2fc31c2e::t_ac382ca7b83cd8 3-21
+  s_16790a2fc31c2e::t_7bac724c2d89e3 22-30
+plugins/kdev-api-autotest/skills/kdev-api-autotest/references/infra-standards.md
+  s_16790a2fc31c2e::t_46bff578b351f3 1-50
+plugins/kdev-api-autotest/.claude-plugin/plugin.json
+  s_16790a2fc31c2e::t_0b6e7971a9ba52 1-10
+plugins/kdev-test-cases/CHANGELOG.md
+  s_16790a2fc31c2e::t_3807ed1da5d9ca 3-28
+plugins/kdev-api-autotest/skills/kdev-api-autotest/references/failure-triage.md
+  s_16790a2fc31c2e::t_46bff578b351f3 1-50
+plugins/kdev-api-autotest/skills/kdev-api-autotest/evals/inputs/failing_skips.txt
+  s_16790a2fc31c2e::t_46bff578b351f3 1-16
+plugins/kdev-api-autotest/skills/kdev-api-autotest/SKILL.md
+  s_16790a2fc31c2e::t_46bff578b351f3 1-210
+plugins/kdev-test-points/skills/kdev-test-points/evals/evals.json
+  s_16790a2fc31c2e::t_0c1828f3889db0 3,7-9,14-16,21,23,28-36
+plugins/kdev-test-points/skills/kdev-test-points/SKILL.md
+  s_16790a2fc31c2e::t_0c1828f3889db0 3,26-27,31,35,39,41,43,45,47-49,62-64,68-73,87,91,96,100,102-103,111-130,132-136,138-139,141-145,212,216,222,224-225,230,234-243,254,262,264-267,269-274,280,282,287-288,296,303-313,321
+plugins/kdev-api-autotest/skills/kdev-api-autotest/evals/inputs/provision_snippet.py
+  s_16790a2fc31c2e::t_46bff578b351f3 1-20
+.claude-plugin/marketplace.json
+  s_16790a2fc31c2e::t_faaf06a697c267 62
+  s_16790a2fc31c2e::t_5c9b63791c82b7 65
+  s_16790a2fc31c2e::t_e3258d2e8c5ba2 60,66
+  s_16790a2fc31c2e::t_5d510716da07e1 68
+  s_16790a2fc31c2e::t_0f783aade0621e 77-81
+  s_16790a2fc31c2e::t_6ff56e4d2fe3f9 59
+plugins/kdev-test-points/skills/kdev-test-points/assets/SOP_测试点MODv2.md
+  s_16790a2fc31c2e::t_0c1828f3889db0 1-431
+plugins/kdev-test-cases/README.md
+  s_16790a2fc31c2e::t_b8ef761d4f43f0 99-101
+plugins/kdev-api-autotest/skills/kdev-api-autotest/references/pytest-toolbox.md
+  s_16790a2fc31c2e::t_46bff578b351f3 1-106
+plugins/kdev-api-autotest/skills/kdev-api-autotest/evals/inputs/failing_output.txt
+  s_16790a2fc31c2e::t_46bff578b351f3 1-27
+plugins/kdev-api-autotest/CHANGELOG.md
+  s_16790a2fc31c2e::t_b8c51696d558d4 1-32
+plugins/kdev-api-autotest/skills/kdev-api-autotest/evals/inputs/widget_api_cases.md
+  s_16790a2fc31c2e::t_46bff578b351f3 1-11
+plugins/kdev-api-autotest/skills/kdev-api-autotest/references/four-piece-recipe.md
+  s_16790a2fc31c2e::t_46bff578b351f3 1-105
+plugins/kdev-test-points/.claude-plugin/plugin.json
+  s_16790a2fc31c2e::t_e3258d2e8c5ba2 3
+  s_16790a2fc31c2e::t_15695d4be15a99 4
+plugins/kdev-api-autotest/skills/kdev-api-autotest/evals/evals.json
+  s_16790a2fc31c2e::t_46bff578b351f3 1-26
+README.md
+  s_16790a2fc31c2e::t_3119e09f6d7bcd 19
+  s_16790a2fc31c2e::t_1850e357d4dcaa 39
+  s_16790a2fc31c2e::t_53f31b72773927 68
+  s_16790a2fc31c2e::t_482f841337f0b9 192-196,198-201
+plugins/kdev-api-autotest/skills/kdev-api-autotest/references/datascope-account-alignment.md
+  s_16790a2fc31c2e::t_46bff578b351f3 1-63
+plugins/kdev-api-autotest/skills/kdev-api-autotest/evals/inputs/openapi_snippet.json
+  s_16790a2fc31c2e::t_46bff578b351f3 1-36
+plugins/kdev-api-autotest/README.md
+  s_16790a2fc31c2e::t_dc1dbad2b89077 1-84
+plugins/kdev-test-cases/.claude-plugin/plugin.json
+  s_16790a2fc31c2e::t_e3258d2e8c5ba2 3-4
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.7",
+  "base_commit_sha": "56de8df922f1db8d3ab38ad26f07dac98107af1d",
+  "prompts": {},
+  "sessions": {
+    "s_16790a2fc31c2e": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "5d32b7fd-0111-4971-ac6b-a7e2a54ffb05",
+        "model": "unknown"
+      },
+      "human_author": "doudoudou-dou <82752251@qq.com>"
+    }
+  }
+}
