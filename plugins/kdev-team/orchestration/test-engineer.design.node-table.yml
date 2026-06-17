@@ -5,6 +5,7 @@
 # 与 dev-engineer 并行独立、流程不延续（不同人不同活）。无 env、无码，永远可跑。
 # kind=action|gate|terminal；gate 节点带 gate id 指向 gate_specs。复用通用 kdev-flow-driver + kdev-core（零改）。
 flow: test-design-flow
+delivery_node: n3-merge      # 交付节点（flow-driver §2.4ter handoff-write 落点）；lint 解析 handoff 目标据此
 max_retries: 3
 terminal_fail: n-fail
 nodes:

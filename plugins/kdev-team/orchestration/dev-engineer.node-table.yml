@@ -10,6 +10,7 @@
 # 增量数 N 在 n3-plan 定死（按"可独立 e2e"切），循环不能边跑边加。详见
 # skills/kdev-flow-driver/references/gate-decision-logic.md 的 g-increment 判据。
 flow: coding-flow
+delivery_node: n11-merge     # 交付节点（flow-driver §2.4ter handoff-write 落点）；lint 解析 handoff 目标据此
 max_retries: 3
 terminal_fail: n-fail
 nodes:

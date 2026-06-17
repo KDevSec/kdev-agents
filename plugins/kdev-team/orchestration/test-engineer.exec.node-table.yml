@@ -4,6 +4,7 @@
 # API 扩展点：将来 kdev-api-autotest 建成，在 n0-ui-auto 与 n1-coverage-review 间插 n?-api-auto 节点。
 # kind=action|gate|terminal；gate 节点带 gate id 指向 gate_specs。复用通用 kdev-flow-driver + kdev-core（零改）。
 flow: test-exec-flow
+delivery_node: n2-report     # 交付节点（flow-driver §2.4ter handoff-write 落点）；lint 解析 handoff 目标据此
 max_retries: 3
 terminal_fail: n-fail
 nodes:

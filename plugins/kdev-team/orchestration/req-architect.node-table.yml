@@ -17,6 +17,7 @@
 # 跨员工交付（P-B）：n8-merge 收尾落 handoff（handoff-write --employee req-architect --node n8-merge），
 #   下游 dev-engineer coding-flow 同 slug handoff-read 当 spec/plan 输入。契约见 kdev-flow-driver SKILL §2.4ter。
 flow: design-flow
+delivery_node: n8-merge      # 交付节点（flow-driver §2.4ter handoff-write 落点）；lint 解析 handoff 目标据此
 max_retries: 3
 terminal_fail: n-fail
 nodes:
