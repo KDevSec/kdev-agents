@@ -51,3 +51,37 @@ def test_render_screen_low_confidence_forces_second_confirm():
     plan["runner_up"] = {"template_id": "design+build", "why_not": "x"}
     s = confirm.render_screen(plan)
     assert "禁" in s or "二次确认" in s      # 禁一键 Enter 提示
+
+
+import pytest
+
+
+def test_drop_stage_sets_on_false():
+    plan = dp.parse(GOOD)
+    out = confirm.apply_edit(plan, "d 3")
+    assert out["stages"][2]["on"] is False
+    assert plan["stages"][2]["on"] is True      # 原 plan 不被改
+
+
+def test_review_override_edit():
+    out = confirm.apply_edit(dp.parse(GOOD), "r dev-engineer g-sec-review=self")
+    assert out["review_overrides"]["dev-engineer"]["g-sec-review"] == "self"
+
+
+def test_add_and_remove_human_gate():
+    out = confirm.apply_edit(dp.parse(GOOD), "g +after-test")
+    assert "after-test" in out["human_gates"]
+    out2 = confirm.apply_edit(out, "g -after-req")
+    assert "after-req" not in out2["human_gates"]
+
+
+def test_swap_template_and_slug():
+    out = confirm.apply_edit(dp.parse(GOOD), "t design+build")
+    assert out["template_id"] == "design+build"
+    out2 = confirm.apply_edit(out, "s my-feature")
+    assert out2["slug"] == "my-feature"
+
+
+def test_unknown_command_raises():
+    with pytest.raises(confirm.EditError):
+        confirm.apply_edit(dp.parse(GOOD), "frobnicate 7")
