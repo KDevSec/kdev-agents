@@ -1,0 +1,22 @@
+plugins/kdev-team/kdev_team/delivery_plan.py
+  s_8d0a90e28c8eec::t_fa88a0a56f88a2 15-22,27-28
+  s_8d0a90e28c8eec::t_457b3c9b7576ab 1-14,23-26,29-71
+plugins/kdev-team/tests/test_router_delivery_plan.py
+  s_8d0a90e28c8eec::t_86324a374143fc 1-54
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.8",
+  "base_commit_sha": "09fabdb9fffc644bce795823e0a32153eee96400",
+  "prompts": {},
+  "sessions": {
+    "s_8d0a90e28c8eec": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "222d14f6-0b3d-40bd-83e3-4247f6083074",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
