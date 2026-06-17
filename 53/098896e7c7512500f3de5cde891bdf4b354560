@@ -1,0 +1,19 @@
+plugins/kdev-team/skills/kdev-team/SKILL.md
+  s_8d0a90e28c8eec::t_5cf80531b90774 163
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.8",
+  "base_commit_sha": "53098896e7c7512500f3de5cde891bdf4b354560",
+  "prompts": {},
+  "sessions": {
+    "s_8d0a90e28c8eec": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "222d14f6-0b3d-40bd-83e3-4247f6083074",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
