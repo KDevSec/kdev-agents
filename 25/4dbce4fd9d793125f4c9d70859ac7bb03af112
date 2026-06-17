@@ -1,0 +1,26 @@
+docs/superpowers/specs/2026-06-16-img-to-pptx-design.md
+  s_9bf526d8053703::t_7dbd4b855600b1 96-98
+  s_9bf526d8053703::t_61d5171783b214 30,32,35-45,48-51
+  s_9bf526d8053703::t_6c38f06f2c84ad 10
+  s_9bf526d8053703::t_827a1fe685f8e5 105-106
+  s_9bf526d8053703::t_74a33167450e82 53,55-57
+  s_9bf526d8053703::t_141369de429871 79,81-85
+  s_9bf526d8053703::t_c21bc469be0e3d 20-21
+  s_9bf526d8053703::t_589797e0d24589 64
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.7",
+  "base_commit_sha": "254dbce4fd9d793125f4c9d70859ac7bb03af112",
+  "prompts": {},
+  "sessions": {
+    "s_9bf526d8053703": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "e16f695b-689d-4db8-a15f-8fdf09680998",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
