@@ -55,6 +55,54 @@ border-radius:6px;padding:4px 9px;margin:3px 5px 3px 0;font-size:11px;background
 """
 
 
+_EMP_DISPLAY = {"req-architect": "需求架构师", "dev-engineer": "开发工程师",
+                "test-engineer": "测试工程师"}
+
+
+def _render_delivery(primary):
+    """有 delivery 时渲染三块：交付链进度 + 派单流 + 员工忙闲；无 delivery 返回 ""（向后兼容）。
+
+    全字符串字段 escape()；数值字段（done_count/stage_index/tokens...）由 datasource 保证为
+    int/None，原样插值（None 仅 str() 后展示，不参与 HTML 结构注入）。
+    """
+    d = primary.get("delivery")
+    if not d:
+        return ""
+    # ① 交付链进度条：各 stage 圈选，已完成（i < done_count）标 pass
+    steps = "".join(
+        f'<span class="gate {"pass" if i < d["done_count"] else ""}">'
+        f'{i+1}. {escape(_EMP_DISPLAY.get(s["emp"], s["emp"]))}</span>'
+        for i, s in enumerate(d["stages"])
+    )
+    # ② 派单流：每 dispatch 一行 + 紧随的折叠详情面板（:target 驱动，见 Task 4.4）
+    disp_rows = ""
+    for dv in primary.get("dispatches", []):
+        emp = escape(_EMP_DISPLAY.get(dv["emp"], dv["emp"] or "?"))
+        st = "进行中" if dv["running"] else escape(str(dv["status"]))
+        usage = (f' · {dv["subagent_tokens"]} tok' if dv.get("subagent_tokens") else "")
+        usage += (f' · {dv["tool_uses"]} tools' if dv.get("tool_uses") else "")
+        usage += (f' · {dv["duration_s"]}s' if dv.get("duration_s") else "")
+        dot = '<i style="color:var(--green)">●</i> ' if dv["running"] else ""
+        disp_rows += (
+            f'<div class="story"><span>{dot}{emp} · {escape(dv["flow"] or "")}</span>'
+            f'<span class="muted">{st}{usage}</span></div>'
+        )
+    # ③ 员工忙闲条：busy → fail 红框
+    busy_rows = "".join(
+        f'<span class="gate {"fail" if a["busy"] else ""}">'
+        f'{escape(_EMP_DISPLAY.get(a["emp"], a["emp"]))}：{"忙" if a["busy"] else "闲"}</span>'
+        for a in primary.get("employee_activity", [])
+    )
+    return (
+        f'<div class="sec"><div class="sh t">🧭 交付链 · {escape(str(d["template_id"]))} '
+        f'（{escape(str(d["progress_label"]))}）</div><div class="sb">{steps}</div></div>'
+        f'<div class="sec"><div class="sh">📡 派单流</div><div class="sb">'
+        f'{disp_rows or "<span class=muted>暂无派单</span>"}</div></div>'
+        f'<div class="sec"><div class="sh">👤 员工忙闲</div><div class="sb">'
+        f'{busy_rows or "<span class=muted>暂无员工活动</span>"}</div></div>'
+    )
+
+
 def _story_cls(status):
     return {"done": "st-done", "in_progress": "st-prog"}.get(status, "st-pend")
 
@@ -141,7 +189,8 @@ def render(model, *, generated_at):
             act += f' · <span style="color:var(--red)">{escape(active["blocked_reason"])}</span>'
     else:
         act = '<span class="muted">无在跑棒次</span>'
-    act += '<div class="note">注：员工级派单/忙闲事件待 P-B handoff 落地，当前仅显示单棒控制态。</div>'
+    if not primary.get("delivery"):
+        act += '<div class="note">注：本需求非 CEO 编排链，仅显示单棒控制态。</div>'
 
     if primary.get("gates"):
         gate_html = "".join(
@@ -189,6 +238,7 @@ def render(model, *, generated_at):
         f'<div class="sec"><div class="sh t">📋 用户故事完成度（{done}/{total} · {pct}%）</div>'
         f'<div class="sb">{story_rows}</div></div>'
         f'<div class="sec"><div class="sh">👥 当前活动</div><div class="sb">{act}</div></div>'
+        f'{_render_delivery(primary)}'
         f'<div class="sec"><div class="sh y">🔍 评审流水（PASS/FAIL · 无 score）</div>'
         f'<div class="sb">{gate_html}</div></div>'
         f'<div class="sec"><div class="sh r">🛡️ 待处理告警</div><div class="sb">{alert_html}</div></div>'
