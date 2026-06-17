@@ -1,5 +1,12 @@
 # Changelog — kdev-hud
 
+## 0.2.0 — 2026-06-18
+- 派单可视化：datasource 读 `delivery-plan.yml`（guarded yaml）+ dispatch 事件配对派生。
+- dashboard 渲染交付链进度（链进度 i/N）/ 派单流 / 员工忙闲。
+- 自包含 `hud.html` `:target` 折叠钻入面板（location.hash 扛 2s 自动刷新，零外链）。
+
+> G-004：本次改了 plugin version/skill/command/agent，用户需刷 marketplace（/plugin 更新或重装）+ 重启 session 才生效。
+
 ## 0.1.0 — 2026-06-12
 - 首版：第 4 plugin「观测层」，纯只读消费 kdev-core feature-first 账本。
 - 通道① 命令行状态栏（单行 ANSI，字段映射真实数据）。

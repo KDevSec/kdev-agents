@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.9.0 — 编排路由器（CEO 总编排）MVP：kdev_team python 包 + `/kdev-team` skill（plan/confirm/drive 三段）
+
+- 新增 `kdev_team` python 包（lifecycle / roster / delivery_plan / lint / confirm / drive）+ `lifecycles/full-delivery.yml` 模板。
+- `/kdev-team` skill & command：plan/confirm/drive 三段式——plan 读 delivery-plan.yml + lint 校验；confirm 等用户确认节点清单；drive 按链序 dispatch 各节点编排 agent。
+- `node-table` 加 `delivery_node` 字段：编排路由器据此识别节点在交付链中的位置。
+- MVP 仅兑现 full-delivery 一模板；两笔诚实债（评审开关 per-gate 自动化未建；链级进度无断点续跑、不达 L3）见 SKILL.md §5。
+
+> G-004：本次改了 plugin version/skill/command/agent，用户需刷 marketplace（/plugin 更新或重装）+ 重启 session 才生效。
+
 ## 0.8.1 — reviewer 回函契约收口：裸文件交接 ≠ CLI flow-state handoff（Q 候选 2 + G 候选 3）
 
 - 🔴 **修契约混用（Q 候选 2）**：reviewer 发函回函文件族（`handoffs/reviewer/<gate>.{request,*.score.md,arbitration.md,handoff.json}`）是 **裸 `Write`/`Read` 文件**，schema 自定义、**不含** CLI flow-state handoff 的 `node_id/employee/status/summary` 必填键。原文档让 caller 用 CLI `handoff-read` 取回函 verdict——真走会 `FlowStateError: missing required key 'node_id'`。统一改成 **caller/reviewer 用普通 `Read` 取**，CLI `handoff-write/read` 只服务 intra-flow(a) / P-B 跨员工(b) 两用（生产方持 `node_id` 的 flow-owner 节点）。

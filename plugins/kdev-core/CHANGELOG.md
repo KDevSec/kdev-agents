@@ -2,6 +2,16 @@
 
 本插件遵循 [语义化版本](https://semver.org/lang/zh-CN/)。
 
+## 0.4.0 — 2026-06-18
+
+**编排路由器 MVP（CEO 总编排）：events.jsonl 新增 `dispatch` 事件类型（派单/回填）**
+
+- `dispatch_event` builder：`start` 派单（记录 slug/run/node/subagent_type/prompt_tokens）+ `done` 回填（可空 usage：subagent_tokens/tool_uses/duration_s），append-only 写 events.jsonl。
+- CLI 新增 `dispatch-start` / `dispatch-done`：业务方写入口（dispatch-start 返回 event_id 供 done 回填配对）。
+- 服务 kdev-team CEO 总编排派单场景；R2/R3 纯函数零改。
+
+> G-004：本次改了 plugin version/skill/command/agent，用户需刷 marketplace（/plugin 更新或重装）+ 重启 session 才生效。
+
 ## 0.3.0 — 2026-06-12
 
 **B 轨文件交接协议：交接状态读写（落 handoff_dir 旁，承 test_handoffs.py「协议留 P-B」预留）**
