@@ -52,3 +52,23 @@ def test_write_read_roundtrip_creates_dir(tmp_path):
 
 def test_read_missing_returns_none(tmp_path):
     assert dp.read(str(tmp_path), "nope") is None
+
+
+def test_read_normalizes_bare_on_key(tmp_path):
+    # Write raw YAML with bare `on:` key (YAML 1.1 parses it as boolean True)
+    raw = """\
+template_id: full-delivery
+slug: bare-on-test
+goal: "test bare on"
+confidence: 0.9
+stages:
+  - emp: req-architect
+    flow: design-flow
+    on: true
+"""
+    p = dp.path(str(tmp_path), "bare-on-test")
+    p.parent.mkdir(parents=True, exist_ok=True)
+    p.write_text(raw, encoding="utf-8")
+    plan = dp.read(str(tmp_path), "bare-on-test")
+    assert plan["stages"][0].get("on") is True
+    assert True not in plan["stages"][0]

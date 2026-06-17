@@ -52,3 +52,13 @@ def test_dispatch_cmds_are_cli_argv_lists():
     assert s0["dispatch_start_cmd"][0] == "dispatch-start"
     assert "--dispatch-id" in s0["dispatch_start_cmd"]
     assert s0["dispatch_done_cmd"][0] == "dispatch-done"
+
+
+def test_dispatch_start_cmd_includes_handoff_from_when_set():
+    seq = drive.build_sequence(dp.parse(GOOD))
+    # stage 1 (index 0): handoff_from=null → no --handoff-from flag
+    assert "--handoff-from" not in seq[0]["dispatch_start_cmd"]
+    # stage 2 (index 1): handoff_from=req-architect@n8-merge → flag present
+    assert "--handoff-from" in seq[1]["dispatch_start_cmd"]
+    hf_idx = seq[1]["dispatch_start_cmd"].index("--handoff-from")
+    assert seq[1]["dispatch_start_cmd"][hf_idx + 1] == "req-architect@n8-merge"

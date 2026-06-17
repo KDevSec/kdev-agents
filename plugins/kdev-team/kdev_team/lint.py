@@ -23,7 +23,7 @@ def validate(plan, staff=None) -> list:
     on_stages = [s for s in plan["stages"] if s.get("on")]
     seen_emps = []   # 按顺序的 on:true emp，用于 handoff 前向引用校验
 
-    for i, s in enumerate(on_stages):
+    for s in on_stages:
         emp, flow = s.get("emp"), s.get("flow")
         # 2. emp flow-owner + flow 合法
         if not roster.is_flow_owner(emp, staff):

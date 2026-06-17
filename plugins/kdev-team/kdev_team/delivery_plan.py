@@ -66,6 +66,9 @@ def read(workspace, slug):
     if not p.exists():
         return None
     try:
-        return yaml.safe_load(p.read_text(encoding="utf-8"))
+        plan = yaml.safe_load(p.read_text(encoding="utf-8"))
+        if isinstance(plan, dict) and isinstance(plan.get("stages"), list):
+            plan["stages"] = [_normalize_stage(s) for s in plan["stages"]]
+        return plan
     except (yaml.YAMLError, OSError):
         return None

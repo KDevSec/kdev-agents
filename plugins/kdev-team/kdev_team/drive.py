@@ -15,6 +15,10 @@ def build_sequence(plan) -> list:
         emp, flow = s["emp"], s["flow"]
         did = f"{slug}#{i}-{emp}"
         gate = _HUMAN_GATE.get(emp)
+        start_cmd = ["dispatch-start", flow, slug, "--emp", emp,
+                     "--dispatch-id", did, "--stage-index", str(i)]
+        if s.get("handoff_from"):
+            start_cmd += ["--handoff-from", s["handoff_from"]]
         out.append({
             "stage_index": i,
             "emp": emp,
@@ -22,9 +26,7 @@ def build_sequence(plan) -> list:
             "dispatch_id": did,
             "handoff_from": s.get("handoff_from"),
             "driver_cmd": f"/kdev-flow-driver {emp} --task {slug} --slug {slug}",
-            "dispatch_start_cmd": [
-                "dispatch-start", flow, slug, "--emp", emp,
-                "--dispatch-id", did, "--stage-index", str(i)],
+            "dispatch_start_cmd": start_cmd,
             "dispatch_done_cmd": [
                 "dispatch-done", flow, slug, "--emp", emp,
                 "--dispatch-id", did, "--status", "done"],
