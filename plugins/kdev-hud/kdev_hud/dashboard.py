@@ -52,6 +52,10 @@ border-radius:6px;padding:4px 9px;margin:3px 5px 3px 0;font-size:11px;background
 .muted{color:var(--mut)}
 .qrow{display:flex;justify-content:space-between;padding:3px 0;border-bottom:1px solid rgba(255,255,255,.05)}
 .note{font-size:10px;color:var(--mut);font-style:italic;margin-top:4px}
+.hud-panel{display:none;border:1px dashed var(--line);border-radius:6px;
+margin:4px 0 8px;padding:8px 10px;font-size:11px;color:var(--mut);background:#0e1d31}
+.hud-panel:target{display:block}
+.drill{color:var(--blue);text-decoration:none;font-size:10px;margin-left:6px}
 """
 
 
@@ -74,7 +78,9 @@ def _render_delivery(primary):
         f'{i+1}. {escape(_EMP_DISPLAY.get(s["emp"], s["emp"]))}</span>'
         for i, s in enumerate(d["stages"])
     )
-    # ② 派单流：每 dispatch 一行 + 紧随的折叠详情面板（:target 驱动，见 Task 4.4）
+    # stage_index → handoff_from 映射（panel 钻入展示链上游交接点）
+    stages = d.get("stages") or []
+    # ② 派单流：每 dispatch 一行 + 紧随的折叠详情面板（纯 CSS :target 驱动，零 JS 事件绑定）
     disp_rows = ""
     for dv in primary.get("dispatches", []):
         emp = escape(_EMP_DISPLAY.get(dv["emp"], dv["emp"] or "?"))
@@ -83,9 +89,24 @@ def _render_delivery(primary):
         usage += (f' · {dv["tool_uses"]} tools' if dv.get("tool_uses") else "")
         usage += (f' · {dv["duration_s"]}s' if dv.get("duration_s") else "")
         dot = '<i style="color:var(--green)">●</i> ' if dv["running"] else ""
+        # DOM-safe 锚 id：dispatch_id 替换 # / : → -（避免破坏 href/id 语法）
+        pid = "d-" + (dv["dispatch_id"] or "x").replace("#", "-").replace(":", "-")
+        si = dv.get("stage_index")
+        # 该 dispatch 对应 stage 的 handoff_from（stage_index 1-based）
+        handoff = ""
+        if isinstance(si, int) and 1 <= si <= len(stages):
+            handoff = stages[si - 1].get("handoff_from") or ""
         disp_rows += (
-            f'<div class="story"><span>{dot}{emp} · {escape(dv["flow"] or "")}</span>'
+            f'<div class="story"><span>{dot}{emp} · {escape(dv["flow"] or "")}'
+            f'<a class="drill" href="#{escape(pid)}">详情▾</a></span>'
             f'<span class="muted">{st}{usage}</span></div>'
+            f'<div class="hud-panel" id="{escape(pid)}">'
+            f'派单 {escape(str(dv.get("dispatch_id") or ""))} · 阶段 {dv.get("stage_index")}<br>'
+            f'状态 {st} · tokens {dv.get("subagent_tokens")} · tools {dv.get("tool_uses")}'
+            f' · {dv.get("duration_s")}s<br>'
+            f'handoff {escape(str(handoff)) or "—"}<br>'
+            f'起 {escape(str(dv.get("started_at")))} · 止 {escape(str(dv.get("done_at")))}'
+            f'</div>'
         )
     # ③ 员工忙闲条：busy → fail 红框
     busy_rows = "".join(
@@ -139,7 +160,10 @@ def _page(generated_at, inner):
         "<!DOCTYPE html><html lang=\"zh-CN\"><head><meta charset=\"UTF-8\">"
         "<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">"
         f"<title>KDev HUD 驾驶舱</title>"
-        f"<script>setTimeout(function(){{location.reload();}},{_RELOAD_MS});</script>"
+        f"<script>setTimeout(function(){{"
+        f"var h=location.hash;location.reload();"
+        f"if(h){{location.hash=h;}}"
+        f"}},{_RELOAD_MS});</script>"
         f"<style>{_CSS}</style></head><body><div class=\"wrap\">"
         "<div class=\"bar\"><span class=\"brand\">🏢 KDev 实时驾驶舱</span>"
         f"<span class=\"gen\">生成 {escape(generated_at)}</span>"
