@@ -1,0 +1,22 @@
+docs/framework/01-design/2026-06-06-01-数字员工整体设计路线图roadmap-v1.0.md
+  s_6d9b9371174bce::t_b579615e06d8c2 196
+  s_6d9b9371174bce::t_a64d9e2ba1a123 145-146
+  s_6d9b9371174bce::t_110403c33b5cad 204-205
+  s_6d9b9371174bce::t_5a25cda79850cd 139
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.7",
+  "base_commit_sha": "97fb4073aac94636541a9ab23e29c6c68995b34a",
+  "prompts": {},
+  "sessions": {
+    "s_6d9b9371174bce": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "493381a9-f29b-4d7f-8e38-c8fdc3207aaa",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
