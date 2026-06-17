@@ -160,7 +160,7 @@ steps = drive.build_sequence(plan)   # list[step]
 本 MVP 是 **L2→L3 human-in-loop 编排，不是自主 L3**。两笔账要对用户讲明白：
 
 🔻 **诚实债 1：评审开关 per-gate 自动化引擎未建。**
-确认屏上的 per-gate 专家/自评只是**意图展示**——没有 per-gate flow-config merge 引擎把"这一 gate 走专家、那一 gate 走自评"自动喂进各 flow-driver。当前评审开关只能：① 用 `/kdev-flow-driver` 的 `--review-mode {ai,both,human}` 三档做**段级**粗调；② per-gate 的细粒度切换靠**手改对应员工的 node-table**。**不要宣称 per-gate 评审自动化已工作。**
+确认屏上的 per-gate 专家/自评只是**意图展示**——没有 per-gate flow-config merge 引擎把"这一 gate 走专家、那一 gate 走自评"自动喂进各 flow-driver。当前评审开关只能：① 用 **flow 初始化**时的 `--review-mode {ai,both,human}` 三档做**段级**粗调——这是 **kdev_core** CLI 的 flag（`python3 -m kdev_core init <flow> <slug> --review-mode {ai,both,human}` 或 `start-run` 同名参数），`/kdev-flow-driver` **自身不暴露该 flag**（它只接 `--task/--auto/--slug`）；② per-gate 的细粒度切换靠**手改对应员工的 node-table** 的 `gate_specs.reviewer` 字段。**不要宣称 per-gate 评审自动化已工作。**
 
 🔻 **诚实债 2：链级进度无断点续跑，崩了不可恢复。**
 跨员工的链级状态（跑到第几 step、哪些段已完成）**只活在主会话内存里**——没有 `delivery-resume` cursor、没有链级断点续跑。主会话崩溃 / 换 session → 链级进度**不可恢复**（已落盘的 delivery-plan.yml 和 events.jsonl 还在，但要人工判断从哪段重起）。**因此本 MVP 不得宣称达 L3**（L3 要求无人值守可恢复的自主编排，本 MVP 不具备）。
