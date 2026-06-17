@@ -1,0 +1,27 @@
+plugins/kdev-team/tests/test_router_delivery_plan.py
+  s_8d0a90e28c8eec::t_ef3b3807a2229a 55-74
+plugins/kdev-team/kdev_team/lint.py
+  s_8d0a90e28c8eec::t_58d0697f1ad102 26
+plugins/kdev-team/kdev_team/drive.py
+  s_8d0a90e28c8eec::t_39c3cdc0fe3c0a 18-21,29
+plugins/kdev-team/kdev_team/delivery_plan.py
+  s_8d0a90e28c8eec::t_5adc2f7562e5b5 69-72
+plugins/kdev-team/tests/test_router_drive.py
+  s_8d0a90e28c8eec::t_b659cccbb1e4b6 55-64
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.8",
+  "base_commit_sha": "f7a7c144251fcf01f0de95067569fe3208ecb667",
+  "prompts": {},
+  "sessions": {
+    "s_8d0a90e28c8eec": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "222d14f6-0b3d-40bd-83e3-4247f6083074",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
