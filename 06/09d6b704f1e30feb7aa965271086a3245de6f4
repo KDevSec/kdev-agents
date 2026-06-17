@@ -1,0 +1,19 @@
+docs/superpowers/plans/2026-06-17-编排路由器MVP-tdd实施.md
+  s_8d0a90e28c8eec::t_2310ea5deb36d1 1-2239
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.8",
+  "base_commit_sha": "0609d6b704f1e30feb7aa965271086a3245de6f4",
+  "prompts": {},
+  "sessions": {
+    "s_8d0a90e28c8eec": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "222d14f6-0b3d-40bd-83e3-4247f6083074",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
