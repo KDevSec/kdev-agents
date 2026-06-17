@@ -6,6 +6,11 @@
 import json
 from pathlib import Path
 
+try:
+    import yaml as _yaml
+except ImportError:        # HUD 自包含：缺 PyYAML 不崩，delivery-plan 视为缺失
+    _yaml = None
+
 
 def _features_dir(workspace) -> Path:
     return Path(workspace) / ".kdev" / "features"
@@ -57,6 +62,66 @@ def list_feature_slugs(workspace):
         if (sub / "flow-state.json").exists():
             out.append(sub.name)
     return out
+
+
+# ---------------------------------------------------------------------------
+# Task 4.1: delivery-plan 读取 + dispatch 事件派生
+# ---------------------------------------------------------------------------
+
+def _normalize_stage_on(stage):
+    """YAML 1.1 把裸 `on:` 键解析成布尔 True（kdev-team 写盘会加引号、但手写/兼容旧文件可能裸写）；
+    防御性归一：把 True 键搬回字符串 "on"，使 stage.get("on") 稳定可用。"""
+    if isinstance(stage, dict) and True in stage and "on" not in stage:
+        stage = dict(stage)
+        stage["on"] = stage.pop(True)
+    return stage
+
+
+def read_delivery_plan(workspace, slug):
+    """读 features/<slug>/delivery-plan.yml → dict；缺 yaml/缺文件/坏 → None。"""
+    if _yaml is None:
+        return None
+    path = _feature_dir(workspace, slug) / "delivery-plan.yml"
+    if not path.exists():
+        return None
+    try:
+        plan = _yaml.safe_load(path.read_text(encoding="utf-8"))
+    except (_yaml.YAMLError, OSError):
+        return None
+    if isinstance(plan, dict) and isinstance(plan.get("stages"), list):
+        plan["stages"] = [_normalize_stage_on(s) for s in plan["stages"]]
+    return plan
+
+
+def _dispatch_views(events):
+    """dispatch 事件按 dispatch_id 配对 start↔done → 渲染用摘要。"""
+    by_id = {}
+    order = []
+    for e in events:
+        if e.get("type") != "dispatch":
+            continue
+        did = e.get("dispatch_id")
+        if did not in by_id:
+            by_id[did] = {
+                "dispatch_id": did, "emp": e.get("emp"), "flow": e.get("flow"),
+                "stage_index": e.get("stage_index"), "status": "running",
+                "started_at": None, "done_at": None, "running": True,
+                "subagent_tokens": None, "tool_uses": None, "duration_s": None,
+            }
+            order.append(did)
+        v = by_id[did]
+        if e.get("phase") == "start":
+            v["started_at"] = e.get("ts")
+            if e.get("stage_index") is not None:
+                v["stage_index"] = e.get("stage_index")
+        elif e.get("phase") == "done":
+            v["done_at"] = e.get("ts")
+            v["status"] = e.get("status") or "done"
+            v["running"] = False
+            for k in ("subagent_tokens", "tool_uses", "duration_s"):
+                if e.get(k) is not None:
+                    v[k] = e.get(k)
+    return [by_id[d] for d in order]
 
 
 # ---------------------------------------------------------------------------
