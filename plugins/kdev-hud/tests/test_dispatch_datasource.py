@@ -62,3 +62,56 @@ def test_read_delivery_plan_normalizes_bare_on_key(tmp_path):
     plan = datasource.read_delivery_plan(str(tmp_path), "s")
     assert plan["stages"][0].get("on") is True   # 归一后 stage.get("on") 稳定
     assert True not in plan["stages"][0]          # 布尔 True 键已被搬走
+
+
+import json
+
+
+def _seed(tmp_path, plan_yaml, events):
+    d = tmp_path / ".kdev" / "features" / "auth"
+    d.mkdir(parents=True)
+    (d / "flow-state.json").write_text(json.dumps({"slug": "auth", "stories": []}),
+                                       encoding="utf-8")
+    (d / "delivery-plan.yml").write_text(plan_yaml, encoding="utf-8")
+    with (d / "events.jsonl").open("w", encoding="utf-8") as f:
+        for e in events:
+            f.write(json.dumps(e) + "\n")
+    return str(tmp_path)
+
+
+PLAN = ("template_id: full-delivery\nslug: auth\ngoal: g\nstages:\n"
+        "  - {emp: req-architect, flow: design-flow, on: true, handoff_from: null}\n"
+        "  - {emp: dev-engineer, flow: coding-flow, on: true, handoff_from: req-architect@n8-merge}\n"
+        "  - {emp: test-engineer, flow: test-design-flow, on: true, handoff_from: req-architect@n8-merge}\n")
+
+
+def test_feature_view_has_delivery_progress(tmp_path):
+    ws = _seed(tmp_path, PLAN, [
+        _ev(phase="start", emp="req-architect", dispatch_id="auth#1-req-architect", stage_index=1, slug="auth"),
+        _ev(phase="done", status="done", emp="req-architect", dispatch_id="auth#1-req-architect", slug="auth"),
+        _ev(phase="start", emp="dev-engineer", flow="coding-flow", dispatch_id="auth#2-dev-engineer", stage_index=2, slug="auth"),
+    ])
+    v = datasource.build_feature_view(ws, "auth")
+    assert v["delivery"]["total_on"] == 3
+    assert v["delivery"]["done_count"] == 1
+    assert v["delivery"]["progress_label"] == "链进度 1/3"
+    assert len(v["dispatches"]) == 2
+
+
+def test_employee_activity_marks_running_busy(tmp_path):
+    ws = _seed(tmp_path, PLAN, [
+        _ev(phase="start", emp="dev-engineer", flow="coding-flow", dispatch_id="auth#2-dev-engineer", stage_index=2, slug="auth"),
+    ])
+    v = datasource.build_feature_view(ws, "auth")
+    busy = {a["emp"]: a["busy"] for a in v["employee_activity"]}
+    assert busy.get("dev-engineer") is True
+
+
+def test_feature_view_no_delivery_plan_is_none(tmp_path):
+    d = tmp_path / ".kdev" / "features" / "bare"
+    d.mkdir(parents=True)
+    (d / "flow-state.json").write_text(json.dumps({"slug": "bare", "stories": []}),
+                                       encoding="utf-8")
+    v = datasource.build_feature_view(str(tmp_path), "bare")
+    assert v["delivery"] is None
+    assert v["dispatches"] == []

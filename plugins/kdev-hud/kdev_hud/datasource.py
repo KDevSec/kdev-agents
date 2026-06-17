@@ -187,6 +187,27 @@ def build_feature_view(workspace, slug):
     active_view = _active_view(doc)
     gate_views = _gate_views(events)
     alerts = _alerts(active_view, gate_views)
+    # —— 派单/链进度派生（dispatch 事件 + delivery-plan）——
+    dispatches = _dispatch_views(events)
+    plan = read_delivery_plan(workspace, slug)
+    if plan:
+        on_stages = [s for s in (plan.get("stages") or []) if s.get("on")]
+        done_count = sum(1 for dv in dispatches if dv["status"] == "done")
+        delivery = {
+            "template_id": plan.get("template_id"),
+            "slug": plan.get("slug", slug),
+            "goal": plan.get("goal"),
+            "stages": on_stages,
+            "total_on": len(on_stages),
+            "done_count": done_count,
+            "progress_label": f"链进度 {done_count}/{len(on_stages)}",
+        }
+    else:
+        delivery = None
+    employee_activity = [
+        {"emp": dv["emp"], "busy": dv["running"], "dispatch_id": dv["dispatch_id"]}
+        for dv in dispatches
+    ]
     return {
         "slug": doc.get("slug", slug),
         "display_name": doc.get("display_name") or slug,
@@ -199,6 +220,9 @@ def build_feature_view(workspace, slug):
         "alerts": alerts, "alert_count": len(alerts),
         "events": events,             # 原始 tail，渲染层自行截断
         "updated_at": doc.get("updated_at"),
+        "delivery": delivery,
+        "dispatches": dispatches,
+        "employee_activity": employee_activity,
     }
 
 
