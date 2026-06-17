@@ -1,3 +1,6 @@
+import json
+
+from kdev_core import cli
 from kdev_core import events
 
 
@@ -53,3 +56,24 @@ def test_dispatch_events_roundtrip_via_append_read(tmp_path):
     assert [g["phase"] for g in got] == ["start", "done"]
     assert all(g["type"] == "dispatch" for g in got)
     assert got[0]["dispatch_id"] == got[1]["dispatch_id"]
+
+
+def test_cli_dispatch_start_then_done_writes_two_events(tmp_path, capsys):
+    ws = str(tmp_path)
+    rc = cli.main(["dispatch-start", "design-flow", "auth",
+                   "--emp", "req-architect", "--dispatch-id", "auth#1-req-architect",
+                   "--stage-index", "1", "--workspace", ws])
+    assert rc == 0
+    out_start = json.loads(capsys.readouterr().out)
+    assert out_start["phase"] == "start" and out_start["emp"] == "req-architect"
+
+    rc = cli.main(["dispatch-done", "design-flow", "auth",
+                   "--emp", "req-architect", "--dispatch-id", "auth#1-req-architect",
+                   "--status", "done", "--subagent-tokens", "999", "--workspace", ws])
+    assert rc == 0
+    out_done = json.loads(capsys.readouterr().out)
+    assert out_done["phase"] == "done" and out_done["status"] == "done"
+    assert out_done["subagent_tokens"] == 999
+
+    evs = events.read_events(ws, "auth")
+    assert [e["phase"] for e in evs] == ["start", "done"]

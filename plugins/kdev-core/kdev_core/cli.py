@@ -144,6 +144,29 @@ def cmd_events(args):
     return 0
 
 
+def cmd_dispatch_start(args):
+    from kdev_core import events
+    e = events.dispatch_event(
+        phase="start", slug=args.slug, flow=args.flow, emp=args.emp,
+        dispatch_id=args.dispatch_id, stage_index=args.stage_index,
+        handoff_from=args.handoff_from)
+    events.append_event(args.workspace, args.slug, e)
+    print(json.dumps(e, ensure_ascii=False, indent=2))
+    return 0
+
+
+def cmd_dispatch_done(args):
+    from kdev_core import events
+    e = events.dispatch_event(
+        phase="done", slug=args.slug, flow=args.flow, emp=args.emp,
+        dispatch_id=args.dispatch_id, status=args.status,
+        subagent_tokens=args.subagent_tokens, tool_uses=args.tool_uses,
+        duration_s=args.duration_s)
+    events.append_event(args.workspace, args.slug, e)
+    print(json.dumps(e, ensure_ascii=False, indent=2))
+    return 0
+
+
 def cmd_handoff_path(args):
     p = flow_state.handoff_dir(args.workspace, args.slug, args.employee)
     print(str(p))
@@ -325,6 +348,22 @@ def build_parser():
 
     pev = _common(sub, "events")
     pev.set_defaults(func=cmd_events)
+
+    pds = _common(sub, "dispatch-start")
+    pds.add_argument("--emp", required=True)
+    pds.add_argument("--dispatch-id", required=True, dest="dispatch_id")
+    pds.add_argument("--stage-index", type=int, default=None, dest="stage_index")
+    pds.add_argument("--handoff-from", default=None, dest="handoff_from")
+    pds.set_defaults(func=cmd_dispatch_start)
+
+    pdd = _common(sub, "dispatch-done")
+    pdd.add_argument("--emp", required=True)
+    pdd.add_argument("--dispatch-id", required=True, dest="dispatch_id")
+    pdd.add_argument("--status", default="done", choices=["done", "blocked"])
+    pdd.add_argument("--subagent-tokens", type=int, default=None, dest="subagent_tokens")
+    pdd.add_argument("--tool-uses", type=int, default=None, dest="tool_uses")
+    pdd.add_argument("--duration-s", type=int, default=None, dest="duration_s")
+    pdd.set_defaults(func=cmd_dispatch_done)
 
     php = _common(sub, "handoff-path")
     php.add_argument("--employee", required=True)
