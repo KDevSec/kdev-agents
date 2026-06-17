@@ -4,10 +4,10 @@
 控制态小而热（flow-state.json 的 active{}），流水长而冷（这里）。每行一个 JSON
 对象、append-only、自带 actor + slug/flow/run（去归一化，HUD 扫 events 不用回查）。
 
-两类事件（P-Core-FF 范围）：
+两类事件（P-Core-FF 范围）+ dispatch：
   - transition：R2 流转（来自 phase_history 条目），actor="system"
   - gate：R3 关卡判定（来自 GateResult），actor=GateResult.by
-dispatch（派单）事件留 P-B handoff。
+  - dispatch：CEO 总编排派单/回填（start 派单 + done 回填 usage），actor="ceo"
 """
 import json
 from datetime import datetime, timezone
@@ -85,4 +85,32 @@ def gate_event(*, slug, flow, run, gate_result) -> dict:
         "request_id": gr.get("request_id"),
         "issues": list(gr.get("issues", [])),
         "revisions": list(gr.get("revisions", [])),
+    }
+
+
+def dispatch_event(*, phase, slug, flow, emp, dispatch_id,
+                   stage_index=None, handoff_from=None, status=None,
+                   subagent_tokens=None, tool_uses=None, duration_s=None,
+                   actor="ceo") -> dict:
+    """Build a dispatch event line (CEO 派单/回填).
+
+    phase="start"：派单时写（stage_index / handoff_from）。
+    phase="done"：完成时**追加**回填（status + 可空 usage：subagent_tokens/tool_uses/duration_s）。
+    events.jsonl append-only —— done 不改写 start，靠 dispatch_id 配对。
+    """
+    return {
+        "ts": _now_iso(),
+        "type": "dispatch",
+        "phase": phase,
+        "actor": actor,
+        "slug": slug,
+        "flow": flow,
+        "emp": emp,
+        "dispatch_id": dispatch_id,
+        "stage_index": stage_index,
+        "handoff_from": handoff_from,
+        "status": status,
+        "subagent_tokens": subagent_tokens,
+        "tool_uses": tool_uses,
+        "duration_s": duration_s,
     }
