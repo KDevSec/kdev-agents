@@ -1,0 +1,26 @@
+docs/framework/01-design/2026-06-16-01-数字员工单兵到组织落地规划-v1.0.md
+  s_0bc0fce0df1dab::t_6c02dca227b2c6 5
+  s_0bc0fce0df1dab::t_0b3151ebca2771 1
+  s_0bc0fce0df1dab::t_07bd0b338c14a6 113
+  s_0bc0fce0df1dab::t_99124458e6a919 190,192-231
+  s_0bc0fce0df1dab::t_3aa2c2c48910f5 314-329
+  s_0bc0fce0df1dab::t_3154c1e267d820 6
+  s_0bc0fce0df1dab::t_3b51c757f56a31 126
+  s_0bc0fce0df1dab::t_a8c3e33a8b8414 336
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.7",
+  "base_commit_sha": "36c62c40d8f2b11f94db0b22f66aea16c40563fa",
+  "prompts": {},
+  "sessions": {
+    "s_0bc0fce0df1dab": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "85ad6ec7-943f-477d-90f3-d72c687e4f8b",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
