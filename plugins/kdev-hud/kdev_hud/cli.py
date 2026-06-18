@@ -1,7 +1,8 @@
-"""kdev-hud CLI —— python -m kdev_hud {statusline,render}（纯只读）。
+"""kdev-hud CLI —— python -m kdev_hud {statusline,render,setup}（纯只读 + 一次性安装）。
 
 statusline：输出单行接 Claude Code statusLine（消费并忽略 stdin 的 session JSON）。
 render：读 features/ → 写 <workspace>/.kdev/hud.html（不在 features/ 下，gitignored）。
+setup：把 statusLine 幂等合并进 settings.json（OMC installer 模式）。
 workspace 解析：--workspace > stdin JSON 的 cwd > 当前工作目录。
 """
 import argparse
@@ -10,7 +11,7 @@ import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
-from kdev_hud import datasource, statusline, dashboard
+from kdev_hud import datasource, statusline, dashboard, setup
 
 
 def _consume_stdin():
@@ -80,6 +81,30 @@ def cmd_render(args):
     return 0
 
 
+def cmd_setup(args):
+    scope = "user" if getattr(args, "user", False) else "project"
+    workspace = args.workspace or str(Path.cwd())
+    plugin_root = setup.resolve_plugin_root()
+    command = setup.build_statusline_command(plugin_root)
+    settings_path = setup.resolve_settings_path(scope, workspace)
+    try:
+        result = setup.install_statusline(settings_path, command, force=args.force)
+    except setup.SetupError as e:
+        sys.stderr.write(str(e) + "\n")
+        return 1
+    action = result["action"]
+    path = result["path"]
+    if action == "created":
+        print(f"✅ 已写入 {path}，重载/重启 session 后状态栏生效")
+    elif action == "updated":
+        print(f"✅ 已更新 {path}，重载/重启 session 后状态栏生效")
+    elif action == "skipped_foreign":
+        print(f"未改动：已有他者 statusLine，加 `--force` 覆盖（会先备份 settings.json.bak）")
+    elif action == "forced":
+        print(f"✅ 已强制写入 {path}（原文件已备份至 {result['backup']}），重载/重启 session 后状态栏生效")
+    return 0
+
+
 def build_parser():
     p = argparse.ArgumentParser(prog="kdev-hud", description="KDev HUD 观测层（只读）")
     common = argparse.ArgumentParser(add_help=False)
@@ -91,6 +116,15 @@ def build_parser():
     pr = sub.add_parser("render", parents=[common], help="通道② 生成 hud.html")
     pr.add_argument("--out", help="输出路径，缺省 <workspace>/.kdev/hud.html")
     pr.set_defaults(func=cmd_render)
+    psetup = sub.add_parser("setup", parents=[common], help="把 statusLine 接进 settings.json")
+    scope_group = psetup.add_mutually_exclusive_group()
+    scope_group.add_argument("--user", action="store_true",
+                             help="写入用户级 ~/.claude/settings.json（缺省 project）")
+    scope_group.add_argument("--project", action="store_true",
+                             help="写入项目级 <workspace>/.claude/settings.json（缺省）")
+    psetup.add_argument("--force", action="store_true",
+                        help="覆盖他者 statusLine（先备份 settings.json.bak）")
+    psetup.set_defaults(func=cmd_setup)
     return p
 
 
