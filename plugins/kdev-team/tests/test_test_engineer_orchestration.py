@@ -20,16 +20,11 @@ def test_design_flow_loads_6_nodes():
     assert table["terminal_fail"] == "n-fail"
 
 
-def test_exec_flow_loads_5_nodes():
+def test_exec_flow_loads_6_nodes():
     data, table = _load(EXEC_NT)
     assert data["flow"] == "test-exec-flow"
-    assert len(table["nodes"]) == 6  # updated: n0a-api-auto 加入后从 5 → 6
+    assert len(table["nodes"]) == 6  # n0a-api-auto 加入后从 5 → 6
     assert table["terminal_fail"] == "n-fail"
-
-
-def test_exec_flow_loads_6_nodes_with_api():
-    data, table = _load(EXEC_NT)
-    assert len(table["nodes"]) == 6, "exec-flow 加入 n0a-api-auto 后应有 6 节点"
 
 
 def test_exec_flow_has_api_auto_node():
