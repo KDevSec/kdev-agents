@@ -16,7 +16,31 @@ python3 -m kdev_hud statusline --workspace /path/to/project
 python3 -m kdev_hud render --workspace /path/to/project
 ```
 
-## 接 Claude Code statusLine（settings.json）
+## 一键接入
+
+**首选**：在 Claude Code 主会话中运行 `/kdev-hud-setup`，或直接执行：
+
+```bash
+# 项目级（默认，写 <workspace>/.claude/settings.json）
+python3 -m kdev_hud setup --project
+
+# 用户级（写 ~/.claude/settings.json，全局生效）
+python3 -m kdev_hud setup --user
+
+# 强制覆盖他者 statusLine（先备份 settings.json.bak）
+python3 -m kdev_hud setup --project --force
+```
+
+命令幂等：重跑无副作用；只动 `statusLine` 一键；他者条目默认跳过（`--force` 覆盖并备份）。
+
+写入的命令采用**绝对路径**形式（`__main__.py` 启动时自举父目录到 `sys.path`，绕开 PYTHONPATH / FF-2）：
+```
+python3 "/abs/.../kdev_hud/__main__.py" statusline --workspace ${workspaceFolder}
+```
+
+> **G-004**：改完 settings.json 后，需在 Claude Code 刷新 marketplace（重装/更新插件）并重启 session，新 statusLine 命令才会激活。
+
+## 接 Claude Code statusLine（手动回退方式）
 ```json
 { "statusLine": { "type": "command",
   "command": "python3 -m kdev_hud statusline --workspace ${workspaceFolder}" } }
@@ -42,3 +66,15 @@ python3 -m kdev_hud render --workspace /path/to/project
 cd plugins/kdev-hud && python3 -m pytest tests/ -v
 ```
 fixture 用 kdev_core 真实写 API 生成（防格式漂移，R-009）。
+
+## WP-B（未实现）：statusLine 缓存包装 + 事件刷新
+
+> TODO(WP-B) — 本次 defer，不实现。
+
+**背景**：CC v2.1.x 不会持续重拉 `statusLine`——只有用户与状态栏面板交互时才触发一次轮询。因此当前实现每次都实时计算，但用户几乎看不到变化。
+
+**未来方案**：
+- `statusline` 命令改为**快读缓存**：读 `.kdev/hud/statusline.<session>.txt`，毫秒级返回，避免每次重算。
+- HUD 计算（重开销）由 hook / 后台异步写缓存文件；可复用触发 `hud.html` 重生成的同一信号顺带写缓存。
+- 新增 `--cached` 参数：强制读缓存（跳过实时计算），搭配 `--cached=false` 强制实时。
+- 探索 `refreshInterval`（若 CC 未来支持）定期拉取，保持状态栏准实时。
