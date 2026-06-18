@@ -44,6 +44,7 @@ employees:
       - test-engineer-points
       - test-engineer-cases
       - test-engineer-ui
+      - test-engineer-api
   reviewer:
     display: 评审专家
     kind: callee                              # 被 caller R3 review gate 发函调用，无自有 flow

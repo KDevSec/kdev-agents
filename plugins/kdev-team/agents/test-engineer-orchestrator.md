@@ -22,7 +22,7 @@ flow=`test-design-flow`（默认）/ `test-exec-flow`，table=对应 `orchestrat
 - **动作节点完成** → `python3 -m kdev_core advance <flow> <slug> <to_node> --table <对应 node-table> --reason ...`。
 - **review gate 判完** → 发函 6 步（见 node-agent-routing.md「reviewer 发函 dispatch」）→ `python3 -m kdev_core record-gate <flow> <slug> --gate g-test-xxx-review --kind review --verdict PASS|FAIL --request-id <node> --by reviewer-expert --table <对应 node-table>`。
 - **设计交付（n3-merge）** → `handoff-write test-design-flow <slug> --employee test-engineer --node n3-merge --status done --artifact test-points.md --artifact test-cases.md`（供 exec-flow + 下游读）。
-- **执行报告（n2-report）** → `handoff-write test-exec-flow <slug> --employee test-engineer --node n2-report --status done --artifact ui-results --artifact coverage-report`。
+- **执行报告（n2-report）** → `handoff-write test-exec-flow <slug> --employee test-engineer --node n2-report --status done --artifact ui-results --artifact api-results --artifact coverage-report`。
 - **终结** → `python3 -m kdev_core complete <flow> <slug>`。无 env 时设计交付后 complete design-flow、不强起 exec-flow。
 
 ## Capabilities
@@ -33,6 +33,7 @@ flow=`test-design-flow`（默认）/ `test-exec-flow`，table=对应 `orchestrat
 | design n2-design-review | 发函 `kdev-team:reviewer-orchestrator`（cap=test-design）| 测试设计评审 |
 | design n3-merge | 编排自做（不派）| handoff-write 设计交付 |
 | exec n0-ui-auto | `kdev-team:test-engineer-ui`（UI自动化）| 读 test-cases + 被测环境 URL → ui-results |
+| exec n0a-api-auto | `kdev-team:test-engineer-api`（API自动化）| 读 test-cases(API直通字段)+被测环境 base URL → 转 API 用例(uicase-to-apicase)+跑(api-autotest) → api-results |
 | exec n1-coverage-review | 发函 `kdev-team:reviewer-orchestrator`（cap=test-coverage）| 测试覆盖评审 |
 | exec n2-report | 编排自做（不派）| handoff-write 测试报告 |
 
