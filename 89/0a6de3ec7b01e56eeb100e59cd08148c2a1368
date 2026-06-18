@@ -1,0 +1,19 @@
+plugins/kdev-team/tests/test_test_engineer_orchestration.py
+  s_514813c2541bfb::t_90ea48bfad698d 23,26
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.8",
+  "base_commit_sha": "890a6de3ec7b01e56eeb100e59cd08148c2a1368",
+  "prompts": {},
+  "sessions": {
+    "s_514813c2541bfb": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "975d7c0d-2bec-4835-bad1-4b662472c24e",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
