@@ -99,7 +99,7 @@ def cmd_setup(args):
     elif action == "updated":
         print(f"✅ 已更新 {path}，重载/重启 session 后状态栏生效")
     elif action == "skipped_foreign":
-        print(f"未改动：已有他者 statusLine，加 `--force` 覆盖（会先备份 settings.json.bak）")
+        print("未改动：已有他者 statusLine，加 `--force` 覆盖（会先备份 settings.json.bak）")
     elif action == "forced":
         print(f"✅ 已强制写入 {path}（原文件已备份至 {result['backup']}），重载/重启 session 后状态栏生效")
     return 0

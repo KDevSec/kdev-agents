@@ -101,6 +101,7 @@ def test_install_merges_without_clobber(tmp_path):
     assert data["theme"] == "dark"
     assert data["env"] == {"A": "1"}
     assert "statusLine" in data
+    assert list(data.keys()) == ["theme", "env", "statusLine"]
 
 
 def test_install_bad_json_raises_and_no_write(tmp_path):
