@@ -114,6 +114,7 @@ def test_cap_reviewers_are_read_only():
 TEST_AGENTS = [
     "test-engineer-orchestrator", "test-engineer-points",
     "test-engineer-cases", "test-engineer-ui",
+    "test-engineer-api",
 ]
 
 

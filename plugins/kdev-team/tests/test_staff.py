@@ -70,9 +70,15 @@ def test_test_engineer_entry():
     KT = Path(__file__).resolve().parents[1]
     for path in nt.values():
         assert (KT / path).exists(), f"node_tables 路径不存在: {path}"
-    assert len(emp["agents"]) == 4
+    assert len(emp["agents"]) == 5  # updated: test-engineer-api 加入后从 4 → 5
     for a in emp["agents"]:
         assert (AGENTS / f"{a}.md").exists(), f"花名册引用的 agent 不存在: {a}"
+
+
+def test_test_engineer_agents_include_api():
+    d = yaml.safe_load(STAFF.read_text(encoding="utf-8"))
+    emp = d["employees"]["test-engineer"]
+    assert "test-engineer-api" in emp["agents"], "test-engineer 花名册应含 test-engineer-api"
 
 
 def test_every_flow_owner_has_one_table_kind_callee_has_dispatch():

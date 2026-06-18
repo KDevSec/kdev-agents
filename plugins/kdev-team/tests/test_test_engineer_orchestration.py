@@ -20,11 +20,33 @@ def test_design_flow_loads_6_nodes():
     assert table["terminal_fail"] == "n-fail"
 
 
-def test_exec_flow_loads_5_nodes():
+def test_exec_flow_loads_6_nodes():
     data, table = _load(EXEC_NT)
     assert data["flow"] == "test-exec-flow"
-    assert len(table["nodes"]) == 5
+    assert len(table["nodes"]) == 6  # n0a-api-auto 加入后从 5 → 6
     assert table["terminal_fail"] == "n-fail"
+
+
+def test_exec_flow_has_api_auto_node():
+    data, table = _load(EXEC_NT)
+    assert "n0a-api-auto" in table["nodes"], "exec-flow 应含 n0a-api-auto 节点"
+
+
+def test_api_auto_node_next_is_coverage_review():
+    data, table = _load(EXEC_NT)
+    node = table["nodes"]["n0a-api-auto"]
+    assert node["next"] == ["n1-coverage-review"], "n0a-api-auto 的 next 应为 [n1-coverage-review]"
+
+
+def test_ui_auto_node_next_is_api_auto():
+    data, table = _load(EXEC_NT)
+    node = table["nodes"]["n0-ui-auto"]
+    assert node["next"] == ["n0a-api-auto"], "n0-ui-auto 的 next 应为 [n0a-api-auto]（不再直接到 n1-coverage-review）"
+
+
+def test_delivery_node_still_n2_report():
+    data, _ = _load(EXEC_NT)
+    assert data["delivery_node"] == "n2-report"
 
 
 def test_design_review_gate_reviewer_expert():

@@ -136,7 +136,8 @@ Gate 节点由编排器（你）自行判断，不派业务 agent。具体判据
 | 节点 id | subagent_type | 干什么 | 需传上下文 |
 |---|---|---|---|
 | n0-ui-auto | `kdev-team:test-engineer-ui` | 读 test-cases + 被测环境 URL → Playwright+pytest → ui-results | test-cases.md(handoff-read n3-merge), **被测环境 URL(运行时输入)**, recon/menu_list.md, 产物根 |
-| n2-report | 编排自做（不派）| handoff-write 测试报告(ui-results/覆盖) | — |
+| n0a-api-auto | `kdev-team:test-engineer-api`（API 自动化）| 读 test-cases(API直通字段) + 被测环境 base URL → kdev-uicase-to-apicase 转换 + kdev-api-autotest 写/跑/三分 → api-results | test-cases.md(handoff-read n3-merge), **API base URL(运行时输入)**, 产物根 |
+| n2-report | 编排自做（不派）| handoff-write 测试报告(ui-results/api-results/覆盖) | — |
 
 ## Gate 节点（n2-design-review / n1-coverage-review）
 均 `reviewer: reviewer-expert`，按「reviewer 发函 dispatch」段发函 `kdev-team:reviewer-orchestrator`（cap=test-design / test-coverage）。无 env 时 exec-flow 不 start-run，止于 design 交付。

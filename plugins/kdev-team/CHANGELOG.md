@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.10.0] - 2026-06-18
+
+### Added
+- 测试工程师补 API 自动化能力（第 4 业务能力）
+  - 新增 agent: test-engineer-api（n0a-api-auto 节点）
+  - 调用链：读 test-cases.md → kdev-uicase-to-apicase 转换 → kdev-api-autotest 写/跑/三分 → api-results
+  - 核心能力矩阵更新：dev6+req5+test4+review8
+  - ⚠️ G-004：须刷 marketplace + 重启激活新 agent 直派
+
 ## 0.9.0 — 编排路由器（CEO 总编排）MVP：kdev_team python 包 + `/kdev-team` skill（plan/confirm/drive 三段）
 
 - 新增 `kdev_team` python 包（lifecycle / roster / delivery_plan / lint / confirm / drive）+ `lifecycles/full-delivery.yml` 模板。

@@ -35,3 +35,8 @@ def test_reviewer_orchestrator_routes_test_caps():
     t = ORCH.read_text(encoding="utf-8")
     assert "test-design" in t and "test-coverage" in t
     assert "test-engineer:g-test-design-review" in t
+
+
+def test_node_routing_has_api_agent():
+    t = NAR.read_text(encoding="utf-8")
+    assert "kdev-team:test-engineer-api" in t
