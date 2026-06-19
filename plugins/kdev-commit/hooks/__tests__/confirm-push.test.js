@@ -176,6 +176,56 @@ test('T9c: file 缺少 pushConfirm 字段 → 回落 ask', () => {
   assert.ok(asksForConfirm(out));
 });
 
+// ── v0.4.0 自主推进令牌（# 自主推进）放行 ──
+
+test('T10: 令牌 + 普通 push（默认 ask）→ 不弹框', () => {
+  const out = runHook({ cmd: 'git push # 自主推进' });
+  assert.equal(out.stdout, '', `期望令牌放行静默但 stdout=${out.stdout}`);
+});
+
+test('T11: 令牌 + 裸 --force → 仍弹框（--force 兜底，令牌不放行）', () => {
+  const out = runHook({ cmd: 'git push --force # 自主推进' });
+  assert.ok(asksForConfirm(out), `期望强推仍弹框但 stdout=${out.stdout}`);
+  assert.match(
+    out.parsed.hookSpecificOutput.permissionDecisionReason,
+    /--force/,
+    '弹框 reason 应包含 --force 警告'
+  );
+});
+
+test('T12: 令牌 + --force-with-lease → 不弹框（非裸 force）', () => {
+  const out = runHook({ cmd: 'git push --force-with-lease # 自主推进' });
+  assert.equal(out.stdout, '', `期望放行静默但 stdout=${out.stdout}`);
+});
+
+test('T13: 无令牌 + 普通 push（ask）→ 弹框（手动模式兜底回归）', () => {
+  const out = runHook({ cmd: 'git push' });
+  assert.ok(asksForConfirm(out), `期望手动模式弹框但 stdout=${out.stdout}`);
+});
+
+test('T14: 令牌 + env=off → 不弹框（off 即全关，令牌无关）', () => {
+  const out = runHook({
+    cmd: 'git push # 自主推进',
+    env: { KDEV_COMMIT_PUSH_CONFIRM: 'off' },
+  });
+  assert.equal(out.stdout, '');
+});
+
+test('T15: 防误触 — branch 名含"自主推进"但无 # 注释 → 弹框', () => {
+  const out = runHook({ cmd: 'git push origin feat-自主推进' });
+  assert.ok(asksForConfirm(out), `branch 名字样不应算令牌，期望弹框但 stdout=${out.stdout}`);
+});
+
+test('T16: 防误触 — "自主推进"在 commit message 里（链式命令）→ 弹框', () => {
+  const out = runHook({ cmd: 'git commit -m "feat: 自主推进模式" && git push' });
+  assert.ok(asksForConfirm(out), `commit msg 字样不应算令牌，期望弹框但 stdout=${out.stdout}`);
+});
+
+test('T17: 容错 — `git push #自主推进`（# 与字之间无空格）→ 不弹框', () => {
+  const out = runHook({ cmd: 'git push #自主推进' });
+  assert.equal(out.stdout, '', `\\s* 应容忍 0 空白，期望放行但 stdout=${out.stdout}`);
+});
+
 test('不破坏验证: 非 git push 命令（如 git status）→ 不拦截', () => {
   const out = runHook({
     cmd: 'git status',

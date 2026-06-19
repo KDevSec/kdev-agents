@@ -1,7 +1,7 @@
 {
   "name": "kdev-commit",
   "description": "AI commit + push 一体化：skill 引导 AI 用 <git user.name>-AI + 本地真实 email 完成 commit；hook 硬校验身份覆盖；push 前弹权限框让用户确认",
-  "version": "0.3.0",
+  "version": "0.4.0",
   "author": {
     "name": "ly"
   },

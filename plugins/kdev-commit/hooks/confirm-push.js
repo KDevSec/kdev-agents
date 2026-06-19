@@ -6,6 +6,9 @@
 // v0.3.0+: KDEV_COMMIT_PUSH_CONFIRM env / ~/.config/kdev-commit/config.json
 //          three-level config (off / warn-force / ask). SKILL.md 仍硬约束 AI
 //          不擅自 push——hook 关只关 IDE 弹窗，对话层 gate 永在。
+// v0.4.0+: 「自主推进」令牌——命令含 `# 自主推进` 注释（正则 /#\s*自主推进/）则
+//          放行普通 push（跳弹窗），但裸 --force 即便带令牌也仍弹窗兜底。
+//          授权来自用户对话（SKILL.md 触发集），AI 翻译成这个单一令牌盖在命令上。
 
 'use strict';
 
@@ -61,8 +64,12 @@ function readStdin() {
   const mode = readMode();
   // 裸强推：`--force`（后面不接 `-`，区分 `--force-with-lease`）或短别名 `-f`
   const hasBareForce = /(^|\s)(--force(?!-)(\s|$)|-f(\s|$))/.test(cmd);
+  // 自主推进令牌：`#` 注释前缀 + 仅空白 + `自主推进`（强制 `#` 防 branch 名/commit msg 误触）
+  const hasAutoToken = /#\s*自主推进/.test(cmd);
 
   if (mode === 'off') return;
+  // 令牌放行普通 push；裸 --force 即便带令牌也落到后面的弹窗兜底
+  if (hasAutoToken && !hasBareForce) return;
   if (mode === 'warn-force' && !hasBareForce) return;
 
   const warn = hasBareForce
