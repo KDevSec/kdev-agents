@@ -25,6 +25,8 @@
 - ❌ 白名单仓库 / 按 remote / 按 branch 精细控制
 - ❌ 复用 `~/.claude/settings.json` 的 `pluginConfig`（未确认是 Claude Code 官方约定，避免耦合内部 schema）
 
+> ⚠️ 上面前两条（"一次授权永久放行 / 每次重新问"、"提交并推送不作隐式授权"）已被 [2026-06-20-kdev-commit-自主推进令牌放行-design.md](../../../superpowers/specs/2026-06-20-kdev-commit-自主推进令牌放行-design.md) §8 在「自主推进态」开例外（v0.4.0）：用户显式说自主推进触发词后授予 standing 授权，该期间 AI 给 push 盖 `# 自主推进` 令牌跳过弹窗、不再每次问。以新 spec 为准（R-009 回写）。
+
 ## 3. 配置入口（最终决策）
 
 ### 3.1 两个通道，优先级 env > file > default
