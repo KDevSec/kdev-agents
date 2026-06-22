@@ -87,7 +87,7 @@ Two modes are supported — chosen by SKILL.md §1 pre-flight based on whether t
   N. 平台数据保持不变   ← 仅 异常流 且 源缺失时追加
 ```
 
-**Field-order rule**: match the example's §二 / §样例 block exactly. For v2 the example is typically `SOP_测试用例MODv2.md`, which places `测试范围分组` between `需求点名称` and `用例类型`.
+**Field-order rule**: match the example's §二 / §样例 block exactly. For v2 the example is typically `SOP_测试用例MOD.md`, which places `测试范围分组` between `需求点名称` and `用例类型`.
 
 ### Per-AR header (v2)
 
@@ -209,7 +209,7 @@ Every block ends with `\n---\n`. The last block before a new `##` AR header (or 
 
 Copy the example's §七 self-check verbatim if present (do not paraphrase). If the example has no §七, omit this section — do **not** invent one.
 
-The v2 example (`SOP_测试用例MODv2.md`) has 16 self-check items (8 通用 + 8 1:1 映射 including 3 h4-related). The v1 example (`SOP_测试用例MOD.md`) has 13 items (8 通用 + 5 1:1 映射). Pick whichever the user passed as `--example`.
+The v2 example (`SOP_测试用例MOD.md`) has 16 self-check items (8 通用 + 8 1:1 映射 including 3 h4-related). The v1 example (`SOP_测试用例MOD-old.md`) has 13 items (8 通用 + 5 1:1 映射). Pick whichever the user passed as `--example`.
 
 ---
 
