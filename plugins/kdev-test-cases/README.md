@@ -73,7 +73,7 @@ claude plugin install kdev-test-cases@kdev-agents
 
 `--input` 必须是已完成的 测试点 .md（含 `### AR-[A-Z]+-\d{2}\.\d{3}\.\d{3}` 头 + 编号表格行）。如果是 raw spec / PRD / API contract，先用 `kdev-test-points` 设计测试点。
 
-`--example` 必须是 fielded-block 模板（如 `SOP_测试用例MOD.md`），其 §二/§样例 的 code block 布局决定输出块格式。
+`--example` 必须是 fielded-block 模板（如 `SOP_测试用例MOD-old.md`），其 §二/§样例 的 code block 布局决定输出块格式。
 
 ### 触发
 
@@ -96,7 +96,7 @@ claude plugin install kdev-test-cases@kdev-agents
 
 ## 演进历史
 
-- **v0.2.0**（当前）：同步 v2 canonical 渲染器——用例编号升级 `TC-AR{数字段}-G{N}-{NNN}`（承载上游 `#### 测试范围 N` h4 分组）、AR 前缀解锁、AR 编号 spec-verbatim、角色从 spec 取 + 新增 `assets/SOP_测试用例MODv2.md`。
+- **v0.2.0**（当前）：同步 v2 canonical 渲染器——用例编号升级 `TC-AR{数字段}-G{N}-{NNN}`（承载上游 `#### 测试范围 N` h4 分组）、AR 前缀解锁、AR 编号 spec-verbatim、角色从 spec 取 + 新增 `assets/SOP_测试用例MOD.md`。
 - **v0.1.1**：marketplace 注册名从 `kdev-test-cases-v1` 纠正为规范名 `kdev-test-cases`（source 指向真实目录、description 去残留 `-v1`）。
 - **v0.1.0**：首次发布——从 `kdev-test-case` 拆分出的纯渲染器。4 个 core eval 首跑 4/4 PASS。
 

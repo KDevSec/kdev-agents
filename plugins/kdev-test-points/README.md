@@ -108,7 +108,7 @@ claude plugin install kdev-test-points@kdev-agents
 
 ## 演进历史
 
-- **v0.2.0**（当前）：同步 v2 canonical 引擎——SKILL.md 升级（Phase 5 三条硬规则：AR 前缀/角色从 spec grep、R-NEW51 AR 数闸、deliverable-hygiene/命名/UI+API 双验；输出末尾加「模式与生成元数据」段）+ 新增 `assets/SOP_测试点MODv2.md` + eval 扩至 5 条。
+- **v0.2.0**（当前）：同步 v2 canonical 引擎——SKILL.md 升级（Phase 5 三条硬规则：AR 前缀/角色从 spec grep、R-NEW51 AR 数闸、deliverable-hygiene/命名/UI+API 双验；输出末尾加「模式与生成元数据」段）+ 新增 `assets/SOP_测试点MOD.md` + eval 扩至 5 条。
 - **v0.1.1**：marketplace 注册名从 `kdev-test-points-v1` 纠正为规范名 `kdev-test-points`（source 指向真实目录、description 去残留 `-v1`），修复安装命令 `claude plugin install kdev-test-points@kdev-agents` 无法解析。
 - **v0.1.0**：首次发布——从 `kdev-test-case` 拆分出的测试设计引擎。4 种模式 + 双标准框架 + SP15 模板覆盖 + 审计 companion 机制。4 个 core eval 覆盖 feature-spec-lite / feature-spec / api-contract / rejects-testpoints-input。
 

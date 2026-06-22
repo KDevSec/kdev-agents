@@ -2,11 +2,11 @@
 
 ## [0.2.0] — 2026-06-16
 
-**同步 v2 canonical 测试点引擎：Phase 5 三条硬规则入核心 + 新增 SOP_测试点MODv2 资产 + eval 扩到 5 条。**
+**同步 v2 canonical 测试点引擎：Phase 5 三条硬规则入核心 + 新增 SOP_测试点MOD 资产 + eval 扩到 5 条。**
 
 ### ✨ 新增
 
-- **`assets/SOP_测试点MODv2.md`（431 行）** — v2 测试点设计 SOP，承载 4 项 v2 传播（h4 测试范围分组 / AR 前缀解锁 / AR 编号 spec-verbatim 不造 sub-AR / 角色解锁），作为 SKILL.md 的规则依据资产。
+- **`assets/SOP_测试点MOD.md`（431 行）** — v2 测试点设计 SOP，承载 4 项 v2 传播（h4 测试范围分组 / AR 前缀解锁 / AR 编号 spec-verbatim 不造 sub-AR / 角色解锁），作为 SKILL.md 的规则依据资产。
 - **eval `cross-project-vfadmin-spec-no-AR-SATP-pollution`** — 跨项目回归：验证不向 vfadmin spec 注入 `AR-SATP-` 前缀污染。evals 由 4 条增至 5 条。
 
 ### 🔄 变更

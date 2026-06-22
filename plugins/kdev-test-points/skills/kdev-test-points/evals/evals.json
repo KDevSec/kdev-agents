@@ -5,8 +5,8 @@
     {
       "id": 1,
       "name": "spec-with-kdev-mod-example-v2",
-      "prompt": "/kdev-test-points --input /home/sec/project/SOP_test/specs/001-pl-project-version-mgmt/spec.md --example /home/sec/project/ClaudeCodeTest/docs/SOP_测试点MODv2.md --output /tmp/eval-v2-1-output.md\n\n这是一个针对 RuoYi-Vue3-FastAPI 项目的内部 spec（4 个 User Story / FR-001 ~ FR-023 / SC-001 ~ SC-007）。请按 example 模板（MODv2，本项目当前默认契约的 v2 实验版本）的列定义渲染测试点表格。",
-      "expected_output": "Mode 自动判定为 feature-spec-lite（example 是 fielded-template style：含 `AR-SATP-XX.YYY.ZZZ` 三段 AR 编号 + 测试点标题/预期/类型/准入 等 ≤9 列）。AR 前缀从 example 抽到 `AR-SATP-`（不是 skill 内写死的默认）；角色从 example/MODv2 §3.6 抽到 `超级管理员`；模块号 04/05/06/99 语义从 example §1.5 抽出。CRUD 拆 3 AR（通用 floor 来自 skill v2 §3.2）+ FR-002 del_flag inline、FR-004 4 要素 inline、API 直连关联已删拒绝（项目业务断言来自 MODv2 §3.6 CRUD 三件套的项目业务断言细节段）。性能整体 OOS（不出现任何 ≤Ns 行；OOS 标注引用 MODv2 §7.6 措辞模板）。companion <stem>-audit.md 因未传 `--audit` **不生成**。",
+      "prompt": "/kdev-test-points --input /home/sec/project/SOP_test/specs/001-pl-project-version-mgmt/spec.md --example /home/sec/project/ClaudeCodeTest/docs/SOP_测试点MOD.md --output /tmp/eval-v2-1-output.md\n\n这是一个针对 RuoYi-Vue3-FastAPI 项目的内部 spec（4 个 User Story / FR-001 ~ FR-023 / SC-001 ~ SC-007）。请按 example 模板（MOD，本项目当前默认契约的 v2 实验版本）的列定义渲染测试点表格。",
+      "expected_output": "Mode 自动判定为 feature-spec-lite（example 是 fielded-template style：含 `AR-SATP-XX.YYY.ZZZ` 三段 AR 编号 + 测试点标题/预期/类型/准入 等 ≤9 列）。AR 前缀从 example 抽到 `AR-SATP-`（不是 skill 内写死的默认）；角色从 example/MOD §3.6 抽到 `超级管理员`；模块号 04/05/06/99 语义从 example §1.5 抽出。CRUD 拆 3 AR（通用 floor 来自 skill v2 §3.2）+ FR-002 del_flag inline、FR-004 4 要素 inline、API 直连关联已删拒绝（项目业务断言来自 MOD §3.6 CRUD 三件套的项目业务断言细节段）。性能整体 OOS（不出现任何 ≤Ns 行；OOS 标注引用 MOD §7.6 措辞模板）。companion <stem>-audit.md 因未传 `--audit` **不生成**。",
       "files": []
     },
     {
@@ -26,7 +26,7 @@
     {
       "id": 4,
       "name": "rejects-testpoints-input-unchanged-from-v1",
-      "prompt": "/kdev-test-points --input /tmp/example-testpoints.md --example /home/sec/project/ClaudeCodeTest/docs/SOP_测试用例MOD.md --output /tmp/eval-v2-4-output.md\n\n用上游已生成的 测试点 .md 配 fielded-block example 跑一遍。",
+      "prompt": "/kdev-test-points --input /tmp/example-testpoints.md --example /home/sec/project/ClaudeCodeTest/docs/SOP_测试用例MOD-old.md --output /tmp/eval-v2-4-output.md\n\n用上游已生成的 测试点 .md 配 fielded-block example 跑一遍。",
       "expected_output": "行为与 v1 一致：skill 应在 workflow step 2 识别输入是已生成的 测试点 .md（含 `### AR-[A-Z]+-\\d{2}\\.\\d{3}\\.\\d{3}` 头 + 编号表格行），停止生成并提示用户改用 kdev-test-cases 进行 fielded 渲染，而不是误把它当作 raw spec 再走一遍测试设计。"
     },
     {

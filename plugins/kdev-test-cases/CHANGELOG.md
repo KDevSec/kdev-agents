@@ -2,11 +2,11 @@
 
 ## [0.2.0] — 2026-06-16
 
-**同步 v2 canonical 渲染器：承载 h4 测试范围分组 + 新增 SOP_测试用例MODv2 资产 + eval 更新。**
+**同步 v2 canonical 渲染器：承载 h4 测试范围分组 + 新增 SOP_测试用例MOD 资产 + eval 更新。**
 
 ### ✨ 新增
 
-- **`assets/SOP_测试用例MODv2.md`** — v2 测试用例渲染 SOP，承载 4 项 v2 传播（h4 测试范围分组 / AR 前缀解锁 / AR 编号 spec-verbatim / 角色解锁）。
+- **`assets/SOP_测试用例MOD.md`** — v2 测试用例渲染 SOP，承载 4 项 v2 传播（h4 测试范围分组 / AR 前缀解锁 / AR 编号 spec-verbatim / 角色解锁）。
 - `references/output-skeleton.md` 扩写以支持 `#### 测试范围 N` h4 分组与 `TC-AR{数字段}-G{N}-{NNN}` 编号（`G{N}` 编码测试范围号）。
 
 ### 🔄 变更
