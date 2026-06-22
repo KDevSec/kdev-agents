@@ -1,0 +1,25 @@
+plugins/kdev-hud/tests/test_dispatch_dashboard.py
+  s_8d0a90e28c8eec::t_13352fa0afd084 1-60
+plugins/kdev-hud/kdev_hud/dashboard.py
+  s_8d0a90e28c8eec::t_887a41fcc9fbff 155-158
+  s_8d0a90e28c8eec::t_4d5ba4afa5dd07 55-58
+  s_8d0a90e28c8eec::t_5da35b65fecc77 208-209
+  s_8d0a90e28c8eec::t_42be79be5d7392 62-118
+  s_8d0a90e28c8eec::t_a47b01df02f835 257
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.8",
+  "base_commit_sha": "fcbebaebb3a4c1a30e5b575de9a84aad399f0919",
+  "prompts": {},
+  "sessions": {
+    "s_8d0a90e28c8eec": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "222d14f6-0b3d-40bd-83e3-4247f6083074",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}

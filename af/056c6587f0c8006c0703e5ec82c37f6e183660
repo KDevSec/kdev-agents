@@ -1,0 +1,21 @@
+plugins/kdev-team/tests/test_router_lint.py
+  s_8d0a90e28c8eec::t_0079878cfa240a 1-28
+plugins/kdev-team/kdev_team/roster.py
+  s_8d0a90e28c8eec::t_9534c86a6e4c3a 1-66
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.8",
+  "base_commit_sha": "af056c6587f0c8006c0703e5ec82c37f6e183660",
+  "prompts": {},
+  "sessions": {
+    "s_8d0a90e28c8eec": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "222d14f6-0b3d-40bd-83e3-4247f6083074",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}

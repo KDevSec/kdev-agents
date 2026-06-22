@@ -1,0 +1,23 @@
+plugins/kdev-team/skills/kdev-team/SKILL.md
+  s_8d0a90e28c8eec::t_37662c786729e0 1-192
+plugins/kdev-team/commands/kdev-team.md
+  s_8d0a90e28c8eec::t_7c3bc8f5f9bb13 1-34
+plugins/kdev-team/tests/test_router_skill_manifest.py
+  s_8d0a90e28c8eec::t_cf9d050636d449 1-36
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.8",
+  "base_commit_sha": "82bc137691870fc31521f44cc597e219f37833c5",
+  "prompts": {},
+  "sessions": {
+    "s_8d0a90e28c8eec": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "222d14f6-0b3d-40bd-83e3-4247f6083074",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}

@@ -1,0 +1,22 @@
+plugins/kdev-core/tests/test_dispatch_events.py
+  s_8d0a90e28c8eec::t_9caf1d7d51f342 1-55
+plugins/kdev-core/kdev_core/events.py
+  s_8d0a90e28c8eec::t_56e20e4ca239df 7,10
+  s_8d0a90e28c8eec::t_e68c20dbe431cc 89-116
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.8",
+  "base_commit_sha": "4d469470b58deeeb6295daa5453e4c9bd37355d3",
+  "prompts": {},
+  "sessions": {
+    "s_8d0a90e28c8eec": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "222d14f6-0b3d-40bd-83e3-4247f6083074",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}

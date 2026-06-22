@@ -1,0 +1,21 @@
+docs/skills/kdev-commit/specs/2026-05-18-push-confirm-config-design.md
+  s_9d11cfb7275c87::t_88b8566b3ffbd6 28-29
+docs/superpowers/specs/2026-06-20-kdev-commit-自主推进令牌放行-design.md
+  s_9d11cfb7275c87::t_db4b67315da4d8 1-159
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.9",
+  "base_commit_sha": "4b8c888b41d6645aeca0043833b29eec7ac834d3",
+  "prompts": {},
+  "sessions": {
+    "s_9d11cfb7275c87": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "cf7fd3f5-ad28-4cbc-b6a3-c347f3b837a9",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}

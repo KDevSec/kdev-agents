@@ -1,0 +1,33 @@
+plugins/kdev-commit/skills/kdev-commit/SKILL.md
+  s_9d11cfb7275c87::t_1809a7f01415ed 91-112
+  s_9d11cfb7275c87::t_871bf927aba224 89
+  s_9d11cfb7275c87::t_07be0b3841e026 128-129
+plugins/kdev-commit/hooks/__tests__/confirm-push.test.js
+  s_9d11cfb7275c87::t_fbb5a098ce9d00 179-228
+plugins/kdev-commit/README.md
+  s_9d11cfb7275c87::t_4bd9c1b1b86da0 63-79
+  s_9d11cfb7275c87::t_a170d1eabb13fc 160
+plugins/kdev-commit/hooks/confirm-push.js
+  s_9d11cfb7275c87::t_8bb0f399b4d901 67-68,71-72
+  s_9d11cfb7275c87::t_88ba9218092932 9-11
+plugins/kdev-commit/.claude-plugin/plugin.json
+  s_9d11cfb7275c87::t_1b4dcbe1f227f5 4
+plugins/kdev-commit/CHANGELOG.md
+  s_9d11cfb7275c87::t_69b24fe383e45c 1-39
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.9",
+  "base_commit_sha": "15f7ce0f1950c9fbd318bc78b4564c177b4e2d13",
+  "prompts": {},
+  "sessions": {
+    "s_9d11cfb7275c87": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "cf7fd3f5-ad28-4cbc-b6a3-c347f3b837a9",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}

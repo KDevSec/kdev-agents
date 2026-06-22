@@ -1,0 +1,22 @@
+plugins/kdev-hud/kdev_hud/datasource.py
+  s_8d0a90e28c8eec::t_a3354edcf51612 68-126
+  s_8d0a90e28c8eec::t_e765bf528ebdad 9-13
+plugins/kdev-hud/tests/test_dispatch_datasource.py
+  s_8d0a90e28c8eec::t_862ca1d8bd0564 1-64
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.8",
+  "base_commit_sha": "6a9df2149ec1b8ba70c40c4a335bd5c0129cb3c2",
+  "prompts": {},
+  "sessions": {
+    "s_8d0a90e28c8eec": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "222d14f6-0b3d-40bd-83e3-4247f6083074",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}

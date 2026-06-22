@@ -1,0 +1,29 @@
+plugins/kdev-hud/.claude-plugin/plugin.json
+  s_8d0a90e28c8eec::t_f91c3e4bf51386 4
+plugins/kdev-team/CHANGELOG.md
+  s_8d0a90e28c8eec::t_6f3c5fbdea22c6 3-11
+plugins/kdev-core/.claude-plugin/plugin.json
+  s_8d0a90e28c8eec::t_e4f04046882380 4
+plugins/kdev-core/CHANGELOG.md
+  s_8d0a90e28c8eec::t_aa1fc5aaa1b758 5-14
+plugins/kdev-team/.claude-plugin/plugin.json
+  s_8d0a90e28c8eec::t_594127665857b4 4
+plugins/kdev-hud/CHANGELOG.md
+  s_8d0a90e28c8eec::t_a82d4442fcd634 3-9
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.8",
+  "base_commit_sha": "dda0262b82993286289fccd31fef13ebb7a67283",
+  "prompts": {},
+  "sessions": {
+    "s_8d0a90e28c8eec": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "222d14f6-0b3d-40bd-83e3-4247f6083074",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}

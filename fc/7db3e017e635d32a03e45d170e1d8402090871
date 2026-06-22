@@ -1,0 +1,19 @@
+docs/superpowers/plans/2026-06-18-kdev-hud-setup-statusline.md
+  s_22525fa85bc62d::t_56fd9a90af98c3 1-224
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.8",
+  "base_commit_sha": "fc7db3e017e635d32a03e45d170e1d8402090871",
+  "prompts": {},
+  "sessions": {
+    "s_22525fa85bc62d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "cfb5df2e-492b-4de8-b078-5b523b8b5ac4",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
