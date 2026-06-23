@@ -66,6 +66,9 @@ sandbox/*
 # Git worktrees (本地隔离工作区，不跟踪)
 /.worktrees/
 
+# superpowers brainstorm 本地草稿（不入库）
+.superpowers/brainstorm
+
 # eval fixture：.kdev/ 测试数据，必须跟踪
 !plugins/kdev-memory/evals/fixtures/**/.kdev/
 !plugins/kdev-memory/evals/fixtures/**/.kdev/**
