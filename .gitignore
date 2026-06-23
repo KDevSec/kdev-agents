@@ -40,6 +40,9 @@ bridge/*.cjs
 # KDev / OMC runtime
 .omc/
 
+# 工具生成目录（需重新跑后再提交）
+.understand-anything/
+
 # References 源码项目 (不提交开源项目的 clone)
 # 但保留分析文档 (.md)
 docs/skills/kdev-code-graph/references/Understand-Anything/
