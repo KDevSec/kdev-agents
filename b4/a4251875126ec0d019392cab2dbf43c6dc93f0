@@ -1,0 +1,19 @@
+.gitignore
+  s_86e4f8d71ba8ad::t_ea331235330e4b 69-71
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.9",
+  "base_commit_sha": "b4a4251875126ec0d019392cab2dbf43c6dc93f0",
+  "prompts": {},
+  "sessions": {
+    "s_86e4f8d71ba8ad": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "272650ef-96b9-4136-8125-6e2e15e4c13b",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
