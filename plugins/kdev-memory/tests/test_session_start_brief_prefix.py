@@ -28,6 +28,7 @@ def _run_hook(repo: Path, source: str = "startup") -> dict:
     r = subprocess.run(
         [sys.executable, str(HOOK)],
         cwd=str(repo), input=payload, capture_output=True, text=True,
+        encoding="utf-8", errors="replace",
     )
     return json.loads(r.stdout) if r.stdout.strip() else {}
 

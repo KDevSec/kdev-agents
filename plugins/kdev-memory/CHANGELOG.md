@@ -1,5 +1,55 @@
 # kdev-memory CHANGELOG
 
+## [0.18.2] — 2026-06-23
+
+**commit-tracker 不再自举记忆目录：未初始化工程跑 `git commit` 不再凭空冒出 `.kdev/memory/`。**
+
+### 🐛 修复
+
+- **`hooks/commit-tracker.py` 漏存在性门控（核心修复）**：PostToolUse(Bash) hook 在检测到 `git commit` 后，未像其它 hook 那样先判断 `.kdev/memory/` 是否已存在，就直接调 `pending_commits.append(state_dir, …)`，而 [`lib/pending_commits.py:_write`](plugins/kdev-memory/hooks/lib/pending_commits.py) 里 `state_dir.mkdir(parents=True, exist_ok=True)` 会无条件建目录——于是**任何工程（哪怕从没初始化过 kdev-memory）只要跑过一次 `git commit`，根目录就冒出 `.kdev/memory/state/pending-commits.json`**，随后 SessionEnd / PreCompact 等 hook 接着往里写 `WARN-未记录-*.md`、`checkpoints/`、`state/.rating-setup-shown`，污染了与本插件无关的工程。现于 `main()` 里、确认是 git commit 之后、计算 `state_dir` 之前，加一道与 session-start-brief / session-end-check / pre-compact-check / post-write-check 一致的存在性门控：`if not (repo / ".kdev" / "memory").is_dir(): print(SUPPRESS); return 0`。未初始化工程静默退出，已初始化工程的 commit 累积功能不变。
+
+### 🔍 全量审计（确认无第二处自举点）
+
+逐一核查 `hooks/` 下所有 hook 及 `hooks/lib/` 的 `mkdir` 调用，确认除 commit-tracker 外**无第二处「未门控就 mkdir / 写 `.kdev/memory/`」的自举点**：
+
+- **`lib/pending_commits.py` `_write()`** — `state_dir.mkdir(parents=True)`：唯一未门控的调用方就是 commit-tracker（本次已修）；其余调用方（`stop-check` / `session-start-brief`）只走 `read()` / `format_brief_hint()`（只读），且这两个 hook 自身已门控；step-recorder 的 `clear()` 仅在已初始化上下文（主会话 dispatch 时 `.kdev/memory/` 必已存在）运行。
+- **`lib/skill_version.py` `write_cache()`** — `state_dir.mkdir(parents=True)`：唯一调用方 `session-start-brief.main()` 在 `if not kdev_dir.is_dir(): return 0` 门控**之后**才调 `detect_drift`；且 `detect_drift` 仅在 `current_skill_sha`（git log SKILL.md）非 None 时才写——双重安全。
+- **`lib/step_id.py` `increment_counter()` / `_dup_index()`** — `state_dir.mkdir(parents=True)`：仅被 `mint_next_step_id` / `mint_record_id` 调用，调用方是 step-recorder subagent 与 distill，均在已初始化上下文运行；无任何未门控 hook 直接调它。
+- **`lib/trigger-match.py` `save_dedup_state()`** — `STATE_FILE.parent.mkdir(...)`：`trigger-match.main()` 在 `if not KDEV_DIR.is_dir(): emit_suppress(); return 0`（line 523）门控之后才可能触达。
+- **`lib/distill.py` `export_markdown_slices()`** — `out_dir.mkdir(...)`（导出目标目录，非 `.kdev/memory` 本身）：`distill.main()` 自身有 `if not kdev.is_dir(): return 2` 门控；且 distill 仅由 `/kdev-memory-distill` 用户命令或 auto-distill（经已门控的 `session-start-brief`）触发。
+- **`lib/migrate_scope.py` `migrate_to_scoped()`** — `staff/<id>` / `shared/` 的 `mkdir`：函数自身先 `if not root.is_dir(): return result`（`.kdev/memory` 不存在即返回）；且本模块是**手动 CLI 迁移工具**（docstring 明示「手动调用，不自动跑」），无任何 hook 自动调用。
+- **`lib/migrate.py` `kdev_memory_migrate()`** — `new_dir.mkdir(...)`：自身先 `if not kdev_dir.is_dir(): return`（`.kdev/` 不存在即返回），只在 `.kdev/` 已存在时才建 `.kdev/memory/`（迁移/补建语义，非「凭空」）。
+- **`lib/kdev_sync.py` `bootstrap()`** — `kdev.parent.mkdir` + `git clone`：仅当 `kdev-sync.yml` 配了 `memory_repo` remote 时才 clone（用户显式配 sync remote 的合法路径，与本次 bug 不同类）。
+- **`session-start-brief._rating_setup_hint()`（marker.parent.mkdir）/ `pre-compact-check` checkpoint_dir.mkdir** — 均在各自 hook 的存在性门控之后。
+
+结论：`lib/` 里的 mkdir 调用本身无需改动——它们都在已门控的调用链下游（或自身带 `if not …is_dir()` 守卫、或仅手动 CLI / 用户显式命令触发）。根因只在 commit-tracker 这一处入口漏门。
+
+### 🧪 测试
+
+- 新增 `test_hook_does_not_bootstrap_kdev_memory_when_uninitialized`（TDD RED→GREEN）：在没 `.kdev/` 的临时仓里模拟一次 git commit 调 commit-tracker，断言事后 `.kdev/` 不存在、pending 为空。
+- 调整 `test_hook_resilient_to_missing_state_dir`：原 setup 未建 `.kdev/memory/`（实为测了 bug 行为），现改为建 `.kdev/memory/` 但不建 `state/`——回归「已初始化工程缺 state 子目录 → append 自动补建」这一**仍应保留**的合法行为，与本次「未初始化工程不得自举」门控正交。
+
+### 🐛 修复（续）：Windows 中文环境 subprocess 编码
+
+**根因**：测试 helper 与库代码里的 `subprocess.run(..., text=True)` 未指定 `encoding`，在中文 Windows 上默认用 GBK（cp936）解码被调 hook / git 的非 ASCII 输出（中文 nudge、中文分支名、emoji 等），触发 `UnicodeDecodeError: 'gbk' codec can't decode byte ...`——`_readerthread` 崩溃 → `r.stdout` 变 `None` → 后续 `.strip()` / 拼接抛 `AttributeError`，测试直接 FAIL。这与项目已有的 [`lib/_utf8.py`](plugins/kdev-memory/hooks/lib/_utf8.py)（输出侧 reconfigure stdout）是同一编码意识在**输入侧**的缺口。
+
+**修复**：统一给所有 `text=True` 的 `subprocess.run` 加 `encoding="utf-8", errors="replace"`——UTF-8 是 hook / git 输出的实际编码，`errors="replace"` 兜底防崩溃。保持现有 `r.stdout + r.stderr` 字符串拼接逻辑不变，最小侵入。
+
+**范围**（全量审计 `tests/` + `hooks/lib/` 下所有 `text=True` 调用）：
+
+- 测试侧 8 处：`test_stop_check_pending.py` / `test_stop_check.py` / `test_brief_verbosity.py` / `test_session_start_brief_prefix.py` / `test_commit_tracker.py`（2 处）/ `test_step_id.py` / `test_kdev_sync.py` 的 `_run_hook` / `_run` / `_git` helper。
+- 库代码侧 2 处：[`lib/step_id.py:_git_query`](plugins/kdev-memory/hooks/lib/step_id.py)（被 `compute_branch_slug` 调用读分支名）、[`lib/kdev_sync.py:_git`](plugins/kdev-memory/hooks/lib/kdev_sync.py)（被 `bootstrap` 调用跑 push/pull）。
+
+**效果**：`test_stop_hook_silent_when_no_pending` / `test_stop_hook_warns_when_pending_age_exceeded` / `test_slug_sanitize_unicode`（中文分支名 "实验/中文分支"）/ `test_sync_push_then_pull_propagates` 等 6 个用例从 FAIL → PASS。
+
+**未修的剩余隐患**（无测试触发，记录待后续）：`lib/worktree_link.py`（2 处 `_git` / mklink）、`lib/skill_version.py`（`detect_drift` 的 git log）、`lib/migrate-v0.7.py`（3 处）的 `text=True` 仍无 `encoding`。当前无测试覆盖且输出多为纯 ASCII（sha / 路径），暂不强制修；后续若这些路径输出中文/emoji 会触发同类崩溃。
+
+**⚠️ 与编码无关的预存并发 bug（未修，超出本任务范围）**：`test_step_id.py::test_dup_index_concurrent_no_collision` / `test_increment_concurrent_no_collision` 在本机稳定/间歇失败——20 线程并发调 `_dup_index` / `increment_counter` 只拿到 11 个结果（少 9 个），是文件锁并发竞争问题，与本次编码修复正交。建议另开任务诊断 `_dup_index` / `increment_counter` 的并发安全。
+
+### 📌 下游同步提醒
+
+本 bug 在下游 fork **ieidev-team 的 `hooks/commit-tracker.py`** 同样存在（同一处漏门控 + 同一 `pending_commits.append` 调用链）。请下游同步补上同一道存在性门控，否则未初始化工程跑 `git commit` 仍会自举 `.kdev/memory/`。
+
 ## [0.18.1] — 2026-06-14
 
 **召回扫描器双认补全：时间戳形 G 条目不再静默漏召 + 记录 ID 文法单一真相源。**

@@ -81,6 +81,15 @@ def main() -> int:
         return 0
 
     repo = Path.cwd()
+    # 存在性门控：未初始化 .kdev/memory/ 的工程不得凭空自举该目录
+    # （与 session-start-brief / session-end-check / pre-compact-check / post-write-check
+    # 一致：只有用户显式 /kdev-memory setup 或配了 sync remote clone 才会产生该目录）。
+    # 否则 pending_commits.append → _write() 的 state_dir.mkdir(parents=True) 会把
+    # 整个 .kdev/memory/ 自举出来，污染与本插件无关的工程。
+    if not (repo / ".kdev" / "memory").is_dir():
+        print(SUPPRESS)
+        return 0
+
     sha = _git_query(repo, "log", "-1", "--format=%H")
     subject = _git_query(repo, "log", "-1", "--format=%s")
     if not sha or subject is None:

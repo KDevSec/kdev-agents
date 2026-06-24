@@ -83,7 +83,8 @@ def _ensure_machine_local_gitignore(kdev):
 def _git(args, cwd, *, identity=False):
     pre = _GIT_ID if identity else []
     return subprocess.run(["git", *pre, *args], cwd=str(cwd),
-                          capture_output=True, text=True)
+                          capture_output=True, text=True,
+                          encoding="utf-8", errors="replace")
 
 
 def _kdev_dir(repo_root):

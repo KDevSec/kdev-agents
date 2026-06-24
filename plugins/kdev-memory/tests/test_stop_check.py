@@ -49,7 +49,8 @@ def _setup(tmp_path: Path, rating_line: str | None, strict: bool) -> Path:
 
 def _run(repo: Path) -> tuple[int, str]:
     r = subprocess.run([sys.executable, str(HOOK)], cwd=str(repo),
-                       input="{}", capture_output=True, text=True)
+                       input="{}", capture_output=True, text=True,
+                       encoding="utf-8", errors="replace")
     return r.returncode, r.stdout + r.stderr
 
 

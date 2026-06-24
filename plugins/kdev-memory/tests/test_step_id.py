@@ -66,7 +66,8 @@ def test_slug_bugfix_prefix_kept(tmp_path, monkeypatch):
 def test_slug_detached_head(tmp_path, monkeypatch):
     repo = _git_init(tmp_path)
     sha = subprocess.run(
-        ["git", "rev-parse", "HEAD"], cwd=repo, capture_output=True, text=True, check=True
+        ["git", "rev-parse", "HEAD"], cwd=repo, capture_output=True, text=True,
+        encoding="utf-8", errors="replace", check=True
     ).stdout.strip()
     subprocess.run(["git", "checkout", "-q", sha], cwd=repo, check=True)
     monkeypatch.chdir(repo)

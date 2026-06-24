@@ -108,10 +108,41 @@ def test_git_uppercase_C_flag_handled(tmp_path):
     assert len(_read_pending(repo)["commits"]) == 1
 
 
-def test_hook_resilient_to_missing_state_dir(tmp_path):
-    """state dir doesn't exist yet → hook should auto-create via pending_commits.append."""
+def test_hook_does_not_bootstrap_kdev_memory_when_uninitialized(tmp_path):
+    """未初始化 .kdev/memory 的工程跑 git commit → hook 必须静默退出，
+    不得凭空创建 .kdev/memory/（与 session-start/end/pre-compact/post-write 一致的存在性门控）。
+
+    回归 bug：commit-tracker 曾直接调 pending_commits.append → _write() 里
+    state_dir.mkdir(parents=True) 把整个 .kdev/memory/ 自举出来，污染无关工程。
+    """
     repo = tmp_path / "repo"
     repo.mkdir()
+    subprocess.run(["git", "init", "-q", "-b", "main"], cwd=repo, check=True)
+    (repo / "f.txt").write_text("x", encoding="utf-8")
+    subprocess.run(["git", "add", "f.txt"], cwd=repo, check=True)
+    subprocess.run(
+        ["git", "-c", "user.email=t@t", "-c", "user.name=t",
+         "commit", "-q", "-m", "fresh"],
+        cwd=repo, check=True,
+    )
+    # 起点：确实没有 .kdev/
+    assert not (repo / ".kdev").exists()
+    _run_hook(repo, "git commit -m fresh")
+    # 修复后：hook 不应自举 .kdev/memory/
+    assert not (repo / ".kdev").exists(), (
+        "commit-tracker 不应在未初始化工程里凭空创建 .kdev/memory/"
+    )
+    # pending 自然也不该有
+    assert _read_pending(repo)["commits"] == []
+
+
+def test_hook_resilient_to_missing_state_dir(tmp_path):
+    """已初始化工程（.kdev/memory/ 存在）但 state 子目录还没建 → hook 照常累积，
+    由 pending_commits.append 自动建 state/。这是「已初始化」路径，不受存在性门控影响。"""
+    repo = tmp_path / "repo"
+    repo.mkdir()
+    # 关键：.kdev/memory/ 已存在（已初始化），但 state/ 子目录尚未建
+    (repo / ".kdev" / "memory").mkdir(parents=True)
     subprocess.run(["git", "init", "-q", "-b", "main"], cwd=repo, check=True)
     (repo / "f.txt").write_text("x", encoding="utf-8")
     subprocess.run(["git", "add", "f.txt"], cwd=repo, check=True)
@@ -149,6 +180,7 @@ def test_commit_stashes_transcript_path(tmp_path):
         "session_id": "s1",
     })
     subprocess.run([sys.executable, str(HOOK)], cwd=str(repo), input=payload,
-                   capture_output=True, text=True)
+                   capture_output=True, text=True,
+                   encoding="utf-8", errors="replace")
     pending = _read_pending(repo)
     assert pending["transcript_path"] == str(tp)

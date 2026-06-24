@@ -65,7 +65,8 @@ import subprocess as _sp
 
 
 def _git(args, cwd):
-    return _sp.run(["git", *args], cwd=str(cwd), capture_output=True, text=True)
+    return _sp.run(["git", *args], cwd=str(cwd), capture_output=True, text=True,
+                    encoding="utf-8", errors="replace")
 
 
 def _bare_remote(tmp_path):

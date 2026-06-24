@@ -31,7 +31,8 @@ def _init(tmp_path: Path, config_text: str | None = None) -> Path:
 def _ctx(repo: Path) -> str:
     r = subprocess.run([sys.executable, str(HOOK)], cwd=str(repo),
                        input=json.dumps({"source": "startup"}),
-                       capture_output=True, text=True)
+                       capture_output=True, text=True,
+                       encoding="utf-8", errors="replace")
     out = json.loads(r.stdout) if r.stdout.strip() else {}
     return out.get("hookSpecificOutput", {}).get("additionalContext", "")
 

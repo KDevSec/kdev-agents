@@ -27,6 +27,7 @@ def _run_hook(repo: Path) -> str:
     r = subprocess.run(
         [sys.executable, str(HOOK)],
         cwd=str(repo), input="{}", capture_output=True, text=True,
+        encoding="utf-8", errors="replace",
     )
     return r.stdout + r.stderr
 
