@@ -85,6 +85,11 @@ def recorder_target_log(scope: Optional[str], root: PathLike = DEFAULT_ROOT) -> 
     return shared_dir(root) / "执行日志.md"
 
 
+def recorder_target_jsonl(scope: Optional[str], root: PathLike = DEFAULT_ROOT) -> Path:
+    """叙事 Step JSONL 主账路径（Q-20260617）。与 recorder_target_log 同 scope 拓扑，扩展名 .jsonl。"""
+    return recorder_target_log(scope, root).with_name("执行日志.jsonl")
+
+
 def resolve_step_slug(scope: Optional[str], root: PathLike = DEFAULT_ROOT) -> str:
     """scope → Step ID slug。
 
