@@ -39,6 +39,7 @@ from milestone import is_milestone_path  # noqa: E402
 from missing_summaries import list_missing_past_summaries  # noqa: E402
 from archive_hint import collect_archive_hints  # noqa: E402
 from pending_commits import format_brief_hint as pending_format_brief_hint  # noqa: E402
+import step_log  # noqa: E402  # JSONL 主账读封装（dual-read 迁移第 1 步）
 from scope import shared_dir  # noqa: E402
 from memory_config import read_rating_mode  # noqa: E402
 
@@ -174,20 +175,26 @@ def main() -> int:
                 f"若本轮是最后一次会话，请将新增条目追加到汇总末尾（不要覆盖已有内容）。"
             )
 
-    # 4. 执行日志今天空
+    # 4. 执行日志今天空（dual-read：md 今日态 ∪ jsonl 主账今日 Step）
+    #    jsonl 空 → steps_for_date 返回 [] → 仅看 md，行为字节级不变。
     log_file = shared / "执行日志.md"
-    log_empty_today = False
+    md_has_today = False
     if log_file.is_file():
         try:
             text = log_file.read_text(encoding="utf-8")
         except OSError:
             text = ""
-        if today not in text:
-            log_empty_today = True
-            reminders.append(
-                "[kdev-memory] 执行日志里今天没有任何条目。如果本轮完成了工作步骤，"
-                "请实时追加 Step 记录到 .kdev/memory/执行日志.md。"
-            )
+        md_has_today = today in text
+    try:
+        jsonl_has_today = bool(step_log.steps_for_date(today, root=kdev_dir))
+    except Exception:
+        jsonl_has_today = False
+    log_empty_today = not (md_has_today or jsonl_has_today)
+    if log_empty_today:
+        reminders.append(
+            "[kdev-memory] 执行日志里今天没有任何条目。如果本轮完成了工作步骤，"
+            "请实时追加 Step 记录到 .kdev/memory/执行日志.md。"
+        )
 
     # 5. 过去日期缺每日汇总
     missing_past = list_missing_past_summaries(str(kdev_dir), today)

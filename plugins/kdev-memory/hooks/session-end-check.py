@@ -19,6 +19,7 @@ LIB_DIR = SCRIPT_DIR / "lib"
 sys.path.insert(0, str(LIB_DIR))
 
 from migrate import kdev_memory_migrate  # noqa: E402
+import step_log  # noqa: E402  # JSONL 主账读封装（dual-read 迁移第 1 步）
 from scope import shared_dir  # noqa: E402
 
 
@@ -95,7 +96,8 @@ def main() -> int:
     flush_file = kdev_dir / ".last-flush"
     warn_file = kdev_dir / f"WARN-未记录-{today}.md"
 
-    # 执行日志今天已有条目 → 无需警告
+    # 执行日志今天已有条目 → 无需警告（dual-read：md 今日态 ∪ jsonl 主账今日 Step）
+    # jsonl 空 → steps_for_date 返回 [] → 仅看 md，行为字节级不变。
     if log_file.is_file():
         try:
             text = log_file.read_text(encoding="utf-8")
@@ -103,6 +105,11 @@ def main() -> int:
             text = ""
         if today in text:
             return 0
+    try:
+        if step_log.steps_for_date(today, root=kdev_dir):
+            return 0
+    except Exception:
+        pass
 
     # 检测变化
     if flush_file.is_file():

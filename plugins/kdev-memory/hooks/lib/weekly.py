@@ -29,8 +29,27 @@ from _utf8 import force_utf8_stdio  # noqa: E402
 
 force_utf8_stdio()
 
+import scope as _scope  # noqa: E402
+import step_log  # noqa: E402  # JSONL 主账读封装（dual-read 迁移第 1 步）
+import step_dualread  # noqa: E402  # JSONL Step → md 投影合成器
 from scope import shared_dir, staff_log_files  # noqa: E402
 from step_id import id_label_fragment  # noqa: E402
+
+
+def _dedup_steps(md_steps: list[dict], jsonl_steps: list[dict]) -> list[dict]:
+    """md ∪ jsonl 去重并集（weekly 条目形态，去重键 = (title, date)）。md 优先。
+
+    jsonl 空时 jsonl_steps=[] → 返回 md_steps 原样。
+    """
+    seen = {(s.get("title"), s.get("date")) for s in md_steps}
+    out = list(md_steps)
+    for s in jsonl_steps:
+        key = (s.get("title"), s.get("date"))
+        if key in seen:
+            continue
+        seen.add(key)
+        out.append(s)
+    return out
 
 
 def in_range(s: str | None, d_from: date, d_to: date) -> bool:
@@ -78,8 +97,13 @@ def render(kdev: Path, d_from: date, d_to: date) -> None:
     in_range_fn = lambda s: in_range(s, d_from, d_to)  # noqa: E731
 
     base = shared_dir(kdev)
-    steps = [s for s in parse_entries(base / "执行日志.md", r"^##\s+Step\s+\S+.*$") if in_range_fn(s["date"])]
-    # per-员工 scope Step 也计入（flat 下 staff_log_files 返回 []）
+    # dual-read：md 路径（既有）∪ jsonl 主账（合成器投影），去重并集。
+    # jsonl 空时 read_steps 返回 [] → steps 退化为纯 md 解析，行为字节级不变。
+    md_steps = [s for s in parse_entries(base / "执行日志.md", r"^##\s+Step\s+\S+.*$") if in_range_fn(s["date"])]
+    jsonl_steps = [s for s in step_dualread.jsonl_steps_as_parse_entries(step_log.read_steps(root=kdev))
+                   if in_range_fn(s["date"])]
+    steps = _dedup_steps(md_steps, jsonl_steps)
+    # per-员工 scope Step 也计入（flat 下 staff_log_files / list_staff 返回 []）
     staff_step_counts: dict[str, int] = {}
     for scope_id, path in staff_log_files("执行日志.md", kdev):
         scoped = [s for s in parse_entries(path, r"^##\s+Step\s+\S+.*$") if in_range_fn(s["date"])]
@@ -87,6 +111,20 @@ def render(kdev: Path, d_from: date, d_to: date) -> None:
             s["scope"] = scope_id
         steps.extend(scoped)
         staff_step_counts[scope_id] = len(scoped)
+    if _scope.is_scoped(kdev):
+        for scope_id in _scope.list_staff(kdev):
+            md_scoped = {(s.get("title"), s.get("date")) for s in steps if s.get("scope") == scope_id}
+            scoped_jsonl = [s for s in step_dualread.jsonl_steps_as_parse_entries(
+                step_log.read_steps(scope=scope_id, root=kdev)) if in_range_fn(s["date"])]
+            added = 0
+            for s in scoped_jsonl:
+                if (s.get("title"), s.get("date")) in md_scoped:
+                    continue
+                s["scope"] = scope_id
+                steps.append(s)
+                added += 1
+            if added:
+                staff_step_counts[scope_id] = staff_step_counts.get(scope_id, 0) + added
     # Q/G/R/建议 heading 双认：id_label_fragment 同时认 legacy(Q-\d+) 与时间戳(Q YYYYMMDD-...)形（Q-020）
     ques = [q for q in parse_entries(base / "决策日志.md", rf"^##\s+{id_label_fragment('Q')}.*$") if in_range_fn(q["date"])]
     gotchas = [g for g in parse_entries(base / "踩坑日志.md", rf"^##\s+{id_label_fragment('G')}.*$") if in_range_fn(g["date"])]

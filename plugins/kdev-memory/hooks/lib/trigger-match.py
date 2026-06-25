@@ -44,7 +44,8 @@ KDEV_DIR = Path(".kdev/memory")
 STATE_FILE = KDEV_DIR / "state" / "trigger-sessions.json"
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from scope import shared_dir, staff_log_files  # noqa: E402
+import step_log  # noqa: E402  # JSONL 主账读封装（dual-read 迁移第 1 步）
+from scope import shared_dir, staff_log_files, list_staff, is_scoped  # noqa: E402
 from step_id import id_label_fragment  # noqa: E402
 
 # 约定的项目级 spec 文件扫描路径
@@ -294,6 +295,46 @@ def scan_step_entries() -> list[dict]:
         for e in scoped:
             e["scope"] = scope_id
         entries.extend(scoped)
+
+    # dual-read：jsonl 主账 Step 的结构化 triggers 叠加（md 不替换）。
+    # jsonl 空 → read_steps 返回 [] → 零叠加，行为字节级不变。
+    # 去重键 = (id, date)，md 优先；今日/昨日过滤同 md 路径。
+    seen = {(e["id"], e.get("date")) for e in entries}
+
+    def _jsonl_entry(rec: dict, scope_id: str | None) -> dict | None:
+        rec_date = rec.get("date") if isinstance(rec.get("date"), str) else None
+        if rec_date is not None and not date_ok(rec_date):
+            return None
+        trigs = rec.get("triggers")
+        trigs = [str(t) for t in trigs if str(t).strip()] if isinstance(trigs, list) else []
+        if not trigs:
+            return None
+        rid = str(rec.get("record_id") or "").strip()
+        if (rid, rec_date) in seen:
+            return None
+        seen.add((rid, rec_date))
+        e = {
+            "id": rid,
+            "title": str(rec.get("title") or ""),
+            "triggers": trigs,
+            "path": str(step_log.jsonl_path(scope=scope_id, root=KDEV_DIR)),
+            "source": "Step",
+            "date": rec_date,
+        }
+        if scope_id is not None:
+            e["scope"] = scope_id
+        return e
+
+    for rec in step_log.read_steps(root=KDEV_DIR):
+        e = _jsonl_entry(rec, None)
+        if e:
+            entries.append(e)
+    if is_scoped(KDEV_DIR):
+        for scope_id in list_staff(KDEV_DIR):
+            for rec in step_log.read_steps(scope=scope_id, root=KDEV_DIR):
+                e = _jsonl_entry(rec, scope_id)
+                if e:
+                    entries.append(e)
     return entries
 
 

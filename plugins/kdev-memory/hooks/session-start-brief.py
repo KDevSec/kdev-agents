@@ -36,6 +36,7 @@ from promote_scan import scan_promote_candidates  # noqa: E402
 from distill_trigger import check_distill_trigger  # noqa: E402
 from pending_commits import format_brief_hint as pending_format_brief_hint  # noqa: E402
 from skill_version import detect_drift as skill_detect_drift  # noqa: E402
+import step_log  # noqa: E402  # JSONL 主账读封装（dual-read 迁移第 1 步）
 from scope import shared_dir, list_staff, staff_dir  # noqa: E402
 from memory_config import read_rating_mode, rating_mode_configured, read_brief_verbosity  # noqa: E402
 
@@ -87,17 +88,36 @@ def _glob_checkpoint_files(kdev_dir: Path, max_items: int = 3) -> List[str]:
     return [str(p) for p in files[:max_items]]
 
 
-def _log_today_status(log_file: Path, today: str) -> str:
-    if not log_file.is_file():
+def _log_today_status(log_file: Path, today: str, root: Path | None = None) -> str:
+    """dual-read：md 路径今日态 ∪ jsonl 主账今日 Step 计数。
+
+    jsonl 空 → steps_for_date 返回 [] → 仅 md 路径生效，行为字节级不变。
+    """
+    md_has_today = False
+    md_step_count = 0
+    if log_file.is_file():
+        try:
+            text = log_file.read_text(encoding="utf-8")
+        except OSError:
+            text = ""
+        if today in text:
+            md_has_today = True
+            md_step_count = sum(1 for line in text.splitlines() if line.startswith("## Step "))
+
+    jsonl_today = 0
+    if root is not None:
+        try:
+            jsonl_today = len(step_log.steps_for_date(today, root=root))
+        except Exception:
+            jsonl_today = 0
+
+    if not md_has_today and jsonl_today == 0:
         return "空"
-    try:
-        text = log_file.read_text(encoding="utf-8")
-    except OSError:
-        return "空"
-    if today not in text:
-        return "空"
-    step_count = sum(1 for line in text.splitlines() if line.startswith("## Step "))
-    return f"今日有 {step_count} 条 Step（含历史）"
+    if md_has_today and jsonl_today == 0:
+        return f"今日有 {md_step_count} 条 Step（含历史）"
+    # jsonl 有今日 Step：合并计数（md 含历史口径 + jsonl 今日数）
+    total = md_step_count + jsonl_today
+    return f"今日有 {total} 条 Step（含历史）"
 
 
 def _last_heading(path: Path, prefix: str) -> str:
@@ -112,6 +132,25 @@ def _last_heading(path: Path, prefix: str) -> str:
         if line.startswith(prefix):
             last = line
     return last
+
+
+def _recent_step_heading(log_file: Path, root: Path) -> str:
+    """dual-read：md 最后一条 `## Step ` heading ∪ jsonl 主账最后一条 record。
+
+    jsonl 空 → read_steps 返回 [] → 退回 md 最后 heading，行为字节级不变。
+    两源都有时取 jsonl 末条（recorder 仍写 md，jsonl 为更新主账时优先；当前 jsonl 空不触发）。
+    """
+    md_last = _last_heading(log_file, "## Step ")
+    try:
+        recs = step_log.read_steps(root=root)
+    except Exception:
+        recs = []
+    if not recs:
+        return md_last
+    last = recs[-1]
+    rid = str(last.get("record_id") or "Step ?")
+    title = str(last.get("title") or "")
+    return f"## {rid}" + (f": {title}" if title else "")
 
 
 def _staff_scope_block(kdev_dir: Path) -> str:
@@ -133,6 +172,17 @@ def _staff_scope_block(kdev_dir: Path) -> str:
                 if line.startswith("## Step "):
                     count += 1
                     latest = line[len("## "):].strip()
+        # dual-read：该 scope 的 jsonl 主账 Step 计入（jsonl 空 → 零叠加）
+        try:
+            recs = step_log.read_steps(scope=sid, root=kdev_dir)
+        except Exception:
+            recs = []
+        if recs:
+            count += len(recs)
+            last = recs[-1]
+            rid = str(last.get("record_id") or "Step ?")
+            title = str(last.get("title") or "")
+            latest = (rid + (f": {title}" if title else "")).strip()
         tail = f"（最新 {latest}）" if latest else ""
         lines.append(f"- {sid}: {count} 条 Step{tail}")
     return "\n".join(lines)
@@ -457,7 +507,7 @@ def main() -> int:
     warn_files = _glob_warn_files(kdev_dir)
     checkpoint_files = _glob_checkpoint_files(kdev_dir)
     log_file = shared / "执行日志.md"
-    log_today = _log_today_status(log_file, today)
+    log_today = _log_today_status(log_file, today, root=kdev_dir)
     summary_today_status = "已生成" if (shared / "每日汇总" / f"{today}.md").is_file() else "未生成"
     missing_past = list_missing_past_summaries(str(kdev_dir), today)
     drift_hint = _claude_md_drift_hint()
@@ -473,7 +523,7 @@ def main() -> int:
     state_pending = read_state_field("pending_decisions")
     state_unresolved = read_state_field("unresolved_gotchas")
 
-    recent_step = _last_heading(log_file, "## Step ")
+    recent_step = _recent_step_heading(log_file, kdev_dir)
     recent_q = _last_heading(shared / "决策日志.md", "## Q")   # "## Q" catches both "Q-NNN" and "Q YYYYMMDD-..."
     recent_g = _last_heading(shared / "踩坑日志.md", "## G")   # "## G" catches both "G-NNN" and "G YYYYMMDD-..."
     staff_block = _staff_scope_block(kdev_dir)

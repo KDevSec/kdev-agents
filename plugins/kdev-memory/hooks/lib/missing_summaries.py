@@ -22,7 +22,9 @@ from pathlib import Path
 from typing import List
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
-from scope import shared_dir  # noqa: E402
+import step_log  # noqa: E402  # JSONL 主账读封装（dual-read 迁移第 1 步）
+import step_dualread  # noqa: E402  # JSONL Step → md 投影合成器
+from scope import shared_dir, list_staff, is_scoped  # noqa: E402
 
 
 _DATE_RE = re.compile(r"日期：(\d{4}-\d{2}-\d{2})")
@@ -57,6 +59,19 @@ def list_missing_past_summaries(
             continue
         for m in _DATE_RE.finditer(text):
             dates.add(m.group(1))
+
+    # dual-read：jsonl 主账 Step 的日期也算"有条目"（shared + 每个 staff scope）。
+    # jsonl 空 → read_steps 返回 [] → dates 不变，行为字节级一致。
+    try:
+        for d in step_dualread.jsonl_step_dates(step_log.read_steps(root=Path(kdev_dir))):
+            dates.add(d)
+        if is_scoped(Path(kdev_dir)):
+            for scope_id in list_staff(Path(kdev_dir)):
+                for d in step_dualread.jsonl_step_dates(
+                        step_log.read_steps(scope=scope_id, root=Path(kdev_dir))):
+                    dates.add(d)
+    except Exception:
+        pass
 
     if not dates:
         return ""

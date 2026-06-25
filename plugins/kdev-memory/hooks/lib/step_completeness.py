@@ -67,6 +67,8 @@ VOIDED_HEURISTIC_PATTERNS = (
 _LIB_DIR = Path(__file__).resolve().parent
 if str(_LIB_DIR) not in sys.path:
     sys.path.insert(0, str(_LIB_DIR))
+import step_log  # noqa: E402  # JSONL 主账读封装（dual-read 迁移第 1 步）
+import step_dualread  # noqa: E402  # JSONL Step → md 投影合成器
 from status_schema import is_voided_status, warn_unknown_status  # noqa: E402
 from step_id import id_label_fragment  # noqa: E402
 
@@ -254,6 +256,23 @@ def _has_model_self_review(body: str) -> bool:
     return any(h in body for h in ("### 模型他评", "## 模型他评", "### 模型自评", "## 模型自评"))
 
 
+def _merge_steps(md_steps: list[dict[str, Any]], jsonl_steps: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    """md ∪ jsonl 去重并集：md 优先，jsonl 只补 md 里没有的 (label, date)。
+
+    去重键 = (label, date)——同一 Step 若已在 md 出现就不重复计 jsonl 投影。
+    当前 jsonl 为空 → jsonl_steps=[] → 返回 md_steps 原样（顺序不变）。
+    """
+    seen = {(s.get("label"), s.get("date")) for s in md_steps}
+    out = list(md_steps)
+    for s in jsonl_steps:
+        key = (s.get("label"), s.get("date"))
+        if key in seen:
+            continue
+        seen.add(key)
+        out.append(s)
+    return out
+
+
 def run_check(log_path: Path, today: str, lookback_days: int = DEFAULT_LOOKBACK_DAYS, rating_mode: str = "user-required") -> dict[str, Any]:
     """主入口：扫执行日志，返回检测结果 dict。
 
@@ -261,7 +280,12 @@ def run_check(log_path: Path, today: str, lookback_days: int = DEFAULT_LOOKBACK_
     - today: YYYY-MM-DD，用于区分"今日新增半残"
     - lookback_days: 扫最近多少天的 Step（过滤降低 noise）
     """
-    if not log_path.is_file():
+    # dual-read：md 路径（既有）∪ jsonl 主账（step_log.read_steps 经合成器投影）。
+    # jsonl 空时 read_steps 返回 []，all_steps 退化为纯 md 解析 → 行为字节级不变。
+    jsonl_file = step_log.jsonl_path(root=log_path.parent)
+    md_exists = log_path.is_file()
+    jsonl_exists = jsonl_file.is_file()
+    if not md_exists and not jsonl_exists:
         return {
             "status": "no-log-file",
             "half_complete_steps": [],
@@ -270,8 +294,9 @@ def run_check(log_path: Path, today: str, lookback_days: int = DEFAULT_LOOKBACK_
             "summary": "执行日志文件不存在",
         }
 
-    text = log_path.read_text(encoding="utf-8")
-    all_steps = parse_steps(text)
+    md_steps = parse_steps(log_path.read_text(encoding="utf-8")) if md_exists else []
+    jsonl_steps = step_dualread.jsonl_steps_as_parse_steps(step_log.read_steps(root=log_path.parent))
+    all_steps = _merge_steps(md_steps, jsonl_steps)
 
     # 按日期过滤
     scanned_steps = [s for s in all_steps if _within_lookback(s["date"], today, lookback_days)]

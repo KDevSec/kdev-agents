@@ -29,6 +29,7 @@ force_utf8_stdio()  # Windows GBK 兼容：v0.8.1+ 统一处理 emoji 编码（p
 
 from migrate import kdev_memory_migrate  # noqa: E402
 from checkpoint import prune_old_checkpoints  # noqa: E402
+import step_log  # noqa: E402  # JSONL 主账读封装（dual-read 迁移第 1 步）
 from scope import shared_dir  # noqa: E402
 
 
@@ -86,15 +87,21 @@ def main() -> int:
     checkpoint_dir.mkdir(parents=True, exist_ok=True)
     checkpoint_file = checkpoint_dir / f"压缩前-{timestamp}.md"
 
-    # 判断"是否未落盘"
+    # 判断"是否未落盘"（dual-read：md 今日态 ∪ jsonl 主账今日 Step）
+    # jsonl 空 → steps_for_date 返回 [] → 仅看 md，行为字节级不变。
     log_file = shared / "执行日志.md"
-    log_empty_today = True
+    md_has_today = False
     if log_file.is_file():
         try:
             text = log_file.read_text(encoding="utf-8")
         except OSError:
             text = ""
-        log_empty_today = today not in text
+        md_has_today = today in text
+    try:
+        jsonl_has_today = bool(step_log.steps_for_date(today, root=kdev_dir))
+    except Exception:
+        jsonl_has_today = False
+    log_empty_today = not (md_has_today or jsonl_has_today)
 
     porcelain = _git_porcelain()
 

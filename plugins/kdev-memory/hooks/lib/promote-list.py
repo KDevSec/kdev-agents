@@ -19,6 +19,9 @@ from datetime import date
 from pathlib import Path
 from typing import List, Tuple
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import step_log  # noqa: E402  # JSONL 主账读封装（dual-read 迁移第 1 步）
+
 
 SOURCES: List[Tuple[str, str]] = [
     ("改进建议.md", "建议"),
@@ -82,6 +85,34 @@ def list_pending_entries(md_path: Path, max_items: int = 30) -> List[str]:
     return pending[:max_items]
 
 
+def list_pending_steps_jsonl(kdev_dir: Path, md_step_text: str = "", max_items: int = 30) -> List[str]:
+    """dual-read：从 执行日志.jsonl 主账浮出非销账 Step 沉淀候选。
+
+    jsonl record 无 promote_status 字段（与 md `## Step` 等价口径），故浮出所有
+    非销账（voided-*）Step，附 status 标注。去重：record 标题已内嵌在某 md Step
+    行里则跳过（substring 判定，防 md+jsonl 双源同 Step 重复列出）。
+    jsonl 空 → read_steps 返回 [] → 返回 []，行为不变。
+    """
+    try:
+        records = step_log.read_steps(root=kdev_dir)
+    except Exception:
+        return []
+    pending: List[str] = []
+    for rec in records:
+        status = str(rec.get("status") or "").strip()
+        if status.startswith("voided"):
+            continue
+        title = str(rec.get("title") or "").strip()
+        if not title or (title and title in md_step_text):
+            continue
+        rid = str(rec.get("record_id") or "").strip()
+        label = f"{rid}: {title}" if rid else title
+        pending.append(f"- {label}  [{status or 'pending'}]")
+        if len(pending) >= max_items:
+            break
+    return pending
+
+
 def main() -> int:
     kdev_dir = Path(".kdev/memory")
     if not kdev_dir.is_dir():
@@ -99,8 +130,27 @@ def main() -> int:
 
     for filename, label in SOURCES:
         path = kdev_dir / filename
-        if not path.is_file():
+        is_step = filename == "执行日志.md"
+        # Step 走 dual-read：md 缺失但 jsonl 有 Step 时仍需出该 section
+        if not path.is_file() and not is_step:
             continue
+
+        if is_step:
+            md_entries = list_pending_entries(path) if path.is_file() else []
+            md_step_text = "\n".join(md_entries)
+            # dual-read：jsonl 主账 Step 候选（record 标题已内嵌在某 md 行里则跳过）
+            jsonl_entries = list_pending_steps_jsonl(kdev_dir, md_step_text=md_step_text)
+            if not (md_entries or jsonl_entries):
+                continue
+            print(f"## {label}（{kdev_dir}/{filename} + 执行日志.jsonl）")
+            print("")
+            for entry in md_entries:
+                print(entry)
+            for entry in jsonl_entries:
+                print(entry)
+            print("")
+            continue
+
         print(f"## {label}（{kdev_dir}/{filename}）")
         print("")
         for entry in list_pending_entries(path):

@@ -25,6 +25,7 @@ from pathlib import Path
 SCRIPT_DIR = Path(__file__).resolve().parent
 sys.path.insert(0, str(SCRIPT_DIR))
 
+import step_log  # noqa: E402  # JSONL 主账读封装（dual-read 迁移第 1 步）
 from memory_config import read_distill_mode, read_distill_thresholds  # noqa: E402
 from scope import shared_dir  # noqa: E402
 from step_id import id_label_fragment  # noqa: E402
@@ -120,51 +121,81 @@ def _count_entries_after(file_path: Path, prefix_re: str, since_ts: float | None
     return count
 
 
-def _count_misalign_after(execution_log: Path, since_ts: float | None) -> int:
+def _count_misalign_after(execution_log: Path, since_ts: float | None, root: Path | None = None) -> int:
     """统计上次蒸馏后差值 ≥ 1.5 的 Step 条数。
 
-    需要解析 Step 条目的"评分差异分析"段。
+    dual-read：md 路径（既有正则扫"评分差异分析"段）∪ jsonl 主账
+    （读 score_diff.delta）。jsonl 空 → read_steps 返回 [] → 仅 md 计数，行为不变。
+    去重键 = (record_id/标题首行, date)——同一 Step 在两源都现身只计一次。
     """
     import re
-    if not execution_log.is_file():
-        return 0
-
-    try:
-        text = execution_log.read_text(encoding="utf-8")
-    except (OSError, UnicodeDecodeError):
-        return 0
+    count = 0
+    seen_md_keys: set = set()
 
     step_head = re.compile(r"^##\s+Step\s+\S+.*$", re.MULTILINE)
     diff_re = re.compile(r"差值\s*(?:[:：]\s*)?([+-]?\d+(?:\.\d+)?)")
     date_re = re.compile(r"^\s*日期\s*[：:]\s*(\d{4}-\d{2}-\d{2})", re.MULTILINE)
-    heads = list(step_head.finditer(text))
+    id_re = re.compile(r"^##\s+(Step\s+\S+)", re.MULTILINE)
 
-    count = 0
-    for i, m in enumerate(heads):
-        start = m.start()
-        end = heads[i + 1].start() if i + 1 < len(heads) else len(text)
-        body = text[start:end]
+    # --- md 路径（既有）---
+    if execution_log.is_file():
+        try:
+            text = execution_log.read_text(encoding="utf-8")
+        except (OSError, UnicodeDecodeError):
+            text = ""
+        heads = list(step_head.finditer(text))
+        for i, m in enumerate(heads):
+            start = m.start()
+            end = heads[i + 1].start() if i + 1 < len(heads) else len(text)
+            body = text[start:end]
 
-        # 时间过滤
-        if since_ts is not None:
             dm = date_re.search(body)
-            if dm:
+            entry_date = dm.group(1) if dm else None
+            idm = id_re.search(body)
+            entry_id = idm.group(1).strip() if idm else None
+
+            # 时间过滤
+            if since_ts is not None and entry_date:
                 try:
-                    entry_dt = datetime.fromisoformat(dm.group(1))
-                    if entry_dt.timestamp() <= since_ts:
+                    if datetime.fromisoformat(entry_date).timestamp() <= since_ts:
                         continue
                 except ValueError:
                     pass
 
-        # 差值过滤
-        dv = diff_re.search(body)
-        if dv:
+            # 差值过滤
+            dv = diff_re.search(body)
+            if dv:
+                try:
+                    if abs(float(dv.group(1))) >= 1.5:
+                        count += 1
+                        seen_md_keys.add((entry_id, entry_date))
+                except ValueError:
+                    pass
+
+    # --- jsonl 主账（dual-read 叠加）---
+    if root is None:
+        root = execution_log.parent
+    for rec in step_log.read_steps(root=root):
+        rec_date = rec.get("date") if isinstance(rec.get("date"), str) else None
+        rec_id = str(rec.get("record_id") or "").strip() or None
+        # 去重：同一 (id, date) 若已被 md 计入则跳过
+        if (rec_id, rec_date) in seen_md_keys:
+            continue
+        # 时间过滤
+        if since_ts is not None and rec_date:
             try:
-                if abs(float(dv.group(1))) >= 1.5:
-                    count += 1
+                if datetime.fromisoformat(rec_date).timestamp() <= since_ts:
+                    continue
             except ValueError:
                 pass
-
+        sd = rec.get("score_diff") or {}
+        delta = sd.get("delta") if isinstance(sd, dict) else None
+        if delta is not None:
+            try:
+                if abs(float(delta)) >= 1.5:
+                    count += 1
+            except (ValueError, TypeError):
+                pass
     return count
 
 
@@ -195,7 +226,7 @@ def check_distill_trigger(kdev_dir: Path | str = ".kdev/memory") -> TriggerCheck
     # F/R 标题双认：id_label_fragment 同时认旧式 `F-001` 与时间戳形 `F 20260613-…`（Q-020）
     new_f = _count_entries_after(shared_dir(kdev) / "skill-feedback.md", rf"^##\s+{id_label_fragment('F')}", last_ts)
     new_r = _count_entries_after(shared_dir(kdev) / "改进建议.md", rf"^##\s+{id_label_fragment('R')}", last_ts)
-    new_misalign = _count_misalign_after(shared_dir(kdev) / "执行日志.md", last_ts)
+    new_misalign = _count_misalign_after(shared_dir(kdev) / "执行日志.md", last_ts, root=kdev)
 
     reasons: list[str] = []
 

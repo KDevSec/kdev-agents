@@ -30,6 +30,9 @@ sys.path.insert(0, str(SCRIPT_DIR))
 from _utf8 import force_utf8_stdio  # noqa: E402
 force_utf8_stdio()
 
+import scope as _scope  # noqa: E402
+import step_log  # noqa: E402  # JSONL 主账读封装（dual-read 迁移第 1 步）
+import step_dualread  # noqa: E402  # JSONL Step → md 投影合成器
 from sanitize import sanitize_text, verify_no_leaks  # noqa: E402
 from scope import shared_dir, staff_log_files  # noqa: E402
 from status_schema import is_voided_status, warn_unknown_status  # noqa: E402
@@ -169,6 +172,28 @@ def _split_entries(text: str, head_re: re.Pattern[str], source_file: str) -> lis
     return result
 
 
+def _record_to_entry(record: dict) -> Entry:
+    """JSONL Step record → distill `Entry`（dual-read 迁移第 1 步，叠加 md 不替换）。
+
+    raw body 经 step_dualread 合成，含 render_full / render_misalignment / diff_score
+    grep 的子串（`差值：<delta>` / `顺畅度：<n>`）；fields 填 about/status 供
+    is_misalignment_step / step_about 读取。source_file 标 jsonl 以区分来源。
+    """
+    rec_date = record.get("date")
+    rec_date = rec_date if isinstance(rec_date, str) else None
+    about = str(record.get("about") or "project")
+    status = str(record.get("status") or "")
+    return Entry(
+        entry_id=str(record.get("record_id") or "Step ?"),
+        title=str(record.get("title") or ""),
+        date=rec_date,
+        source_file="执行日志.jsonl",
+        raw=step_dualread.record_to_md_body(record),
+        fields={"about": about, "status": status,
+                **({"日期": rec_date} if rec_date else {})},
+    )
+
+
 def _iter_memory_files(kdev_dir: Path, prefix: str) -> Iterable[Path]:
     """主文件（shared 解析）+ 归档目录下同前缀 markdown。"""
     base = shared_dir(kdev_dir)
@@ -199,6 +224,24 @@ def collect_entries(kdev_dir: Path) -> list[Entry]:
         except (OSError, UnicodeDecodeError):
             continue
         entries.extend(_split_entries(text, step_head_re, path.name))
+
+    # dual-read：jsonl 主账 Step 叠加（md 不替换；jsonl 空 → read_steps 返回 [] → 零叠加）。
+    # 去重键 = (entry_id, date)，md 优先；shared + 每个 staff scope 都并入。
+    seen_steps = {(e.entry_id, e.date) for e in entries if e.entry_id.split()[:1] == ["Step"]}
+    for rec in step_log.read_steps(root=kdev_dir):
+        e = _record_to_entry(rec)
+        if (e.entry_id, e.date) in seen_steps:
+            continue
+        seen_steps.add((e.entry_id, e.date))
+        entries.append(e)
+    if _scope.is_scoped(kdev_dir):
+        for scope_id in _scope.list_staff(kdev_dir):
+            for rec in step_log.read_steps(scope=scope_id, root=kdev_dir):
+                e = _record_to_entry(rec)
+                if (e.entry_id, e.date) in seen_steps:
+                    continue
+                seen_steps.add((e.entry_id, e.date))
+                entries.append(e)
     return entries
 
 
