@@ -6,6 +6,21 @@
 
 ---
 
+## 🧭 总纲：两套 memory 是两种场景，别默认 kdev = ieidev
+
+| | kdev-memory | ieidev-team |
+|---|---|---|
+| **场景** | **单用户 · 跨会话召回** | **多 Agent · 记忆共享** |
+| 一句话目标 | 开新会话召回"上次做到哪 / 别重踩坑" | 决定"哪些记忆在哪些 agent 间共享" |
+| 记忆是什么 | 一条连续的**个人时间线**（读者 = 人 + 下个会话的 Claude） | 团队**协作底座**（读者 = 其他 agent） |
+| 核心机制 | SessionStart brief + trigger-match 召回 | staff-scope / delegation / events / handoffs / CQO |
+
+**决策判据**：比对 ieidev 做跟进时先问一句——这条是「**服务单用户召回的通用工程改进**」（bug 修复 / sync UX / 确定性渲染 / 结构化存储 → **借**），还是「**多 agent 共享机制**」（scope / delegation / events / handoffs / CQO / 硬切契约 → **主动分叉**）？
+
+所以本文标题「对齐 ieidev-team」应读作「**借 ieidev 的通用工程改进，在共享机制上主动分叉**」——不是「让 kdev = ieidev」。这条是下方「不跟清单」（§5）一刀切的判据，也是 P2 选 **C1 永久 dual-read**（非 ieidev 式硬切）的总根。详见决策 [Q 20260625-173847]（`.kdev/memory/决策日志.md`）。
+
+---
+
 ## TL;DR — 三个层级
 
 | 层级 | 内容 | 与架构决策的关系 | 建议 |
@@ -13,7 +28,7 @@
 | ~~P0 立刻修~~ ✅ | 时间戳 ID 双认回归（weekly / distill_trigger / distill 漏认 Q-020 后的新条目） | **完全独立**，纯 bug | **已实施 2026-06-25**（commit `a8377a6`，+6 TDD 用例） |
 | ~~P1 短期跟~~ ✅ | sync 层三件套（`init-local` / `sync: off` / 失败会话内提示） | 独立于 JSONL | **已实施 2026-06-25**（commit `6f4296f`，+14 TDD 用例） |
 | **P1b 调查中** | Windows hook 控制台闪窗（上游缺陷）+ wrapper 加固 backport（CRLF/.gitattributes/PYTHONUTF8/单行 exec） | 加固独立普惠双队列；闪窗本身 = Claude Code 上游 **not-planned**，pythonw 可能白费 | 加固**随 P1 一批做**；闪窗走 Windows 实验闸定夺 |
-| **P2 需决策** | JSONL 叙事主账（Plan D Phase 2）+ checkpoint 瘦身 | **大架构升级**，已有 P-C2 设计稿未实施 | 先拍「kdev-memory 是否迁 JSONL」，再排实施 |
+| ~~P2 需决策~~ ✅ 已实施(C1) | JSONL 叙事主账（Plan D Phase 2）= Phase A 基座 + dual-read + Phase B(recorder→jsonl+daily_render) + Phase C(切档下线+文档+spec回写)。checkpoint 瘦身(D4) **未做·defer** | 选 **C1 永久 dual-read**（Q 20260625-173847；借 JSONL 增益、低风险不硬切，见总纲） | **已实施 2026-06-25**（commits `f525e3b`→`d8b8829`，516 passed）；**未发布**，待另会话 bugfix 后 bump 0.19.0+刷 marketplace 激活 |
 
 **不跟清单**（team 编排耦合，独立 kdev-memory 无意义）：`delegation.py`、`recall.py` 的 events/handoffs 部分、`block-advance-past-gate.py`、`cqo-event-audit.py`、`claude_md_merge.py` 的 shim 化。详见 §5。
 
