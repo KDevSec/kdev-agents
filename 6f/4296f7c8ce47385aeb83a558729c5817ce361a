@@ -1,0 +1,30 @@
+kdev-sync.yml
+  s_7911c9068c7c15::t_ab089c64c2b552 6-9
+plugins/kdev-memory/hooks/lib/kdev_sync.py
+  s_7911c9068c7c15::t_e49253fa2dbe4c 223-224
+  s_7911c9068c7c15::t_286c6d77844271 21-33,36-41,59-83,87-93,96,99
+  s_7911c9068c7c15::t_f38f12e45a414a 154-156,162-182
+plugins/kdev-memory/hooks/kdev-sync-bootstrap.py
+  s_7911c9068c7c15::t_69190760aa5d90 18-26
+plugins/kdev-memory/tests/test_kdev_sync.py
+  s_7911c9068c7c15::t_10ab7b90f9f25e 3
+  s_7911c9068c7c15::t_c73f7adfe48d84 93-94
+  s_7911c9068c7c15::t_afc22fcbb733ec 46-47,51-56,65-70
+  s_7911c9068c7c15::t_f84b1278ea9066 169-283
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.13",
+  "base_commit_sha": "6f4296f7c8ce47385aeb83a558729c5817ce361a",
+  "prompts": {},
+  "sessions": {
+    "s_7911c9068c7c15": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "dae659e8-6a74-493c-aecd-8c1c67aece9a",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
