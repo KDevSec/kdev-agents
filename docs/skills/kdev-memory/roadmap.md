@@ -12,6 +12,7 @@
 |------|------|------------------|------|
 | ~~P0 立刻修~~ ✅ | 时间戳 ID 双认回归（weekly / distill_trigger / distill 漏认 Q-020 后的新条目） | **完全独立**，纯 bug | **已实施 2026-06-25**（commit `a8377a6`，+6 TDD 用例） |
 | ~~P1 短期跟~~ ✅ | sync 层三件套（`init-local` / `sync: off` / 失败会话内提示） | 独立于 JSONL | **已实施 2026-06-25**（commit `6f4296f`，+14 TDD 用例） |
+| **P1b 调查中** | Windows hook 控制台闪窗（上游缺陷）+ wrapper 加固 backport（CRLF/.gitattributes/PYTHONUTF8/单行 exec） | 加固独立普惠双队列；闪窗本身 = Claude Code 上游 **not-planned**，pythonw 可能白费 | 加固**随 P1 一批做**；闪窗走 Windows 实验闸定夺 |
 | **P2 需决策** | JSONL 叙事主账（Plan D Phase 2）+ checkpoint 瘦身 | **大架构升级**，已有 P-C2 设计稿未实施 | 先拍「kdev-memory 是否迁 JSONL」，再排实施 |
 
 **不跟清单**（team 编排耦合，独立 kdev-memory 无意义）：`delegation.py`、`recall.py` 的 events/handoffs 部分、`block-advance-past-gate.py`、`cqo-event-audit.py`、`claude_md_merge.py` 的 shim 化。详见 §5。
@@ -54,6 +55,52 @@ ieidev 0.4.0 → 0.5.0 把「记忆仓 git 同步」从「失败只打 stderr（
 | **失败会话内提示** | pull/clone/init 失败不报 stderr，改 `<kdev-sync-reminder>` XML 标签 + 中文引导（教 `gh auth login` 一次缓存凭据） | 失败 `print` 到 stderr，用户不可见 | 低（`sync_failed_reminder_text()` + bootstrap 上层改打印通道） |
 
 > 💡 本会话 SessionStart 弹的 `<ieidev-sync-reminder>「检测到工程记忆尚未 git 托管…」`正是这套体验的产物——kdev 目前给不出等价的会话内引导。
+
+---
+
+## P1b — Windows hook 控制台闪窗 ＋ wrapper 加固（新增 2026-06-25，调查中）
+
+> 起源：用户报"Windows 上 hook **一直启停闪控制台窗**"。0.18.3 CHANGELOG 只修了 GCM「Connect to GitHub」弹窗（GUI 凭据框，与闪窗**正交**），**没碰闪窗根因**（✅ 核实：`git diff d9be67e HEAD` 对 [run-python-hook.cmd](plugins/kdev-memory/hooks/run-python-hook.cmd) 和 [hooks.json](plugins/kdev-memory/hooks/hooks.json) 均空）。本节落账调查结论，避免丢失。
+
+### 现象与场景判定（✅ 已核实控制台模型）
+
+- **闪窗 = 每次 hook 触发弹一个 cmd.exe 控制台窗**，高频（PostToolUse 命中每次 Write/Edit/MultiEdit/NotebookEdit/Bash，SessionStart 连闪两下）。
+- **精确命中 = Windows × GUI 宿主**（VSCode/JetBrains 原生扩展 / Claude Desktop）；**Windows × 终端 CLI 不闪**（hook 继承终端 console）。Linux/macOS 全程无关。
+- 用户实际用户面（2026-06-25 确认）：**原生扩展（闪）＋ 终端 CLI（不闪）双队列共存** → 推出修法**红线：对终端 CLI 队列必须无害**（pythonw 改的是整个 Windows 分支，会触及这拨）。
+
+### 根因：Claude Code 上游缺陷，非 kdev（✅ 机制独立推导 ＋ claude-code-guide 网查吻合）
+
+- Claude Code 在 Windows GUI 宿主派生 command hook 时**没传 `CREATE_NO_WINDOW`（0x08000000）** → OS 给 cmd.exe 新分配 console 并显示。**不是 kdev bug**：任何带 command hook 的插件都中招，kdev 只是 6 类事件高频显眼。
+- 官方**主动不修**：RFE「给 hook 加 windowsHide」被 closed as **not planned**；无任何隐藏窗口的 settings/env 配置。
+- ⚠️ **可信度**：上游 issue 号系 claude-code-guide 网查所得（个别 URL 畸形，按 R-009 引用前须自核）；但"缺 CREATE_NO_WINDOW ＋ 无配置 ＋ RFE not-planned"的**定性**与从控制台模型独立推导的机制**一致**，高可信。
+- ⚠️ **pythonw 可能白费**：v2.1.143 起 Claude Code 派生 claude.exe 子进程做沙箱再跑 hook。若那个缺 flag 的窗口是 **claude.exe 沙箱子进程**的（在我们 cmd.exe 之上一层），插件侧换 pythonw/wscript 也消不掉它。窗口归谁随 Claude Code 版本而变（老版本 spawn cmd.exe→窗口是 cmd.exe 的、或许能动；新版本沙箱 fork→窗口是 claude.exe 的、无解），**从 Linux 无法判定**。
+
+### ✅ 可立刻做 ＋ 普惠双队列：wrapper 加固 backport（ieidev 0.5.0 领先，kdev 0.18.3 该跟）
+
+**契合本 roadmap「ieidev 领先、kdev 该跟」主题，是 4 路 diff 漏掉的一项。** kdev 的 [run-python-hook.cmd](plugins/kdev-memory/hooks/run-python-hook.cmd) 是**纯 LF 且无 .gitattributes**（✅ `file` 实测）；ieidev 同名文件 CRLF ＋ `.gitattributes` 锁 ＋ 更硬：
+
+| 加固项 | ieidev 0.5.0 | kdev 0.18.3 | 影响 | 难度 |
+|--------|-------------|-------------|------|------|
+| 行尾 CRLF ＋ `.gitattributes` 锁 `hooks/run-python-hook.cmd text eol=crlf` | ✅ | ❌ 纯 LF，无 .gitattributes | 🔴 LF→cmd.exe 忽略 `@echo off`→窗里/终端里刷命令文本（GUI 闪得脏、CLI 终端有噪声） | 低 |
+| cmd 块 ASCII-only（中文只放 bash 行）| ✅ | ⚠️ 注释英文但无强约束 | GBK 控制台中文乱码 | 低 |
+| `PYTHONUTF8=1` | ✅ 双分支 set | ❌ 无 | GBK 下中文/emoji 输出更稳 | 极小 |
+| Unix 分支单行 ＋ 尾 `#` 吃 `\r` | ✅ | ❌ 多行（CRLF 化后 `\r` 会弄坏路径/关键字） | **与 CRLF 改动绑定**：若锁 CRLF 必须同改 | 低 |
+| `exec` 单次执行 ＋ `--version` 探测跳 Win Store python3 死垫片 | ✅ | ❌ `python3 \|\| python` | 避免 Store stub 假成功 | 低 |
+
+> **绑定关系**：一旦把 .cmd 锁成 CRLF，Unix/bash 分支**必须**同步改成 ieidev 那种「单行 ＋ 尾 `#`」写法，否则 CRLF 的 `\r` 会弄坏 bash 分支——两件事不可拆。
+> **价值独立于"窗口能否消"**：加固让闪窗从「刷一屏命令」降到「干净一闪」、消终端 CLI 噪声、修 LF 潜在跨平台 bug、对齐 ieidev。**即使窗口最终消不掉也值得做。**
+
+### ❌ 不可借鉴：autoserve 的 DETACHED 手法
+
+ieidev 的 `autoserve.py`（`pyieidev/ieidev_hud/`，`_spawn_serve()` 行 188-191）会用 `DETACHED_PROCESS | CREATE_NEW_PROCESS_GROUP` 无窗起后台 HUD 服务——但它 `stdin/stdout/stderr` 全 DEVNULL，是发射后不管。**hook 必须回传 stdout ＋ exit code 给 Claude Code，照搬会断回传。** 只能当"团队会用 creationflags"的存在证明，非现成解。
+
+### 决策点（拍板前别动手）
+
+1. **Tier-1 wrapper 加固**：建议**直接做**（独立成立、零风险、双队列普惠）。产物：改 [run-python-hook.cmd](plugins/kdev-memory/hooks/run-python-hook.cmd)（CRLF ＋ ASCII cmd ＋ PYTHONUTF8 ＋ 单行 exec bash）＋ 新增 `.gitattributes` 锁 CRLF ＋ TDD（保两分支仍能选对解释器）。
+2. **窗口本身走实验闸**：在 Windows 扩展环境把某 hook 临时换成 trivial `pythonw` 脚本——**还闪 = 窗口是 claude.exe 的（plugin 无解，转文档化）；不闪 = 窗口是 cmd.exe 的（pythonw 有救，再正式投）**。10 分钟换确定性，避免盲投。
+3. **文档化兜底**（若实验证明 plugin 无解）：README/CHANGELOG 标明「Windows GUI 宿主闪窗 = Claude Code 上游已知缺陷（非本插件），官方 not-planned，受影响用户可去上游 issue +1 或改终端 CLI」。
+
+**落地顺序**：Tier-1 随 P1 一批做（同属低风险 ieidev-backport）；窗口实验需用户 Windows 机器配合，结果回写本节。
 
 ---
 
@@ -127,7 +174,7 @@ ieidev 把 [pre-compact-check.py](plugins/kdev-memory/hooks/pre-compact-check.py
 ## 附录：建议落地顺序
 
 1. **本周**：P0 时间戳双认（4 处 + TDD），bump patch 版。
-2. **下一迭代**：P1 sync 三件套 + P2 配套的 checkpoint 指针格式（两者都独立于 JSONL，先收割低风险收益）。
+2. **下一迭代**：P1 sync 三件套 + **P1b wrapper 加固（CRLF/.gitattributes/PYTHONUTF8/单行 exec backport）** + P2 配套的 checkpoint 指针格式（都独立于 JSONL，先收割低风险收益）；并行让用户在 Windows 跑 P1b 闪窗归属实验（pythonw 是否有救）。
 3. **专题决策会**：拍 P2 JSONL 是否迁、怎么分阶段，连带处理 G-011 worktree ID 隐患；决策结果回写 [P-C2 spec](docs/superpowers/specs/2026-06-13-P-C2-JSONL操作层+token优化-design.md) 与 SKILL.md（spec→canonical 回写铁规）。
 
 ---
