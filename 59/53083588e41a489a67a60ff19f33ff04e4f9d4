@@ -1,0 +1,23 @@
+plugins/kdev-memory/hooks/lib/daily_render.py
+  s_7911c9068c7c15::t_7f1f3e82069a1d 1-136
+plugins/kdev-memory/tests/test_daily_render.py
+  s_7911c9068c7c15::t_93b5279ce4e605 1-110
+plugins/kdev-memory/skills/kdev-memory/SKILL.md
+  s_7911c9068c7c15::t_91c9ec26518cf5 300-314,318
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.13",
+  "base_commit_sha": "5953083588e41a489a67a60ff19f33ff04e4f9d4",
+  "prompts": {},
+  "sessions": {
+    "s_7911c9068c7c15": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "dae659e8-6a74-493c-aecd-8c1c67aece9a",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
