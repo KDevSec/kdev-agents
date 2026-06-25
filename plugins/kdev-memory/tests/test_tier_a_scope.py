@@ -30,11 +30,42 @@ def test_missing_summaries_scoped(tmp_path):
 
 
 def test_archive_hint_scoped(tmp_path):
+    """季度切档提醒仍照常解析 shared/ 子目录（回归保护）。"""
+    root = tmp_path / "memory"
+    (root / "shared").mkdir(parents=True)
+    (root / "shared" / "决策日志.md").write_text("日期：2020-01-01\n", encoding="utf-8")
+    out = archive_hint.collect_archive_hints(str(root))
+    assert "决策日志.md" in out
+
+
+def test_archive_hint_execution_log_monthly_gated_off(tmp_path):
+    """JSONL 迁移 Phase C：执行日志.md 按月切档提醒已下线，不应再出现。
+
+    旧条目（2020-01）相对今天必然跨月，gate off 前会触发月度提醒；gate off 后即使
+    执行日志.md 里有跨月旧条目也不再提示切档（jsonl 主账无月度 rotation 落点）。
+    """
     root = tmp_path / "memory"
     (root / "shared").mkdir(parents=True)
     (root / "shared" / "执行日志.md").write_text("日期：2020-01-01\n", encoding="utf-8")
     out = archive_hint.collect_archive_hints(str(root))
-    assert "执行日志.md" in out
+    assert "执行日志.md" not in out
+
+
+def test_archive_hint_quarterly_still_fires(tmp_path):
+    """回归保护：决策/踩坑日志的季度切档提醒仍照常出现。"""
+    root = tmp_path / "memory"
+    (root / "shared").mkdir(parents=True)
+    # 2020 Q1 相对任何后续季度必然跨季 → 应触发季度切档提醒。
+    (root / "shared" / "决策日志.md").write_text("日期：2020-01-01\n", encoding="utf-8")
+    (root / "shared" / "踩坑日志.md").write_text("日期：2020-01-01\n", encoding="utf-8")
+    out = archive_hint.collect_archive_hints(str(root))
+    assert "决策日志.md" in out
+    assert "踩坑日志.md" in out
+    assert "跨季" in out
+    # 同时确认执行日志即便存在跨月旧条目也不混进季度提醒里。
+    (root / "shared" / "执行日志.md").write_text("日期：2020-01-01\n", encoding="utf-8")
+    out2 = archive_hint.collect_archive_hints(str(root))
+    assert "执行日志.md" not in out2
 
 
 def test_promote_scan_scoped(tmp_path):

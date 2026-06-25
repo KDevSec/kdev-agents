@@ -3,7 +3,7 @@
 被 stop-check.py 通过 import 引用。
 
 切档规则（见 SKILL.md「文件切档与归档」）：
-  执行日志.md   → 按月切     执行日志-YYYY-MM.md
+  执行日志.md   → 月度切档已下线（JSONL 迁移 Phase C，见 collect_archive_hints）
   踩坑日志.md   → 按季度切  踩坑日志-YYYYQN.md
   决策日志.md   → 按季度切  决策日志-YYYYQN.md
   改进建议.md   → 不切档
@@ -52,7 +52,12 @@ def earliest_date_in_file(path: Path) -> Optional[str]:
 
 
 def check_monthly_archive_hint(path: Path, label: str) -> str:
-    """检查某文件是否需要按月归档；返回提醒文本（无则空）。"""
+    """检查某文件是否需要按月归档；返回提醒文本（无则空）。
+
+    ⚠️ 当前无调用方（JSONL 迁移 Phase C）：唯一按月切档的 执行日志.md 已硬切换到
+    执行日志.jsonl 单一 append-only 主账，Step 月度归档提醒已 gate off（见
+    collect_archive_hints）。保留本函数：将来若建 jsonl 月度 rotation 通道可直接复用。
+    """
     earliest = earliest_date_in_file(path)
     if not earliest:
         return ""
@@ -92,9 +97,13 @@ def collect_archive_hints(kdev_dir: str) -> str:
     kdev = shared_dir(Path(kdev_dir))
     hints: list = []
 
-    line = check_monthly_archive_hint(kdev / "执行日志.md", "执行日志.md")
-    if line:
-        hints.append(f"  - {line}")
+    # 执行日志 Step 按月归档提醒：JSONL 迁移 Phase C cutover 后 gate off。
+    # 叙事 Step 已硬切换到 执行日志.jsonl 单一 append-only 主账（Q 20260625-173847-ly1989abc，
+    # 采 C1 永久 dual-read），旧 执行日志.md 冻结、经 dual-read 永久兼容读。Phase C 未建
+    # jsonl 月度 rotation 通道（无 执行日志-YYYY-MM.jsonl），「把老条目切到 归档/
+    # 执行日志-YYYY-MM.md」这个动作在 jsonl 世界没有落点——再读冻结归档只会给出「重切
+    # 已冻结文件」的错误信号。故 Step 月度归档提醒下线；Q/G（决策/踩坑）季度归档提醒仍按
+    # 各自 markdown 工作（下方）。
 
     line = check_quarterly_archive_hint(kdev / "踩坑日志.md", "踩坑日志.md")
     if line:
