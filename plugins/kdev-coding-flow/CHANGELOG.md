@@ -1,5 +1,12 @@
 # Changelog
 
+## v0.3.0 — 2026-06-25
+
+### Changed
+
+- 删除 SKILL.md 尾部「接 kdev-core 底座（员工编排在 kdev-team）」指针段——数字员工集群 kdev-core/kdev-team/kdev-hud 已退役归档至 `docs/framework/04-references/_retired-plugins/`，coding-flow 回归**独立纯方法论 skill**（13 节点 SOP + TDD + E2E Gate 方法论，正文本就自包含，仅去掉对已退役 kdev-team 的悬空指针）。
+- 说明：coding-flow 的 persona+node-table 编排层自诞生即绑定 kdev-core 引擎（persona 调 `python -m kdev_core`），属数字员工编排概念，已随 kdev-team 退役；**不**还原回本插件（还原即重新耦合）。本插件作为独立方法论参考，由 Claude/人直接遵循 SOP。
+
 ## v0.2.0 — 2026-05-12
 
 ### Changed

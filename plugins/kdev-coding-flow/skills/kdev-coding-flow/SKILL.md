@@ -328,9 +328,3 @@ skill 必须支持"完全自主"模式：
 > "用 13 节点 SOP 自主完成这个需求"
 > "实施这个 plan，端到端"
 > "auto mode 跑完这个 feature"
-
-## 接 kdev-core 底座（员工编排在 kdev-team）
-
-本 SOP 的 13 节点编排由**开发工程师**员工执行，定义在 `plugins/kdev-team/`：
-- 编排 agent `dev-engineer-orchestrator` 读 `kdev-team/orchestration/dev-engineer.node-table.yml`、用 kdev-core CLI 驱动引擎、按节点派 `dev-engineer-*` 业务 agent。
-- 本 SKILL = **方法论 + skill 调用要求/模板参考**（agent 参考），**不充当编排器**（守 Q-008：编排=agent 按 node-table 调度）。

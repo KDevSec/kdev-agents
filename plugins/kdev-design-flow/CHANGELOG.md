@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.4.0 — 2026-06-25
+
+**解耦数字员工底座，回归独立自包含（回退 v0.3.0 接底座）**
+
+- 恢复自带 `lib/flow_state.py` 状态机 + `tests/test_flow_state.py`（从 `26fc511` 还原）；删除 `tests/test_skill_base_migration.py`（断言依赖底座的迁移测试）。
+- `skills/kdev-design-flow/SKILL.md` 还原为**自跑状态机**版：状态落本插件 `.kdev/design-flow/<slug>/flow-state.json`，不再依赖 kdev-core 引擎 / kdev-team `kdev-flow-driver`。
+- 背景：数字员工集群 kdev-core/kdev-team/kdev-hud 已退役归档至 `docs/framework/04-references/_retired-plugins/`；design-flow 作为独立流程 skill 不应耦合已退役的编排底座。SOP 行为不破（3 评审闸门 / 3 retry / 宪法 UI 抽取 / 恢复模式均保留）。测试 33 passing。
+
 ## 0.3.0 — 2026-06-12
 
 **接 kdev-core 底座：SKILL 回归方法论参考，自带 flow_state 退役**

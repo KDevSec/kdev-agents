@@ -84,24 +84,6 @@
       "description": "Bug 修复 8 步流程 skill + /kdev-bugfix 斜杠命令（深集成 OpenSpec + 禅道双源 + 三档评审 + dry-run 演练）：禅道拉取 OR 直接对话 → proposal/design/specs/tasks → 根因投资（systematic-debugging Iron Law） → RED 回归测试（test-driven-development） → GREEN 最小修复 → 验证闸门（type-check + lint + 测试 + openspec validate） → 评审闸门（AI/multi/human/both 三档；P0/鉴权/跨模块/数据迁移/文件>3 强制升级 multi） → kdev-commit → 禅道 active→resolved 自动回写（失败兜底手动指引）。修复结论用统一三段交付摘要【根因分析】/【影响范围】/【修复方案】跨禅道 comment / 会话报告 / 产物文档 / commit message 共享。--dry-run 完整跑 8 步但不动任何持久状态（不写产物/不动 src/不动 git/不调禅道写接口）。autodetect openspec/ 决定模式；ZENTAO_API_URL+TOKEN 触发禅道源",
       "category": "development",
       "source": "./plugins/kdev-bugfix"
-    },
-    {
-      "name": "kdev-team",
-      "description": "KDev 数字员工集群：编排+业务 agent + per-员工 node-table + staff.yml 花名册（员工集中总目录）",
-      "category": "development",
-      "source": "./plugins/kdev-team"
-    },
-    {
-      "name": "kdev-core",
-      "description": "数字员工编排底座（R1 状态/R2 流转/R3 关卡）：feature-first 存储 + events.jsonl 流水。被 kdev-team 经 python -m kdev_core 驱动。",
-      "category": "development",
-      "source": "./plugins/kdev-core"
-    },
-    {
-      "name": "kdev-hud",
-      "description": "数字员工观测层（第 4 plugin，纯只读）：把 kdev-core feature-first 账本渲染成通道①命令行状态栏 + 通道②自包含网页仪表盘 hud.html。不写 features/，底座可 headless 单装。",
-      "category": "development",
-      "source": "./plugins/kdev-hud"
     }
   ]
 }

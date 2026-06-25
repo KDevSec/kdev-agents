@@ -43,6 +43,18 @@
 
 总磁盘 ~1.1GB（浅克隆 `--depth 1`）。
 
+### 1.4 退役插件历史备份（2026-06-25 归档）
+
+从 `plugins/` 退役、整树搬入 `_retired-plugins/` 作冻结历史备份（已从 `.claude-plugin/marketplace.json` 注销，不再作为活跃插件安装）。代码冻结，内部对 `plugins/...` 的相对/绝对路径引用为搬迁前状态，不再维护。
+
+| 子目录 | 原路径 | 说明 |
+|---|---|---|
+| `_retired-plugins/kdev-core/` | `plugins/kdev-core` | 数字员工编排底座（R1 状态/R2 流转/R3 关卡）：feature-first 存储 + events.jsonl 流水 |
+| `_retired-plugins/kdev-hud/` | `plugins/kdev-hud` | 数字员工观测层（纯只读）：把 kdev-core feature-first 账本渲染成命令行状态栏 + 自包含网页仪表盘 |
+| `_retired-plugins/kdev-team/` | `plugins/kdev-team` | KDev 数字员工集群：编排+业务 agent + per-员工 node-table + staff.yml 花名册 |
+
+> 与 `_repos/`（gitignore 的外部源码克隆）不同，`_retired-plugins/` 是**自有代码的历史快照，纳入版本控制**。
+
 ---
 
 ## 二、克隆命令（重新建立环境用）
@@ -101,3 +113,4 @@ docs/framework/04-references/_repos/
 | 2026-05-30 | 第一轮：clone OMC/Letta/mem0/Aider/Continue + 5 仓综合报告 + 双轨提案 + 知识图谱集成方案 |
 | 2026-05-30 | 第二轮：clone LangGraph/CrewAI + 6 深扫 agent（OMC 编排 / OMC 自演进 / Continue 跨 IDE / OpenMemory MCP / LangGraph 多 agent / CrewAI 6-crew）+ 补遗 doc + 数字员工架构最终建议 |
 | 2026-06-05 | 从整体架构正文剥离 OMC 架构借鉴对照 → 独立参考档案（2026-06-05-07）|
+| 2026-06-25 | 退役插件归档：`plugins/{kdev-core,kdev-hud,kdev-team}` 整树搬入 `_retired-plugins/`，同步从 marketplace.json 注销 3 条注册 |

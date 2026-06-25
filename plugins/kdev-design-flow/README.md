@@ -50,6 +50,6 @@ cd plugins/kdev-design-flow
 python3 -m pytest tests/ -v
 ```
 
-预期：29 passing（slug 11 + skill_md_lint 14 + skill_base_migration 4）。
+预期：33 passing（slug 11 + skill_md_lint 14 + flow_state 8）。
 
-> v0.3.0 起 design-flow 接 kdev-core 底座：自带 `lib/flow_state.py` 退役（状态迁 kdev-core feature-first `.kdev/features/<slug>/`），原 `test_flow_state.py` 移除，新增 `test_skill_base_migration.py`（迁移断言）。编排由 kdev-team 通用 `kdev-flow-driver` + `req-architect.node-table.yml` 驱动，本 SKILL 回归方法论参考。
+> v0.4.0（2026-06-25）起 design-flow **解耦数字员工底座、回归独立自包含**：恢复自带 `lib/flow_state.py` 状态机 + `tests/test_flow_state.py`，SKILL 还原为自跑状态机（状态落本插件 `.kdev/design-flow/<slug>/`，不依赖 kdev-core/kdev-team）。原 v0.3.0「接底座」改动（flow_state 退役、迁 kdev-core feature-first、`test_skill_base_migration.py` 迁移断言）已回退——kdev-core/kdev-team 已退役归档至 `docs/framework/04-references/_retired-plugins/`。
