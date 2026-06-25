@@ -158,3 +158,53 @@ def test_no_entries_in_range_message(tmp_path):
     _setup(tmp_path)
     r = _call(tmp_path, "2020-01-01", "2020-01-07")
     assert "无记录" in r.stdout or "空" in r.stdout or "no entries" in r.stdout.lower()
+
+
+def test_timestamp_form_qgr_entries_counted(tmp_path):
+    """Q-020/v0.17 时间戳形 Q/G/R 条目（`## Q 20260625-...`）也要被 weekly 收录。
+
+    回归：4 处漏改硬编码 `X-\\d+`，时间戳形 Q/G/R 被静默漏掉。
+    weekly heading 双认应改用 id_label_fragment。
+    """
+    k = _setup(tmp_path)
+    (k / "决策日志.md").write_text(
+        "# 决策日志\n\n## Q 20260625-093000-ly: 时间戳形决策\n\n日期：2026-04-18\n",
+        encoding="utf-8",
+    )
+    (k / "踩坑日志.md").write_text(
+        "# 踩坑日志\n\n## G 20260625-094000-ly: 时间戳形踩坑\n\n日期：2026-04-18\n",
+        encoding="utf-8",
+    )
+    (k / "改进建议.md").write_text(
+        "# 改进建议\n\n## R 20260625-095000-ly: 时间戳形改进\n\n日期：2026-04-18\n",
+        encoding="utf-8",
+    )
+    r = _call(tmp_path, "2026-04-15", "2026-04-21")
+    assert r.returncode == 0
+    # 过程资产段统计：Q/G/R 各应计 1 条（非 0）
+    assert "**决策 Q-NNN**：1 条" in r.stdout, f"时间戳形 Q 未被收录：\n{r.stdout}"
+    assert "**踩坑 G-NNN**：1 条" in r.stdout, f"时间戳形 G 未被收录：\n{r.stdout}"
+    assert "**改进信号 R-NNN / 建议**：1 条" in r.stdout, f"时间戳形 R 未被收录：\n{r.stdout}"
+
+
+def test_timestamp_form_r_in_gotcha_body_marks_resolved(tmp_path):
+    """踩坑 body 里关联了时间戳形 R（`R 20260625-...`）→ 应判为"已解决"。
+
+    回归：gotcha_to_rule / unresolved_gotchas 用 `re.search(r"R-\\d+", body)`，
+    时间戳形 R 关联不被识别，导致已升规则的踩坑被误判为"待升规则"。
+    应改用 id_label_fragment('R')。
+    """
+    k = _setup(tmp_path)
+    (k / "踩坑日志.md").write_text(
+        "# 踩坑日志\n\n## G 20260625-094000-ly: 已升规则的踩坑\n\n"
+        "日期：2026-04-18\n\n关联规则：R 20260625-095000-ly（已升为规则）\n",
+        encoding="utf-8",
+    )
+    r = _call(tmp_path, "2026-04-15", "2026-04-21")
+    assert r.returncode == 0
+    # 该踩坑先得被收录（G heading 双认）
+    assert "**踩坑 G-NNN**：1 条" in r.stdout, f"时间戳形踩坑未被收录：\n{r.stdout}"
+    # 已解决 → 进经验总结"📐 踩坑升规则"（用渲染的具体条目行判，避开占位提示里的同名子串）
+    assert "📐 **踩坑升规则**" in r.stdout, f"关联时间戳形 R 的踩坑未判为已解决：\n{r.stdout}"
+    # 不应进问题教训"🕳️ 待升规则的踩坑"
+    assert "🕳️ **待升规则的踩坑**" not in r.stdout, f"已升规则的踩坑被误判为待升规则：\n{r.stdout}"

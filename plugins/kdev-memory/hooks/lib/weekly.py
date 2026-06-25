@@ -30,6 +30,7 @@ from _utf8 import force_utf8_stdio  # noqa: E402
 force_utf8_stdio()
 
 from scope import shared_dir, staff_log_files  # noqa: E402
+from step_id import id_label_fragment  # noqa: E402
 
 
 def in_range(s: str | None, d_from: date, d_to: date) -> bool:
@@ -86,13 +87,14 @@ def render(kdev: Path, d_from: date, d_to: date) -> None:
             s["scope"] = scope_id
         steps.extend(scoped)
         staff_step_counts[scope_id] = len(scoped)
-    ques = [q for q in parse_entries(base / "决策日志.md", r"^##\s+Q-\d+.*$") if in_range_fn(q["date"])]
-    gotchas = [g for g in parse_entries(base / "踩坑日志.md", r"^##\s+G-\d+.*$") if in_range_fn(g["date"])]
-    rules = [r for r in parse_entries(base / "改进建议.md", r"^##\s+(?:R-\d+|建议\s*#?\s*\d+).*$") if in_range_fn(r["date"])]
+    # Q/G/R/建议 heading 双认：id_label_fragment 同时认 legacy(Q-\d+) 与时间戳(Q YYYYMMDD-...)形（Q-020）
+    ques = [q for q in parse_entries(base / "决策日志.md", rf"^##\s+{id_label_fragment('Q')}.*$") if in_range_fn(q["date"])]
+    gotchas = [g for g in parse_entries(base / "踩坑日志.md", rf"^##\s+{id_label_fragment('G')}.*$") if in_range_fn(g["date"])]
+    rules = [r for r in parse_entries(base / "改进建议.md", rf"^##\s+(?:{id_label_fragment('R')}|建议\s*#?\s*\d+).*$") if in_range_fn(r["date"])]
 
     high_score = [s for s in steps if (user_score(s["body"]) or 0) >= 4.5]
     high_diff = [s for s in steps if (diff_score(s["body"]) or 0) >= 1.5]
-    gotcha_to_rule = [g for g in gotchas if re.search(r"R-\d+", g["body"])]
+    gotcha_to_rule = [g for g in gotchas if re.search(id_label_fragment("R"), g["body"])]
 
     scored = [user_score(s["body"]) for s in steps if user_score(s["body"]) is not None]
     avg_score = round(sum(scored) / len(scored), 2) if scored else None
@@ -160,7 +162,7 @@ def render(kdev: Path, d_from: date, d_to: date) -> None:
         if s not in high_score:
             ds = diff_score(s["body"]) or 0
             lesson_items.append(f"- 🔍 **评分差值 {ds}**：{s['title']}（{s['date']}）—— 模型自评和用户感受落差大，方法论盲区候选")
-    unresolved_gotchas = [g for g in gotchas if not re.search(r"R-\d+", g["body"])]
+    unresolved_gotchas = [g for g in gotchas if not re.search(id_label_fragment("R"), g["body"])]
     for g in unresolved_gotchas[:3]:
         lesson_items.append(f"- 🕳️ **待升规则的踩坑**：{g['title']} —— 建议评估是否立 R-NNN")
     low_score = [s for s in steps if (user_score(s["body"]) or 99) < 3]

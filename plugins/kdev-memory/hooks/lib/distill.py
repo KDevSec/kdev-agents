@@ -235,7 +235,8 @@ def is_misalignment_step(entry: Entry, threshold: float = 1.5) -> bool:
 
 def is_skill_feedback_high(entry: Entry) -> bool:
     """筛 skill-feedback 切片：F 条目 + subject != unknown + subject_confidence=high + verbatim 非空。"""
-    if not entry.entry_id.startswith("F-"):
+    # 双认 legacy `F-001` 与时间戳形 `F 20260613-…`，与本文件 ~380 行计数口径一致（Q-020）
+    if not (entry.entry_id.startswith("F-") or entry.entry_id.startswith("F ")):
         return False
     subject = entry.fields.get("subject", "").strip()
     if not subject or subject == "unknown":

@@ -293,5 +293,44 @@ class TestDistillTrigger(unittest.TestCase):
             self.assertEqual(r.new_misalign_count, 2)
 
 
+class TestTimestampFormDualRecognition(unittest.TestCase):
+    """Q-020/v0.17 时间戳形 F/R 条目（`## F 20260625-...`）也要被计数。
+
+    回归：distill_trigger 用硬编码 `^##\\s+F-\\d+` / `R-\\d+`，时间戳形被静默漏掉，
+    导致 v0.17 后所有新 F/R 不计入触发判定。应改用 id_label_fragment。
+    """
+
+    def test_timestamp_form_f_counted(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            kdev = Path(tmp) / "memory"
+            _write_minimal_kdev(kdev)
+            recent_date = (datetime.now() - timedelta(days=1)).strftime("%Y-%m-%d")
+            (kdev / "skill-feedback.md").write_text(dedent(f"""\
+                # Skill Feedback
+
+                ## F 20260625-093000-ly: 时间戳形反馈
+                日期：{recent_date}
+                subject: plugin:test
+                verbatim: "test"
+            """), encoding="utf-8")
+            r = distill_trigger.check_distill_trigger(kdev)
+            self.assertEqual(r.new_f_count, 1, "时间戳形 F 未被计数")
+
+    def test_timestamp_form_r_counted(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            kdev = Path(tmp) / "memory"
+            _write_minimal_kdev(kdev)
+            recent_date = (datetime.now() - timedelta(days=1)).strftime("%Y-%m-%d")
+            (kdev / "改进建议.md").write_text(dedent(f"""\
+                # 改进建议
+
+                ## R 20260625-095000-ly: 时间戳形改进
+                日期：{recent_date}
+                项目：test
+            """), encoding="utf-8")
+            r = distill_trigger.check_distill_trigger(kdev)
+            self.assertEqual(r.new_r_count, 1, "时间戳形 R 未被计数")
+
+
 if __name__ == "__main__":
     unittest.main()

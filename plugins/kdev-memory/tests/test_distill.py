@@ -488,5 +488,69 @@ class TestDistillStatusDefense(unittest.TestCase):
         self.assertIn("非枚举", buf.getvalue())
 
 
+class TestTimestampFormSkillFeedback(unittest.TestCase):
+    """Q-020/v0.17 时间戳形 F 条目（`## F 20260625-...`）也要进 skill-feedback 切片。
+
+    回归：is_skill_feedback_high 用 `entry.entry_id.startswith("F-")`，
+    时间戳形 entry_id（`F 20260625-...`）被漏掉，与同文件计数口径
+    （`startswith("F-") or startswith("F ")`）不一致。
+    """
+
+    def _ts_f_entry(self):
+        raw = (
+            "## F 20260625-093000-ly: 时间戳形反馈\n"
+            "日期：2026-06-25\n"
+            "subject: plugin:kdev-memory\n"
+            "subject_inferred_by: L1-显式提及\n"
+            "subject_confidence: high\n"
+            "type: 痛点\n"
+            'verbatim: "时间戳形反馈原话"\n'
+            "score: null\n"
+        )
+        return distill.Entry(
+            entry_id="F 20260625-093000-ly",
+            title="时间戳形反馈",
+            date="2026-06-25",
+            source_file="skill-feedback.md",
+            raw=raw,
+            fields={
+                "subject": "plugin:kdev-memory",
+                "subject_confidence": "high",
+                "type": "痛点",
+                "verbatim": "时间戳形反馈原话",
+            },
+        )
+
+    def test_is_skill_feedback_high_accepts_timestamp_form(self):
+        self.assertTrue(
+            distill.is_skill_feedback_high(self._ts_f_entry()),
+            "时间戳形 F 条目未被 is_skill_feedback_high 识别",
+        )
+
+    def test_timestamp_form_f_in_by_subject_slice(self):
+        """端到端：时间戳形 F 应出现在 skill-feedback by-subject 切片里。"""
+        with tempfile.TemporaryDirectory() as tmp:
+            kdev = Path(tmp) / "memory"
+            kdev.mkdir()
+            (kdev / "skill-feedback.md").write_text(dedent("""\
+                # Skill Feedback
+
+                ## F 20260625-093000-ly: 时间戳形反馈
+                日期：2026-06-25
+                subject: plugin:kdev-memory
+                subject_inferred_by: L1-显式提及
+                subject_confidence: high
+                type: 痛点
+                verbatim: "时间戳形反馈原话"
+                score: null
+            """), encoding="utf-8")
+            out = Path(tmp) / "dataset"
+            stats = distill.export_markdown_slices(kdev, out, do_sanitize=True)
+            self.assertEqual(stats.counts["skill_feedback_high"], 1)
+            slice_file = out / "dataset-skill-feedback-by-subject" / "plugin-kdev-memory.md"
+            self.assertTrue(slice_file.is_file(), "时间戳形 F 未产出 by-subject 切片")
+            self.assertIn("时间戳形反馈原话", slice_file.read_text(encoding="utf-8"))
+
+
 if __name__ == "__main__":
     unittest.main()
