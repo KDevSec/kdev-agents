@@ -15,10 +15,16 @@ def main():
     except Exception as exc:  # hooks must never crash the session
         print(f"[kdev-sync] bootstrap skipped: {exc}", file=sys.stderr)
         return
-    if res["action"] == "remind":
+    action = res["action"]
+    if not res.get("ok", True):
+        # 联网同步失败（多半缺 GitHub 凭据）→ 在**会话内**给可读提示，不弹 GUI（_git 已禁交互）。
+        if action in ("pull", "clone", "init"):
+            msg = kdev_sync.sync_failed_reminder_text(action, res.get("message", ""))
+            print(f"<kdev-sync-reminder>\n{msg}\n</kdev-sync-reminder>")
+        else:
+            print(f"[kdev-sync] {action} failed: {res['message']}", file=sys.stderr)
+    elif action in ("remind", "init-local") and res.get("message"):
         print(f"<kdev-sync-reminder>\n{res['message']}\n</kdev-sync-reminder>")
-    elif not res["ok"]:
-        print(f"[kdev-sync] {res['action']} failed: {res['message']}", file=sys.stderr)
 
 
 if __name__ == "__main__":

@@ -18,10 +18,27 @@ REMINDER = (
     "kdev-sync.yml 登记，以便跨机器 / 团队同步、换机不丢记忆。是否现在初始化？"
 )
 
+REMOTE_REMINDER = (
+    "工程记忆已建本地独立仓（nested repo），但尚未配置远程。强烈建议在 kdev-sync.yml "
+    "登记 memory_repo 并建远程仓，以便跨机器 / 团队同步、换机不丢记忆。"
+)
+
+# 项目级「不建记忆仓」退出提示——附在每条提醒后。标记写进**项目仓**（kdev-sync.yml，入库），
+# 提交后全队读到即不再提示、不再建仓（团队都知道有人决定本项目不要记忆仓）。
+OPTOUT_HINT = (
+    "\n（工程记忆是与代码仓**分开**的独立 git 仓。本项目若不想建记忆仓 / 不想被提示，"
+    "在项目根 `kdev-sync.yml` 写一行 `sync: off` 并**提交到本项目仓**——全队据此从此静默、"
+    "不再提示也不再建仓；想重新启用删掉该行即可。）"
+)
+
 
 def read_sync_config(repo_root):
-    """Parse the flat kdev-sync.yml -> {'memory_repo': url|None, 'branch': str}."""
-    cfg = {"memory_repo": None, "branch": "main"}
+    """Parse the flat kdev-sync.yml -> {'memory_repo': url|None, 'branch': str, 'sync': str}.
+
+    `sync: off` —— 项目级「不建记忆仓 / 不同步」开关。提交到**项目仓**后全队据此静默跳过、
+    不再提示（团队都知道有人决定本项目不要记忆仓）；缺省 'on'。
+    """
+    cfg = {"memory_repo": None, "branch": "main", "sync": "on"}
     path = Path(repo_root) / "kdev-sync.yml"
     if not path.exists():
         return cfg
@@ -39,24 +56,47 @@ def read_sync_config(repo_root):
 
 def reminder_text():
     """The 中文 托管提醒 (记忆架构 §9.4)."""
-    return REMINDER
+    return REMINDER + OPTOUT_HINT
+
+
+def remote_reminder_text():
+    """本地仓已建、缺远程时的中文提醒。"""
+    return REMOTE_REMINDER + OPTOUT_HINT
+
+
+def sync_failed_reminder_text(action, detail=""):
+    """联网同步（pull/clone/init）失败时给**会话内**的可读提示——替代 Windows 上会弹的
+    Git Credential Manager「Connect to GitHub」GUI（_git 已禁交互，缺凭据静默失败）。
+    引导用户在终端登录一次缓存凭据，之后每次会话自动静默同步。"""
+    tail = f"（详情：{detail}）" if detail else ""
+    return (
+        f"工程记忆云同步未完成（{action} 失败，多半是记忆仓需要 GitHub 凭据但本机未缓存）"
+        "——已跳过，不影响本地使用与记忆留存。\n"
+        "要开启跨机/团队同步：在终端对该 GitHub 账号登录一次以缓存凭据"
+        "（如 `gh auth login`，或对该账号任意仓库 `git pull` 一次按提示登录），"
+        "之后每次会话启动会自动静默同步，不再弹窗。" + tail + OPTOUT_HINT
+    )
+
+
+def is_sync_off(repo_root):
+    """项目是否已选择「不建记忆仓」（kdev-sync.yml 里 sync: off）。"""
+    return str(read_sync_config(repo_root).get("sync", "on")).strip().lower() == "off"
 
 
 def decide_action(*, has_git, kdev_nonempty, remote):
-    """Pure SessionStart bootstrap decision.
-
-    Returns one of:
-      'pull'   — .kdev/ is already a repo (fetch latest).
-      'clone'  — no repo, .kdev/ empty/absent, a remote is configured (new machine).
-      'init'   — no repo, .kdev/ already has local content, a remote is configured
-                 (convert this machine's existing memory into the nested repo + first push).
-      'remind' — no remote configured (emit the 中文 托管提醒; do nothing destructive).
+    """Pure SessionStart bootstrap decision. Returns one of:
+      'pull'       — .kdev/ 已是仓且配置了 remote（拉最新）。
+      'clone'      — 无仓、.kdev/ 空/缺、有 remote（新机器）。
+      'init'       — 无仓、.kdev/ 已有本地内容、有 remote（转 nested repo + 首推）。
+      'init-local' — 无仓、.kdev/ 已有本地内容、无 remote（本地 git init 建独立仓 +
+                     机器本地 .gitignore + 首次 commit；并提醒去建远程仓）。
+      'remind'     — 无可建（空且无 remote），或本地仓已建但无 remote → 持续提醒建远程仓。
     """
     if has_git:
-        return "pull"
+        return "pull" if remote else "remind"
     if remote:
         return "init" if kdev_nonempty else "clone"
-    return "remind"
+    return "init-local" if kdev_nonempty else "remind"
 
 
 # Fixed identity for the nested memory repo's own commits (hermetic; the code repo's
@@ -111,12 +151,35 @@ def bootstrap(repo_root):
     has_git = (kdev / ".git").exists()
     kdev_nonempty = kdev.exists() and any(kdev.iterdir())
     cfg = read_sync_config(repo_root)
+    # 项目级退出：kdev-sync.yml 标了 sync: off（已提交到项目仓）→ 全程静默，不建仓、不联网、不提示。
+    if str(cfg.get("sync", "on")).strip().lower() == "off":
+        return {"action": "optout", "ok": True, "message": ""}
     remote = cfg["memory_repo"]
     branch = cfg["branch"]
     action = decide_action(has_git=has_git, kdev_nonempty=kdev_nonempty, remote=remote)
 
     if action == "remind":
-        return {"action": "remind", "ok": True, "message": reminder_text()}
+        # has_git 但无 remote：本地仓已建、缺远程 → 提醒去建远程仓；
+        # 否则（无仓且无 remote）→ 原"尚未 git 托管"初始化提醒。
+        msg = remote_reminder_text() if has_git else reminder_text()
+        return {"action": "remind", "ok": True, "message": msg}
+
+    if action == "init-local":
+        # 无 remote：仍建本地独立 nested repo（记忆即刻被版本化），提醒去建远程仓。
+        _ensure_machine_local_gitignore(kdev)
+        msgs = []
+        for args_, ident, tolerate in [
+            (["init", "-b", branch], True, False),
+            (["config", "core.quotepath", "false"], False, False),
+            (["add", "-A"], False, False),
+            (["commit", "-m", "chore(kdev-memory): bootstrap local memory repo (no remote)"], True, False),
+        ]:
+            r = _git(args_, cwd=kdev, identity=ident)
+            msgs.append(f"git {args_[0]}: rc={r.returncode}")
+            if r.returncode != 0 and not tolerate:
+                return {"action": "init-local", "ok": False,
+                        "message": "; ".join(msgs) + " :: " + (r.stderr or "").strip()}
+        return {"action": "init-local", "ok": True, "message": remote_reminder_text()}
 
     if action == "pull":
         r = _git(["pull", "--ff-only"], cwd=kdev)
@@ -157,6 +220,8 @@ def bootstrap(repo_root):
 
 def sync_push(repo_root, message="chore(kdev-memory): session sync"):
     """SessionEnd/rollup: commit + push .kdev/. Returns {'ok', 'pushed', 'message'}. Never raises."""
+    if is_sync_off(repo_root):
+        return {"ok": True, "pushed": False, "message": "sync off (项目已选择不建记忆仓)"}
     kdev = _kdev_dir(repo_root)
     if not (kdev / ".git").exists():
         return {"ok": True, "pushed": False, "message": "no .kdev/.git; skip (untracked memory)"}
