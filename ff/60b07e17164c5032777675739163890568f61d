@@ -1,0 +1,23 @@
+plugins/kdev-memory/.claude-plugin/plugin.json
+  s_7911c9068c7c15::t_0fdbd49a85fcb6 3
+  s_7911c9068c7c15::t_a9d95f913d0110 9
+  s_7911c9068c7c15::t_6f5a2fafa83af6 4
+plugins/kdev-memory/CHANGELOG.md
+  s_7911c9068c7c15::t_e9ee295f9609d1 3-37
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.13",
+  "base_commit_sha": "ff60b07e17164c5032777675739163890568f61d",
+  "prompts": {},
+  "sessions": {
+    "s_7911c9068c7c15": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "dae659e8-6a74-493c-aecd-8c1c67aece9a",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
