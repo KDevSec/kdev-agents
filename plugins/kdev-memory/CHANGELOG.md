@@ -1,5 +1,40 @@
 # kdev-memory CHANGELOG
 
+## [0.19.0] - 2026-06-25
+
+对齐 ieidev-team memory 的一批跟进（详见 [docs/skills/kdev-memory/roadmap.md](../../docs/skills/kdev-memory/roadmap.md)）：P0 回归修复 + P1 sync UX + P2 叙事 Step JSONL 主账迁移（采 C1 永久 dual-read）。全程 TDD，516 passed。
+
+> 🧭 **场景定位**：kdev-memory = 单用户·跨会话召回；ieidev-team = 多 Agent·记忆共享。本批借 ieidev 的通用工程改进，在「多 agent 共享机制」上主动分叉（不跟 delegation/scope/events/handoffs/CQO；P2 选 C1 永久 dual-read 而非 ieidev 硬切）。详见决策 Q 20260625-173847。
+
+### 🐛 P0：时间戳 ID 双认回归修复
+
+v0.17（Q-020）起新记录改时间戳 ID（`Q 2026...` 空格分隔），但三处仍硬编码 `X-\d+`，导致 v0.17 后**所有新 Q/G/R/F 被这三处静默漏掉**。改用既有 `id_label_fragment` 双认：
+- `weekly.py`：周报 Q/G/R 收录 + 踩坑「已解决」关联判定（修「所有踩坑误判未解决」污染周报/`unresolved_gotchas`）。
+- `distill_trigger.py`：auto-distill 新 F/R 计数。
+- `distill.py`：skill-feedback 切片双认时间戳形 F。
+
+### ✨ P1：sync UX 三件套（对齐 ieidev 0.5.0）
+
+- **init-local**：无 remote 但 `.kdev/` 非空 → SessionStart 自动 `git init` 建本地 nested 仓 + 首次 commit + 提醒建远程。
+- **sync: off**：`kdev-sync.yml` 项目级永久静默开关（`is_sync_off` + `OPTOUT_HINT`）。
+- **失败会话内引导**：pull/clone/init 失败不再只打 stderr，改输出 `<kdev-sync-reminder>` 中文引导。
+- 保住 kdev 已有的 GCM 非交互三开关（0.18.3）+ UTF-8 subprocess 修复，未回退。
+
+### 🏗️ P2：叙事 Step JSONL 主账迁移（C1 永久 dual-read）
+
+叙事 Step 主账从 `执行日志.md` 迁到 `执行日志.jsonl`；决策/踩坑/改进/反馈/汇总/状态仍**永久 markdown 主存**。**C1 = 历史 `执行日志.md` 冻结、经 dual-read 永久兼容读，不迁存量、不退 md-read**（区别于 ieidev 的硬切）。决策 Q 20260625-173847。
+
+- **Phase A 基座**：`step_log.py`（`append_step` 原子写 + `read_steps`/`steps_for_date` + `validate` 7 hard-gate）、`migrate_jsonl.py`（手动迁移 CLI，幂等、`_migrated_raw` 零丢失）、`scope.recorder_target_jsonl`。
+- **dual-read**：`step_dualread.py` 合成器层把 jsonl record 投影成等价 md 喂既有 helper；11 个读 Step 的 reader 改读 `执行日志.md ∪ 执行日志.jsonl`，安全不变式「jsonl 空 → 行为字节级不变」。
+- **Phase B**：step-recorder agent 改调 `append_step` 落 jsonl（剥 team 耦合的 delegation、保 dual-read 要的 score_diff）；新增 `daily_render.py` **承重墙**——从 jsonl 确定性渲染每日汇总，取代「LLM 翻多个 md 拼装」。
+- **Phase C**：`archive_hint` 执行日志按月切档下线（jsonl append-only 无 rotation + md 冻结；决策/踩坑/改进季度切档照常）；SKILL + references 5 处 + P-C2 spec 按 C1 措辞对齐（spec→canonical 回写铁规）。
+
+### 📌 升级须知
+
+- 本版改了 hook/agent/lib，需**刷新 marketplace** 才激活（G-004：装入 ≠ 生效）。
+- 升级后**新** Step 落 `执行日志.jsonl`，**历史** Step 留 `执行日志.md` 经 dual-read 仍读，**无需手动迁移**（存量迁移可选，手动跑 `hooks/lib/migrate_jsonl.py`）。
+- checkpoint 瘦身（D4）本版未做，defer。
+
 ## [0.18.3] - 2026-06-25
 
 **修复**：kdev-memory SessionStart bootstrap 触发 GCM「Connect to GitHub」弹窗
