@@ -1,0 +1,29 @@
+plugins/kdev-memory/tests/test_migrate_jsonl.py
+  s_7911c9068c7c15::t_87983bb96fb09f 1-152
+plugins/kdev-memory/hooks/lib/migrate_jsonl.py
+  s_7911c9068c7c15::t_897886f1f36553 1-172
+plugins/kdev-memory/tests/test_step_log.py
+  s_7911c9068c7c15::t_1b9ba34b482e76 1-87
+plugins/kdev-memory/tests/test_scope_jsonl.py
+  s_7911c9068c7c15::t_52282c0afba5f0 1-47
+plugins/kdev-memory/hooks/lib/scope.py
+  s_7911c9068c7c15::t_2887b20f62a86a 88-92
+plugins/kdev-memory/hooks/lib/step_log.py
+  s_7911c9068c7c15::t_55cd63848939af 1-112
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.13",
+  "base_commit_sha": "97b0ad2e987ef520761f6cc52dedf9686924d4cc",
+  "prompts": {},
+  "sessions": {
+    "s_7911c9068c7c15": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "dae659e8-6a74-493c-aecd-8c1c67aece9a",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
