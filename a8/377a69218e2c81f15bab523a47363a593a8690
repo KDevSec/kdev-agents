@@ -1,0 +1,33 @@
+plugins/kdev-memory/tests/test_distill_trigger.py
+  s_7911c9068c7c15::t_55bc547cd61a45 296-334
+plugins/kdev-memory/tests/test_distill.py
+  s_7911c9068c7c15::t_30a6d1530e1c0b 491-554
+plugins/kdev-memory/hooks/lib/weekly.py
+  s_7911c9068c7c15::t_ea2d14b84548db 33
+  s_7911c9068c7c15::t_07a44e7ce20567 90-93,97
+  s_7911c9068c7c15::t_7373f4757a2008 165
+plugins/kdev-memory/hooks/lib/distill_trigger.py
+  s_7911c9068c7c15::t_21deffb86105f2 30
+  s_7911c9068c7c15::t_d5aeb7093f2639 195-197
+plugins/kdev-memory/tests/test_weekly_aggregate.py
+  s_7911c9068c7c15::t_653a4f5fbdaa79 205-210
+  s_7911c9068c7c15::t_f31cd489e421ee 161-204
+plugins/kdev-memory/hooks/lib/distill.py
+  s_7911c9068c7c15::t_b2299485232da4 238-239
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.13",
+  "base_commit_sha": "a8377a69218e2c81f15bab523a47363a593a8690",
+  "prompts": {},
+  "sessions": {
+    "s_7911c9068c7c15": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "dae659e8-6a74-493c-aecd-8c1c67aece9a",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
