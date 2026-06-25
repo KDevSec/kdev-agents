@@ -1,0 +1,36 @@
+docs/framework/04-references/README.md
+  s_48b7eee32c1529::t_a6be03b0238f54 116
+  s_48b7eee32c1529::t_7719d517808b5a 46-57
+plugins/kdev-design-flow/skills/kdev-design-flow/SKILL.md
+  s_48b7eee32c1529::t_2ce49c6dcab7c2 18,20-21,23,57,60-69,72,79,98,107,116-118,126,131,133,135,138,140-142,144-171,173,179,191,199,229,246,252,263-264,269,271,275,278,287-290,294
+plugins/kdev-coding-flow/.claude-plugin/plugin.json
+  s_48b7eee32c1529::t_88d9addc5adc2c 4
+plugins/kdev-design-flow/lib/flow_state.py
+  s_48b7eee32c1529::t_2ce49c6dcab7c2 1-85
+plugins/kdev-design-flow/.claude-plugin/plugin.json
+  s_48b7eee32c1529::t_bb691824e4f9b5 4
+plugins/kdev-design-flow/README.md
+  s_48b7eee32c1529::t_213e71a4272756 53,55
+plugins/kdev-coding-flow/CHANGELOG.md
+  s_48b7eee32c1529::t_7d7a4abaa2f76d 3-9
+plugins/kdev-design-flow/tests/test_flow_state.py
+  s_48b7eee32c1529::t_2ce49c6dcab7c2 1-79
+plugins/kdev-design-flow/CHANGELOG.md
+  s_48b7eee32c1529::t_08c6d792c7865c 3-10
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.13",
+  "base_commit_sha": "e073d958afb9d8270ec8c6ee2e1952060e5e16fc",
+  "prompts": {},
+  "sessions": {
+    "s_48b7eee32c1529": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "76db88bd-0a10-4c41-bef6-910a126ec405",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
