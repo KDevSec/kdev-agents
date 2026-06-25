@@ -1,0 +1,68 @@
+plugins/kdev-memory/hooks/session-start-brief.py
+  s_7911c9068c7c15::t_9ad5d61156a29d 510
+  s_7911c9068c7c15::t_3c078da04a6116 526
+  s_7911c9068c7c15::t_1c841b6bd3a508 91-114,116-120
+  s_7911c9068c7c15::t_ea41fa199ed999 175-185
+  s_7911c9068c7c15::t_f2605f67cc867c 137-155
+  s_7911c9068c7c15::t_91965a7679530d 39
+plugins/kdev-memory/hooks/lib/distill.py
+  s_7911c9068c7c15::t_3c00545ac15d00 227-244
+  s_7911c9068c7c15::t_eb345edc8ca2c2 33-35
+  s_7911c9068c7c15::t_b689d6a84c3fa6 175-196
+plugins/kdev-memory/hooks/lib/weekly.py
+  s_7911c9068c7c15::t_f33bba78c43309 100-106,114-127
+  s_7911c9068c7c15::t_81b9da3e75a4da 32-34,39-52
+plugins/kdev-memory/hooks/lib/step_dualread.py
+  s_7911c9068c7c15::t_b34b7d81539e70 1-167
+plugins/kdev-memory/hooks/stop-check.py
+  s_7911c9068c7c15::t_4d88f714f1d376 42
+  s_7911c9068c7c15::t_14dd806617c382 178-179,181,187-197
+plugins/kdev-memory/hooks/pre-compact-check.py
+  s_7911c9068c7c15::t_d1667ff1ba2864 90-91,93,99-104
+  s_7911c9068c7c15::t_bef56fdf37b2f0 32
+plugins/kdev-memory/tests/test_dualread_readers.py
+  s_7911c9068c7c15::t_4cae4ecb5b930e 1-336,355,357-359,361-371,382-387,400-402,404-405,407-413
+  s_7911c9068c7c15::t_e68d1b3ad7af54 337-354,356,360
+  s_7911c9068c7c15::t_5d809b668c96f7 372-381,388-399,403,406
+plugins/kdev-memory/hooks/lib/step_completeness.py
+  s_7911c9068c7c15::t_3fabe2169fe3e1 70-71
+  s_7911c9068c7c15::t_1879c5c562354f 259-275
+  s_7911c9068c7c15::t_bafad9b328b19b 283-288,297-299
+plugins/kdev-memory/tests/test_step_dualread.py
+  s_7911c9068c7c15::t_19496af13f398b 1-92
+plugins/kdev-memory/hooks/lib/promote-list.py
+  s_7911c9068c7c15::t_129595368294b1 141-142
+  s_7911c9068c7c15::t_20a31163f2daa4 89-91,94-105,107-115
+  s_7911c9068c7c15::t_c6b100417ef039 88,92-93,106
+  s_7911c9068c7c15::t_15a4f56c840655 133-135,137-140,143-153
+  s_7911c9068c7c15::t_79c905cf136cad 22-24
+plugins/kdev-memory/hooks/lib/missing_summaries.py
+  s_7911c9068c7c15::t_2c5bdf20502721 25-27
+  s_7911c9068c7c15::t_73564afcbaa942 63-75
+plugins/kdev-memory/hooks/session-end-check.py
+  s_7911c9068c7c15::t_f167c7fb9f11e8 99-100,108-112
+  s_7911c9068c7c15::t_7cd74f69c7c206 22
+plugins/kdev-memory/hooks/lib/trigger-match.py
+  s_7911c9068c7c15::t_3c733913f7a80d 298-337
+  s_7911c9068c7c15::t_89596116f615e2 47-48
+plugins/kdev-memory/hooks/lib/distill_trigger.py
+  s_7911c9068c7c15::t_fb3e081ddafb54 28
+  s_7911c9068c7c15::t_d81a9938d60b2a 124,127-129,132-133,138-150,153-158,160,165-185,187-188,191-198
+  s_7911c9068c7c15::t_efc3ad4d22b481 229
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.13",
+  "base_commit_sha": "f525e3b79f10fe7b3a4e72c1c36ceb3d9b26699a",
+  "prompts": {},
+  "sessions": {
+    "s_7911c9068c7c15": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "dae659e8-6a74-493c-aecd-8c1c67aece9a",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
