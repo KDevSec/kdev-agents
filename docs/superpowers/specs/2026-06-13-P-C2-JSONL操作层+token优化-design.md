@@ -13,6 +13,24 @@
 
 ---
 
+## ⚠️ 实施状态（2026-06-25 回写，spec→canonical 铁规）
+
+> 本 spec 原为 **design 稿（只设计不实施）**。其 **JSONL 主账部分已在 kdev-memory 落地**，本节记录实施现状与**与本稿设计的关键分叉**，正文 §1–§9 保留为原始设计意图（**勿删**），以本节为实施口径的权威覆盖。
+
+| 项 | 现状 |
+|---|---|
+| **JSONL 操作层 + 叙事 Step 主账** | **已实施**（Phase A 基座 `step_log.py` 7 hard-gate + dual-read `step_dualread.py`；Phase B recorder→jsonl + `daily_render.py` 承重墙，commits a8377a6→5953083 区间的 P2 部分）|
+| **md↔jsonl 切换立场** | ⚠️ **kdev 采 C1「永久 dual-read」，故意分叉本稿/ieidev 的硬切**（**Q 20260625-173847-ly1989abc**）：历史 Step 留 `执行日志.md` **冻结·经 `step_dualread.py` 与 jsonl 永久 dual-read（md∪jsonl 并集）**，**存量 md 不迁移、md-read 不退、md 不重命名为 archive**。ieidev 同源迁移走 jsonl-only 硬切（丢 md）——两插件**立场相反**，kdev 是 deliberate 分叉，不是同步落后 |
+| **Step ID 撞号（G-011）** | ✅ **根因已随 Q-020 时间戳 minting 退役（live）**：`mint_record_id` 用 `<YYYYMMDD-HHMMSS>-<who>`，slug/counter 退役；多 worktree/多机/多会话不再撞号 |
+| **执行日志月度切档** | **已下线**（无 jsonl 月度 rotation 通道，`archive_hint.py` 的 Step 月度 gate off；决策/踩坑季度 markdown 切档仍照常）|
+| **存量 md 迁移 + 版本 0.19.0 发布** | **待另一会话 BUG 修复后统一做**（本次只做代码落地 + 文档对齐 C1）|
+
+> ⚠️ 文档已对齐 C1：[SKILL.md](../../../plugins/kdev-memory/skills/kdev-memory/SKILL.md) + references（[六类记录-schema.md §3](../../../plugins/kdev-memory/skills/kdev-memory/references/六类记录-schema.md) / [切档与归档.md](../../../plugins/kdev-memory/skills/kdev-memory/references/切档与归档.md) / [markdown-切片导出.md](../../../plugins/kdev-memory/skills/kdev-memory/references/markdown-切片导出.md) / [自动化机制-hooks.md](../../../plugins/kdev-memory/skills/kdev-memory/references/自动化机制-hooks.md)）均加 Phase 2 · C1 声明，引用本决策号。
+>
+> 📌 与本稿 §0.5 row3「Step ID 退役 slug/counter，换时间戳原语」一致（已实施）；本稿其余收窄设计（员工叙事砍掉、staff 稀疏、events 只读复用）仍属 **defer**，未在本次 JSONL 主账迁移实施范围内。
+
+---
+
 ## 0. 一句话
 
 P-C2 把 kdev-memory 的记账拆成**两层表示**——廉价**事实流水**（**只读复用** kdev-core 的 `events.jsonl`，按 `actor` 过滤出员工视图，不造第二本账）供 agent 高频低成本召回；重 **markdown 叙事 Step 退化成「仅 CEO/shared 一根、从 events+handoffs+transcript 周期性派生」的薄加料层**（只承载机器给不了的他评/评分/经验/续航 + 兜 off-flow）。配套把 **Step ID 从「顺序整数」换成「时间戳 + 人前缀」**，从根上消除分布式写手的撞号问题（G-011）。

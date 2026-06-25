@@ -1,6 +1,6 @@
 ---
 name: kdev-memory
-description: 为多迭代长周期工程项目建立「持久工程记忆 + 智能召回 + 蒸馏导出」制度——每步完成、每次踩坑、每个决策、每次评分、每次对外部 skill/工具的反馈实时落盘到 `.kdev/memory/` 规范文件；用户再次提到相关话题时 UserPromptSubmit hook 自动召回指针让 Claude 按需 Read。用作跨会话续航 + 避免重复踩坑 + 未来 skill 自主优化 / 知识蒸馏的原料库。核心机制：实时落盘 + 汇总从文件聚合（不翻会话）+ 命中即召回 + 按期归档切档 + CLAUDE.md 接口契约化 + subject 三级自动推断 + verbatim 原话不可改写 + markdown 主存 + markdown 切片包蒸馏导出（不引入 JSONL）+ 落盘路径 hybrid/inline 两档可选。触发时机：用户说"建立工程记忆 / 加 .kdev / 搞记忆机制"开始初始化；说"写今天总结 / 生成每日汇总 / 交接给明天 / 总结一下今天"从 `.kdev/memory/` 当天条目聚合输出；说"切档 / 归档一下 / 整理主文件"按月/季度搬老条目到归档子目录；说"这条以后都要遵守 / 加到项目规则 / 变成硬规矩 / 升级成铁规"按规则升级流程问用户三件事；说"修 CLAUDE.md 漂移 / 接口漂移 / claude.md 对齐 skill / claude.md 升级"按接口契约生成精确 diff patch 对齐 CLAUDE.md；新会话时问"昨天做到哪了 / 之前聊到什么 / 上次进度 / 继续上次的工作 / 恢复上下文"从 `.kdev/memory/` 回读；或会话即将被压缩、看到 `<kdev-memory-recall>` / `<kdev-memory-brief>` 注入（含 ⚠️ CLAUDE.md 接口漂移提示）、看到 `.kdev/memory/WARN-未记录-*.md` 或 checkpoint 文件、用户抱怨"每次新会话都要重新解释上下文"等场景；**或当用户在对话流里对外部 skill/插件/工具说出 5 类语义之一——RFE（"要是能 X 就好了 / 希望 Y / 如果有 Z 多好"）、痛点（"这破 X / 这玩意 / 不好用 / 太吵 / 太烦"）、bug（"为啥 / 怎么会这样 / 不应该是这样吧"）、表扬（"干得对 / 这次准 / 帮大忙"）、困惑（"看不懂 / 啥意思 / 为啥要这么干"）——按 subject 三级推断（L1 显式提及 / L2 上下文 / L3 候选选一）确定归属、起草 F-NNN 反馈条目、向用户一句话确认后落盘到 skill-feedback.md**；或用户给 Step 打分时夹带 skill 反馈（"4 分但 X 太吵"）按**评分裂解**自动拆两条——Step 评分段记项目分（subject:project）+ F-NNN 记 skill 反馈（subject:plugin:X, verbatim:用户原话）；或用户问"对谁打分 / 这分给谁 / 评分 subject 是什么 / 怎么归类这条反馈"按三级推断回答；或用户说"导出蒸馏数据 / 导出 markdown / export-md / distill / 蒸馏 / 知识蒸馏 / 训练数据 / 把记录弄出来训练"走 `/kdev-memory-distill` 产出三个 markdown 切片包（dataset-full / dataset-misalignment / dataset-skill-feedback-by-subject）；或用户问"记录太占上下文 / subagent 模式 / hybrid / record_mode / 落盘方式怎么切"时介绍 .kdev/memory/config.yaml 的两档配置（hybrid 默认 / inline 备用）；或用户问"自动蒸馏 / 定时蒸馏 / 什么时候蒸馏 / distill mode / 蒸馏阈值 / 多久蒸馏一次 / 蒸馏频率"时介绍 distill.mode 两档（auto 默认：阈值满足 SessionStart 后台 Popen 跑 distill.py --auto-context、manual 备用：仅 brief 注入"建议蒸馏"），触发条件 = 时间 ≥ 7 天 AND（F 新增 ≥10 OR misalign 新增 ≥3 OR R 新增 ≥5），失败写 WARN-distill-failed-*.md 下次 SessionStart 显眼提醒。不管状态机或流程编排，只管"该记什么、何时记、怎么记、怎么归属（subject）、怎么召回、何时归档、何时导出蒸馏切片、何时自动触发蒸馏"。
+description: 为多迭代长周期工程项目建立「持久工程记忆 + 智能召回 + 蒸馏导出」制度——每步完成、每次踩坑、每个决策、每次评分、每次对外部 skill/工具的反馈实时落盘到 `.kdev/memory/` 规范文件；用户再次提到相关话题时 UserPromptSubmit hook 自动召回指针让 Claude 按需 Read。用作跨会话续航 + 避免重复踩坑 + 未来 skill 自主优化 / 知识蒸馏的原料库。核心机制：实时落盘 + 汇总从文件聚合（不翻会话）+ 命中即召回 + 按期归档切档 + CLAUDE.md 接口契约化 + subject 三级自动推断 + verbatim 原话不可改写 + 叙事 Step 走 JSONL 主账（执行日志.jsonl，daily_render 承重墙渲染）/ 历史 Step 留 执行日志.md 冻结经 step_dualread 永久 dual-read（C1，Q 20260625-173847-ly1989abc）/ 决策·踩坑·改进·skill-feedback·每日汇总·当前状态 仍永久 markdown 主存 + markdown 切片包蒸馏导出（蒸馏直接吃 markdown）+ 落盘路径 hybrid/inline 两档可选。触发时机：用户说"建立工程记忆 / 加 .kdev / 搞记忆机制"开始初始化；说"写今天总结 / 生成每日汇总 / 交接给明天 / 总结一下今天"从 `.kdev/memory/` 当天条目聚合输出；说"切档 / 归档一下 / 整理主文件"按月/季度搬老条目到归档子目录；说"这条以后都要遵守 / 加到项目规则 / 变成硬规矩 / 升级成铁规"按规则升级流程问用户三件事；说"修 CLAUDE.md 漂移 / 接口漂移 / claude.md 对齐 skill / claude.md 升级"按接口契约生成精确 diff patch 对齐 CLAUDE.md；新会话时问"昨天做到哪了 / 之前聊到什么 / 上次进度 / 继续上次的工作 / 恢复上下文"从 `.kdev/memory/` 回读；或会话即将被压缩、看到 `<kdev-memory-recall>` / `<kdev-memory-brief>` 注入（含 ⚠️ CLAUDE.md 接口漂移提示）、看到 `.kdev/memory/WARN-未记录-*.md` 或 checkpoint 文件、用户抱怨"每次新会话都要重新解释上下文"等场景；**或当用户在对话流里对外部 skill/插件/工具说出 5 类语义之一——RFE（"要是能 X 就好了 / 希望 Y / 如果有 Z 多好"）、痛点（"这破 X / 这玩意 / 不好用 / 太吵 / 太烦"）、bug（"为啥 / 怎么会这样 / 不应该是这样吧"）、表扬（"干得对 / 这次准 / 帮大忙"）、困惑（"看不懂 / 啥意思 / 为啥要这么干"）——按 subject 三级推断（L1 显式提及 / L2 上下文 / L3 候选选一）确定归属、起草 F-NNN 反馈条目、向用户一句话确认后落盘到 skill-feedback.md**；或用户给 Step 打分时夹带 skill 反馈（"4 分但 X 太吵"）按**评分裂解**自动拆两条——Step 评分段记项目分（subject:project）+ F-NNN 记 skill 反馈（subject:plugin:X, verbatim:用户原话）；或用户问"对谁打分 / 这分给谁 / 评分 subject 是什么 / 怎么归类这条反馈"按三级推断回答；或用户说"导出蒸馏数据 / 导出 markdown / export-md / distill / 蒸馏 / 知识蒸馏 / 训练数据 / 把记录弄出来训练"走 `/kdev-memory-distill` 产出三个 markdown 切片包（dataset-full / dataset-misalignment / dataset-skill-feedback-by-subject）；或用户问"记录太占上下文 / subagent 模式 / hybrid / record_mode / 落盘方式怎么切"时介绍 .kdev/memory/config.yaml 的两档配置（hybrid 默认 / inline 备用）；或用户问"自动蒸馏 / 定时蒸馏 / 什么时候蒸馏 / distill mode / 蒸馏阈值 / 多久蒸馏一次 / 蒸馏频率"时介绍 distill.mode 两档（auto 默认：阈值满足 SessionStart 后台 Popen 跑 distill.py --auto-context、manual 备用：仅 brief 注入"建议蒸馏"），触发条件 = 时间 ≥ 7 天 AND（F 新增 ≥10 OR misalign 新增 ≥3 OR R 新增 ≥5），失败写 WARN-distill-failed-*.md 下次 SessionStart 显眼提醒。不管状态机或流程编排，只管"该记什么、何时记、怎么记、怎么归属（subject）、怎么召回、何时归档、何时导出蒸馏切片、何时自动触发蒸馏"。
 ---
 
 # KDev 工程记忆机制
@@ -61,17 +61,19 @@ skill-feedback.md（F-NNN）的 `verbatim` 字段必须保留**用户原句**—
 - 记忆失真 → 靠回忆写的记录比实时写的差一个量级
 - 用户评分过夜补录 → 第二天的分数严重失真（感受褪色）
 
-### 🔴 每日汇总是"从 `.kdev/memory/` 聚合"，不是"翻会话记录"
+### 🔴 每日汇总是"跑 daily_render.py 从 `.kdev/memory/` 确定性聚合"，不是"翻会话记录"
 
-用户说"写今天的总结"时，智能体的动作路径**必须**是：
+用户说"写今天的总结"时，智能体的动作路径**必须**是（详见 §「每日汇总的动作路径（必读）」）：
 
 ```
-读 .kdev/memory/执行日志.md  ──┐
-读 .kdev/memory/决策日志.md  ──┤
-读 .kdev/memory/踩坑日志.md  ──┼── 按今天日期筛选条目 → 拼装 → 写入 每日汇总/YYYY-MM-DD.md
-读 .kdev/memory/改进建议.md  ──┤
-读 .kdev/memory/当前状态.md  ──┘
+跑 daily_render.py（承重墙）
+  ├─ 叙事 Step 主账：读 .kdev/memory/执行日志.jsonl（step_log）+ 历史 执行日志.md（冻结，
+  │    经 step_dualread 永久 dual-read 并集）→ 渲染「完成的工作 / 未完成项 / 负面评价观察」
+  └─ Q/G/R 仍读对应 markdown（决策日志.md / 踩坑日志.md / 改进建议.md）→ 拼当日新增索引
+→ 写入 每日汇总/YYYY-MM-DD.md（可选 LLM 在骨架上叠加润色 + 填明日计划）
 ```
+
+> **Phase 2 · C1（Q 20260625-173847-ly1989abc）**：叙事 Step 物理主账 = `执行日志.jsonl`（append-only，step-recorder 落盘）；历史 Step 留在 `执行日志.md`（**冻结**，不再写入），经 [hooks/lib/step_dualread.py](../../hooks/lib/step_dualread.py) 与 jsonl **永久 dual-read（md∪jsonl 并集）**。**存量 md 不迁移、md-read 不退**——这是相对 ieidev 硬切（jsonl-only、丢 md）的 **deliberate 分叉**。决策/踩坑/改进/skill-feedback/每日汇总/当前状态仍永久 markdown 主存，本次迁移完全不碰。
 
 **严禁**：回头翻会话上下文、让用户"重述今天做了什么"、凭印象总结。
 
@@ -153,8 +155,8 @@ skill-feedback.md（F-NNN）的 `verbatim` 字段必须保留**用户原句**—
 |---------|---------|------|------------|
 | 需要人做决策（有歧义、多选项、不可逆） | 决策日志.md | Q（新：时间戳形，见下） | `references/六类记录-schema.md` §1 |
 | 踩坑 / 绕路 / 报错 / 命令失败 | 踩坑日志.md | G（新：时间戳形，见下） | §2 |
-| 每步/每里程碑完成 | 执行日志.md（双评分） | Step（新：时间戳形） | §3 |
-| 用户当场反馈体验/规则 | 执行日志.md 的评估区 | — | §3 |
+| 每步/每里程碑完成 | 执行日志.jsonl（叙事 Step JSONL 主账，双评分；历史 Step 留 执行日志.md 冻结·dual-read） | Step（新：时间戳形） | §3 |
+| 用户当场反馈体验/规则 | 执行日志.jsonl 的评分段 | — | §3 |
 | 会话结束前 | 每日汇总/YYYY-MM-DD.md | — | §4 |
 | 评分差值 ≥ 2 或反复出现的感受信号（项目内方法论） | 改进建议.md | R（新：时间戳形，见下） | §5 |
 | **对外部 skill/插件/工具的 5 类语义反馈**（RFE/痛点/bug/表扬/困惑） | **skill-feedback.md**【新】 | **F（新：时间戳形，见下）** | **`references/skill-反馈通道-F.md`** |
@@ -167,7 +169,7 @@ skill-feedback.md（F-NNN）的 `verbatim` 字段必须保留**用户原句**—
 
 **2. 踩坑日志.md（G-NNN）** — 绕弯才发现的事。**必须**在标题下一行标 `triggers: [...]` 3-5 个关键词（中英文都要），否则永远不会被自动召回。
 
-**3. 执行日志.md（双评分，最核心）** — 每个工作单元一条 Step（**粒度 = 自然停顿点**：连续独立执行 ≥ 30min–1h / 需用户决策 / 有可 review 产出 任一触发闸门，详见 `references/六类记录-schema.md` §3），四段：**执行事实**（工具调用/报错/绕路/token/**使用的 skill**，估算即可）+ **模型自评**（顺畅度 1-5，**必填一条扣分项**防讨好式满分）+ **用户评分**（当场采集，1-5 + 一句话）+ **评分差异分析**（差值 ≥ 2 → 追加 R-NNN）。**锁定铁规**：模型自评时分戳必须早于用户评分时分戳（防自评污染）。
+**3. 执行日志.jsonl（叙事 Step JSONL 主账，双评分，最核心）**（Phase 2 · C1，Q 20260625-173847-ly1989abc：物理主账 = jsonl，历史 Step 留 `执行日志.md` 冻结·经 step_dualread 永久 dual-read） — 每个工作单元一条 Step（**粒度 = 自然停顿点**：连续独立执行 ≥ 30min–1h / 需用户决策 / 有可 review 产出 任一触发闸门，详见 `references/六类记录-schema.md` §3），四段：**执行事实**（工具调用/报错/绕路/token/**使用的 skill**，估算即可）+ **模型自评**（顺畅度 1-5，**必填一条扣分项**防讨好式满分）+ **用户评分**（当场采集，1-5 + 一句话）+ **评分差异分析**（差值 ≥ 2 → 追加 R-NNN）。**锁定铁规**：模型自评时分戳必须早于用户评分时分戳（防自评污染）。
 
 **4. 每日汇总/YYYY-MM-DD.md** — 给下次会话的交接班。速览 + 未完成项 + 明日计划 + 当日新增 Q/G/R 索引。**不复述执行日志已有细节**。
 
@@ -202,7 +204,7 @@ skill-feedback.md（F-NNN）的 `verbatim` 字段必须保留**用户原句**—
 
 ## 文件切档与归档
 
-长项目主文件膨胀时，采用**人工触发 + Claude 提醒**的切档制度。核心规则：执行日志按月切、踩坑/决策按季切、改进建议不切；搬家不删除，编号保留，切档前征得用户同意。Stop hook 检测跨期时提醒。
+长项目主文件膨胀时，采用**人工触发 + Claude 提醒**的切档制度。核心规则：踩坑/决策按季切、改进建议不切；搬家不删除，编号保留，切档前征得用户同意。Stop hook 检测跨期时提醒。**执行日志按月切档已下线**（Phase 2 · C1，Q 20260625-173847-ly1989abc：叙事 Step 走 `执行日志.jsonl` append-only 主账，无 jsonl 月度 rotation；历史 `执行日志.md` 冻结·经 step_dualread 永久 dual-read，不再切档），故 `archive_hint.py` 的 Step 月度归档 gate 已 off，决策/踩坑季度切档仍照常。
 
 > 切档规则一览、操作步骤、召回逻辑变化见 **`references/切档与归档.md`**。
 
@@ -286,7 +288,7 @@ distill:
 - **SessionEnd**：关会话前写 `WARN-未记录-YYYY-MM-DD.md` 兜底
 - **SessionStart**：注入 `<kdev-memory-brief>` 摘要（今日进度 + 当前状态字段 + ⚠️ 待处理项，含 CLAUDE.md **接口漂移**检测——基于 `claude_md_contract` 自动发现老项目缺哪些 hook 标签响应）
 - **PreCompact**：压缩前快照到 `checkpoints/压缩前-*.md`（7 天自动清理）
-- **UserPromptSubmit**：字面匹配 triggers 注入 `<kdev-memory-recall>` 指针（session 去重）
+- **UserPromptSubmit**：字面匹配 triggers 注入 `<kdev-memory-recall>` 指针（session 去重；Step triggers 经 step_dualread 读 md∪jsonl 并集，C1 永久 dual-read）
 
 **边界**：hook 只能戳一下 Claude 注意或硬阻塞罢工，不能做智能判断。真正的决策（该不该写、写什么）由 skill 负责——不要想用 hook 代替 skill。
 
@@ -329,7 +331,7 @@ Step 3：更新 .kdev/memory/当前状态.md
 
 - 一次性脚本、单会话就结束的任务 → 过度设计
 - 已有成熟项目管理工具（Jira/Linear）承接决策和缺陷 → 只保留执行日志 + 每日汇总即可
-- 用户明确说"别搞那么多文件" → 听用户的，可以退化成只有执行日志.md 一份
+- 用户明确说"别搞那么多文件" → 听用户的，可以退化成只有执行日志.jsonl（叙事 Step 主账）一份
 
 ## 落地时的务实提醒
 
@@ -349,7 +351,7 @@ Step 3：更新 .kdev/memory/当前状态.md
 
 F-NNN 的 `verbatim` 字段（用户原话）是最高价值的 RFE 信号源——保留情绪 / 强度 / 具体场景。
 
-**架构决策**：**markdown 主存 + markdown 切片包导出，不引入 JSONL**——现代蒸馏管道（Axolotl / Unsloth / HuggingFace SFT trainer 等）直接吃 markdown，多一层中间格式徒增维护、丢失叙事（markdown body 里的因果链 reasoning trace 是顶级蒸馏样本）。
+**架构决策（Phase 2 · C1 校准，Q 20260625-173847-ly1989abc）**：存储分两层——**叙事 Step 走 JSONL 主账（`执行日志.jsonl`，daily_render.py 承重墙确定性渲染日总结；历史 Step 留 `执行日志.md` 冻结·经 step_dualread 永久 dual-read，存量不迁、md-read 不退）；决策/踩坑/改进(R)/skill-feedback(F)/方法论铁规/每日汇总/当前状态 等仍永久 markdown 主存；蒸馏导出仍产 markdown 切片包**。蒸馏侧不引入额外中间格式——现代蒸馏管道（Axolotl / Unsloth / HuggingFace SFT trainer 等）直接吃 markdown，Step 叙事在导出时从 jsonl 渲染回 markdown body（因果链 reasoning trace 是顶级蒸馏样本，叙事不丢），其余条目直接读 markdown。
 
 > 三个切片包的筛选规则、sanitize 规则、实现路径、subagent 化建议见 **`references/markdown-切片导出.md`**。
 > 蒸馏触发机制（auto / manual 两档）见 **`references/蒸馏触发机制.md`**。
@@ -444,7 +446,7 @@ kdev-memory 支持两种物理布局，**flat 为默认，scoped 需手动迁移
 
 | 布局 | 目录结构 | 适用场景 |
 |---|---|---|
-| **flat（默认）** | `.kdev/memory/{执行日志.md, 决策日志.md, ...}` | 单人 / 主控单轨项目（现状不变） |
+| **flat（默认）** | `.kdev/memory/{执行日志.jsonl（叙事 Step 主账）+ 执行日志.md（历史·冻结·dual-read）, 决策日志.md, ...}` | 单人 / 主控单轨项目（现状不变） |
 | **scoped** | `.kdev/memory/{shared/<markdown>, staff/<canonical-id>/<markdown>}` | 多员工数字员工 dogfood |
 
 ### 检测方式
@@ -461,7 +463,7 @@ python3 plugins/kdev-memory/hooks/lib/migrate_scope.py --staff dev-engineer,req-
 
 存放项目级公共记录：
 - 决策日志.md / 踩坑日志.md / skill-feedback.md / 当前状态.md
-- 执行日志.md（主线 / shared scope 的 Step rollup）
+- 执行日志.jsonl（主线 / shared scope 的叙事 Step 主账，Phase 2 · C1）+ 执行日志.md（历史 Step 冻结·经 step_dualread 永久 dual-read）
 - 改进建议.md / 方法论铁规.md / conventions.md / 每日汇总/ / 归档/
 
 ### staff/\<canonical-id\>/ — 员工专属执行 rollup
@@ -538,9 +540,9 @@ commits_batch_id: <Q-NNN or null>
 })
 ````
 
-**`scope` 字段说明**：
-- 缺省 / `shared`：主线活动，Step 写入 `shared/执行日志.md`（flat 布局则写根目录执行日志.md）
-- `<canonical-id>`（如 `dev-engineer`）：员工活动，Step 写入 `staff/<canonical-id>/执行日志.md`
+**`scope` 字段说明**（Phase 2 · C1：新 Step 落 `执行日志.jsonl` 主账，不写 md）：
+- 缺省 / `shared`：主线活动，Step 写入 `shared/执行日志.jsonl`（flat 布局则写根目录执行日志.jsonl）
+- `<canonical-id>`（如 `dev-engineer`）：员工活动，Step 写入 `staff/<canonical-id>/执行日志.jsonl`
 
 主控 dispatch 员工 step 时，将 `scope` 设为该员工的 canonical id；主线活动留空或填 `shared`。kdev-step-recorder agent 读取该字段决定落盘路径和 slug（详见 [agents/kdev-step-recorder.md](../../agents/kdev-step-recorder.md)）。
 
