@@ -9,6 +9,7 @@ SessionStart 自举：
 SessionEnd/rollup -> commit + push。
 全程 stdlib-only —— hook 不能因缺依赖而炸。
 """
+import os
 import subprocess
 from pathlib import Path
 
@@ -62,6 +63,16 @@ def decide_action(*, has_git, kdev_nonempty, remote):
 # AI/human identity is separate and set elsewhere).
 _GIT_ID = ["-c", "user.name=kdev-memory", "-c", "user.email=kdev@local", "-c", "commit.gpgsign=false"]
 
+# 禁止任何交互式凭据弹窗：本 hook 是 best-effort，缺凭据应静默失败、不弹框打断会话。
+# Windows 上 Git Credential Manager 默认会弹「Connect to GitHub」GUI（SessionStart 的 bootstrap
+# 做 pull/clone/push 时触发）。下面三件套关掉交互；已缓存的凭据仍可用，正常同步不受影响。
+_NONINTERACTIVE_GIT_ENV = {
+    "GIT_TERMINAL_PROMPT": "0",   # git 自身不在终端问账号密码
+    "GCM_INTERACTIVE": "Never",   # Git Credential Manager 不弹 GUI（旧版 env 开关）
+}
+# 配置版开关（新版 GCM 读 credential.interactive），用 -c 注入，覆盖各版本。
+_NONINTERACTIVE_GIT_CONF = ["-c", "credential.interactive=false"]
+
 # Machine-local memory (NOT hosted to the shared memory repo) — §5.3 #13/#14/#15/#16.
 # Bare names (no internal slash) match at any depth: covers flat (.kdev/memory/state/)
 # and scoped (.kdev/state/) layouts.
@@ -81,10 +92,12 @@ def _ensure_machine_local_gitignore(kdev):
 
 
 def _git(args, cwd, *, identity=False):
-    pre = _GIT_ID if identity else []
+    pre = _NONINTERACTIVE_GIT_CONF + (_GIT_ID if identity else [])
+    env = dict(os.environ)
+    env.update(_NONINTERACTIVE_GIT_ENV)
     return subprocess.run(["git", *pre, *args], cwd=str(cwd),
                           capture_output=True, text=True,
-                          encoding="utf-8", errors="replace")
+                          encoding="utf-8", errors="replace", env=env)
 
 
 def _kdev_dir(repo_root):

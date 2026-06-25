@@ -1,5 +1,15 @@
 # kdev-memory CHANGELOG
 
+## [0.18.3] - 2026-06-25
+
+**修复**：kdev-memory SessionStart bootstrap 触发 GCM「Connect to GitHub」弹窗
+
+- `hooks/lib/kdev_sync.py` `_git()` 加 GCM 三开关（对齐 ieidev-team 0.4.7）：
+  - env: `GIT_TERMINAL_PROMPT=0`、`GCM_INTERACTIVE=Never`
+  - cmdline: `-c credential.interactive=false`
+- 行为：已缓存 HTTPS 凭据的机器**不变**（正常 pull/clone/push）；无凭据机器上**静默失败**（stderr 走 `_git()` 返回值，bootstrap 上层 L108-141 已有容错），不再弹 GCM GUI。
+- 新增 `tests/test_kdev_sync_noninteractive.py` 覆盖三开关。
+
 ## [0.18.2] — 2026-06-23
 
 **commit-tracker 不再自举记忆目录：未初始化工程跑 `git commit` 不再凭空冒出 `.kdev/memory/`。**
