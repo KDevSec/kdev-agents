@@ -27,7 +27,7 @@
 |------|------|------------------|------|
 | ~~P0 立刻修~~ ✅ | 时间戳 ID 双认回归（weekly / distill_trigger / distill 漏认 Q-020 后的新条目） | **完全独立**，纯 bug | **已实施 2026-06-25**（commit `a8377a6`，+6 TDD 用例） |
 | ~~P1 短期跟~~ ✅ | sync 层三件套（`init-local` / `sync: off` / 失败会话内提示） | 独立于 JSONL | **已实施 2026-06-25**（commit `6f4296f`，+14 TDD 用例） |
-| **P1b 调查中** | Windows hook 控制台闪窗（上游缺陷）+ wrapper 加固 backport（CRLF/.gitattributes/PYTHONUTF8/单行 exec） | 加固独立普惠双队列；闪窗本身 = Claude Code 上游 **not-planned**，pythonw 可能白费 | 加固**随 P1 一批做**；闪窗走 Windows 实验闸定夺 |
+| ~~P1b 调查中~~ ✅ 加固已做 | wrapper 加固 backport（CRLF/.gitattributes/PYTHONUTF8/单行 exec）✅；Windows 闪窗根因 = Claude Code 上游 **not-planned** | 加固独立普惠双队列；闪窗本身上游不修 | **加固已实施 0.19.1**（commit `9cfc7a5`）；闪窗能否消待 Windows 实验闸 |
 | ~~P2 需决策~~ ✅ 已实施(C1) | JSONL 叙事主账（Plan D Phase 2）= Phase A 基座 + dual-read + Phase B(recorder→jsonl+daily_render) + Phase C(切档下线+文档+spec回写)。checkpoint 瘦身(D4) **未做·defer** | 选 **C1 永久 dual-read**（Q 20260625-173847；借 JSONL 增益、低风险不硬切，见总纲） | **已实施 2026-06-25**（commits `f525e3b`→`d8b8829`，516 passed）；**未发布**，待另会话 bugfix 后 bump 0.19.0+刷 marketplace 激活 |
 
 **不跟清单**（team 编排耦合，独立 kdev-memory 无意义）：`delegation.py`、`recall.py` 的 events/handoffs 部分、`block-advance-past-gate.py`、`cqo-event-audit.py`、`claude_md_merge.py` 的 shim 化。详见 §5。
@@ -73,7 +73,7 @@ ieidev 0.4.0 → 0.5.0 把「记忆仓 git 同步」从「失败只打 stderr（
 
 ---
 
-## P1b — Windows hook 控制台闪窗 ＋ wrapper 加固（新增 2026-06-25，调查中）
+## P1b — Windows hook 控制台闪窗 ＋ wrapper 加固　✅ wrapper 加固已实施 0.19.1（commit `9cfc7a5`）；闪窗根因待 Windows 实验
 
 > 起源：用户报"Windows 上 hook **一直启停闪控制台窗**"。0.18.3 CHANGELOG 只修了 GCM「Connect to GitHub」弹窗（GUI 凭据框，与闪窗**正交**），**没碰闪窗根因**（✅ 核实：`git diff d9be67e HEAD` 对 [run-python-hook.cmd](plugins/kdev-memory/hooks/run-python-hook.cmd) 和 [hooks.json](plugins/kdev-memory/hooks/hooks.json) 均空）。本节落账调查结论，避免丢失。
 
@@ -119,7 +119,9 @@ ieidev 的 `autoserve.py`（`pyieidev/ieidev_hud/`，`_spawn_serve()` 行 188-19
 
 ---
 
-## P2 — JSONL 叙事主账（Plan D Phase 2）【需决策】
+## P2 — JSONL 叙事主账（Plan D Phase 2）　✅ 已实施 C1（0.19.0，commits `f525e3b`→`d8b8829`）
+
+> ✅ **已实施（0.19.0，C1 永久 dual-read，决策 Q 20260625-173847）**：下方组件清单 + reader 切换 + 文档同步已全部落地。但 kdev 选 **C1 永久 dual-read**（历史 md 冻结经 dual-read 续读、不迁存量、不退 md-read），区别于本节当初设想的 ieidev 式硬切（archive + reader 退 md）。以下为当初设计盘点，保留作背景。
 
 **这是 ieidev 领先 kdev 的最大一块，也是后续一长串下游 diff 的总根。** ieidev 0.3.0（2026-06-23）落地，kdev 有设计稿 [`docs/superpowers/specs/2026-06-13-P-C2-JSONL操作层+token优化-design.md`](docs/superpowers/specs/2026-06-13-P-C2-JSONL操作层+token优化-design.md) 但**截至 0.18.3 未实施**，仍是 markdown 单一主存。对应记忆决策 **Q 20260617-182852「员工记忆层 JSONL 主账化（md 退日总结派生）」**。
 
@@ -152,7 +154,7 @@ step-recorder agent 改 JSONL 落盘（[kdev-step-recorder.md](plugins/kdev-memo
 
 ---
 
-## P2 配套 — PreCompact checkpoint 瘦身（D4，token 经济）
+## P2 配套 — PreCompact checkpoint 瘦身（D4，token 经济）　✅ 已实施 0.19.1（commit `8f91d47`）
 
 ieidev 把 [pre-compact-check.py](plugins/kdev-memory/hooks/pre-compact-check.py) 的 checkpoint 从「全文复制 durable md（执行/决策/踩坑/改进）」改为**指针模式**——durable 文件压缩后磁盘仍在、有召回通道、有 git 历史，三重冗余无需抄；checkpoint 只留**易失叙事信号**（未落盘 Step 警告，措辞强化为「易失信号·压缩后优先补记」）。
 
@@ -186,11 +188,20 @@ ieidev 把 [pre-compact-check.py](plugins/kdev-memory/hooks/pre-compact-check.py
 
 ---
 
-## 附录：建议落地顺序
+## 附录：实施记录（2026-06-25 → 06-30，roadmap 主体已全部落地）
 
-1. **本周**：P0 时间戳双认（4 处 + TDD），bump patch 版。
-2. **下一迭代**：P1 sync 三件套 + **P1b wrapper 加固（CRLF/.gitattributes/PYTHONUTF8/单行 exec backport）** + P2 配套的 checkpoint 指针格式（都独立于 JSONL，先收割低风险收益）；并行让用户在 Windows 跑 P1b 闪窗归属实验（pythonw 是否有救）。
-3. **专题决策会**：拍 P2 JSONL 是否迁、怎么分阶段，连带处理 G-011 worktree ID 隐患；决策结果回写 [P-C2 spec](docs/superpowers/specs/2026-06-13-P-C2-JSONL操作层+token优化-design.md) 与 SKILL.md（spec→canonical 回写铁规）。
+| 项 | 状态 | 版本 / commit |
+|----|------|---------------|
+| P0 时间戳双认 | ✅ | 0.19.0 `a8377a6` |
+| P1 sync UX 三件套 | ✅ | 0.19.0 `6f4296f` |
+| P2 JSONL 主账（C1 永久 dual-read，Phase A/B/C） | ✅ | 0.19.0 `f525e3b`→`d8b8829` |
+| P1b wrapper 加固 | ✅ | 0.19.1 `9cfc7a5` |
+| D4 checkpoint 指针瘦身 | ✅ | 0.19.1 `8f91d47` |
+| P1b Windows 闪窗实验（窗口能否消） | ⏳ 待 Windows 机 | 上游 not-planned |
+| 仍 defer：存量 md 迁移 / MemOS 语义召回 / G-011 live 碎轨 reconcile / Q-017 蒸馏质量闸 | ⏳ | — |
+
+> **范围澄清**（回应"当前状态.md 要不要 jsonl"）：JSONL 迁移**只动叙事 Step（执行日志）这种 append-only 记录流**；`当前状态.md`（单份就地更新的活文档）/ 决策 / 踩坑 / F / 改进 / 每日汇总 **永久 markdown 主存**——kdev 与 ieidev 同此设计（ieidev 代码亦只引用 `当前状态.md`）。
+> P2「是否迁 JSONL」已拍：迁，采 **C1 永久 dual-read**（Q 20260625-173847，见总纲）。G-011 撞号根因已随 Q-020 时间戳 minting 退役（live）；剩「历史碎轨 reconcile」单独专项 defer。
 
 ---
 
