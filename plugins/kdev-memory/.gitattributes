@@ -1,0 +1,2 @@
+# 保持 Windows 批处理封装为 CRLF（cmd.exe 解析必需）
+hooks/run-python-hook.cmd text eol=crlf

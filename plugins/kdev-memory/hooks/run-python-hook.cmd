@@ -1,29 +1,23 @@
 : << 'PYBLOCK'
 @echo off
-REM Cross-platform Python hook wrapper for kdev-memory
-REM Windows: prefers py -3 (most reliable), then python, then python3
-REM Unix: the shell interprets this as a script (: is a no-op in bash)
-
+REM Cross-platform Python hook wrapper for kdev-memory.
+REM Windows cmd.exe runs this batch block; Unix and Git-Bash run the single bash line below.
+REM This file MUST stay CRLF: cmd.exe needs CRLF to parse a batch file correctly (LF-only
+REM makes cmd ignore @echo off / REM / exit /b and run every line as a command). The cmd
+REM block MUST also stay ASCII-only. Chinese notes live only in the bash line (cmd never
+REM reaches it). PYTHONUTF8=1 keeps Chinese and emoji hook output safe on GBK consoles.
 set "SCRIPT=%~1"
 if "%SCRIPT%"=="" exit /b 0
-
 set "HOOK_DIR=%~dp0"
-
-REM Primary: py -3 (Windows Python launcher, guaranteed Python 3)
+set "PYTHONUTF8=1"
 py -3 "%HOOK_DIR%%SCRIPT%" %2 %3 %4 %5 %6 %7 %8 %9
 if %ERRORLEVEL% equ 0 exit /b 0
-
-REM Secondary: python (common on most Windows setups)
 python "%HOOK_DIR%%SCRIPT%" %2 %3 %4 %5 %6 %7 %8 %9
 if %ERRORLEVEL% equ 0 exit /b 0
-
-REM Fallback: python3 (may be Windows Store stub on some systems)
 python3 "%HOOK_DIR%%SCRIPT%" %2 %3 %4 %5 %6 %7 %8 %9
 exit /b %ERRORLEVEL%
-
 PYBLOCK
-# Unix/Mac: use python3 first (standard on modern Unix), fall back to python
-SCRIPT_DIR="$(cd "$(dirname "$0")" && pwd)"
-SCRIPT_NAME="$1"
-shift
-python3 "${SCRIPT_DIR}/${SCRIPT_NAME}" "$@" 2>/dev/null || python "${SCRIPT_DIR}/${SCRIPT_NAME}" "$@"
+# Unix/macOS/Git-Bash 分支：写成单行，行尾 '#' 吃掉 CRLF 的 \r（CRLF 文件下多行 bash 会因每行
+# 尾随 \r 而把路径/关键字带上 \r 弄坏；单行 + 尾 '#' 注释掉那个 \r 最稳）。逐个 --version 探测，
+# 跳过 Windows Store 的 python3 死垫片，命中即 exec（单次执行）。PYTHONUTF8=1 保 GBK 下不崩。
+S="$(cd "$(dirname "$0")" && pwd)/$1"; shift; export PYTHONUTF8=1; for p in python3 python "py -3"; do $p --version >/dev/null 2>&1 && exec $p "$S" "$@"; done #
