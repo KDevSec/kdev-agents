@@ -3,12 +3,19 @@
 
 会话即将被压缩时触发。此时 Claude 仍有完整上下文。
 
-行为：
+行为（D4 瘦身后：checkpoint = 易失信号 + durable 指针，不再逐字重抄）：
   1. 总是写 .kdev/memory/checkpoints/压缩前-YYYY-MM-DD-HHMMSS.md
-     内容 = 今日核心文件原文复制 + 工作区 porcelain
-  2. 执行日志今天空 + 工作区有变更 → checkpoint 加"⚠️ 未落盘"警告区块
+     内容 = 工作区 porcelain（易失）+ 未落盘 delta 警告（易失，不可复得）
+            + durable 记忆指针（路径 + 行数 / jsonl 末条 record_id，不抄全文）
+  2. 今日无 Step（md ∪ jsonl，dual-read）+ 工作区有变更 → checkpoint 加"⚠️ 未落盘"警告区块
   3. 顺手清理 7 天前的旧 checkpoint
   4. stdout 软提醒
+
+为何不再逐字抄 durable 文件（D4）：决策/踩坑/改进/当前状态/执行日志 等 durable
+文件在压缩后磁盘仍在、有召回通道、有嵌套仓 git 历史——三重冗余，逐字重抄纯属
+token 浪费。唯一不可复得的是「干了活但未落盘」的易失叙事信号，故强化它 + 出指针。
+注意：「今日是否未落盘」判断仍走 dual-read（md 今日态 ∪ jsonl 主账今日 Step），
+D4 只指针化「durable 文件全文复制」那部分，不退回成只读 jsonl。
 """
 
 from __future__ import annotations
@@ -114,15 +121,20 @@ def main() -> int:
     parts.append("**主要用途**：压缩后 Claude 上下文会丢失细节，此文件保留原始信号。")
     parts.append("")
 
+    jsonl = step_log.jsonl_path(root=kdev_dir)
+
     if log_empty_today and porcelain:
+        # 易失·不可复得：干了活但没 dispatch recorder 的 Step 不在任何文件里。
+        # 这是 checkpoint 唯一真正不可复得的叙事信号，故强化 + 提醒压缩后优先补记。
         parts.extend([
-            "## ⚠️ 未落盘警告",
+            "## ⚠️ 未落盘警告（易失信号·压缩后优先补记）",
             "",
-            f"**执行日志今天（{today}）无任何条目**，但工作区存在未提交变更。",
-            "说明本会话的工作单元（Step）未实时落盘。请压缩后优先：",
+            f"**执行日志今天（{today}）md 与 jsonl 主账均无任何 Step**，但工作区存在未提交变更。",
+            "说明本会话已干了活、但工作单元（Step）尚未实时落盘——",
+            "**这是压缩后唯一不可从磁盘/召回/git 历史复得的叙事信号**。请压缩后优先：",
             "",
-            '1. 读本文件的"工作区快照"区块',
-            f"2. 回忆对应的 Step，追加到 `{log_file}`",
+            '1. 读本文件的"工作区快照"区块，回忆本会话干了什么',
+            f"2. dispatch kdev-step-recorder 把对应 Step 落到 `{jsonl}`",
             "3. 补记完成后删除本 checkpoint",
             "",
         ])
@@ -136,33 +148,44 @@ def main() -> int:
         "",
     ])
 
-    for src_name in ("执行日志.md", "决策日志.md", "踩坑日志.md", "改进建议.md", "当前状态.md"):
-        src = shared / src_name
-        if not src.is_file():
-            continue
-        parts.extend([
-            f"## 📋 {src_name} 原文（压缩前快照）",
-            "",
-            "```markdown",
-        ])
+    # durable 文件 → 指针（不抄全文；压缩后 Read 活文件 / 召回通道 / git 历史回读）。
+    # D4：durable 拷贝是三重冗余（活文件在盘 + 召回 + 嵌套仓 git 历史）。
+    parts.append("## 📍 durable 记忆指针（压缩后 Read 活文件回读，不在此重抄全文）")
+    parts.append("")
+
+    # 已落盘 Step（执行日志.jsonl）→ 指针：路径 + 当日条数 + 末条 record_id
+    if jsonl.is_file():
         try:
-            parts.append(src.read_text(encoding="utf-8").rstrip("\n"))
+            recs = step_log.read_steps(root=kdev_dir)
+        except Exception:
+            recs = []
+        last = recs[-1].get("record_id", "(无 record_id)") if recs else "(空)"
+        try:
+            today_n = len(step_log.steps_for_date(today, root=kdev_dir))
+        except Exception:
+            today_n = -1
+        parts.append(f"- {jsonl}（当日 {today_n} 条；末条 {last}）")
+
+    # 叙事 Step 仍 dual-read：执行日志.md 若存在（旧账 / 未迁条目）也出指针
+    for name in ("执行日志.md", "决策日志.md", "踩坑日志.md", "改进建议.md", "当前状态.md"):
+        p = shared / name
+        if not p.is_file():
+            continue
+        try:
+            n_lines = len(p.read_text(encoding="utf-8").splitlines())
         except OSError:
-            parts.append("(读取失败)")
-        parts.extend(["```", ""])
+            n_lines = -1
+        parts.append(f"- {p}（{n_lines} 行）")
 
     today_summary = shared / "每日汇总" / f"{today}.md"
     if today_summary.is_file():
-        parts.extend([
-            f"## 📅 今日汇总（{today}）原文",
-            "",
-            "```markdown",
-        ])
         try:
-            parts.append(today_summary.read_text(encoding="utf-8").rstrip("\n"))
+            n_lines = len(today_summary.read_text(encoding="utf-8").splitlines())
         except OSError:
-            parts.append("(读取失败)")
-        parts.extend(["```", ""])
+            n_lines = -1
+        parts.append(f"- {today_summary}（今日汇总，{n_lines} 行）")
+
+    parts.append("")
 
     parts.extend([
         "---",

@@ -411,3 +411,76 @@ def test_pre_compact_jsonl_today_step_no_unsaved_warning(tmp_path):
     assert cps, "checkpoint 应被写出"
     body = cps[0].read_text(encoding="utf-8")
     assert "未落盘警告" not in body
+
+
+# ============================================================
+# pre-compact-check (subprocess) — D4 checkpoint 瘦身（durable 指针化）
+# ============================================================
+
+def test_pre_compact_md_dualread_today_step_no_unsaved_warning(tmp_path):
+    """dual-read 回归：今日 Step 仅在 md（执行日志.md 含 today）+ 工作区有变更
+    → log_empty_today=False → 无"未落盘警告"。证明 D4 没把 dual-read 退回成只读 jsonl。"""
+    k = tmp_path / ".kdev" / "memory"
+    k.mkdir(parents=True)
+    _git_repo_with_unstaged(tmp_path)
+    today = date.today().isoformat()
+    # 仅写 md（不写 jsonl）：今日态只来自 md 这一路
+    (k / "执行日志.md").write_text(
+        f"# 执行日志\n\n## Step main-1 — {today}\n\n仅 md 落盘的 Step\n",
+        encoding="utf-8")
+    _pre_compact(tmp_path)
+    cps = list((k / "checkpoints").glob("压缩前-*.md"))
+    assert cps, "checkpoint 应被写出"
+    body = cps[0].read_text(encoding="utf-8")
+    assert "未落盘警告" not in body, "md 今日态应抑制警告（dual-read 不可退回只读 jsonl）"
+
+
+def test_pre_compact_durable_md_is_pointer_not_fulltext(tmp_path):
+    """D4 核心：durable md（决策/踩坑/改进/当前状态）压缩后是指针（路径+行数），
+    不含全文正文。"""
+    k = tmp_path / ".kdev" / "memory"
+    k.mkdir(parents=True)
+    _git_repo_with_unstaged(tmp_path)
+    sentinel = "DURABLE_FULLTEXT_SENTINEL_决策正文不该出现在checkpoint"
+    (k / "决策日志.md").write_text(
+        f"# 决策日志\n\n## Q-001\n\n{sentinel}\n", encoding="utf-8")
+    (k / "踩坑日志.md").write_text("# 踩坑日志\n\n## G-001\n\n坑正文\n", encoding="utf-8")
+    _pre_compact(tmp_path)
+    cps = list((k / "checkpoints").glob("压缩前-*.md"))
+    assert cps, "checkpoint 应被写出"
+    body = cps[0].read_text(encoding="utf-8")
+    # (a) 不含 durable md 全文正文
+    assert sentinel not in body, "checkpoint 不应逐字抄 durable md 全文"
+    # (b) 是指针格式：含路径 + 行数
+    assert "决策日志.md" in body, "应有决策日志指针（路径）"
+    assert "踩坑日志.md" in body, "应有踩坑日志指针（路径）"
+    assert "行）" in body, "指针应带行数"
+    assert "durable 记忆指针" in body, "应有 durable 指针区块标题"
+
+
+def test_pre_compact_jsonl_pointer_has_last_record_id(tmp_path):
+    """D4：执行日志.jsonl 出指针（路径 + 当日条数 + 末条 record_id），不抄全文。"""
+    k = tmp_path / ".kdev" / "memory"
+    k.mkdir(parents=True)
+    _git_repo_with_unstaged(tmp_path)
+    today = date.today().isoformat()
+    rid = "Step 20260630-120000-ly"
+    step_log.append_step(_jsonl_record(rid=rid, today=today), root=k)
+    _pre_compact(tmp_path)
+    cps = list((k / "checkpoints").glob("压缩前-*.md"))
+    assert cps, "checkpoint 应被写出"
+    body = cps[0].read_text(encoding="utf-8")
+    assert "执行日志.jsonl" in body, "应有 jsonl 指针"
+    assert rid in body, "jsonl 指针应含末条 record_id"
+
+
+def test_pre_compact_unsaved_warning_wording_strengthened(tmp_path):
+    """D4：未落盘易失信号措辞强化为「易失信号·压缩后优先补记」。"""
+    k = tmp_path / ".kdev" / "memory"
+    k.mkdir(parents=True)
+    _git_repo_with_unstaged(tmp_path)
+    _pre_compact(tmp_path)
+    cps = list((k / "checkpoints").glob("压缩前-*.md"))
+    assert cps, "checkpoint 应被写出"
+    body = cps[0].read_text(encoding="utf-8")
+    assert "易失信号·压缩后优先补记" in body, "警告措辞应强化"
