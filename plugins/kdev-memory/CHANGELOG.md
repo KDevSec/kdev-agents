@@ -1,5 +1,26 @@
 # kdev-memory CHANGELOG
 
+## [0.19.1] - 2026-06-30
+
+对齐 ieidev-team 的两条真 gap（roadmap P1b / P2 配套 D4），均通用、低风险、TDD（520 passed）。
+
+### ✨ hook wrapper 加固（P1b，对齐 ieidev 0.5.0）
+
+`run-python-hook.cmd` 跨平台健壮性：
+- 行尾改 CRLF + 新增 `.gitattributes` 锁 `text eol=crlf`（LF 下 cmd.exe 忽略 `@echo off`/`REM` → 窗里刷命令文本，是 Windows GUI 闪窗刷屏根因之一）。
+- cmd 块 ASCII-only + 双分支 `PYTHONUTF8=1`（GBK 控制台中文/emoji 不崩）。
+- Unix 分支单行 + 尾 `#` 吃 CRLF 的 `\r` + 逐个 `--version` 探测跳 Win Store python3 死垫片 + 命中即 `exec`。
+- polyglot 结构不变；实跑验证 bash 分支选对 python3、stdout 回传、exit 0。
+- 注：Windows GUI 闪窗根因（Claude Code 没传 `CREATE_NO_WINDOW`）是上游 **not-planned**，本加固让其从"刷一屏命令"降到"干净一闪"；窗口能否彻底消需 Windows 实验闸定夺。
+
+### ✨ PreCompact checkpoint 瘦身（D4，token 经济，对齐 ieidev）
+
+`pre-compact-check.py` 的 checkpoint 从「全文复制 durable md」改为**指针模式**：durable 文件出一行 `<path>（N 行）`、`执行日志.jsonl` 出末条 record_id 指针，只保留并强化"未落盘易失信号（压缩后优先补记）"。叠加在 dual-read 之上不回退（今日态 md∪jsonl 双路保留）。
+
+### 📌 升级须知
+
+- 本版改了 hook/wrapper，需**刷新 marketplace** 才激活（G-004）。
+
 ## [0.19.0] - 2026-06-25
 
 对齐 ieidev-team memory 的一批跟进（详见 [docs/skills/kdev-memory/roadmap.md](../../docs/skills/kdev-memory/roadmap.md)）：P0 回归修复 + P1 sync UX + P2 叙事 Step JSONL 主账迁移（采 C1 永久 dual-read）。全程 TDD，516 passed。
