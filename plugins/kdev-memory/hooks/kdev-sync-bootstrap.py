@@ -26,6 +26,18 @@ def main():
     elif action in ("remind", "init-local") and res.get("message"):
         print(f"<kdev-sync-reminder>\n{res['message']}\n</kdev-sync-reminder>")
 
+    # 未推积压可见化：正常 bootstrap 之后，若记忆仓本地领先 upstream（自动 push 失败会累积
+    # 领先），额外弹一段独立提醒——SessionEnd 的 push 失败到不了用户，必须在 SessionStart 抓。
+    # sync:off（optout）时全静默，不提醒；与上面的 remind/clone/pull 提醒叠加、互不打架。
+    if action != "optout":
+        try:
+            n = kdev_sync.unpushed_count(repo_root)
+        except Exception:
+            n = 0
+        if n > 0:
+            msg = kdev_sync.unpushed_reminder_text(n)
+            print(f"<kdev-sync-reminder>\n{msg}\n</kdev-sync-reminder>")
+
 
 if __name__ == "__main__":
     main()

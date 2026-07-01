@@ -1,5 +1,19 @@
 # kdev-memory CHANGELOG
 
+## [0.19.2] - 2026-07-01
+
+记忆仓自动 push 失败**可见化**——补上 SSH 修复没堵的可见性缺口。SessionEnd 的 `git push` 失败只 print 到 stderr、用户看不见，备份可长期静默落后而不自知（实测积压 45 会话）。全程 TDD，530 passed。
+
+### ✨ 未推积压可见化（SessionStart 提醒）
+
+- `kdev_sync.unpushed_count(repo_root)`：对 `.kdev/` 跑 `git rev-list --count @{u}..HEAD` 数本地领先 upstream 条数（**不 fetch**——push 失败会累积领先该 ref，正是要抓的信号）。无 `.git`/无 upstream/出错 → 返回 0（只读、容错、永不抛）。
+- `kdev-sync-bootstrap.py`（SessionStart）：正常 bootstrap 之后，若 `unpushed_count > 0` 额外弹一段独立 `<kdev-sync-reminder>`（含条数 + 检查 SSH key/凭据 + `.kdev` 手动 `git push` 引导）。与现有 remind/clone/pull 提醒叠加互不打架；`sync: off`（optout）全静默。
+- `kdev-sync-push.py`（SessionEnd）：push 失败时除 stderr 外，仿 `session-end-check.py` 写持久信号文件 `.kdev/memory/WARN-记忆未推送-<date>.md`，保证有据可查。
+
+### 📌 升级须知
+
+- 本版改了 hook 脚本，需**刷新 marketplace** 才激活（G-004）。
+
 ## [0.19.1] - 2026-06-30
 
 对齐 ieidev-team 的两条真 gap（roadmap P1b / P2 配套 D4），均通用、低风险、TDD（520 passed）。

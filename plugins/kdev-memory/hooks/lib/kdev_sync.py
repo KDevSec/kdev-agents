@@ -11,6 +11,7 @@ SessionEnd/rollup -> commit + push。
 """
 import os
 import subprocess
+from datetime import date
 from pathlib import Path
 
 REMINDER = (
@@ -76,6 +77,62 @@ def sync_failed_reminder_text(action, detail=""):
         "（如 `gh auth login`，或对该账号任意仓库 `git pull` 一次按提示登录），"
         "之后每次会话启动会自动静默同步，不再弹窗。" + tail + OPTOUT_HINT
     )
+
+
+def unpushed_reminder_text(count):
+    """SessionStart 会话内提示：记忆仓有 N 条本地 commit 未推上远程（自动 push 可能失败）。
+
+    换机不丢记忆依赖记忆仓被推上远程；push 失败会让本地累积领先 upstream 该 ref，
+    这里把它显性化，别静默积压（实测曾积压 45 会话）。"""
+    return (
+        f"⚠️ 记忆仓有 {count} 条本地 commit 未推上远程——自动 push 可能失败"
+        "（检查 SSH key/凭据，或在 .kdev 手动 git push）。换机不丢记忆依赖它，别忽略。"
+    )
+
+
+def unpushed_count(repo_root):
+    """.kdev/ 本地领先 upstream 的 commit 条数（git rev-list --count @{u}..HEAD）。
+
+    只读、**不 fetch**——push 失败会让本地累积领先 upstream ref，正是要抓的信号。
+    无 .git / 无 upstream / 任何出错 → 返回 0（容错，永不抛）。
+    """
+    try:
+        kdev = _kdev_dir(repo_root)
+        if not (kdev / ".git").exists():
+            return 0
+        r = _git(["rev-list", "--count", "@{u}..HEAD"], cwd=kdev)
+        if r.returncode != 0:
+            return 0
+        return int((r.stdout or "0").strip() or "0")
+    except Exception:
+        return 0
+
+
+def warn_unpushed(repo_root, count):
+    """push 失败时写持久信号文件 .kdev/memory/WARN-记忆未推送-<date>.md（仿 session-end-check WARN）。
+
+    保证「自动 push 失败」有据可查、下次会话能被 SessionStart brief / 用户看到。
+    只读依赖 count；写文件失败静默吞掉，永不抛。返回写入的 Path 或 None。
+    """
+    try:
+        mem = _kdev_dir(repo_root) / "memory"
+        if not mem.is_dir():
+            return None
+        today = date.today().isoformat()
+        warn_file = mem / f"WARN-记忆未推送-{today}.md"
+        body = (
+            f"# ⚠️ 记忆仓未推送：{today}\n\n"
+            f"会话结束时自动 push 失败，记忆仓有 **{count} 条本地 commit 未推上远程**。\n\n"
+            "换机 / SSH 失效时会丢这些记忆。请检查：\n\n"
+            "1. SSH key / 凭据是否有效（`ssh -T git@github.com` 或 `gh auth status`）\n"
+            "2. 在 `.kdev` 目录手动 `git push` 补推\n"
+            f"3. 补推成功后 `rm {warn_file}`\n\n"
+            "_本文件由 kdev-memory SessionEnd hook 自动生成（push 失败兜底）。_\n"
+        )
+        warn_file.write_text(body, encoding="utf-8")
+        return warn_file
+    except Exception:
+        return None
 
 
 def is_sync_off(repo_root):

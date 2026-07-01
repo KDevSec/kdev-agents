@@ -281,3 +281,113 @@ def test_bootstrap_hook_emits_sync_reminder_on_clone_failure(tmp_path):
                   encoding="utf-8", errors="replace", env=env)
     assert "<kdev-sync-reminder>" in r.stdout and "</kdev-sync-reminder>" in r.stdout
     assert "凭据" in r.stdout
+
+
+# ── 件 4：未推积压可见化 — unpushed_count + SessionStart 弹提醒（0.19.2）──
+
+
+def _make_ahead_repo(tmp_path, ahead=1):
+    """造一个 .kdev git 仓：clone 自 bare remote 后本地多提交 N 条（本地领先 upstream N）。"""
+    bare = _bare_remote(tmp_path)
+    seed = tmp_path / "seed"
+    (seed / ".kdev").mkdir(parents=True)
+    (seed / ".kdev" / "执行日志.md").write_text("step 1\n", encoding="utf-8")
+    _write_yml(seed, str(bare))
+    kdev_sync.bootstrap(seed)  # init + 首推 → remote 有内容
+
+    repo = tmp_path / "R"
+    repo.mkdir()
+    _write_yml(repo, str(bare))
+    kdev_sync.bootstrap(repo)  # clone → 与 upstream 齐平
+    kdev = repo / ".kdev"
+    _git(["config", "user.name", "t"], cwd=kdev)
+    _git(["config", "user.email", "t@t"], cwd=kdev)
+    for i in range(ahead):
+        (kdev / f"local-{i}.md").write_text("x", encoding="utf-8")
+        _git(["add", "-A"], cwd=kdev)
+        _git(["commit", "-m", f"local {i}"], cwd=kdev)  # 只提交不 push → 本地领先
+    return repo
+
+
+def test_unpushed_count_zero_when_no_git(tmp_path):
+    (tmp_path / ".kdev").mkdir()
+    assert kdev_sync.unpushed_count(tmp_path) == 0
+
+
+def test_unpushed_count_zero_when_no_upstream(tmp_path):
+    # init-local（本地仓、无 remote/upstream）→ rev-list @{u} 失败 → 返回 0，不崩。
+    (tmp_path / ".kdev").mkdir()
+    (tmp_path / ".kdev" / "x.md").write_text("local", encoding="utf-8")
+    kdev_sync.bootstrap(tmp_path)  # init-local，无 upstream
+    assert kdev_sync.unpushed_count(tmp_path) == 0
+
+
+def test_unpushed_count_zero_when_in_sync(tmp_path):
+    bare = _bare_remote(tmp_path)
+    repo = tmp_path / "A"
+    (repo / ".kdev").mkdir(parents=True)
+    (repo / ".kdev" / "执行日志.md").write_text("step 1\n", encoding="utf-8")
+    _write_yml(repo, str(bare))
+    kdev_sync.bootstrap(repo)  # init + push → 齐平
+    assert kdev_sync.unpushed_count(repo) == 0
+
+
+def test_unpushed_count_counts_local_lead(tmp_path):
+    repo = _make_ahead_repo(tmp_path, ahead=3)
+    assert kdev_sync.unpushed_count(repo) == 3
+
+
+def test_unpushed_reminder_text_mentions_count_and_push():
+    t = kdev_sync.unpushed_reminder_text(45)
+    assert "45" in t and "未推" in t and "git push" in t
+
+
+def _run_bootstrap_hook(tmp_path):
+    import subprocess as _subp
+    import sys
+    hook = Path(__file__).parent.parent / "hooks" / "kdev-sync-bootstrap.py"
+    env = dict(os.environ)
+    env["CLAUDE_PROJECT_DIR"] = str(tmp_path)
+    return _subp.run([sys.executable, str(hook)], capture_output=True, text=True,
+                     encoding="utf-8", errors="replace", env=env)
+
+
+def test_bootstrap_hook_reminds_on_unpushed_backlog(tmp_path):
+    repo = _make_ahead_repo(tmp_path, ahead=2)
+    r = _run_bootstrap_hook(repo)
+    assert "<kdev-sync-reminder>" in r.stdout
+    assert "2 条本地 commit 未推" in r.stdout
+
+
+def test_bootstrap_hook_no_unpushed_reminder_when_in_sync(tmp_path):
+    bare = _bare_remote(tmp_path)
+    repo = tmp_path / "A"
+    (repo / ".kdev").mkdir(parents=True)
+    (repo / ".kdev" / "执行日志.md").write_text("step 1\n", encoding="utf-8")
+    _write_yml(repo, str(bare))
+    kdev_sync.bootstrap(repo)  # 齐平
+    r = _run_bootstrap_hook(repo)
+    assert "未推" not in r.stdout
+
+
+def test_bootstrap_hook_silent_on_unpushed_when_sync_off(tmp_path):
+    repo = _make_ahead_repo(tmp_path, ahead=2)
+    # 事后加 sync: off → optout 全静默，即使本地领先也不提醒。
+    (repo / "kdev-sync.yml").write_text("sync: off\n", encoding="utf-8")
+    r = _run_bootstrap_hook(repo)
+    assert "未推" not in r.stdout
+    assert "<kdev-sync-reminder>" not in r.stdout
+
+
+def test_warn_unpushed_writes_signal_file(tmp_path):
+    mem = tmp_path / ".kdev" / "memory"
+    mem.mkdir(parents=True)
+    p = kdev_sync.warn_unpushed(tmp_path, 7)
+    assert p is not None and p.exists()
+    body = p.read_text(encoding="utf-8")
+    assert "7 条本地 commit 未推" in body and "git push" in body
+
+
+def test_warn_unpushed_noop_when_no_memory_dir(tmp_path):
+    (tmp_path / ".kdev").mkdir()  # 没有 memory/ 子目录
+    assert kdev_sync.warn_unpushed(tmp_path, 3) is None

@@ -17,6 +17,12 @@ def main():
         return
     if not res["ok"]:
         print(f"[kdev-sync] push failed: {res['message']}", file=sys.stderr)
+        # push 失败 stderr 到不了用户 → 仿 session-end-check 写持久 WARN 信号文件，保证有据可查。
+        try:
+            n = kdev_sync.unpushed_count(repo_root) or 1
+            kdev_sync.warn_unpushed(repo_root, n)
+        except Exception:
+            pass
 
 
 if __name__ == "__main__":
