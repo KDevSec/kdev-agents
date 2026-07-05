@@ -1,0 +1,45 @@
+docs/skills/kdev-memory/roadmap.md
+  s_3ae8861f068042::t_566c110af808dc 181-183,185-187
+  s_3ae8861f068042::t_cec3d82c617caf 35
+plugins/kdev-memory/hooks/lib/worktree_link.py
+  s_3ae8861f068042::t_0b6a3c4010ec46 83
+  s_3ae8861f068042::t_29cfeb24f90a0c 30
+plugins/kdev-memory/hooks/lib/migrate-v0.7.py
+  s_3ae8861f068042::t_9dbdcc4171016c 28
+  s_3ae8861f068042::t_101719fe5cb7e3 60
+  s_3ae8861f068042::t_994aff60e3a068 53
+plugins/kdev-memory/hooks/lib/skill_version.py
+  s_3ae8861f068042::t_a636f92266a867 61
+plugins/kdev-memory/.claude-plugin/plugin.json
+  s_3ae8861f068042::t_dcd23139e4ea45 4
+plugins/kdev-memory/hooks/session-start-brief.py
+  s_3ae8861f068042::t_8a8be6b9e73d37 70
+plugins/kdev-memory/hooks/pre-compact-check.py
+  s_3ae8861f068042::t_38e7e04b953c41 64,74
+plugins/kdev-memory/hooks/stop-check.py
+  s_3ae8861f068042::t_d361d0dea507f3 91,102
+plugins/kdev-memory/hooks/user-prompt-trigger.py
+  s_3ae8861f068042::t_78946bf20663f5 54
+plugins/kdev-memory/hooks/commit-tracker.py
+  s_3ae8861f068042::t_cc6362b0112491 61
+plugins/kdev-memory/hooks/session-end-check.py
+  s_3ae8861f068042::t_30fbdd7aa821e2 67,78
+plugins/kdev-memory/CHANGELOG.md
+  s_3ae8861f068042::t_69fb40a56b855b 3-16
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "d07b5ef67953b2f3025ec2a531f13a25a289f531",
+  "prompts": {},
+  "sessions": {
+    "s_3ae8861f068042": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "cafa9883-fca2-4dbc-b226-b1a4858a867f",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
