@@ -67,6 +67,7 @@ def _git_branch() -> str:
         r = subprocess.run(
             ["git", "rev-parse", "--abbrev-ref", "HEAD"],
             capture_output=True, text=True, check=False,
+            encoding="utf-8", errors="replace",
         )
     except (OSError, FileNotFoundError):
         return ""

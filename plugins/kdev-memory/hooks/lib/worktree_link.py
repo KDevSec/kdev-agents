@@ -27,6 +27,7 @@ def _git_query(*args: str) -> Optional[str]:
     try:
         r = subprocess.run(
             ["git", *args], capture_output=True, text=True, check=False,
+            encoding="utf-8", errors="replace",
         )
     except (OSError, FileNotFoundError):
         return None
@@ -79,6 +80,7 @@ def _create_symlink(target: Path, dest: Path) -> bool:
         r = subprocess.run(
             ["cmd", "/c", "mklink", "/J", dest_win, target_win],
             capture_output=True, text=True, check=False,
+            encoding="utf-8", errors="replace",
         )
         return r.returncode == 0
     except (OSError, FileNotFoundError):

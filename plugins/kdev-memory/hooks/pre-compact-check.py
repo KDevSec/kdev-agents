@@ -61,6 +61,7 @@ def _git_porcelain() -> str:
         in_repo = subprocess.run(
             ["git", "rev-parse", "--is-inside-work-tree"],
             capture_output=True, text=True, check=False,
+            encoding="utf-8", errors="replace",
         )
     except (OSError, FileNotFoundError):
         return ""
@@ -70,6 +71,7 @@ def _git_porcelain() -> str:
         r = subprocess.run(
             ["git", "status", "--porcelain", "-uall"],
             capture_output=True, text=True, check=False,
+            encoding="utf-8", errors="replace",
         )
     except (OSError, FileNotFoundError):
         return ""

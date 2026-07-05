@@ -51,6 +51,7 @@ def main() -> int:
         r = subprocess.run(
             [sys.executable, str(trigger_match)],
             input=raw, text=True, capture_output=True, check=False,
+            encoding="utf-8", errors="replace",
         )
     except (OSError, subprocess.SubprocessError):
         print(SUPPRESS)

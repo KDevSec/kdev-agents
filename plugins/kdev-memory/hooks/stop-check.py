@@ -88,6 +88,7 @@ def _porcelain_substantive_changes() -> Tuple[int, bool]:
         in_repo = subprocess.run(
             ["git", "rev-parse", "--is-inside-work-tree"],
             capture_output=True, text=True, check=False,
+            encoding="utf-8", errors="replace",
         )
     except (OSError, FileNotFoundError):
         return 0, False
@@ -98,6 +99,7 @@ def _porcelain_substantive_changes() -> Tuple[int, bool]:
         r = subprocess.run(
             ["git", "status", "--porcelain", "-uall"],
             capture_output=True, text=True, check=False,
+            encoding="utf-8", errors="replace",
         )
     except (OSError, FileNotFoundError):
         return 0, False

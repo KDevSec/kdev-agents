@@ -58,6 +58,7 @@ def current_skill_sha(
         r = subprocess.run(
             ["git", "log", "-1", "--format=%H", "--", skill_relpath],
             cwd=str(repo_root), capture_output=True, text=True, check=False,
+            encoding="utf-8", errors="replace",
         )
     except (OSError, FileNotFoundError):
         return None

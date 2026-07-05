@@ -25,6 +25,7 @@ def main() -> int:
     r = _run(
         ["git", "rev-parse", "--is-inside-work-tree"],
         capture_output=True, text=True,
+        encoding="utf-8", errors="replace",
     )
     if r.returncode != 0:
         print("[kdev-memory] 当前不在 git 仓库，无需迁移")
@@ -49,12 +50,14 @@ def main() -> int:
     tracked = _run(
         ["git", "ls-files", "--error-unmatch", ".kdev/"],
         capture_output=True, text=True,
+        encoding="utf-8", errors="replace",
     )
     if tracked.returncode == 0:
         print("[kdev-memory] .kdev/ 当前被 git tracked，移出 index（保留历史 commit）...")
         _run(
             ["git", "rm", "-r", "--cached", ".kdev/"],
             capture_output=True, text=True, check=True,
+            encoding="utf-8", errors="replace",
         )
         print("[kdev-memory] 完成。请 git diff --cached 核对，再 commit：")
         print("")

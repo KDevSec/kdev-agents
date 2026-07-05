@@ -58,6 +58,7 @@ def _git_query(repo: Path, *args: str):
         r = subprocess.run(
             ["git", *args],
             cwd=str(repo), capture_output=True, text=True, check=False,
+            encoding="utf-8", errors="replace",
         )
     except (OSError, FileNotFoundError):
         return None

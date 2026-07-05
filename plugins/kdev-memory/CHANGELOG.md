@@ -1,5 +1,19 @@
 # kdev-memory CHANGELOG
 
+## [0.19.3] - 2026-07-05
+
+git subprocess UTF-8 编码容错**铺满全部调用点**——收口 0.18.2 未扫穿的健壮性 gap，追平 ieidev-team。全程零回归，530 passed。
+
+### 🛡️ 中文 / Windows GBK locale 健壮性
+
+- 0.18.2 只给 `step_id.py` / `kdev_sync.py` 的 git subprocess 加了 `encoding="utf-8", errors="replace"`（修非 UTF-8 locale 下 git 输出含非 ASCII 字节 → subprocess `_readerthread` 抛 `UnicodeDecodeError` 炸穿 hook），但未扫穿全仓，当时 changelog 自己点名 worktree_link/skill_version/migrate-v0.7 是"未修剩余隐患"。
+- 本版把同一修复补齐到剩余 **15 处** `subprocess.run(..., text=True, ...)`：`commit-tracker` / `stop-check`(×2) / `session-end-check`(×2) / `pre-compact-check`(×2) / `user-prompt-trigger` / `session-start-brief` / `lib/skill_version` / `lib/worktree_link`(×2，含 Windows mklink 兜底) / `lib/migrate-v0.7`(×3)。写法与既有 `step_id.py` / `kdev_sync.py` 完全一致，只加两个 kwarg，不动任何调用方逻辑。
+- 对照兄弟项目 ieidev-team：它已把该修复铺满所有调用点，kdev 本版跟齐追平（roadmap §6 那条"kdev 反而领先"已 stale，同步更正）。
+
+### 📌 升级须知
+
+- 本版改了 hook 脚本，需**刷新 marketplace** 才激活（G-004）。
+
 ## [0.19.2] - 2026-07-01
 
 记忆仓自动 push 失败**可见化**——补上 SSH 修复没堵的可见性缺口。SessionEnd 的 `git push` 失败只 print 到 stderr、用户看不见，备份可长期静默落后而不自知（实测积压 45 会话）。全程 TDD，530 passed。

@@ -32,7 +32,7 @@
 
 **不跟清单**（team 编排耦合，独立 kdev-memory 无意义）：`delegation.py`、`recall.py` 的 events/handoffs 部分、`block-advance-past-gate.py`、`cqo-event-audit.py`、`claude_md_merge.py` 的 shim 化。详见 §5。
 
-**kdev 反而领先、别回退**：Windows UTF-8 subprocess 修复、`brief.verbosity` 三档、正确的 `kdev-memory:` marker 前缀。详见 §6。
+**kdev 反而领先、别回退**：~~Windows UTF-8 subprocess 修复~~（已 stale——ieidev 铺满全调用点反超、kdev 0.19.3 补齐追平，双方持平）、`brief.verbosity` 三档、正确的 `kdev-memory:` marker 前缀。详见 §6。
 
 ---
 
@@ -178,11 +178,13 @@ ieidev 把 [pre-compact-check.py](plugins/kdev-memory/hooks/pre-compact-check.py
 
 ## 6. kdev 反而领先 ieidev（别回退；可反向 forward-port 给 ieidev）
 
-> ✅ 本节已逐条核实 ieidev 源码。**两条 subagent 误报已剔除**：`brief.verbosity` 三档 ieidev **也有**（session-start-brief.py 行 295/345/463 与 kdev 一致）；marker 前缀 ieidev lint 与模板**自洽**都用 `ieidev-team:`（之前报的 `kdev-team:` 是归一化 sed 的产物，非真差异）。真·领先项只剩一条：
+> ✅ 本节已逐条核实 ieidev 源码。**两条 subagent 误报已剔除**：`brief.verbosity` 三档 ieidev **也有**（session-start-brief.py 行 295/345/463 与 kdev 一致）；marker 前缀 ieidev lint 与模板**自洽**都用 `ieidev-team:`（之前报的 `kdev-team:` 是归一化 sed 的产物，非真差异）。
+>
+> ⚠️ **原「真·领先项」已 stale（2026-07-05 更正）**：下表那条 Windows UTF-8 subprocess 修复**曾是** kdev 唯一真·领先项（0.18.2 只在 `step_id.py`/`kdev_sync.py` 两处加了 `encoding`），但当时**未扫穿全仓**、还有 15 处 `text=True` 调用裸奔。ieidev 后来已把该修复**铺满全部调用点**、反超 kdev。**kdev 0.19.3（2026-07-05）已补齐追平**——15 处全补 `encoding="utf-8", errors="replace"`（见 [CHANGELOG 0.19.3](../../../plugins/kdev-memory/CHANGELOG.md)）。此项**不再是 kdev 领先项，已回到双方持平**；本节至此**无真·领先项**。
 
-| 项 | kdev 状态 | ieidev 状态（缺口已核实） |
-|----|-----------|---------------------------|
-| **Windows UTF-8 subprocess 修复** | [step_id.py:30](plugins/kdev-memory/hooks/lib/step_id.py#L30) `_git_query` + [kdev_sync.py:100](plugins/kdev-memory/hooks/lib/kdev_sync.py#L100) `_git` 的 `subprocess.run` 加 `encoding="utf-8", errors="replace"`（0.18.2，中文 Windows git 输出不崩） | `step_id.py:28-29`（`_git_query`）+ `ieidev_sync.py:139-140`（`_git`）的 `subprocess.run` 均无 `encoding/errors` → 中文 Windows 上 `_readerthread` GBK 解码崩溃。应反向回流给 ieidev |
+| 项 | kdev 状态 | ieidev 状态 |
+|----|-----------|-------------|
+| ~~**Windows UTF-8 subprocess 修复**~~（已持平，非领先项） | ✅ **0.19.3 铺满全部 `subprocess.run(..., text=True)` 调用点**（0.18.2 仅 `step_id.py`/`kdev_sync.py` 两处，其余 15 处 0.19.3 补齐） | ✅ 已先铺满全部调用点（一度反超 kdev）；kdev 0.19.3 已追平 |
 
 > ⚠️ **预存隐患（与对比无关，记录待办）**：[test_step_id.py](plugins/kdev-memory/tests/test_step_id.py) 的 `test_dup_index_concurrent_no_collision` / `test_increment_concurrent_no_collision` 在本机间歇失败——20 线程并发只拿 11 个结果，`_dup_index`/`increment_counter` 文件锁竞争。建议另开任务诊断，与本 roadmap 正交但会影响 P2 JSONL 并发写正确性。
 
