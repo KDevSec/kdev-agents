@@ -37,6 +37,7 @@ from sanitize import sanitize_text, verify_no_leaks  # noqa: E402
 from scope import shared_dir, staff_log_files  # noqa: E402
 from status_schema import is_voided_status, warn_unknown_status  # noqa: E402
 from step_id import id_label_fragment  # noqa: E402
+from memory_config import read_rating_mode  # noqa: E402
 
 
 # ==================== Entry 数据结构 ====================
@@ -83,6 +84,23 @@ HEAD_PATTERNS: dict[str, tuple[str, re.Pattern[str]]] = {
 RE_INLINE_FIELD = re.compile(r"^([A-Za-z_一-鿿][A-Za-z0-9_一-鿿]*)\s*[:：]\s*(.+?)\s*$")
 
 
+def _strip_field_value(raw: str) -> str:
+    """剥字段值：引号包裹的取引号内内容（保护 verbatim 原话里合法的 `#`）；
+    非引号值剥掉行内 ` #` 注释（YAML 惯例：`#` 前需空白）。
+
+    修 `subject_confidence: high   # L1 显式提及…` 被读成 `high   # …` → 漏筛 F 的 bug。
+    """
+    raw = raw.strip()
+    if raw[:1] in ('"', "'"):
+        q = raw[0]
+        end = raw.find(q, 1)
+        return raw[1:end] if end != -1 else raw[1:]
+    m = re.search(r"\s#", raw)
+    if m:
+        raw = raw[: m.start()]
+    return raw.strip().strip('"').strip("'")
+
+
 def _parse_entry_fields(body: str) -> dict[str, str]:
     """解析条目顶部的 frontmatter / inline 字段。
 
@@ -113,7 +131,7 @@ def _parse_entry_fields(body: str) -> dict[str, str]:
             m = RE_INLINE_FIELD.match(line)
             if m:
                 key = m.group(1).strip()
-                value = m.group(2).strip().strip('"').strip("'")
+                value = _strip_field_value(m.group(2))
                 fields[key] = value
             i += 1
 
@@ -136,7 +154,7 @@ def _parse_entry_fields(body: str) -> dict[str, str]:
         m = RE_INLINE_FIELD.match(line)
         if m:
             key = m.group(1).strip()
-            value = m.group(2).strip().strip('"').strip("'")
+            value = _strip_field_value(m.group(2))
             # 已存在的字段不覆盖（frontmatter 优先）
             fields.setdefault(key, value)
         i += 1
@@ -340,8 +358,12 @@ def render_full(entries: list[Entry]) -> str:
     return "\n".join(parts) + "\n"
 
 
-def render_misalignment(entries: list[Entry]) -> str:
-    """dataset-misalignment.md：差值 ≥ 1.5 的 Step。"""
+def render_misalignment(entries: list[Entry], rating_mode: str = "user-opt-in") -> str:
+    """dataset-misalignment.md：差值 ≥ 1.5 的 Step。
+
+    rating_mode=model-only 时无用户评分数据源 → 切片通常为空，追加自解释说明
+    （防"空文件像坏了"误导：这是预期行为，切 user-required 人介入评分后才有料）。
+    """
     misalign = sorted(
         (e for e in entries if is_misalignment_step(e)),
         key=_entry_sort_key,
@@ -352,6 +374,15 @@ def render_misalignment(entries: list[Entry]) -> str:
         f"差值 ≥ 1.5 的 Step（模型自评 vs 用户真实评分的 gap），含完整双评分 + 评分差异分析。共 {len(misalign)} 条。",
         "",
         "**用途**：顶级对齐数据（RLHF / DPO 偏好对 / 修正模型自我评估偏差的训练原料）。",
+    ]
+    if rating_mode == "model-only":
+        parts += [
+            "",
+            "> ⚠️ **当前 `rating.mode: model-only`（纯模型评分，无用户评分）**——本切片的 gap 依赖"
+            "「模型自评 vs 用户真实评分」的差值，model-only 下无用户评分数据源，通常为 0 条。"
+            "**这是预期行为，非缺陷**：切 `rating.mode: user-required`（人介入评分）后才会产生 gap 数据。",
+        ]
+    parts += [
         "",
         "---",
         "",
@@ -431,7 +462,7 @@ def export_markdown_slices(
     # 1. 全量切片
     full_text = render_full(entries)
     # 2. misalignment 切片
-    misalign_text = render_misalignment(entries)
+    misalign_text = render_misalignment(entries, rating_mode=read_rating_mode(kdev_dir))
     # 3. by-subject 切片
     by_subject_files = render_skill_feedback_by_subject(entries)
 

@@ -552,5 +552,86 @@ class TestTimestampFormSkillFeedback(unittest.TestCase):
             self.assertIn("时间戳形反馈原话", slice_file.read_text(encoding="utf-8"))
 
 
+class TestParseFieldInlineComment(unittest.TestCase):
+    """回归：字段值带行内 `# 注释` 时不应污染值。
+
+    bug：`subject_confidence: high   # L1 显式提及"评分"` 被读成
+    `high   # L1 显式提及"评分"`，`!= "high"` → is_skill_feedback_high 漏筛该 F。
+    修：剥行内注释；但引号包裹的值（verbatim 原话）里的 `#` 必须保留。
+    """
+
+    def test_inline_comment_stripped(self):
+        raw = (
+            "## F x-1: t\n"
+            "subject: plugin:kdev-memory\n"
+            'subject_confidence: high   # L1 显式提及"评分"\n'
+            "type: 痛点\n"
+        )
+        fields = distill._parse_entry_fields(raw)
+        self.assertEqual(fields["subject_confidence"], "high")
+
+    def test_frontmatter_block_inline_comment(self):
+        raw = (
+            "## F x-4: t\n"
+            "---\n"
+            "subject_confidence: high  # 注释\n"
+            "---\n"
+        )
+        fields = distill._parse_entry_fields(raw)
+        self.assertEqual(fields["subject_confidence"], "high")
+
+    def test_quoted_value_hash_preserved(self):
+        raw = (
+            "## F x-2: t\n"
+            'verbatim: "原话里有 # 井号不能丢"\n'
+        )
+        fields = distill._parse_entry_fields(raw)
+        self.assertEqual(fields["verbatim"], "原话里有 # 井号不能丢")
+
+    def test_plain_value_unchanged(self):
+        raw = "## F x-3: t\nsubject: plugin:kdev-memory\n"
+        fields = distill._parse_entry_fields(raw)
+        self.assertEqual(fields["subject"], "plugin:kdev-memory")
+
+
+class TestSkillFeedbackInlineComment(unittest.TestCase):
+    """端到端回归：F 条目 subject_confidence 带行内注释，仍应被 skill-feedback 切片捕获。"""
+
+    def test_confidence_with_inline_comment_selected(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            kdev = Path(tmp) / "memory"
+            kdev.mkdir()
+            (kdev / "skill-feedback.md").write_text(dedent("""\
+                # Skill Feedback
+
+                ## F 20260625-100000-ly: 带注释的反馈
+                日期：2026-06-25
+                subject: plugin:kdev-memory
+                subject_confidence: high   # L1 显式提及"评分"
+                type: 痛点
+                verbatim: "带注释条目的原话"
+                score: null
+            """), encoding="utf-8")
+            out = Path(tmp) / "dataset"
+            stats = distill.export_markdown_slices(kdev, out, do_sanitize=True)
+            self.assertEqual(
+                stats.counts["skill_feedback_high"], 1,
+                "subject_confidence 带行内注释导致 F 被漏筛",
+            )
+
+
+class TestMisalignmentModelOnlyNote(unittest.TestCase):
+    """model-only 下 misalignment 无数据源是预期，切片应自解释而非误导成'坏了'。"""
+
+    def test_model_only_note_present(self):
+        text = distill.render_misalignment([], rating_mode="model-only")
+        self.assertIn("model-only", text)
+        self.assertIn("预期", text)
+
+    def test_default_mode_no_note(self):
+        text = distill.render_misalignment([])
+        self.assertNotIn("预期行为，非缺陷", text)
+
+
 if __name__ == "__main__":
     unittest.main()

@@ -1,5 +1,23 @@
 # kdev-memory CHANGELOG
 
+## [0.19.4] - 2026-07-06
+
+评分改纯模型评分（`rating.mode: model-only` 落地）配套的蒸馏两处修正。全程 TDD，537 passed（530 + 7 新）。
+
+### 🐛 skill-feedback 切片漏筛修复（字段行内注释污染值）
+
+- `_parse_entry_fields` 解析字段值时只 strip 引号、不剥行内 `# 注释` → `subject_confidence: high   # L1 显式提及…` 被读成 `high   # …`，`!= "high"` → 合格 F 条目被 `is_skill_feedback_high` 漏筛，`dataset-skill-feedback-by-subject/` 产 0 文件。
+- 新增 `_strip_field_value`：**引号包裹的值取引号内内容**（保护 verbatim 用户原话里合法的 `#`），非引号值按 YAML 惯例剥 ` #` 行内注释。实测本项目那条被漏的 F 归位（skill_feedback_high 0→1）。
+
+### 📊 misalignment 切片 model-only 自解释（防"空文件像坏了"）
+
+- `dataset-misalignment` 的 gap 依赖「模型自评 vs 用户真实评分」的差值；`rating.mode: model-only` 下无用户评分数据源 → 切片恒为 0 条。这是**预期行为非缺陷**，但空文件易被误读成"蒸馏坏了"。
+- `render_misalignment` 加 `rating_mode` 参数，`export_markdown_slices` 读 `rating.mode` 传入；model-only 时切片追加自解释说明（切 `user-required` 人介入评分后才有 gap 数据）。
+
+### 📌 升级须知
+
+- 本版改了 hook/lib 代码（distill.py，command 蒸馏入口调用），需**刷新 marketplace** 才激活（G-004）。
+
 ## [0.19.3] - 2026-07-05
 
 git subprocess UTF-8 编码容错**铺满全部调用点**——收口 0.18.2 未扫穿的健壮性 gap，追平 ieidev-team。全程零回归，530 passed。
