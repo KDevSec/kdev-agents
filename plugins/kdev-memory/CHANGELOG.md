@@ -1,5 +1,23 @@
 # kdev-memory CHANGELOG
 
+## [0.19.5] - 2026-07-07
+
+记忆仓同步两处修复（承 G 20260707-104552）。全程 TDD，539 passed（537 + 2 新）。
+
+### 🐛 sync_push 解耦 commit 与 push（积压推不掉根因）
+
+- `sync_push` 原逻辑把 commit 和 push 绑死：工作区无新变更 → `nothing to commit` **直接 return、跳过 push**。于是任何"已 commit 但未推上去"的积压（如早期 HTTPS 时代 push 失败留下的），后续会话只要工作区没新变更就永远 skip 掉 push、清不掉。0.19.2 的"未推积压可见化"只加了检测提醒，却还靠这个有 bug 的 sync_push 去推——提醒了也推不动。
+- 修：解耦——`if 工作区有变更: commit`；**独立地** `if 本地领先 upstream（unpushed_count > 0）: push`。无论这次有没有新 commit，只要有积压就推。`nothing-to-commit 且 ahead 0` 才 noop（保持原 noop 行为不破坏）。
+
+### 📊 sync 失败提示文案分 remote 类型（别对 SSH 误报"缺凭据"）
+
+- `sync_failed_reminder_text` 原文案武断"多半是需要 GitHub 凭据但本机未缓存"——是 HTTPS 话术，对 SSH remote 误导（SSH 靠 key/agent，实测认证是通的，真问题另在别处）。
+- 改：按 remote 类型分列排查（SSH remote 查 `ssh -T git@github.com` key/agent；HTTPS remote `gh auth login` 缓存凭据），不再武断归因缺凭据。
+
+### 📌 升级须知
+
+- 本版改了 hook/lib 代码（kdev_sync.py，SessionEnd push + SessionStart 提示），需**刷新 marketplace** 才激活（G-004）。
+
 ## [0.19.4] - 2026-07-06
 
 评分改纯模型评分（`rating.mode: model-only` 落地）配套的蒸馏两处修正。全程 TDD，537 passed（530 + 7 新）。

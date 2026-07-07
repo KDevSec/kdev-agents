@@ -154,6 +154,42 @@ def test_sync_push_skips_when_untracked(tmp_path):
     assert res["ok"] and res["pushed"] is False
 
 
+def test_sync_push_pushes_ahead_when_clean(tmp_path):
+    """回归 G 20260707：已 commit 未推的积压，工作区干净时 sync_push 仍应 push（不能 skip）。
+
+    修前 bug：sync_push 见 `nothing to commit` 即 return、跳过 push → 积压永远清不掉。
+    """
+    bare = _bare_remote(tmp_path)
+    repo_a = tmp_path / "A"
+    (repo_a / ".kdev").mkdir(parents=True)
+    (repo_a / ".kdev" / "执行日志.md").write_text("step 1\n", encoding="utf-8")
+    _write_yml(repo_a, str(bare))
+    kdev_sync.bootstrap(repo_a)   # init + push，已同步
+    kdev = repo_a / ".kdev"
+    # 造积压：直接 commit（不经 sync_push），工作区干净但 ahead 1
+    (kdev / "执行日志.md").write_text("step 1\nstep 2\n", encoding="utf-8")
+    _git(["add", "-A"], cwd=kdev)
+    _git(["-c", "user.name=x", "-c", "user.email=x@y.z", "commit", "-m", "manual step 2"], cwd=kdev)
+    assert _git(["status", "--porcelain"], cwd=kdev).stdout.strip() == ""   # 工作区干净
+    assert kdev_sync.unpushed_count(repo_a) == 1                            # 有积压
+
+    res = kdev_sync.sync_push(repo_a)
+    assert res["ok"] and res["pushed"], res            # 修前：pushed False（skip）
+    assert kdev_sync.unpushed_count(repo_a) == 0        # 推完积压清零
+    # 远程确实收到 step 2
+    repo_b = tmp_path / "B"
+    repo_b.mkdir()
+    _write_yml(repo_b, str(bare))
+    kdev_sync.bootstrap(repo_b)
+    assert "step 2" in (repo_b / ".kdev" / "执行日志.md").read_text(encoding="utf-8")
+
+
+def test_sync_failed_reminder_covers_ssh(tmp_path):
+    """SSH remote 场景别只提'缺 GitHub 凭据'（HTTPS 话术），要覆盖 SSH key 排查。"""
+    txt = kdev_sync.sync_failed_reminder_text("pull")
+    assert "SSH" in txt or "ssh" in txt
+
+
 def test_init_writes_gitignore_and_excludes_machine_local(tmp_path):
     bare = _bare_remote(tmp_path)
     repo = tmp_path / "A"

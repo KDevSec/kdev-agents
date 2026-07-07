@@ -71,11 +71,11 @@ def sync_failed_reminder_text(action, detail=""):
     引导用户在终端登录一次缓存凭据，之后每次会话自动静默同步。"""
     tail = f"（详情：{detail}）" if detail else ""
     return (
-        f"工程记忆云同步未完成（{action} 失败，多半是记忆仓需要 GitHub 凭据但本机未缓存）"
-        "——已跳过，不影响本地使用与记忆留存。\n"
-        "要开启跨机/团队同步：在终端对该 GitHub 账号登录一次以缓存凭据"
-        "（如 `gh auth login`，或对该账号任意仓库 `git pull` 一次按提示登录），"
-        "之后每次会话启动会自动静默同步，不再弹窗。" + tail + OPTOUT_HINT
+        f"工程记忆云同步未完成（{action} 失败）——已跳过，不影响本地使用与记忆留存。\n"
+        "要开启跨机/团队同步，按 remote 类型排查：\n"
+        "· SSH remote（git@…）：检查 SSH key / agent（`ssh -T git@github.com`）；\n"
+        "· HTTPS remote：在终端登录一次缓存凭据（`gh auth login`，或对该账号任意仓库 `git pull` 按提示登录）。\n"
+        "排查后每次会话启动会自动静默同步，不再弹窗。" + tail + OPTOUT_HINT
     )
 
 
@@ -284,11 +284,16 @@ def sync_push(repo_root, message="chore(kdev-memory): session sync"):
         return {"ok": True, "pushed": False, "message": "no .kdev/.git; skip (untracked memory)"}
     _git(["add", "-A"], cwd=kdev)
     status = _git(["status", "--porcelain"], cwd=kdev)
-    if not status.stdout.strip():
-        return {"ok": True, "pushed": False, "message": "nothing to commit"}
-    c = _git(["commit", "-m", message], cwd=kdev, identity=True)
-    if c.returncode != 0:
-        return {"ok": False, "pushed": False, "message": (c.stderr or c.stdout).strip()}
+    committed = False
+    if status.stdout.strip():
+        c = _git(["commit", "-m", message], cwd=kdev, identity=True)
+        if c.returncode != 0:
+            return {"ok": False, "pushed": False, "message": (c.stderr or c.stdout).strip()}
+        committed = True
+    # 解耦 commit 与 push（修 G 20260707-104552）：无论这次有没有新 commit，只要本地
+    # 领先 upstream（已 commit 未推的积压，如早期 push 失败留下）就 push——否则积压永远清不掉。
+    if not committed and unpushed_count(repo_root) == 0:
+        return {"ok": True, "pushed": False, "message": "nothing to commit, nothing to push"}
     p = _git(["push"], cwd=kdev)
     return {"ok": p.returncode == 0, "pushed": p.returncode == 0,
             "message": (p.stderr or p.stdout).strip()}
