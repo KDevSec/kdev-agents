@@ -61,5 +61,28 @@ class TestWarnUnknownStatus(unittest.TestCase):
         self.assertEqual(buf.getvalue(), "")
 
 
+class TestFallbackAndSupersededStatus(unittest.TestCase):
+    """兜底方案新档：auto-fallback（待升格活态）+ voided-superseded（升格后销账）。"""
+
+    def test_auto_fallback_known_but_not_voided(self):
+        self.assertTrue(status_schema.is_known_status("auto-fallback"))
+        self.assertFalse(status_schema.is_voided_status("auto-fallback"))  # 活态待升格，非销账
+
+    def test_voided_superseded_known_and_voided(self):
+        self.assertTrue(status_schema.is_known_status("voided-superseded"))
+        self.assertTrue(status_schema.is_voided_status("voided-superseded"))
+
+    def test_is_fallback_status(self):
+        self.assertTrue(status_schema.is_fallback_status("auto-fallback"))
+        for s in ("open", "scored", "voided-faded", "voided-superseded", "", None):
+            self.assertFalse(status_schema.is_fallback_status(s), s)
+
+    def test_new_enums_dont_warn(self):
+        buf = io.StringIO()
+        self.assertFalse(status_schema.warn_unknown_status("auto-fallback", stream=buf))
+        self.assertFalse(status_schema.warn_unknown_status("voided-superseded", stream=buf))
+        self.assertEqual(buf.getvalue(), "")
+
+
 if __name__ == "__main__":
     unittest.main()

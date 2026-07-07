@@ -74,16 +74,39 @@ def validate(record: dict) -> None:
         raise StepValidationError(f"status 非法枚举：{record['status']}")
 
 
-def append_step(record: dict, *, scope: Optional[str] = None, root: PathLike = DEFAULT_ROOT) -> None:
-    record.setdefault("schema_version", SCHEMA_VERSION)
-    record.setdefault("type", "Step")
-    validate(record)
+def _write_record_line(record: dict, scope: Optional[str], root: PathLike) -> None:
     path = jsonl_path(scope, root)
     path.parent.mkdir(parents=True, exist_ok=True)
     line = json.dumps(record, ensure_ascii=False, sort_keys=False) + "\n"
     # 单行 O_APPEND 在 POSIX 上对 < PIPE_BUF 的写是原子的，避免并发交错
     with open(path, "a", encoding="utf-8") as f:
         f.write(line)
+
+
+def append_step(record: dict, *, scope: Optional[str] = None, root: PathLike = DEFAULT_ROOT) -> None:
+    record.setdefault("schema_version", SCHEMA_VERSION)
+    record.setdefault("type", "Step")
+    validate(record)
+    _write_record_line(record, scope, root)
+
+
+def append_fallback_step(record: dict, *, scope: Optional[str] = None, root: PathLike = DEFAULT_ROOT) -> None:
+    """宽松写一条 auto-fallback 降级 Step（hook 机械兜底，绕过 LLM 质量 gate）。
+
+    只做结构守门（record_id/title/date/about/status 非空 str + status==auto-fallback + date 格式），
+    **不查** title 泛化 / triggers≥5 / model_eval / user_rating——降级 Step 本就未经 LLM 提炼，
+    质量由后续升格补（升格走正常 append_step 严格 gate + 旧条标 voided-superseded）。
+    """
+    record.setdefault("schema_version", SCHEMA_VERSION)
+    record.setdefault("type", "Step")
+    for key in ("record_id", "title", "date", "about", "status"):
+        if not isinstance(record.get(key), str) or not record[key].strip():
+            raise StepValidationError(f"缺字段或非字符串：{key}")
+    if record["status"] != "auto-fallback":
+        raise StepValidationError("append_fallback_step 仅接受 status=auto-fallback")
+    if not _DATE_RE.match(record["date"]):
+        raise StepValidationError(f"date 格式应为 YYYY-MM-DD：{record['date']}")
+    _write_record_line(record, scope, root)
 
 
 def read_steps(*, scope: Optional[str] = None, root: PathLike = DEFAULT_ROOT) -> List[dict]:

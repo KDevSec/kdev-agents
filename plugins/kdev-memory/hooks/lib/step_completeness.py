@@ -69,7 +69,7 @@ if str(_LIB_DIR) not in sys.path:
     sys.path.insert(0, str(_LIB_DIR))
 import step_log  # noqa: E402  # JSONL 主账读封装（dual-read 迁移第 1 步）
 import step_dualread  # noqa: E402  # JSONL Step → md 投影合成器
-from status_schema import is_voided_status, warn_unknown_status  # noqa: E402
+from status_schema import is_fallback_status, is_voided_status, warn_unknown_status  # noqa: E402
 from step_id import id_label_fragment  # noqa: E402
 
 
@@ -148,8 +148,9 @@ def check_step(step: dict[str, Any], rating_mode: str = "user-required") -> list
     # v0.7+/v0.18: status = 评分/销账态。非枚举值（修复态误写）→ 告警，不静默当销账
     _status = step.get("status")
     warn_unknown_status(_status, entry_id=step.get("label", "?"))
-    # 销账态（voided-faded / voided-r-<NNN>）跳过欠评扫描
-    if is_voided_status(_status):
+    # 销账态（voided-faded / voided-superseded / voided-r-<NNN>）跳过欠评扫描；
+    # auto-fallback 降级 Step 也跳过——它不是"欠评半残"，是"待升格占位"，Stop hook 不该对它软提醒补评分。
+    if is_voided_status(_status) or is_fallback_status(_status):
         return []
 
     # v0.7+: heuristic voided markers (text layer — compat for historical entries)

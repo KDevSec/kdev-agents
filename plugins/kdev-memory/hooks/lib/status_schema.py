@@ -22,7 +22,7 @@ from __future__ import annotations
 import re
 import sys
 
-KNOWN_SIMPLE = frozenset({"open", "scored", "voided-faded"})
+KNOWN_SIMPLE = frozenset({"open", "scored", "voided-faded", "voided-superseded", "auto-fallback"})
 _RE_VOIDED_R = re.compile(r"^voided-r-\d+$")
 
 
@@ -37,9 +37,22 @@ def is_known_status(s: "str | None") -> bool:
 
 
 def is_voided_status(s: "str | None") -> bool:
-    """status 是否销账态（voided-faded 或 voided-r-<digits>）。"""
+    """status 是否销账态（voided-faded / voided-superseded / voided-r-<digits>）。
+
+    voided-superseded = 降级 Step 被 LLM 升格后销账（旧占位条让位给正式 Step）。
+    """
     s = _norm(s)
-    return s == "voided-faded" or bool(_RE_VOIDED_R.match(s))
+    return s in ("voided-faded", "voided-superseded") or bool(_RE_VOIDED_R.match(s))
+
+
+def is_fallback_status(s: "str | None") -> bool:
+    """status 是否 auto-fallback：hook 机械兜底落的降级 Step，待 LLM 升格。
+
+    是「活态占位」——既非合格 Step（open/scored），也非销账态。消费方须特殊处理：
+    step_completeness 不当合格 Step（"今日无合格 Step"判定要排除它）、distill 过滤不进数据集、
+    SessionStart 检测到它提示主会话升格。
+    """
+    return _norm(s) == "auto-fallback"
 
 
 def warn_unknown_status(status: "str | None", entry_id: str = "?", stream=None) -> bool:

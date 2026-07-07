@@ -20,7 +20,9 @@ sys.path.insert(0, str(LIB_DIR))
 
 from migrate import kdev_memory_migrate  # noqa: E402
 import step_log  # noqa: E402  # JSONL 主账读封装（dual-read 迁移第 1 步）
+import fallback_step  # noqa: E402  # 兜底：LLM 缺席关口机械落降级 Step
 from scope import shared_dir  # noqa: E402
+from status_schema import is_fallback_status  # noqa: E402
 
 
 def _find_newer(kdev_dir: Path, flush_file: Path, max_items: int = 20) -> List[str]:
@@ -107,8 +109,12 @@ def main() -> int:
             text = ""
         if today in text:
             return 0
+    # 排除 auto-fallback 降级 Step：只有"今日有合格 Step"才免警告，否则第一次兜底后
+    # hook 会被自己落的降级 Step 骗成"已有 Step"、再不提示升格（spec §5「别被自己骗」）。
     try:
-        if step_log.steps_for_date(today, root=kdev_dir):
+        qualified = [s for s in step_log.steps_for_date(today, root=kdev_dir)
+                     if not is_fallback_status(s.get("status", ""))]
+        if qualified:
             return 0
     except Exception:
         pass
@@ -123,16 +129,34 @@ def main() -> int:
     if not changed:
         return 0
 
+    # 兜底（LLM 缺席关口）：机械落一条降级 Step 保证"不丢"，待下会话 SessionStart 提示升格。
+    # 永不抛/永不阻塞——失败也继续写 WARN 作人读兜底信号。
+    fb_ok = False
+    try:
+        fb = fallback_step.make_fallback_step(Path("."), "session-end", root=kdev_dir)
+        fb_ok = bool(fb.get("ok"))
+    except Exception:
+        fb_ok = False
+
     # 写 WARN（覆盖同日旧警告）
+    fb_line = (
+        "✅ **已机械落一条降级 Step（`status: auto-fallback`）到执行日志.jsonl 兜底**——骨架"
+        "（commits/files/transcript 指针）已留住，**不会丢**。下次进入项目时由主会话**升格**成正式 Step。"
+        if fb_ok else
+        "⚠️ 降级 Step 兜底未成功（见 stderr），仅靠本 WARN 提示补记。"
+    )
     body_lines: List[str] = [
         f"# ⚠️ 未记录警告：{today}",
         "",
-        f"会话结束时检测到：**执行日志 ({log_file}) 今天无任何条目**，但 `.kdev/memory/` 有未落盘的变更。",
+        f"会话结束时检测到：**执行日志今天无合格 Step**，但 `.kdev/memory/` 有未落盘的变更。",
         "",
-        "下次进入项目时：",
-        f"1. 回忆这些变更对应的工作单元（Step），追加到 {log_file}",
-        "2. 如有关键决策/踩坑/改进信号，补记到对应的 Q/G/R 日志",
-        f"3. 补记完成后 `touch {flush_file}` 重置并 `rm {warn_file}`",
+        fb_line,
+        "",
+        "下次进入项目时（升格降级 Step / 补记）：",
+        "1. 读降级 Step 的 `fallback` 块（commits/files/transcript_path+since_offset）回忆本会话干了什么",
+        f"2. 主会话据此补 title/决策/key_facts，走正常 recorder 落一条正式 Step（旧降级条标 voided-superseded）",
+        "3. 如有关键决策/踩坑/改进信号，补记到对应的 Q/G/R 日志",
+        f"4. 完成后 `touch {flush_file}` 重置并 `rm {warn_file}`",
         "",
         "## 比 .last-flush 更新的文件",
         "",

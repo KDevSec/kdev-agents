@@ -78,3 +78,20 @@ def test_verbosity_verbose_is_full_no_detail_file(tmp_path):
     assert "📊 **今日进度**" in ctx
     assert "brief-detail.md" not in ctx
     assert not (repo / ".kdev" / "memory" / "brief-detail.md").is_file()
+
+
+def test_brief_flags_fallback_step_for_upgrade(tmp_path):
+    """今日 jsonl 有 auto-fallback 降级 Step → brief P0 提示升格（含 record_id + 待升格）。"""
+    from datetime import date
+    repo = _init(tmp_path, config_text="rating.mode: model-only\n")
+    mem = repo / ".kdev" / "memory"
+    rec = {
+        "type": "Step", "record_id": "Step 20260707-000000-x",
+        "title": "[待升格·session-end] fix(x): y", "date": date.today().isoformat(),
+        "about": "project", "status": "auto-fallback",
+        "fallback": {"source": "session-end"},
+    }
+    (mem / "执行日志.jsonl").write_text(json.dumps(rec, ensure_ascii=False) + "\n", encoding="utf-8")
+    ctx = _ctx(repo)
+    assert "待升格" in ctx
+    assert "Step 20260707-000000-x" in ctx

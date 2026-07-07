@@ -1,5 +1,31 @@
 # kdev-memory CHANGELOG
 
+## [0.19.6] - 2026-07-07
+
+**兜底记录 P1 最小闭环**——让"实时落盘断档"从"主会话忘 dispatch 就丢"变成"机械保底不丢 + LLM 异步升格"。全程 TDD，553 passed（539 + 14 新）。设计见 [docs/superpowers/specs/2026-07-07-兜底记录+三层防线-design.md](../../docs/superpowers/specs/2026-07-07-兜底记录+三层防线-design.md)。
+
+### 🛡️ 三层防线的机械兜底层（SessionEnd）
+
+- 起因：实时落盘靠**主会话主动 dispatch step-recorder**（铁规驱动、会漏）；SessionEnd hook 原来只产 WARN 便签，"兜底"退化成"提醒"，实测跨天多个 WARN 无人补。
+- 根本约束：合格 Step 的 title/决策需 LLM 提炼，SessionEnd hook 是纯脚本无 LLM，写不出。故设计成**机械层保底不丢 + LLM 层补质量**。
+
+### ✨ 组件（P1）
+
+- **`auto-fallback` / `voided-superseded` status 新档**（status_schema）：前者=hook 机械兜底的降级 Step（待升格活态，非合格非销账）；后者=升格后旧占位条销账态。新增 `is_fallback_status`。
+- **`step_log.append_fallback_step`**：宽松写入降级 Step（绕过 append_step 的 title 泛化 / triggers / model_eval 严格 gate——降级 Step 本就未经 LLM 提炼）。
+- **`fallback_step.make_fallback_step`**（新模块）：drain `pending-commits.json`（commits/subject 当 title 种子 + transcript_path 留升格）+ git porcelain → 组降级 Step → append jsonl → 清 pending（避免重复兜底）。永不抛。
+- **SessionEnd 接入**：今日无**合格** Step（排除 auto-fallback，防"被自己骗")+ 有变更 → 落降级 Step 兜底；WARN 文案改"已兜底待升格"。
+- **消费方隔离**：`step_completeness` 不把 auto-fallback 当欠评半残（Stop hook 不软提醒补评分）；`distill` 过滤 auto-fallback（机械骨架不进任何数据集切片）。
+- **SessionStart 升格提示**：brief 检测今日 auto-fallback Step → P0 提示主会话读 fallback 块升格成正式 Step。
+
+### 📌 未做（留 P2/P3）
+
+- PreCompact 接入（复用 helper）、升格 supersedes 全链路自动化、daily_render 标注、双关口 drain 去重 = P2；conventional-prefix 猜 about、Stop 提醒强化 = P3。
+
+### 📌 升级须知
+
+- 本版改了 hook/lib 代码（新增 fallback_step.py + 4 处接入），需**刷新 marketplace** 才激活（G-004）。
+
 ## [0.19.5] - 2026-07-07
 
 记忆仓同步两处修复（承 G 20260707-104552）。全程 TDD，539 passed（537 + 2 新）。

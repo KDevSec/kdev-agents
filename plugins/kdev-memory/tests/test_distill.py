@@ -633,5 +633,26 @@ class TestMisalignmentModelOnlyNote(unittest.TestCase):
         self.assertNotIn("预期行为，非缺陷", text)
 
 
+class TestFallbackStepExcluded(unittest.TestCase):
+    """auto-fallback 降级 Step 是机械骨架，不进 collect_entries → 不进任何数据集切片。"""
+
+    def test_auto_fallback_excluded_from_collect(self):
+        import step_log
+        with tempfile.TemporaryDirectory() as tmp:
+            kdev = Path(tmp) / "memory"
+            kdev.mkdir(parents=True)
+            for rid in ("Step fb-1", "Step fb-2"):
+                step_log.append_fallback_step({
+                    "record_id": rid, "title": "[待升格] x", "date": "2026-07-07",
+                    "about": "project", "status": "auto-fallback",
+                    "key_facts": {"tools_invoked_count": 1, "errors_hit": 0},
+                }, root=kdev)
+            entries = distill.collect_entries(kdev)
+            self.assertFalse(
+                [e for e in entries if e.entry_id in ("Step fb-1", "Step fb-2")],
+                "auto-fallback 降级 Step 不应进 collect_entries",
+            )
+
+
 if __name__ == "__main__":
     unittest.main()

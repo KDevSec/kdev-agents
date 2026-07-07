@@ -319,6 +319,24 @@ def _rating_setup_hint(kdev_dir: Path) -> str:
     )
 
 
+def _fallback_upgrade_hint(kdev_dir: Path, today: str) -> str:
+    """今日 jsonl 里的 auto-fallback 降级 Step → P0 提示主会话升格成正式 Step。"""
+    try:
+        from status_schema import is_fallback_status
+        fbs = [s for s in step_log.steps_for_date(today, root=kdev_dir)
+               if is_fallback_status(s.get("status", ""))]
+    except Exception:
+        return ""
+    if not fbs:
+        return ""
+    ids = ", ".join(s.get("record_id", "?") for s in fbs[:5])
+    return (
+        f"  - 🔺 {len(fbs)} 条降级 Step（auto-fallback）待升格：{ids}"
+        f" —— 读其 fallback 块（commits/transcript_path+since_offset）补 title/决策，"
+        f"走 recorder 落正式 Step，旧条标 voided-superseded"
+    )
+
+
 def _build_brief(
     mode: str,
     today: str,
@@ -345,6 +363,7 @@ def _build_brief(
     skill_drift_hint: str = "",
     staff_block: str = "",
     rating_setup_hint: str = "",
+    fallback_hint: str = "",
     verbosity: str = "normal",
 ) -> str:
     """按 mode 组装 brief 文本。返回带换行的 markdown 字符串。"""
@@ -354,11 +373,13 @@ def _build_brief(
     p1_lines: List[str] = []
     p2_lines: List[str] = []
 
-    # P0: WARN 文件 + 今日半残 Step
+    # P0: WARN 文件 + 今日半残 Step + 降级 Step 待升格
     for w in warn_files:
         p0_lines.append(f"  - {w}")
     if step_hint and "今日" in step_hint:
         p0_lines.append(step_hint)
+    if fallback_hint:
+        p0_lines.append(fallback_hint)
 
     # P1: 跨天汇总缺失 / CLAUDE.md 漂移 / 历史半残 / 沉淀提醒
     if missing_past:
@@ -555,7 +576,8 @@ def main() -> int:
         state_step=state_step, state_last=state_last, state_pending=state_pending,
         state_unresolved=state_unresolved, recent_step=recent_step, recent_q=recent_q,
         recent_g=recent_g, pending_hint=pending_hint or "", skill_drift_hint=skill_drift_hint,
-        staff_block=staff_block, rating_setup_hint=rating_setup_hint, verbosity=verbosity,
+        staff_block=staff_block, rating_setup_hint=rating_setup_hint,
+        fallback_hint=_fallback_upgrade_hint(kdev_dir, today), verbosity=verbosity,
     )
     brief = _build_brief(**brief_kwargs)
 

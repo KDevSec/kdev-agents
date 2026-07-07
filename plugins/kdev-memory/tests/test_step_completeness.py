@@ -546,3 +546,9 @@ def test_parse_steps_mixed_legacy_and_timestamp():
     assert len(steps) == 2
     assert steps[0]["label"] == "Step main-6"
     assert steps[1]["label"] == "Step 20260613-101432-ly"
+
+
+def test_auto_fallback_step_not_half_complete():
+    """auto-fallback 降级 Step 不判欠评半残（待升格占位，非欠评；Stop hook 不该软提醒补评分）。"""
+    step = {"label": "Step fb-1", "body": "机械骨架，无评分段", "status": "auto-fallback"}
+    assert step_completeness.check_step(step) == []
