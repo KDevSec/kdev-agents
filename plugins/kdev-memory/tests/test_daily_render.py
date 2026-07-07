@@ -108,3 +108,20 @@ def test_render_timestamp_form_qgr_into_daily_index(tmp_path):
     assert "legacy 形决策也进索引" in block
     assert "时间戳形踩坑进索引" in block
     assert "时间戳形改进进索引" in block
+
+
+def test_render_separates_auto_fallback_step(tmp_path):
+    """auto-fallback 降级 Step 不进"完成的工作"，单列"待升格"区块（P2 ②）。"""
+    step_log.append_step(_rec("正式合格工作", "2026-07-07", delta=1), root=tmp_path)
+    step_log.append_fallback_step({
+        "record_id": "Step fb-1", "title": "[待升格·session-end] fix(x): y",
+        "date": "2026-07-07", "about": "project", "status": "auto-fallback",
+        "key_facts": {"tools_invoked_count": 1, "errors_hit": 0},
+    }, root=tmp_path)
+    out = daily_render.render_daily("2026-07-07", root=tmp_path)
+
+    completed = out[out.index("## 完成的工作"):out.index("## ⚠️ 待升格")]
+    assert "正式合格工作" in completed
+    assert "fix(x): y" not in completed          # 降级 Step 不当完成的工作
+    upgrade = out[out.index("## ⚠️ 待升格"):]
+    assert "fix(x): y" in upgrade and "Step fb-1" in upgrade

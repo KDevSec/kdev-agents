@@ -475,7 +475,8 @@ def test_pre_compact_jsonl_pointer_has_last_record_id(tmp_path):
 
 
 def test_pre_compact_unsaved_warning_wording_strengthened(tmp_path):
-    """D4：未落盘易失信号措辞强化为「易失信号·压缩后优先补记」。"""
+    """D4 + 兜底 P2①：未落盘区块措辞。0.19.7 起 PreCompact 会机械落降级 Step，
+    措辞从「压缩后优先补记」改为「压缩后优先升格」并声明已兜底。"""
     k = tmp_path / ".kdev" / "memory"
     k.mkdir(parents=True)
     _git_repo_with_unstaged(tmp_path)
@@ -483,4 +484,5 @@ def test_pre_compact_unsaved_warning_wording_strengthened(tmp_path):
     cps = list((k / "checkpoints").glob("压缩前-*.md"))
     assert cps, "checkpoint 应被写出"
     body = cps[0].read_text(encoding="utf-8")
-    assert "易失信号·压缩后优先补记" in body, "警告措辞应强化"
+    assert "易失信号·压缩后优先升格" in body, "警告措辞应强化"
+    assert "auto-fallback" in body, "应声明已机械落降级 Step 兜底"

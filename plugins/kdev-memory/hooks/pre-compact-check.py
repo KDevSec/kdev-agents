@@ -37,7 +37,9 @@ force_utf8_stdio()  # Windows GBK 兼容：v0.8.1+ 统一处理 emoji 编码（p
 from migrate import kdev_memory_migrate  # noqa: E402
 from checkpoint import prune_old_checkpoints  # noqa: E402
 import step_log  # noqa: E402  # JSONL 主账读封装（dual-read 迁移第 1 步）
+import fallback_step  # noqa: E402  # 兜底：压缩（第二个丢失关口）机械落降级 Step
 from scope import shared_dir  # noqa: E402
+from status_schema import is_fallback_status  # noqa: E402
 
 
 def _read_trigger() -> str:
@@ -106,8 +108,10 @@ def main() -> int:
         except OSError:
             text = ""
         md_has_today = today in text
+    # 排除 auto-fallback：只有"今日有合格 Step"才算已落盘（同 SessionEnd「别被自己骗」）。
     try:
-        jsonl_has_today = bool(step_log.steps_for_date(today, root=kdev_dir))
+        jsonl_has_today = bool([s for s in step_log.steps_for_date(today, root=kdev_dir)
+                                if not is_fallback_status(s.get("status", ""))])
     except Exception:
         jsonl_has_today = False
     log_empty_today = not (md_has_today or jsonl_has_today)
@@ -126,17 +130,24 @@ def main() -> int:
     jsonl = step_log.jsonl_path(root=kdev_dir)
 
     if log_empty_today and porcelain:
-        # 易失·不可复得：干了活但没 dispatch recorder 的 Step 不在任何文件里。
-        # 这是 checkpoint 唯一真正不可复得的叙事信号，故强化 + 提醒压缩后优先补记。
+        # 兜底（第二个丢失关口）：压缩会截断上下文，压缩后主会话可能忘了 dispatch。
+        # 机械落一条降级 Step 保底不丢（带 drain 去重，防与随后 SessionEnd 重复兜底）。
+        fb = fallback_step.make_fallback_step(Path("."), "pre-compact", root=kdev_dir)
+        fb_ok = bool(fb.get("ok") and not fb.get("skipped"))
         parts.extend([
-            "## ⚠️ 未落盘警告（易失信号·压缩后优先补记）",
+            "## ⚠️ 未落盘警告（易失信号·压缩后优先升格）",
             "",
-            f"**执行日志今天（{today}）md 与 jsonl 主账均无任何 Step**，但工作区存在未提交变更。",
-            "说明本会话已干了活、但工作单元（Step）尚未实时落盘——",
-            "**这是压缩后唯一不可从磁盘/召回/git 历史复得的叙事信号**。请压缩后优先：",
+            f"**执行日志今天（{today}）无合格 Step**，但工作区存在未提交变更（本会话干了活但未实时落盘）。",
+            (
+                "✅ **已机械落一条降级 Step（`status: auto-fallback`）到 jsonl 主账兜底**"
+                "——骨架（commits/files/transcript 指针）已留住，压缩后由主会话升格成正式 Step。"
+                if fb_ok else
+                "⚠️ 降级 Step 兜底未成功，仅靠本 checkpoint 的工作区快照提示补记。"
+            ),
             "",
-            '1. 读本文件的"工作区快照"区块，回忆本会话干了什么',
-            f"2. dispatch kdev-step-recorder 把对应 Step 落到 `{jsonl}`",
+            "压缩后优先：",
+            '1. 读本文件的"工作区快照"区块 + 降级 Step 的 `fallback` 块，回忆本会话干了什么',
+            f"2. 主会话据此升格：走 kdev-step-recorder 落正式 Step 到 `{jsonl}`（旧降级条标 voided-superseded）",
             "3. 补记完成后删除本 checkpoint",
             "",
         ])

@@ -12,6 +12,7 @@ from __future__ import annotations
 
 import subprocess
 import sys
+import time
 from datetime import date, datetime
 from pathlib import Path
 
@@ -56,7 +57,7 @@ def _make_title(source: str, commits: list, files: list) -> str:
 
 
 def make_fallback_step(repo_root, source, *, scope=None, root=None,
-                       when=None, porcelain_cwd=None) -> dict:
+                       when=None, porcelain_cwd=None, dedup_window=300) -> dict:
     """组装并落一条 auto-fallback 降级 Step。返回 {ok, record_id, message}。永不抛。
 
     - drain pending-commits（commits/transcript_path/since_offset）作供料骨架
@@ -69,6 +70,16 @@ def make_fallback_step(repo_root, source, *, scope=None, root=None,
         kdev_root = Path(root) if root is not None else repo_root / ".kdev" / "memory"
         sd = _state_dir(kdev_root)
         sd.mkdir(parents=True, exist_ok=True)   # mint_record_id 去重锚 + pending 落此
+        # 双关口去重（④）：PreCompact 兜过后 SessionEnd 同场紧接触发时，pending 已 drain 空、
+        # 会落一条无 commit 的空降级 Step。用 .last-fallback 时间窗跳过，防重复兜底。
+        marker = sd / ".last-fallback"
+        if dedup_window and marker.exists():
+            try:
+                if time.time() - marker.stat().st_mtime < dedup_window:
+                    return {"ok": True, "skipped": True, "record_id": None,
+                            "message": f"{dedup_window}s 内已兜底，跳过（防双关口重复）"}
+            except OSError:
+                pass
         pending = pending_commits.read(sd)
         commits = pending.get("commits", []) or []
         files = _porcelain_files(porcelain_cwd or repo_root)
@@ -100,6 +111,10 @@ def make_fallback_step(repo_root, source, *, scope=None, root=None,
         last_ts = commits[-1]["ts"] if commits else int(pending.get("since_ts", 0) or 0)
         pending_commits.clear(sd, new_since_step_id=rid, new_since_ts=last_ts,
                               new_since_offset=int(pending.get("since_offset", 0) or 0))
+        try:
+            marker.touch()   # 记本次兜底时刻，供同场另一关口去重
+        except OSError:
+            pass
         return {"ok": True, "record_id": rid, "message": f"fallback step 落盘（{source}）"}
     except Exception as exc:  # 兜底 helper 本身永不抛，失败也不阻塞 hook
         return {"ok": False, "record_id": None, "message": f"fallback failed: {exc}"}

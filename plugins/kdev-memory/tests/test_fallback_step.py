@@ -92,3 +92,29 @@ def test_make_fallback_step_never_raises_on_bad_root(tmp_path):
     res = fallback_step.make_fallback_step("/nonexistent/xyz", "session-end",
                                            when=WHEN)
     assert res["ok"] is False and "fallback" in res["message"]
+
+
+def test_dedup_skips_second_within_window(tmp_path):
+    """双关口去重（④）：PreCompact 兜过后 SessionEnd 同场紧接触发 → 跳过，不落第二条空降级 Step。"""
+    kdev = _kdev(tmp_path)
+    r1 = fallback_step.make_fallback_step(tmp_path, "pre-compact", root=kdev,
+                                          when=WHEN, porcelain_cwd=tmp_path)
+    assert r1["ok"] and not r1.get("skipped")
+    r2 = fallback_step.make_fallback_step(tmp_path, "session-end", root=kdev,
+                                          when=WHEN, porcelain_cwd=tmp_path)
+    assert r2["ok"] and r2.get("skipped")
+    fb = [s for s in step_log.steps_for_date("2026-07-07", root=kdev)
+          if s["status"] == "auto-fallback"]
+    assert len(fb) == 1, "去重窗口内应只落一条降级 Step"
+
+
+def test_dedup_window_zero_disables(tmp_path):
+    """dedup_window=0 关闭去重 → 两次都落（供测试/特殊场景）。"""
+    kdev = _kdev(tmp_path)
+    fallback_step.make_fallback_step(tmp_path, "pre-compact", root=kdev,
+                                     when=WHEN, porcelain_cwd=tmp_path, dedup_window=0)
+    fallback_step.make_fallback_step(tmp_path, "session-end", root=kdev,
+                                     when=WHEN, porcelain_cwd=tmp_path, dedup_window=0)
+    fb = [s for s in step_log.steps_for_date("2026-07-07", root=kdev)
+          if s["status"] == "auto-fallback"]
+    assert len(fb) == 2

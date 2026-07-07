@@ -18,6 +18,7 @@ from typing import List, Optional, Union
 
 import step_log
 from scope import shared_dir
+from status_schema import is_fallback_status
 from step_id import id_label_fragment
 
 PathLike = Union[Path, str]
@@ -64,16 +65,26 @@ def render_daily(date: str, *, root: PathLike = DEFAULT_ROOT) -> str:
     steps = step_log.steps_for_date(date, root=root)
     base = shared_dir(root)
 
+    # auto-fallback 降级 Step 是 hook 机械骨架、未经 LLM 提炼——不当"完成的工作"，单列"待升格"。
+    qualified = [s for s in steps if not is_fallback_status(s.get("status", ""))]
+    fallback = [s for s in steps if is_fallback_status(s.get("status", ""))]
+
     lines: List[str] = [f"# 每日汇总：{date}", ""]
 
     lines.append("## 完成的工作")
-    if steps:
-        for s in steps:
+    if qualified:
+        for s in qualified:
             mark = "✓" if s.get("status") == "scored" else ""
             lines.append(f"- {s.get('title', '')} {mark}{_score_brief(s)}".rstrip())
     else:
         lines.append("- （今日无 Step）")
     lines.append("")
+
+    if fallback:
+        lines.append("## ⚠️ 待升格降级 Step（hook 机械兜底，未经 LLM 提炼，勿当正式工作）")
+        for s in fallback:
+            lines.append(f"- 🔺 {s.get('title', '')}（{s.get('record_id', '')}）")
+        lines.append("")
 
     lines.append("## 未完成项")
     open_steps = [s for s in steps if s.get("status") == "open"]

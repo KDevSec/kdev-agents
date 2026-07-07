@@ -1,5 +1,32 @@
 # kdev-memory CHANGELOG
 
+## [0.19.7] - 2026-07-07
+
+**兜底记录 P2 缺口补齐**（①②④——第二个丢失关口 + daily_render 隔离 + 双关口去重）。全程 TDD，558 passed（+5 新）。承 P1（0.19.6）。
+
+### 🛡️ ① PreCompact 接入（补齐第二个丢失关口）
+
+- P1 只在 SessionEnd 兜底；但**压缩（compact）也是"LLM 缺席的丢失关口"**——压缩截断主会话上下文，压缩后可能忘了 dispatch。
+- `pre-compact-check` 在"今日无合格 Step + 工作区有变更"时也调 `make_fallback_step("pre-compact")` 机械落降级 Step；未落盘区块文案从"压缩后优先补记"改为"已兜底、压缩后优先升格"。今日判定同 SessionEnd 排除 auto-fallback（「别被自己骗」）。
+
+### 🔁 ④ 双关口 drain 去重（① 的配套）
+
+- SessionEnd + PreCompact 同场先后触发时，第二次 pending 已 drain 空、会落一条无 commit 的空降级 Step。
+- `make_fallback_step` 加 `.last-fallback` 时间窗（默认 300s）去重：窗口内已兜过 → 返回 `skipped` 跳过，不落重复条。`dedup_window=0` 可关闭。
+
+### 📊 ② daily_render 隔离 auto-fallback（补 P1 漏的第 3 个消费方）
+
+- P1 只隔离了 distill / step_completeness 两个消费方，daily_render 会把降级 Step 当"完成的工作"渲染进日报。
+- `render_daily` 把 auto-fallback 从"完成的工作"分出，单列"⚠️ 待升格降级 Step（机械兜底，未经 LLM 提炼）"区块。
+
+### 📌 未做（留 P3 + 升格工具化）
+
+- 升格 supersedes 全链路自动化（append-only 下改旧条状态，有设计量）；P3：conventional-prefix 猜 about、Stop 提醒强化、覆盖率进 brief。
+
+### 📌 升级须知
+
+- 本版改了 hook/lib（pre-compact-check / fallback_step / daily_render），需**刷新 marketplace** 才激活（G-004）。
+
 ## [0.19.6] - 2026-07-07
 
 **兜底记录 P1 最小闭环**——让"实时落盘断档"从"主会话忘 dispatch 就丢"变成"机械保底不丢 + LLM 异步升格"。全程 TDD，553 passed（539 + 14 新）。设计见 [docs/superpowers/specs/2026-07-07-兜底记录+三层防线-design.md](../../docs/superpowers/specs/2026-07-07-兜底记录+三层防线-design.md)。
