@@ -110,3 +110,29 @@ def test_empty_tool_name_skipped(tmp_path):
     facts = tx.extract(str(p), 0, None)
     assert "" not in facts["tools_invoked"]
     assert facts["tools_invoked_count"] == 1
+
+
+def test_out_of_range_offset_flagged(tmp_path):
+    """since_offset ≥ 文件行数（跨会话陈旧 EOF 行号）→ out_of_range，别静默当"无工具"。"""
+    p = tmp_path / "t.jsonl"
+    _write_jsonl(p, [
+        _assistant_tool_use("Read"),
+        _assistant_tool_use("Bash", command="ls"),
+    ])  # 2 行
+    facts = tx.extract(str(p), 654, None)   # 654 远超 2 行 = 跨会话越界
+    assert facts["out_of_range"] is True
+    assert facts["unreadable"] is False     # 文件能打开，不是 unreadable
+    assert facts["tools_invoked_count"] == 0
+
+
+def test_in_range_offset_not_flagged(tmp_path):
+    p = tmp_path / "t.jsonl"
+    _write_jsonl(p, [_assistant_tool_use("Read"), _assistant_tool_use("Bash", command="ls")])
+    facts = tx.extract(str(p), 1, None)     # 1 < 2 行，正常增量
+    assert facts["out_of_range"] is False
+
+
+def test_offset_zero_never_out_of_range(tmp_path):
+    p = tmp_path / "t.jsonl"
+    _write_jsonl(p, [_assistant_tool_use("Read")])
+    assert tx.extract(str(p), 0, None)["out_of_range"] is False

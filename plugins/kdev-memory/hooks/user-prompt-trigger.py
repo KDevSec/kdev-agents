@@ -45,6 +45,17 @@ def main() -> int:
         print(SUPPRESS)
         return 0
 
+    # stash 当前会话 transcript 指针（修他评跨会话陈旧：每轮发言都刷新为当前会话，
+    # 让 recorder 溯源不被 pending 的老会话死指针拖成静默降级自评）。永不阻塞。
+    try:
+        from transcript_source import stash_current_transcript
+        _d = json.loads(raw) if raw.strip() else {}
+        _tp = _d.get("transcript_path", "") if isinstance(_d, dict) else ""
+        if _tp:
+            stash_current_transcript(Path(".kdev/memory/state"), _tp)
+    except Exception:
+        pass
+
     # 把 input 原样传给 python 核心
     trigger_match = LIB_DIR / "trigger-match.py"
     try:

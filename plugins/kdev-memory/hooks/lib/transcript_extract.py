@@ -33,9 +33,11 @@ def extract(path: str, since_offset: int = 0, end_offset: int | None = None) -> 
     p = Path(path)
     if not p.is_file():
         return _result(tools, skills, subagents, files, shas, errors, unreadable=True)
+    lines_seen = 0
     try:
         with open(p, encoding="utf-8") as f:
             for i, line in enumerate(f):
+                lines_seen = i + 1
                 if i < since_offset:
                     continue
                 if end_offset is not None and i >= end_offset:
@@ -69,10 +71,15 @@ def extract(path: str, since_offset: int = 0, end_offset: int | None = None) -> 
                             shas.add(m)
     except OSError:
         return _result(tools, skills, subagents, files, shas, errors, unreadable=True)
-    return _result(tools, skills, subagents, files, shas, errors, unreadable=False)
+    # since_offset 越界（≥ 文件实际行数）= 读到空段：多半是 transcript_path/since_offset 跨会话
+    # 陈旧（老会话 EOF 行号套新会话）。区别于"文件打不开"的 unreadable，让 recorder 显式标降级、
+    # 别把"越界读空"静默当成"这段无工具调用"。
+    out_of_range = since_offset > 0 and lines_seen <= since_offset
+    return _result(tools, skills, subagents, files, shas, errors,
+                   unreadable=False, out_of_range=out_of_range)
 
 
-def _result(tools, skills, subagents, files, shas, errors, unreadable):
+def _result(tools, skills, subagents, files, shas, errors, unreadable, out_of_range=False):
     return {
         "tools_invoked": dict(tools),
         "tools_invoked_count": sum(tools.values()),
@@ -83,6 +90,7 @@ def _result(tools, skills, subagents, files, shas, errors, unreadable):
         "errors_hit": len(errors),
         "error_samples": errors[:5],
         "unreadable": unreadable,
+        "out_of_range": out_of_range,
     }
 
 

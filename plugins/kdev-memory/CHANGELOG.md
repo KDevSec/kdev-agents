@@ -1,5 +1,30 @@
 # kdev-memory CHANGELOG
 
+## [0.19.8] - 2026-07-08
+
+**修"模型他评静默降级成自评"**——recorder 的他评溯源从 06-18 就读空、静默退回主会话自评，根因是 transcript 指针跨会话陈旧。全程 TDD，568 passed（+10 新）。
+
+### 🐛 根因（三层，实锤）
+
+- **指针冻结**：pending-commits 的 `transcript_path`/`since_offset` 只由 commit-tracker 在 commit 时更新、且 worktree commit（无 `.kdev/memory`）直接 skip → 3 周 worktree 提交多 → 冻在 2026-06-18 老会话。
+- **offset 跨会话失效**：`since_offset` = 落盘时那个 transcript 的 EOF 行号（`wc -l`），死绑文件；换会话套新会话越界。实测 pending `since_offset=654` 恰好 = 老会话总行数 → 读"654 行之后"必空。
+- **越界静默**：`transcript_extract` 只在文件打不开时标 `unreadable`，`since_offset` 越界读空时不吭声 → recorder 当"这段无工具调用"、静默用主会话自评顶替他评。
+
+### ✨ 修 1：越界不静默（可见性）
+
+- `transcript_extract` 新增 `out_of_range`：`since_offset ≥ 文件行数` → `True`（区别于"文件打不开"的 unreadable）。
+- recorder 遇 `unreadable/out_of_range/空指针` → **回报显式标注"⚠️ 他评降级为自评（原因），未独立溯源"**，不再静默。
+
+### ✨ 修 2：当前会话 transcript 指针独立化（根治）
+
+- 新 `transcript_source.py`：`stash_current_transcript`（写 `state/.current-transcript`）+ `resolve_marker`（recorder 取值，保证指向当前会话；换会话时 `since_offset` 重置 0，不套老会话行号）。
+- **UserPromptSubmit + SessionStart** 从 hook input 提取当前会话 `transcript_path` 写 `.current-transcript`（高频、每轮刷新）——transcript 溯源指针从此不依赖 commit-tracker（worktree 脆弱）。
+- recorder 改用 `resolve_marker`（原裸 `get_transcript_marker`）。commit-tracker 继续只管攒 commits（职责分离）。
+
+### 📌 升级须知
+
+- 本版改了 hook/lib（transcript_extract / 新 transcript_source / user-prompt-trigger / session-start-brief / recorder agent），需**刷新 marketplace** 才激活（G-004）。
+
 ## [0.19.7] - 2026-07-07
 
 **兜底记录 P2 缺口补齐**（①②④——第二个丢失关口 + daily_render 隔离 + 双关口去重）。全程 TDD，558 passed（+5 新）。承 P1（0.19.6）。

@@ -59,6 +59,14 @@ def _read_source() -> Tuple[str, str]:
         return "startup", "unknown"
     source = data.get("source") or "startup"
     session_id = str(data.get("session_id") or "unknown")
+    # stash 当前会话 transcript 指针（修他评跨会话陈旧；与 UserPromptSubmit 双写，会话启动即刷新）
+    try:
+        from transcript_source import stash_current_transcript
+        tp = data.get("transcript_path", "")
+        if tp:
+            stash_current_transcript(Path(".kdev/memory/state"), tp)
+    except Exception:
+        pass
     return source, session_id
 
 
