@@ -1,0 +1,22 @@
+docs/分享/kdev-memory工程记忆技术分享.md
+  s_c8edd91db20dec::t_caae61783d2620 6-463
+  s_c8edd91db20dec::t_a302b5e44fade4 3-5
+  s_c8edd91db20dec::t_d39f9f7ddaff7e 464-466
+  s_c8edd91db20dec::t_9daec787b8f746 1-2,467
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "65d4d0e2c175bbba4929b01a6546d846b386b48c",
+  "prompts": {},
+  "sessions": {
+    "s_c8edd91db20dec": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "0591cd5b-f38f-4621-a158-914c093bf2ab",
+        "model": "claude-fable-5"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
