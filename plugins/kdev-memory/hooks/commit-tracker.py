@@ -24,6 +24,7 @@ from _utf8 import force_utf8_stdio  # noqa: E402
 force_utf8_stdio()
 
 from pending_commits import append  # noqa: E402
+from coexist import defer_to_ieidev  # noqa: E402
 
 SUPPRESS = json.dumps({"continue": True, "suppressOutput": True})
 
@@ -82,6 +83,11 @@ def main() -> int:
         return 0
 
     repo = Path.cwd()
+    # ieidev 让位守卫：.ieidev/memory 在场 → kdev 整体让位、全静默（print(SUPPRESS)，
+    # 不累积 pending-commits）。与下面 .kdev/memory 存在性门控同构、紧挨着。
+    if defer_to_ieidev(repo):
+        print(SUPPRESS)
+        return 0
     # 存在性门控：未初始化 .kdev/memory/ 的工程不得凭空自举该目录
     # （与 session-start-brief / session-end-check / pre-compact-check / post-write-check
     # 一致：只有用户显式 /kdev-memory setup 或配了 sync remote clone 才会产生该目录）。

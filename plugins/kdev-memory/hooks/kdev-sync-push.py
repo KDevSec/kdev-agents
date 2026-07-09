@@ -6,10 +6,15 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent / "lib"))
 import kdev_sync  # noqa: E402
+from coexist import defer_to_ieidev  # noqa: E402
 
 
 def main():
     repo_root = os.environ.get("CLAUDE_PROJECT_DIR") or os.getcwd()
+    # ieidev 让位守卫：.ieidev/memory 在场 → kdev 整体让位、全静默（直接 return，不 commit、
+    # 不 push、不写未推送 WARN）。让位是无条件的：kdev 记忆仓原样留在盘上，历史由 ieidev 侧接走。
+    if defer_to_ieidev(Path(repo_root)):
+        return
     try:
         res = kdev_sync.sync_push(repo_root)
     except Exception as exc:

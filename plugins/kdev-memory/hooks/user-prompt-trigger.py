@@ -21,12 +21,19 @@ LIB_DIR = SCRIPT_DIR / "lib"
 sys.path.insert(0, str(LIB_DIR))
 
 from migrate import kdev_memory_migrate  # noqa: E402
+from coexist import defer_to_ieidev  # noqa: E402
 
 
 SUPPRESS = json.dumps({"continue": True, "suppressOutput": True})
 
 
 def main() -> int:
+    # ieidev 让位守卫：.ieidev/memory 在场 → kdev 整体让位、全静默（print(SUPPRESS) 收声，
+    # 不召回、不 stash transcript 指针）。置于 migrate + stash 之前，确保让位时 kdev 原文件零改动。
+    if defer_to_ieidev():
+        print(SUPPRESS)
+        return 0
+
     # 防御性迁移
     kdev_memory_migrate()
 

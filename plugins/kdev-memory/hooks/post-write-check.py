@@ -23,9 +23,15 @@ sys.path.insert(0, str(LIB_DIR))
 
 from migrate import kdev_memory_migrate  # noqa: E402
 from milestone import is_milestone_path  # noqa: E402
+from coexist import defer_to_ieidev  # noqa: E402
 
 
 def main() -> int:
+    # ieidev 让位守卫：.ieidev/memory 在场 → kdev 整体让位、全静默（return，不打字、不写盘）。
+    # 置于 migrate 之前，确保让位时 kdev 原文件零改动。
+    if defer_to_ieidev():
+        return 0
+
     kdev_memory_migrate()
 
     kdev_dir = Path(".kdev/memory")

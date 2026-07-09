@@ -35,6 +35,7 @@ from _utf8 import force_utf8_stdio  # noqa: E402
 force_utf8_stdio()  # Windows GBK 兼容：v0.8.1+ 统一处理 emoji 编码
 
 from migrate import kdev_memory_migrate  # noqa: E402
+from coexist import defer_to_ieidev  # noqa: E402
 from milestone import is_milestone_path  # noqa: E402
 from missing_summaries import list_missing_past_summaries  # noqa: E402
 from archive_hint import collect_archive_hints  # noqa: E402
@@ -133,6 +134,11 @@ def _porcelain_substantive_changes() -> Tuple[int, bool]:
 
 
 def main() -> int:
+    # ieidev 让位守卫：.ieidev/memory 在场 → kdev 整体让位、全静默（return，不打任何提醒）。
+    # 置于 migrate 之前，确保让位时 kdev 原文件零改动。
+    if defer_to_ieidev():
+        return 0
+
     kdev_memory_migrate()
 
     kdev_dir = Path(".kdev/memory")

@@ -29,6 +29,7 @@ from _utf8 import force_utf8_stdio  # noqa: E402
 force_utf8_stdio()  # Windows GBK 兼容：v0.8.1+ 统一处理 emoji 编码
 
 from migrate import kdev_memory_migrate  # noqa: E402
+from coexist import defer_to_ieidev  # noqa: E402
 from frontmatter import read_state_field  # noqa: E402
 from missing_summaries import list_missing_past_summaries  # noqa: E402
 from worktree_link import worktree_link_kdev  # noqa: E402
@@ -509,6 +510,13 @@ def _build_brief(
 
 
 def main() -> int:
+    # ieidev 让位守卫：.ieidev/memory 在场 → kdev 整体让位、全静默（print(SUPPRESS)，不注入 brief、
+    # 不刷 CLAUDE.md 漂移提示）。置于 migrate + worktree symlink + transcript stash 之前，
+    # 确保让位时 kdev 原文件零改动（否则和 ieidev 的托管段/注入两段打架）。
+    if defer_to_ieidev():
+        print(SUPPRESS)
+        return 0
+
     # 自动迁移
     kdev_memory_migrate()
 

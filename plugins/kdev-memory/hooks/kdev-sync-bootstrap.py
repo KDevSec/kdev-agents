@@ -6,10 +6,15 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent / "lib"))
 import kdev_sync  # noqa: E402
+from coexist import defer_to_ieidev  # noqa: E402
 
 
 def main():
     repo_root = os.environ.get("CLAUDE_PROJECT_DIR") or os.getcwd()
+    # ieidev 让位守卫：.ieidev/memory 在场 → kdev 整体让位、全静默（直接 return，不 bootstrap、
+    # 不自举记忆仓、不弹「工程记忆尚未 git 托管/是否现在初始化」催建 reminder）。
+    if defer_to_ieidev(Path(repo_root)):
+        return
     try:
         res = kdev_sync.bootstrap(repo_root)
     except Exception as exc:  # hooks must never crash the session

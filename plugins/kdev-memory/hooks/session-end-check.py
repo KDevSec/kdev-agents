@@ -19,6 +19,7 @@ LIB_DIR = SCRIPT_DIR / "lib"
 sys.path.insert(0, str(LIB_DIR))
 
 from migrate import kdev_memory_migrate  # noqa: E402
+from coexist import defer_to_ieidev  # noqa: E402
 import step_log  # noqa: E402  # JSONL 主账读封装（dual-read 迁移第 1 步）
 import fallback_step  # noqa: E402  # 兜底：LLM 缺席关口机械落降级 Step
 from scope import shared_dir  # noqa: E402
@@ -88,6 +89,11 @@ def _git_porcelain_kdev() -> List[str]:
 
 
 def main() -> int:
+    # ieidev 让位守卫：.ieidev/memory 在场 → kdev 整体让位、全静默（return，不打字、不写 WARN）。
+    # 置于 migrate 之前，确保让位时 kdev 原文件零改动。
+    if defer_to_ieidev():
+        return 0
+
     kdev_memory_migrate()
 
     kdev_dir = Path(".kdev/memory")
