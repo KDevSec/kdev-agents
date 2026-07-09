@@ -1,5 +1,26 @@
 # kdev-memory CHANGELOG
 
+## [0.20.0] - 2026-07-09
+
+**kdev↔ieidev 记忆共存守卫**——本机同装 kdev-memory 与 ieidev-team（同 fork、钉同样 6 个 Claude Code 事件）时，一个仓里只要 `.ieidev/memory/` 存在，kdev 就整体让位、全静默，消除双份注入/双催建/双记录/两段 CLAUDE.md 契约打架。全程 TDD，593 passed（+25 新）。
+
+### ✨ presence-based 让位（ieidev 固定为主）
+
+- 新 `hooks/lib/coexist.py`：`defer_to_ieidev(root=None)`——cwd 下 `.ieidev/memory` 是目录（或 `.kdev/memory/.migrated-to-ieidev` marker）即判 kdev 让位。与 kdev 认 `.kdev/memory` 的现有立场同构（cwd 相对目录探测）。只判定、不负责返回。
+- **9 个 hook** 逐个接入让位守卫，命中即用各自原生的静默退出形态返回（`print(SUPPRESS)` 类：commit-tracker / session-start-brief / user-prompt-trigger；纯 `return` 类：post-write-check / session-end-check / pre-compact-check / stop-check / kdev-sync-bootstrap / kdev-sync-push）。
+- 含 migrate / worktree-symlink / transcript-stash 等预守卫副作用的 hook，守卫前置到 `main()` 首行——让位时 kdev 原文件**零改动、零写盘、零催建**。
+- kdev-sync-bootstrap 的「工程记忆尚未 git 托管/是否现在初始化」催建 reminder 一并闭嘴。
+
+### 🔒 正确性守恒
+
+- `.ieidev/memory` 不存在时，kdev 现有行为**逐字不变**（正常记录/召回/催建）——568 基线测试原样通过佐证。
+- 让位无条件：即便 `.kdev/memory` 也在（两个都在），也让位（ieidev 优先）；kdev 原文件不动、不删，历史由 ieidev 侧一次性迁移器接走（非本次范围）。
+- CLAUDE.md 托管段无 hook 自动注入（merge 仅 skill/CLI 调），唯一 hook 层触碰是 session-start-brief 的只读漂移提示，随 brief 让位即收声。
+
+### 📌 升级须知
+
+- 本版改了 hook/lib（新 coexist + 9 个 hook），需**刷新 marketplace** 才激活（G-004）。
+
 ## [0.19.8] - 2026-07-08
 
 **修"模型他评静默降级成自评"**——recorder 的他评溯源从 06-18 就读空、静默退回主会话自评，根因是 transcript 指针跨会话陈旧。全程 TDD，568 passed（+10 新）。
