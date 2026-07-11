@@ -170,9 +170,9 @@ SessionStart
 
 实现收尾时逐项回写 canonical：
 
-- [ ] dev-note `kdev-memory上下文消耗诊断-2026-07-10.md` §7.4-2：「写入侧闸位前移更根治」→ 探索推翻（写入侧无 Python 拦截点，注入侧才是确定生效）。就地修正 + 加锚指向本 spec。
-- [ ] `SKILL.md:182`：current_step 短指针约束（组件 ④ 已含，实现即回写）。
-- [ ] `plugin.json` version bump（G-004）。
+- [x] dev-note `kdev-memory上下文消耗诊断-2026-07-10.md` §7.4-2：「写入侧闸位前移更根治」→ 探索推翻（写入侧无 Python 拦截点，注入侧才是确定生效）。就地修正 + 加锚指向本 spec。
+- [x] `SKILL.md:182`：current_step 短指针约束（组件 ④ 已含，实现即回写）。
+- [x] `plugin.json` version bump（G-004）。
 
 ## 10. 未决 / 风险
 

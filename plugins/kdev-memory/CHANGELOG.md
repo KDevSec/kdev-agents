@@ -1,5 +1,23 @@
 # kdev-memory CHANGELOG
 
+## [0.21.0] - 2026-07-10
+
+**brief 三字段长度闸**——SessionStart brief 对 `current_step` / `pending_decisions` / `unresolved_gotchas` 三个 verbatim 无界注入字段加长度闸（分字段阈值 400/1200/800，超限头部保留+尾部折叠指针），防撑爆每会话开局上下文；字段超 2× 阈值时 P1 WARN 催归档。全程 TDD，611 passed。
+
+### ✨ 三字段长度闸（注入侧·确定生效）
+- 新 `hooks/lib/brief_clamp.py`：`clamp_field`（头部保留+尾部折叠指针，UTF-8 按 code point 安全切，`limit<=0` no-op）+ `format_bloat_hint`（膨胀 WARN 行）。
+- `memory_config.py` 加 `read_brief_field_limits`：分字段阈值 400/1200/800，`config.yaml` 可覆盖（`brief.limit_current_step` 等），fail-open。
+- `session-start-brief.py` 单点接入：`main()` 读三字段后先以**原始长度**判 WARN（`>2×` 阈值，`lim>0` 兼防除零）、再 clamp；覆盖 normal/compact/resume/verbose 四档。
+
+### 📖 源头减缓（文档约束）
+- `agents/kdev-step-recorder.md` + `SKILL.md` 补 `current_step` 短指针铁规——禁止 `|【上一里程碑】` 无界拼接旧叙事。
+
+### 🔒 正确性守恒
+- 健康项目（字段未超阈值）brief 行为**逐字不变**；config 缺失/非法 fail-open 到默认。
+
+### 📌 升级须知
+- 本版改了 hook/lib，需**刷新 marketplace** 才激活（G-004）。
+
 ## [0.20.0] - 2026-07-09
 
 **kdev↔ieidev 记忆共存守卫**——本机同装 kdev-memory 与 ieidev-team（同 fork、钉同样 6 个 Claude Code 事件）时，一个仓里只要 `.ieidev/memory/` 存在，kdev 就整体让位、全静默，消除双份注入/双催建/双记录/两段 CLAUDE.md 契约打架。全程 TDD，593 passed（+25 新）。

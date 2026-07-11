@@ -117,3 +117,14 @@ def test_brief_warns_on_bloated_pending(tmp_path):
     ctx = _ctx(repo)
     assert "已折叠" in ctx      # clamp 触发
     assert "字段膨胀" in ctx    # WARN 触发
+
+
+def test_brief_compact_verbosity_clamps_and_warns(tmp_path):
+    """compact 档也过长度闸：超长 pending → compact 输出含折叠指针 + 膨胀 WARN。"""
+    repo = _init(tmp_path, config_text="rating.mode: model-only\nbrief.verbosity: compact\n")
+    mem = repo / ".kdev" / "memory"
+    (mem / "当前状态.md").write_text(
+        f"---\nphase: t\npending_decisions: [{'x' * 2500}]\n---\n", encoding="utf-8")
+    ctx = _ctx(repo)
+    assert "已折叠" in ctx      # compact 档 clamp 触发
+    assert "字段膨胀" in ctx    # compact 档 WARN 触发（compact early-return 分支的 separate append）
