@@ -11,7 +11,7 @@
 
 **导出 = markdown 切片包，蒸馏管道直接吃 markdown，不引入额外 JSONL 中间格式。** 这是**导出层的终态决策**，不留升级口。
 
-> ⚠️ **Phase 2 · C1 校准（Q 20260625-173847-ly1989abc）**：这条只约束**蒸馏导出层**。**存储层不再是"纯 markdown 单一主存"**——叙事 Step 已迁到 `执行日志.jsonl`（JSONL 主账，[step_log.py](../../hooks/lib/step_log.py) 读写，daily_render.py 承重墙渲染日总结）；历史 Step 留 `执行日志.md` 冻结·经 [step_dualread.py](../../hooks/lib/step_dualread.py) 永久 dual-read（存量不迁、md-read 不退，相对 ieidev 硬切的 deliberate 分叉）。**导出时 Step 从 jsonl（∪ 历史 md）渲染回 markdown body**（叙事不丢，见下），其余条目（Q/G/R/F）直接读 markdown。导出层约束不变：产物仍是 markdown 切片包，不再转 JSONL 喂训练。
+> ⚠️ **Phase 2 · C1 校准（Q 20260625-173847）**：这条只约束**蒸馏导出层**。**存储层不再是"纯 markdown 单一主存"**——叙事 Step 已迁到 `执行日志.jsonl`（JSONL 主账，[step_log.py](../../hooks/lib/step_log.py) 读写，daily_render.py 承重墙渲染日总结）；历史 Step 留 `执行日志.md` 冻结·经 [step_dualread.py](../../hooks/lib/step_dualread.py) 永久 dual-read（存量不迁、md-read 不退，相对 ieidev 硬切的 deliberate 分叉）。**导出时 Step 从 jsonl（∪ 历史 md）渲染回 markdown body**（叙事不丢，见下），其余条目（Q/G/R/F）直接读 markdown。导出层约束不变：产物仍是 markdown 切片包，不再转 JSONL 喂训练。
 
 ### 为什么导出层不用 JSONL
 

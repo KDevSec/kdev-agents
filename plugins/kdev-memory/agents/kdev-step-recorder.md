@@ -60,9 +60,9 @@ for sha in <commit_shas>; do git cat-file -e "$sha" 2>/dev/null || echo "MISSING
 When reading/writing `当前状态.md` frontmatter for the `current_step` value:
 
 - **ONLY** the YAML key line `current_step: <value>` is authoritative (the `value` is the field's content).
-- **IGNORE** YAML comment lines (lines starting with `#`). Users may add annotation comments like `# Step 20260613-101432-ly1989abc: ...` for their own bookkeeping — these are notes, NOT state.
+- **IGNORE** YAML comment lines (lines starting with `#`). Users may add annotation comments like `# Step 20260613-101432-abcdev: ...` for their own bookkeeping — these are notes, NOT state.
 - Robust parse: `grep -E "^current_step:" 当前状态.md | head -1 | sed 's/^current_step:\s*//'` (Python equivalent if preferred).
-- v0.17: `current_step` 值为时间戳 Step ID（如 `Step 20260613-101432-ly1989abc`），不再是 `<slug>-N`。
+- v0.17: `current_step` 值为时间戳 Step ID（如 `Step 20260613-101432-abcdev`），不再是 `<slug>-N`。
 - **短指针铁规（brief 长度闸）**：`current_step` 只写**最新** Step ID（+可选 ≤ 一句状态），**严禁** `|【上一里程碑】` 式把旧里程碑叙事拼接进同一字段——该字段被 SessionStart brief 每会话全量注入，无界拼接会撑爆开局上下文（见 docs/superpowers/specs/2026-07-10-brief三字段长度闸-design.md）。
 
 ## Anti-laziness anchors
@@ -128,7 +128,7 @@ print('TARGET:', jsonl_path(scope))
 print('RATING_MODE:', read_rating_mode())
 "
 ```
-Capture `MINTED:` (e.g. `Step 20260613-101432-ly1989abc`) and `TARGET:` (the 执行日志.jsonl path the record lands in — `append_step` resolves the same path from `scope`; this is just for your success message). No counter file is written (timestamp IDs have no counter; Q-020). Capture `RATING_MODE`：决定用户评分段的写法（见 step 2）。
+Capture `MINTED:` (e.g. `Step 20260613-101432-abcdev`) and `TARGET:` (the 执行日志.jsonl path the record lands in — `append_step` resolves the same path from `scope`; this is just for your success message). No counter file is written (timestamp IDs have no counter; Q-020). Capture `RATING_MODE`：决定用户评分段的写法（见 step 2）。
 
 ### 读真 transcript 抽客观事实（P-C1b 溯源）
 
@@ -211,7 +211,7 @@ On success（**只回一句人话确认**——详情已写进 执行日志.json
 
 > 已落 Step <ID> → 执行日志.jsonl（<scope> scope）；当前状态已同步、pending-commits 已清。
 
-例：`已落 Step 20260613-101432-ly1989abc → 执行日志.jsonl（shared scope）；当前状态已同步、pending 已清。`
+例：`已落 Step 20260613-101432-abcdev → 执行日志.jsonl（shared scope）；当前状态已同步、pending 已清。`
 
 （员工 scope 时省略"当前状态已同步"——员工 Step 不动主线 当前状态.md。）
 
