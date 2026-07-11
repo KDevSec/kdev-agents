@@ -95,3 +95,25 @@ def test_brief_flags_fallback_step_for_upgrade(tmp_path):
     ctx = _ctx(repo)
     assert "待升格" in ctx
     assert "Step 20260707-000000-x" in ctx
+
+
+def test_brief_clamps_long_pending_without_warn(tmp_path):
+    """pending 1500 字符（>1200 clamp，<2400 无 WARN）→ 折叠指针出现、无膨胀 WARN。"""
+    repo = _init(tmp_path, config_text="rating.mode: model-only\n")
+    mem = repo / ".kdev" / "memory"
+    (mem / "当前状态.md").write_text(
+        f"---\nphase: t\npending_decisions: [{'x' * 1500}]\n---\n", encoding="utf-8")
+    ctx = _ctx(repo)
+    assert "已折叠" in ctx        # clamp 触发
+    assert "字段膨胀" not in ctx  # WARN 未触发
+
+
+def test_brief_warns_on_bloated_pending(tmp_path):
+    """pending 2500 字符（>2400）→ 折叠指针 + P1 膨胀 WARN 同现。"""
+    repo = _init(tmp_path, config_text="rating.mode: model-only\n")
+    mem = repo / ".kdev" / "memory"
+    (mem / "当前状态.md").write_text(
+        f"---\nphase: t\npending_decisions: [{'x' * 2500}]\n---\n", encoding="utf-8")
+    ctx = _ctx(repo)
+    assert "已折叠" in ctx      # clamp 触发
+    assert "字段膨胀" in ctx    # WARN 触发

@@ -39,7 +39,8 @@ from pending_commits import format_brief_hint as pending_format_brief_hint  # no
 from skill_version import detect_drift as skill_detect_drift  # noqa: E402
 import step_log  # noqa: E402  # JSONL 主账读封装（dual-read 迁移第 1 步）
 from scope import shared_dir, list_staff, staff_dir  # noqa: E402
-from memory_config import read_rating_mode, rating_mode_configured, read_brief_verbosity  # noqa: E402
+from memory_config import read_rating_mode, rating_mode_configured, read_brief_verbosity, read_brief_field_limits  # noqa: E402
+from brief_clamp import clamp_field, format_bloat_hint  # noqa: E402
 
 SUPPRESS = json.dumps({"continue": True, "suppressOutput": True})
 
@@ -374,6 +375,7 @@ def _build_brief(
     rating_setup_hint: str = "",
     fallback_hint: str = "",
     verbosity: str = "normal",
+    field_bloat_hint: str = "",
 ) -> str:
     """按 mode 组装 brief 文本。返回带换行的 markdown 字符串。"""
 
@@ -390,7 +392,9 @@ def _build_brief(
     if fallback_hint:
         p0_lines.append(fallback_hint)
 
-    # P1: 跨天汇总缺失 / CLAUDE.md 漂移 / 历史半残 / 沉淀提醒
+    # P1: 跨天汇总缺失 / CLAUDE.md 漂移 / 历史半残 / 沉淀提醒 + 字段膨胀 WARN
+    if field_bloat_hint:
+        p1_lines.append(field_bloat_hint)
     if missing_past:
         p1_lines.append(
             f"  - 过去日期缺每日汇总（跨天会话遗漏）：{missing_past} —— "
@@ -446,6 +450,8 @@ def _build_brief(
                 cparts.append("🔴 " + step_hint)
             if state_pending:
                 cparts.append(f"- pending_decisions: {state_pending}")
+            if field_bloat_hint:
+                cparts.append(field_bloat_hint)
             prog_one = f"📊 今日进度：执行日志 {log_today}；汇总 {summary_today_status}"
             if git_branch:
                 prog_one += f"；分支 {git_branch}"
@@ -561,6 +567,17 @@ def main() -> int:
     state_pending = read_state_field("pending_decisions")
     state_unresolved = read_state_field("unresolved_gotchas")
 
+    # 三字段长度闸：clamp 注入值 + 以原始长度判 WARN（brief 三字段长度闸 spec）
+    _limits = read_brief_field_limits(kdev_dir)
+    _triples = [("current_step", state_step, _limits["current_step"]),
+                ("pending_decisions", state_pending, _limits["pending_decisions"]),
+                ("unresolved_gotchas", state_unresolved, _limits["unresolved_gotchas"])]
+    _bloat = [(n, len(v), lim) for n, v, lim in _triples if lim > 0 and len(v) > lim * 2]
+    field_bloat_hint = format_bloat_hint(_bloat)
+    state_step = clamp_field(state_step, _limits["current_step"])
+    state_pending = clamp_field(state_pending, _limits["pending_decisions"])
+    state_unresolved = clamp_field(state_unresolved, _limits["unresolved_gotchas"])
+
     recent_step = _recent_step_heading(log_file, kdev_dir)
     recent_q = _last_heading(shared / "决策日志.md", "## Q")   # "## Q" catches both "Q-NNN" and "Q YYYYMMDD-..."
     recent_g = _last_heading(shared / "踩坑日志.md", "## G")   # "## G" catches both "G-NNN" and "G YYYYMMDD-..."
@@ -594,6 +611,7 @@ def main() -> int:
         recent_g=recent_g, pending_hint=pending_hint or "", skill_drift_hint=skill_drift_hint,
         staff_block=staff_block, rating_setup_hint=rating_setup_hint,
         fallback_hint=_fallback_upgrade_hint(kdev_dir, today), verbosity=verbosity,
+        field_bloat_hint=field_bloat_hint,
     )
     brief = _build_brief(**brief_kwargs)
 
