@@ -1,0 +1,29 @@
+plugins/kdev-memory/agents/kdev-step-recorder.md
+  s_ddb727ef76e336::t_ce196c68890091 63,65,131,214
+plugins/kdev-memory/skills/kdev-memory/SKILL.md
+  s_ddb727ef76e336::t_da8bce2c7f914b 3,76,172,207,354
+plugins/kdev-memory/skills/kdev-memory/references/markdown-切片导出.md
+  s_ddb727ef76e336::t_3974fcd11a5693 14
+plugins/kdev-memory/skills/kdev-memory/references/六类记录-schema.md
+  s_ddb727ef76e336::t_6438419eb76a1d 144
+plugins/kdev-memory/skills/kdev-memory/references/切档与归档.md
+  s_ddb727ef76e336::t_2eabe813dbc71b 3
+plugins/kdev-memory/skills/kdev-memory/references/自动化机制-hooks.md
+  s_ddb727ef76e336::t_94960579495484 46,119
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "c1fc146eec37ed3c29249f17cc3643443add038c",
+  "prompts": {},
+  "sessions": {
+    "s_ddb727ef76e336": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "8a6532b7-c424-4c2b-8890-ac967238790d",
+        "model": "claude-fable-5"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
