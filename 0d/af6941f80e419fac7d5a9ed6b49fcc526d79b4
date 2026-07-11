@@ -1,0 +1,21 @@
+plugins/kdev-memory/tests/test_brief_clamp.py
+  s_0d3c07cfe95666::t_aa37a4db750ada 1-70
+plugins/kdev-memory/hooks/lib/brief_clamp.py
+  s_0d3c07cfe95666::t_13059379276479 1-37
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "0daf6941f80e419fac7d5a9ed6b49fcc526d79b4",
+  "prompts": {},
+  "sessions": {
+    "s_0d3c07cfe95666": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "85a05d44-9776-4541-93fa-0cf8d2acd2b3",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
