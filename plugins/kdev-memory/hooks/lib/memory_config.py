@@ -11,6 +11,7 @@
 - distill.reminder_new_misalign: 3（默认）
 - rating.mode: model-only | user-opt-in | user-required  —— 评分模式（默认 user-opt-in）
 - brief.verbosity: compact | normal | verbose  —— SessionStart brief 详略（默认 normal）
+- brief.limit_current_step / brief.limit_pending_decisions / brief.limit_unresolved_gotchas —— brief 三字段长度闸阈值（默认 400 / 1200 / 800）
 
 支持两种语法：顶层 flat key（`distill_mode: auto`）和一层嵌套（`distill:` + 缩进 `mode: auto`）。
 parser 内部统一用 dot notation 存储（`distill.mode`）。
@@ -199,6 +200,30 @@ def read_distill_thresholds(kdev_dir: Path | str = ".kdev/memory") -> dict[str, 
             ("distill.reminder_new_misalign", "distill_reminder_new_misalign"),
             DEFAULT_DISTILL_REMINDER_NEW_MISALIGN,
         ),
+    }
+
+
+DEFAULT_BRIEF_LIMIT_CURRENT_STEP = 400
+DEFAULT_BRIEF_LIMIT_PENDING = 1200
+DEFAULT_BRIEF_LIMIT_UNRESOLVED = 800
+
+
+def read_brief_field_limits(kdev_dir: Path | str = ".kdev/memory") -> dict:
+    """读 brief 三字段长度闸阈值（current_step / pending_decisions / unresolved_gotchas）。
+
+    未配置 / 非法 → 各自默认（fail-open）。兼容 dot-key 与下划线 flat-key。
+    """
+    config = _read_config(kdev_dir)
+    return {
+        "current_step": _read_int_default(
+            config, ("brief.limit_current_step", "brief_limit_current_step"),
+            DEFAULT_BRIEF_LIMIT_CURRENT_STEP),
+        "pending_decisions": _read_int_default(
+            config, ("brief.limit_pending_decisions", "brief_limit_pending_decisions"),
+            DEFAULT_BRIEF_LIMIT_PENDING),
+        "unresolved_gotchas": _read_int_default(
+            config, ("brief.limit_unresolved_gotchas", "brief_limit_unresolved_gotchas"),
+            DEFAULT_BRIEF_LIMIT_UNRESOLVED),
     }
 
 
