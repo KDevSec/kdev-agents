@@ -1,0 +1,23 @@
+docs/superpowers/specs/2026-07-10-brief三字段长度闸-design.md
+  s_0d3c07cfe95666::t_49917476e6169c 173-175
+plugins/kdev-memory/CHANGELOG.md
+  s_0d3c07cfe95666::t_fc3d58cff92f13 3-20
+plugins/kdev-memory/tests/test_brief_verbosity.py
+  s_0d3c07cfe95666::t_0b4bd12c424dbc 120-130
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "3f47b3a2cbe004caba75aa26a4a3a3bcadeda18e",
+  "prompts": {},
+  "sessions": {
+    "s_0d3c07cfe95666": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "85a05d44-9776-4541-93fa-0cf8d2acd2b3",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
