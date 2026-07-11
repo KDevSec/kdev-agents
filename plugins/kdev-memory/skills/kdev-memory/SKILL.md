@@ -179,7 +179,7 @@ skill-feedback.md（F-NNN）的 `verbatim` 字段必须保留**用户原句**—
 
 **7. 方法论铁规.md（可选）** — 项目**自愿**在本项目内强制执行的硬规则。与改进建议.md 的区别：铁规是本项目执行的规则；改进建议是给下游 skill 作者的信号。
 
-**8. 当前状态.md（含 YAML frontmatter）**【重要】 — 工作状态的单一真相源。frontmatter 字段（`phase` / `iteration` / `current_step` / `last_updated` / `pending_decisions` / `unresolved_gotchas`）给 hook 脚本用，body 给人读。**每次完成 Step 都要顺手改** `current_step` + `last_updated`。
+**8. 当前状态.md（含 YAML frontmatter）**【重要】 — 工作状态的单一真相源。frontmatter 字段（`phase` / `iteration` / `current_step` / `last_updated` / `pending_decisions` / `unresolved_gotchas`）给 hook 脚本用，body 给人读。**每次完成 Step 都要顺手改** `current_step` + `last_updated`。 `current_step` 是**短指针**（只留最新 Step ID + 可选一句状态，禁止无界拼接旧里程碑）；`pending_decisions` / `unresolved_gotchas` 超阈值时把旧条目归档进 `每日汇总/`——三字段都被 SessionStart brief 每会话注入，长度闸会截断超限部分（见 2026-07-10-brief三字段长度闸 spec）。
 
 > 每类的完整格式、字段语义、设计意图、锁定铁规细节见 **`references/六类记录-schema.md`**。F-NNN 单独成档，见 **`references/skill-反馈通道-F.md`**。
 

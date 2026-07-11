@@ -63,6 +63,7 @@ When reading/writing `当前状态.md` frontmatter for the `current_step` value:
 - **IGNORE** YAML comment lines (lines starting with `#`). Users may add annotation comments like `# Step 20260613-101432-ly1989abc: ...` for their own bookkeeping — these are notes, NOT state.
 - Robust parse: `grep -E "^current_step:" 当前状态.md | head -1 | sed 's/^current_step:\s*//'` (Python equivalent if preferred).
 - v0.17: `current_step` 值为时间戳 Step ID（如 `Step 20260613-101432-ly1989abc`），不再是 `<slug>-N`。
+- **短指针铁规（brief 长度闸）**：`current_step` 只写**最新** Step ID（+可选 ≤ 一句状态），**严禁** `|【上一里程碑】` 式把旧里程碑叙事拼接进同一字段——该字段被 SessionStart brief 每会话全量注入，无界拼接会撑爆开局上下文（见 docs/superpowers/specs/2026-07-10-brief三字段长度闸-design.md）。
 
 ## Anti-laziness anchors
 
