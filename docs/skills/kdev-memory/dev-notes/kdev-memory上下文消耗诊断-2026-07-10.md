@@ -139,7 +139,7 @@ if state_pending:
 ### 7.4 对 §5 建议的修订
 
 1. **§5.1-1 泛化**：长度闸覆盖 current_step / pending_decisions / unresolved_gotchas 三字段，且 **normal 与 compact 两档都要过闸**，溢出给「更多见 X」指针。
-2. **§5.1-2 闸位前移**：写入侧（recorder / step 落盘）设阈值 WARN 或拒绝拼接，比注入侧更根治；注入侧长度闸作最后兜底。
+2. **§5.1-2 闸位（已被 spec 修正）**：⚠️ 已被 [2026-07-10-brief三字段长度闸 spec](../../../superpowers/specs/2026-07-10-brief三字段长度闸-design.md) §1 修订（R-009）——原设想「写入侧闸位前移更根治」**不成立**：三字段无 Python 写入路径（全靠 LLM 手写进 md），写入侧无确定性拦截点，只能 WARN 检测 + 文档约束；**注入侧长度闸才是唯一代码里确定生效的拦截点**。以 spec 为准。
 3. **§5.2 正面样板**：本仓 current_step（31 字符）即健康「短指针」态，可直接当样板。
 4. **token 估算偏乐观**：纯中文段 Claude tokenizer 常比 3–4 字符/token 更密，真实占比可能高于 40–54%（锚在 62k 实测总量，方向不翻）。
 
