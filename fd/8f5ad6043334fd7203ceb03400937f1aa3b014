@@ -1,0 +1,33 @@
+docs/superpowers/specs/2026-07-10-brief三字段长度闸-design.md
+  s_0d3c07cfe95666::t_2cd2088f273edd 138
+  s_0d3c07cfe95666::t_c526af99124e72 116
+  s_0d3c07cfe95666::t_ff806aa6042713 145
+  s_0d3c07cfe95666::t_b8b1a3c5bbedc9 77
+  s_0d3c07cfe95666::t_6617551e2aa9dc 1-76,78-115,117-137,139-144,146-181
+docs/superpowers/plans/2026-07-10-brief三字段长度闸.md
+  s_0d3c07cfe95666::t_fda76b298106c0 1-506
+docs/skills/kdev-memory/dev-notes/kdev-memory上下文消耗诊断-2026-07-10.md
+  s_0d3c07cfe95666::t_4a4ec1d83e81b0 56,62,101,103-145
+  s_0d3c07cfe95666::t_fceaa56fba84ff 53-55
+  s_0d3c07cfe95666::t_018b1a9229949e 57-61
+  s_0d3c07cfe95666::t_ceb8288dd22626 63-65,98-100
+  s_0d3c07cfe95666::t_efb1daca915d7e 102
+  s_0d3c07cfe95666::t_66ef17c0cbaa36 146-148
+  s_0d3c07cfe95666::t_c0a7d3ca454056 1-52,66-97
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "fd8f5ad6043334fd7203ceb03400937f1aa3b014",
+  "prompts": {},
+  "sessions": {
+    "s_0d3c07cfe95666": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "85a05d44-9776-4541-93fa-0cf8d2acd2b3",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
