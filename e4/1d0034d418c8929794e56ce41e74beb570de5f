@@ -1,0 +1,43 @@
+plugins/kdev-memory/hooks/lib/claude_md_lint.py
+  s_f1c2dcace7ab15::t_3b72b2c35e64bb 10
+  s_f1c2dcace7ab15::t_5bbb0369c6da67 42-43
+  s_f1c2dcace7ab15::t_710066c277effa 163
+plugins/kdev-memory/skills/kdev-memory/SKILL.md
+  s_f1c2dcace7ab15::t_1dbf5292a69a2b 47,51
+plugins/kdev-memory/.claude-plugin/plugin.json
+  s_f1c2dcace7ab15::t_600e1c68651a6b 4
+plugins/kdev-memory/CHANGELOG.md
+  s_f1c2dcace7ab15::t_b79be3cc09f5bb 3-21
+plugins/kdev-memory/skills/kdev-memory/references/初始化-claude-md-模板.md
+  s_f1c2dcace7ab15::t_6383205b5739c3 21
+  s_f1c2dcace7ab15::t_0d8b2e664b2244 138
+  s_f1c2dcace7ab15::t_a3bf60c74a75df 86,88,94
+  s_f1c2dcace7ab15::t_966411c6d67f4a 7
+  s_f1c2dcace7ab15::t_42dcd3526df89e 95
+CLAUDE.md
+  s_f1c2dcace7ab15::t_1fbd9186f10c6d 6,8,14
+  s_f1c2dcace7ab15::t_f2ed5cd222ad09 15
+plugins/kdev-memory/hooks/session-start-brief.py
+  s_f1c2dcace7ab15::t_70b9595a73c1cc 629-633
+plugins/kdev-memory/tests/test_claude_md_lint.py
+  s_f1c2dcace7ab15::t_fd0e958656206e 187-204
+  s_f1c2dcace7ab15::t_2ebd7036866e56 310
+  s_f1c2dcace7ab15::t_26be7fd091f9df 57,61
+  s_f1c2dcace7ab15::t_59bc6846e328ca 160-161
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.12",
+  "base_commit_sha": "e41d0034d418c8929794e56ce41e74beb570de5f",
+  "prompts": {},
+  "sessions": {
+    "s_f1c2dcace7ab15": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "7c1b317e-b203-4f5c-86a2-299fba6b3765",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
