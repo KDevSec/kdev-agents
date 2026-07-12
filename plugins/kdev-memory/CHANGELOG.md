@@ -1,5 +1,23 @@
 # kdev-memory CHANGELOG
 
+## [0.23.0] - 2026-07-12
+
+**他评溯源抗并发（`.current-transcript` 单槽竞争修复）+ 模板自洽性加固**——修 G 20260708-215209 的 2026-07-12 复现根因：`.current-transcript` 是每 repo 单槽全局指针、无会话隔离，同 repo **并发多会话**时互相覆盖，导致 recorder 他评溯源读到并发的另一会话（且 `switched=False`、内容有效可读 → 老越界守卫拦不住、静默错评）。改为**内容校验 + 自动恢复**，而非改 dispatch 契约。全程 TDD，619 passed（+6 新）。
+
+### ✨ 内容校验 + 并发错会话自动恢复
+- `transcript_source.py` 新 `resolve_marker_verified(state_dir, anchors, projects_dir=None)`：用 recorder 手里的 `commit_shas` 当锚验证解出的 transcript **确实含本次 commit**；不含 → 扫 projects 目录兄弟 `*.jsonl` **恢复**到真正含锚的会话（`recovered=True, since_offset=0`），多命中取最新 mtime 标歧义，无命中 → **显式降级**（`degraded=True`）。`anchors` 空（zero-commit step）→ 退回裸 `resolve_marker`，向后兼容。
+- `agents/kdev-step-recorder.md`：取范围步骤改用 `resolve_marker_verified` 传 `commit_shas`；`recovered` 时回报加 `ℹ️ 指针曾指向并发/错误会话，已恢复`；`degraded` 纳入既有"他评降级为自评"显式标注（不静默）。
+- **修法取舍**：不改下游 dispatch 契约、不加 session_id 隔离——纯 recorder 侧内容校验（正是本次 recorder 人肉交叉核对的制度化），blast radius 最小；并发下也能恢复正确会话做他评。
+
+### 🛡️ 模板自洽性加固（pre-existing gap）
+- `tests/test_claude_md_lint.py` 加 `TestTemplateSelfConsistency`：参考文档的 ```markdown 模板正文必须满足自身 frontmatter 声明的 contract（4 条铁规主题 + hook tag 全含），并断言契约恰含 4 条 cross_session_rule（含"记忆分流"）。捕捉"编辑模板漏主题 / 改契约没同步正文"的漂移——此前无测试拦。
+
+### 🔒 正确性守恒
+- `commit_shas` 非空的正常 Step：验证通过即 `verified`、行为不变；只有指针被并发覆盖时才触发恢复。zero-commit step 退回老路径。611+2 基线原样通过。
+
+### 📌 升级须知
+- 本版改了 hook/lib + agent，需**刷新 marketplace** 才激活（G-004）。
+
 ## [0.22.0] - 2026-07-12
 
 **记忆分流第 4 条铁规**——堵产品级缺陷：agent 把项目工程事实误写进 host 内建记忆（`~/.claude/**/memory/`）而非 `.kdev/memory/`。把分流做成第 4 条贯穿 session 铁规主题，经现成 契约/lint/merge/brief 机制传播到所有新旧下游安装。默认制（非绝对）：项目工程记录→`.kdev/memory/`，仅跨项目/所有项目通用规则或用户身份→host 内建。forward-port 自姊妹制度 ieidev-team（commit 3569763）。全程 TDD，613 passed（+2 新）。

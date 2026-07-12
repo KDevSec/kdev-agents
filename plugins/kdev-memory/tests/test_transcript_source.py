@@ -62,6 +62,70 @@ def test_resolve_switched_session_resets_offset_to_zero(tmp_path):
     assert m["switched"] is True
 
 
+# ---- resolve_marker_verified：内容校验 + 并发错会话自动恢复（修 .current-transcript 单槽竞争）----
+
+def _write_jsonl(path: Path, *lines: str) -> None:
+    path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+
+
+def test_verified_pointer_contains_anchor(tmp_path):
+    """指针指向的会话内容含 commit 锚 → 采信、不恢复。"""
+    sd = _sd(tmp_path)
+    proj = tmp_path / "proj"; proj.mkdir()
+    good = proj / "sess-A.jsonl"
+    _write_jsonl(good, '{"t":"[main abc1234] feat: x"}')
+    ts.stash_current_transcript(sd, str(good))
+    m = ts.resolve_marker_verified(sd, ["abc1234"], projects_dir=proj)
+    assert m["transcript_path"] == str(good)
+    assert m["verified"] is True
+    assert m["recovered"] is False
+    assert m["degraded"] is False
+
+
+def test_recover_when_pointer_points_at_concurrent_wrong_session(tmp_path):
+    """核心场景：指针被并发会话覆盖成 sess-B（不含本次 commit），扫兄弟恢复到真正含锚的 sess-A。"""
+    sd = _sd(tmp_path)
+    proj = tmp_path / "proj"; proj.mkdir()
+    real = proj / "sess-A.jsonl"
+    other = proj / "sess-B.jsonl"
+    _write_jsonl(real, '{"t":"[main e41d003] feat: 记忆分流"}')
+    _write_jsonl(other, '{"t":"取证调研 无关内容"}')
+    ts.stash_current_transcript(sd, str(other))          # 指针被并发会话 B 覆盖
+    m = ts.resolve_marker_verified(sd, ["e41d003"], projects_dir=proj)
+    assert m["transcript_path"] == str(real)             # 恢复到含锚的真会话
+    assert m["recovered"] is True
+    assert m["switched"] is True
+    assert m["since_offset"] == 0                         # 恢复会话从头读
+    assert m["degraded"] is False
+
+
+def test_degrade_when_no_transcript_has_anchor(tmp_path):
+    """无任何会话含该 commit 锚（如 transcript 尚未落盘）→ 显式降级、不静默采信错会话。"""
+    sd = _sd(tmp_path)
+    proj = tmp_path / "proj"; proj.mkdir()
+    other = proj / "sess-B.jsonl"
+    _write_jsonl(other, '{"t":"无关"}')
+    ts.stash_current_transcript(sd, str(other))
+    m = ts.resolve_marker_verified(sd, ["deadbee"], projects_dir=proj)
+    assert m["degraded"] is True
+    assert m["verified"] is False
+    assert m["recovered"] is False
+
+
+def test_empty_anchors_falls_back_to_resolve_marker(tmp_path):
+    """无 commit 锚（zero-commit step）→ 退回裸 resolve_marker、向后兼容、标 unverified。"""
+    sd = _sd(tmp_path)
+    proj = tmp_path / "proj"; proj.mkdir()
+    cur = proj / "sess-C.jsonl"
+    _write_jsonl(cur, '{"t":"x"}')
+    ts.stash_current_transcript(sd, str(cur))
+    m = ts.resolve_marker_verified(sd, [], projects_dir=proj)
+    assert m["transcript_path"] == str(cur)
+    assert m["verified"] is False
+    assert m["recovered"] is False
+    assert m["degraded"] is False
+
+
 # ---- hook 集成：UserPromptSubmit / SessionStart 写 .current-transcript ----
 
 import json as _json          # noqa: E402

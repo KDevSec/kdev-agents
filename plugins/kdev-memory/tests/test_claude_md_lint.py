@@ -350,5 +350,50 @@ class TestExtractByMarker(unittest.TestCase):
         self.assertNotIn("外部章节", section)
 
 
+_TEMPLATE_DOC = (
+    Path(__file__).resolve().parents[1]
+    / "skills" / "kdev-memory" / "references" / "初始化-claude-md-模板.md"
+)
+
+
+def _extract_fenced_template_body(doc_text: str) -> str:
+    """从参考文档抽出实际贴进下游 CLAUDE.md 的 ```markdown 模板块（含 BEGIN/END marker 的那段）。"""
+    import re
+    for m in re.finditer(r"```markdown\n(.*?)\n```", doc_text, re.DOTALL):
+        block = m.group(1)
+        if "BEGIN kdev-memory:智能体自动记录规则" in block:
+            return block
+    return ""
+
+
+class TestTemplateSelfConsistency(unittest.TestCase):
+    """加固：参考文档的模板正文必须满足它自己 frontmatter 声明的 contract。
+
+    捕捉两种漂移：① 编辑模板正文时漏掉某条贯穿铁规主题；② 改 frontmatter 契约
+    （加 hook tag / 铁规主题）却没同步模板正文。任一发生 → 下游新装项目的 CLAUDE.md
+    从落地起就缺护栏，且无任何测试拦——本测试就是那道拦。
+    """
+
+    def test_template_body_satisfies_own_contract(self):
+        doc = _TEMPLATE_DOC.read_text(encoding="utf-8")
+        contract = claude_md_lint.parse_contract(doc)
+        self.assertIsNotNone(contract, "参考文档 frontmatter 缺 claude_md_contract")
+        body = _extract_fenced_template_body(doc)
+        self.assertTrue(body, "没在参考文档里找到含 BEGIN marker 的 ```markdown 模板块")
+        r = claude_md_lint.check_drift(contract, body)
+        self.assertFalse(
+            r["drift"],
+            "模板正文与自身 contract 漂移："
+            f"missing_themes={[t for t, _ in r['missing_rule_themes']]} "
+            f"missing_tags={r['missing_hook_tags']} missing_files={r['missing_hook_files']}",
+        )
+
+    def test_contract_declares_four_cross_session_rules(self):
+        """契约必须含 4 条贯穿铁规（记忆分流是第 4 条）——防有人误删回 3 条。"""
+        contract = claude_md_lint.parse_contract(_TEMPLATE_DOC.read_text(encoding="utf-8"))
+        self.assertEqual(len(contract["cross_session_rules"]), 4)
+        self.assertTrue(any("记忆分流" in r for r in contract["cross_session_rules"]))
+
+
 if __name__ == "__main__":
     unittest.main()
