@@ -14,6 +14,11 @@ KDev-agents 文档总索引。按"属于什么"分三层：
 - 架构：[framework/01-design/2026-04-15-02-KDev架构设计v3.0.2修订.md](framework/01-design/2026-04-15-02-KDev架构设计v3.0.2修订.md)
 - 开发方法论：[meta/skill-开发通用流程.md](meta/skill-开发通用流程.md)
 
+**工程记忆蒸馏沉淀（2026-07-10 首次 promote，长效项目资产）**：
+- 架构决策记录：[framework/架构决策日志-ADR.md](framework/架构决策日志-ADR.md) — 23 条 ADR + 决策演进/取代链
+- 踩坑索引：[framework/踩坑索引.md](framework/踩坑索引.md) — 13 条速查，「先核代码再信设计」案例群领衔
+- 方法论反思：[meta/方法论沉淀-实战反思.md](meta/方法论沉淀-实战反思.md) — 5 条可操作规则，R-009 领衔
+
 **已实现的 skill**：
 - [skills/kdev-memory/](skills/kdev-memory/) — 工程记忆插件
 - [skills/kdev-commit/](skills/kdev-commit/) — AI commit + push 插件（文档待补）
