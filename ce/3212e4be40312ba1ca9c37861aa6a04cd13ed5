@@ -1,0 +1,19 @@
+docs/superpowers/specs/2026-07-12-记忆分流-默认kdev-host内建carve-out-design.md
+  s_f1c2dcace7ab15::t_1c3a7e48772fdf 1-65
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.12",
+  "base_commit_sha": "ce3212e4be40312ba1ca9c37861aa6a04cd13ed5",
+  "prompts": {},
+  "sessions": {
+    "s_f1c2dcace7ab15": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "7c1b317e-b203-4f5c-86a2-299fba6b3765",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
