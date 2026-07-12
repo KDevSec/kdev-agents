@@ -44,10 +44,11 @@ skill-feedback.md（F-NNN）的 `verbatim` 字段必须保留**用户原句**—
 
 ## 核心运作原则：实时落盘 + 汇总只读文件（极其重要）
 
-这是本 skill 最关键的机制，任何使用者都必须理解。**这 3 条是"贯穿 session 的铁规"**——需要 Claude 下意识时刻在场遵守，因此它们是唯一会落到项目 `CLAUDE.md` 的内容（其他 skill 细节都留在 SKILL.md / references/，用户召唤时按需读）。
+这是本 skill 最关键的机制，任何使用者都必须理解。**这 4 条是"贯穿 session 的铁规"**——需要 Claude 下意识时刻在场遵守，因此它们是唯一会落到项目 `CLAUDE.md` 的内容（其他 skill 细节都留在 SKILL.md / references/，用户召唤时按需读）。
 
 - 🔴 实时落盘
 - 🔴 文件聚合不翻会话
+- 🔴 记忆分流（工程记录默认写 `.kdev/memory/`，仅跨项目/所有项目通用规则或用户身份才写 host 内建 `~/.claude`）
 - 🔴 优先处理 hook 产出（WARN / brief / recall / checkpoint）
 
 完整模板见 `references/初始化-claude-md-模板.md`。

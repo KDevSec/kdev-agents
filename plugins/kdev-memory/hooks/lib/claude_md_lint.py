@@ -7,7 +7,7 @@ CLAUDE.md 接口契约 lint
 顶部 frontmatter）vs 项目的 `CLAUDE.md`，检测接口级漂移。
 
 **设计原则**：
-- 只扫"接口"层（hook 注入标签 / hook 产出文件模式 / 3 条贯穿 session 铁规）
+- 只扫"接口"层（hook 注入标签 / hook 产出文件模式 / 4 条贯穿 session 铁规）
 - 不扫"实现"层（schema / 评分机制 / 编号规则 等 —— 这些不在契约里）
 - 纯字面子串匹配 + 主题关键词匹配 —— 不做语义理解
 - 无外部依赖（YAML 简易自解析；不 import yaml）
@@ -39,6 +39,8 @@ RULE_THEME_KEYWORDS = {
     "实时落盘": ["实时落盘", "立刻追加", "立即追加", "每做完一步", "持续追加"],
     "文件聚合不翻会话": ["文件聚合", "不翻会话", "从 .kdev/memory/", "不要翻会话", "不翻会话上下文"],
     "优先处理 hook 产出": ["优先处理", "hook 产出", "WARN", "kdev-memory-brief", "kdev-memory-recall"],
+    # 分流规则独有词——刻意不含 ".kdev/memory"（前 3 铁规都提它，会假阳性放过缺分流的项目）
+    "记忆分流": ["~/.claude", "内建记忆", "host 内建", "跨项目", "所有项目"],
 }
 
 # marker 切块（v0.18 / spec-kit 风格托管块）——与 claude_md_merge 对齐，本文件自包含不 import
@@ -158,7 +160,7 @@ def check_drift(contract: dict[str, list[str]], kdev_section: str) -> dict[str, 
         f for f in contract.get("hook_file_patterns", []) if not _file_pattern_matches(f, kdev_section)
     ]
 
-    # 3 条铁规：每条只要任一主题关键词命中就算存在
+    # 4 条铁规：每条只要任一主题关键词命中就算存在
     missing_themes: list[tuple[str, list[str]]] = []
     for theme, keywords in RULE_THEME_KEYWORDS.items():
         if not any(kw in kdev_section for kw in keywords):

@@ -54,10 +54,11 @@ FULL_KDEV_SECTION = """# project
 
 ## 智能体自动记录规则
 
-### 3 条铁规
+### 4 条铁规
 
 🔴 实时落盘到 .kdev/memory/
 🔴 文件聚合不翻会话
+🔴 记忆分流：工程记录默认写 .kdev，仅跨项目/所有项目通用才写 host 内建 ~/.claude
 🔴 优先处理 hook 产出：
 - `.kdev/memory/WARN-未记录-*.md`
 - `<kdev-memory-brief>` 注入
@@ -156,8 +157,8 @@ class TestCheckDrift(unittest.TestCase):
             "hook_file_patterns": ["path/X"],
             "cross_session_rules": [],
         }
-        # 3 个主题都用关键词命中
-        section = "<tag> and path/X here. 实时落盘 + 文件聚合 + 优先处理"
+        # 4 个主题都用关键词命中（含分流主题的独有词 ~/.claude）
+        section = "<tag> and path/X here. 实时落盘 + 文件聚合 + 优先处理 + 跨项目才写 ~/.claude"
         r = claude_md_lint.check_drift(contract, section)
         self.assertFalse(r["drift"])
 
@@ -182,6 +183,24 @@ class TestCheckDrift(unittest.TestCase):
         missing_themes = [t for t, _ in r["missing_rule_themes"]]
         self.assertIn("文件聚合不翻会话", missing_themes)
         self.assertIn("优先处理 hook 产出", missing_themes)
+
+    def test_missing_memory_routing_theme_flagged(self):
+        """分流主题：CLAUDE.md 有前 3 铁规但无分流规则独有词 → 漂移报出「记忆分流」。"""
+        contract = {"hook_injection_tags": [], "hook_file_patterns": [], "cross_session_rules": []}
+        section = "实时落盘 文件聚合不翻会话 优先处理 hook 产出——但没写记忆分流规则"
+        r = claude_md_lint.check_drift(contract, section)
+        missing = [t for t, _ in r["missing_rule_themes"]]
+        self.assertIn("记忆分流", missing)
+
+    def test_memory_routing_theme_present_not_flagged(self):
+        """含分流规则独有词（~/.claude / 跨项目 等）→ 不报「记忆分流」漂移。
+        关键词刻意不含 .kdev/memory（太common、别的铁规也提，会假阳性放过）。"""
+        contract = {"hook_injection_tags": [], "hook_file_patterns": [], "cross_session_rules": []}
+        section = ("实时落盘 文件聚合不翻会话 优先处理 hook 产出。"
+                   "工程记录默认写 .kdev，仅跨项目/所有项目通用才写 host 内建 ~/.claude")
+        r = claude_md_lint.check_drift(contract, section)
+        missing = [t for t, _ in r["missing_rule_themes"]]
+        self.assertNotIn("记忆分流", missing)
 
 
 class TestRunLint(unittest.TestCase):
@@ -288,6 +307,7 @@ class TestExtractByMarker(unittest.TestCase):
             "## 智能体自动记录规则\n"
             "🔴 实时落盘到 .kdev/memory/\n"
             "🔴 文件聚合不翻会话\n"
+            "🔴 记忆分流：默认写 .kdev，仅跨项目才写 host 内建 ~/.claude\n"
             "🔴 优先处理 hook 产出：\n"
             "- `<kdev-memory-brief>` 注入\n"
             "- `<kdev-memory-recall>` 注入\n"

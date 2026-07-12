@@ -626,9 +626,11 @@ def main() -> int:
         except OSError:
             pass
 
-    if not brief.strip():
-        print(SUPPRESS)
-        return 0
+    # 分流提醒 always-on（每会话一短行）：对抗 host 内建 `# Memory` 抢记录——即使 brief
+    # 其余为空也显示，让「工程记忆写 .kdev、不误写 host 内建」时刻在场。见记忆分流铁规。
+    routing_reminder = ("📌 工程记忆默认写 `.kdev/memory/`；"
+                        "仅跨项目/所有项目通用规则或用户身份才写 host 内建 `~/.claude`。")
+    brief = f"{brief}\n\n{routing_reminder}" if brief.strip() else routing_reminder
 
     full = f"<kdev-memory-brief>\n{brief}\n</kdev-memory-brief>"
 

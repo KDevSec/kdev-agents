@@ -1,5 +1,24 @@
 # kdev-memory CHANGELOG
 
+## [0.22.0] - 2026-07-12
+
+**记忆分流第 4 条铁规**——堵产品级缺陷：agent 把项目工程事实误写进 host 内建记忆（`~/.claude/**/memory/`）而非 `.kdev/memory/`。把分流做成第 4 条贯穿 session 铁规主题，经现成 契约/lint/merge/brief 机制传播到所有新旧下游安装。默认制（非绝对）：项目工程记录→`.kdev/memory/`，仅跨项目/所有项目通用规则或用户身份→host 内建。forward-port 自姊妹制度 ieidev-team（commit 3569763）。全程 TDD，613 passed（+2 新）。
+
+### ✨ 第 4 条 cross_session_rule 主题：记忆分流
+- `references/初始化-claude-md-模板.md`：frontmatter `cross_session_rules` 加分流条 + 正文铁规段「3 条」→「4 条」+ 实时落盘后插 🔴 分流规则 + bump `version_hint`（注明 2026-07-12 契约新增该主题、老项目缺则 lint 提醒补、有 marker 走 merge 自动推）。
+- `hooks/lib/claude_md_lint.py`：`RULE_THEME_KEYWORDS` 加 `"记忆分流"` 主题，关键词取分流独有词 `["~/.claude","内建记忆","host 内建","跨项目","所有项目"]`——**刻意不含 `.kdev/memory`**（前 3 铁规都提它，纳入会假阳性放过缺分流的老项目）。
+- `hooks/session-start-brief.py`：`main()` 尾把「空 brief → SUPPRESS」改 always-on 一行分流提醒（`📌 工程记忆默认写 .kdev/memory/…`），对抗 host `# Memory` 高显著性抢记录；置于 ieidev 让位守卫之后（让位项目不受影响）。
+- `SKILL.md`：「这 3 条」→「4 条」+ bullet 加分流条。
+
+### ✅ TDD
+- `tests/test_claude_md_lint.py`：加缺分流独有词→drift 报「记忆分流」/ 含独有词→不报 两用例；修 `FULL_KDEV_SECTION`、check_drift 全命中正例、marker 抽块正例补分流词。
+
+### 🔒 正确性守恒
+- 已含分流独有词的 CLAUDE.md（含本仓 dogfood）不被 lint 报漂移；ieidev 让位项目 brief 全静默不变；其余 611 基线原样通过。
+
+### 📌 升级须知
+- 本版改了 hook/lib，需**刷新 marketplace** 才激活（G-004）——否则下游 cache stale、新 lint 主题与 brief 提醒传播不出去。
+
 ## [0.21.0] - 2026-07-10
 
 **brief 三字段长度闸**——SessionStart brief 对 `current_step` / `pending_decisions` / `unresolved_gotchas` 三个 verbatim 无界注入字段加长度闸（分字段阈值 400/1200/800，超限头部保留+尾部折叠指针），防撑爆每会话开局上下文；字段超 2× 阈值时 P1 WARN 催归档。全程 TDD，611 passed。

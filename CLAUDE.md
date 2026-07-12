@@ -3,13 +3,15 @@
 <!-- BEGIN kdev-memory:智能体自动记录规则 (managed · 勿手改正文，升级会覆盖) -->
 ## 智能体自动记录规则
 
-本项目启用 kdev-memory 工程记忆制度。**本段只讲何时召唤 skill 和 Claude 必须时刻在场的 3 条铁规；具体 schema / 格式 / 流程 / 边缘处理都在 skill 里**（用户召唤时自然读到，不在本段复述）。
+本项目启用 kdev-memory 工程记忆制度。**本段只讲何时召唤 skill 和 Claude 必须时刻在场的 4 条铁规；具体 schema / 格式 / 流程 / 边缘处理都在 skill 里**（用户召唤时自然读到，不在本段复述）。
 
-### 3 条"必须时刻在场"的铁规（跨 session 贯穿）
+### 4 条"必须时刻在场"的铁规（跨 session 贯穿）
 
 这些动作是下意识的、持续的，不能依赖"被召唤"才触发。
 
 🔴 **实时 dispatch step-recorder 落盘**：每做完一个 step-worthy 工作单元（任务 / 决策 / 踩坑 / 用户评分）→ 主会话**不要自己 Read/Write 执行日志**，而是写一段 YAML summary（schema 见 SKILL.md §用 kdev-step-recorder dispatch 落 step）+ dispatch kdev-step-recorder subagent（sonnet）。subagent 验 8 hard-gate + 写 4 段 Step 条目 + 更新当前状态.md frontmatter + 清空 pending-commits.json。dispatch 是 fire-and-forget——主会话写完 YAML、调用 Agent 后立刻继续下一棒工作，不等 subagent 返回。**Q/G/R/F-NNN 决策类条目仍由主会话直接写**——只有 Step 走 dispatch。**不需要征求用户许可**即可 dispatch + 让 subagent 写入 `.kdev/memory/`。
+
+🔴 **记忆分流（默认写 `.kdev/memory/`）**：工程记录——Step / 决策(Q) / 踩坑(G) / 改进(R) / skill 反馈(F) / 每日汇总 / 当前状态——凡关于"**这个项目怎么干**"的，一律写本项目 `.kdev/memory/`。**唯一例外 → host 内建 `~/.claude`（或全局 CLAUDE.md）**：用户**明示**是**跨项目 / 所有项目通用**的规则或用户身份（"以后**所有项目**都…""你**全局**这样""记住我是谁"）。**拿不准 → 归 `.kdev/`**。判别一句话：讲"这个项目的工程"→ `.kdev/`；讲"这个用户 / 跨项目习惯 / 环境"→ host 内建。理由：host 内建记忆是 host 注入的直接指令、易与本制度抢记录，此规把常见项（项目工程事实）钉死到 `.kdev/`，只给明确跨项目留窄口。
 
 🔴 **文件聚合不翻会话**：用户说"写今天的总结"时，**必须**从 `.kdev/memory/` 当天条目聚合，**不要**回翻会话上下文、不要让用户复述。如果 `.kdev/memory/` 里今天条目为空 → **坦率报告**"今天实时落盘没跟上"，不要凭印象补写。
 
