@@ -1,0 +1,5 @@
+# 运行产物 / 缓存（不进仓）
+__pycache__/
+*.pyc
+.pytest_cache/
+scripts/reports/

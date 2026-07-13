@@ -1,0 +1,10 @@
+{
+  "name": "kdev-zentao-sync",
+  "description": "把 kdev 字段化测试用例 .md 与 defects_*.csv 同步进禅道（ZenTao）：导入用例到库、创建测试单并关联用例、提 BUG；另含两项只读能力——查询 BUG 状态（query-bugs）、回归判定（regress-bugs：已修复 bug × junit 结果对照出报告、不写回）。用例+bug+查询+回归走纯 API，测试单走 /browse；仅标准库 + 默认 dry-run",
+  "version": "0.1.0",
+  "author": {
+    "name": "ly"
+  },
+  "license": "MIT",
+  "keywords": ["zentao", "bug", "testcase", "sync", "regression", "junit", "skill", "kdev"]
+}
