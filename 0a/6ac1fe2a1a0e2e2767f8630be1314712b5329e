@@ -1,0 +1,37 @@
+plugins/kdev-memory/hooks/lib/transcript_extract.py
+  s_3ae8861f068042::t_8dbdb6d95c8c83 74-79,82,93
+  s_3ae8861f068042::t_b1d2003ae4a5e3 36,40
+plugins/kdev-memory/tests/test_transcript_extract.py
+  s_3ae8861f068042::t_b5d7e873c5ec99 113-138
+plugins/kdev-memory/hooks/session-start-brief.py
+  s_3ae8861f068042::t_227d7b19c5c3c4 62-69
+plugins/kdev-memory/hooks/user-prompt-trigger.py
+  s_3ae8861f068042::t_69d35f3e521cb5 48-58
+plugins/kdev-memory/agents/kdev-step-recorder.md
+  s_3ae8861f068042::t_8dbda16916ae16 136,138,141
+plugins/kdev-memory/.claude-plugin/plugin.json
+  s_3ae8861f068042::t_c3a65e0ff8b378 4
+plugins/kdev-memory/hooks/lib/transcript_source.py
+  s_3ae8861f068042::t_fd62f67a0ef55f 1-70
+plugins/kdev-memory/tests/test_transcript_source.py
+  s_3ae8861f068042::t_dfbafa70412cdf 63-93
+  s_3ae8861f068042::t_77fada82beca56 1-62
+plugins/kdev-memory/CHANGELOG.md
+  s_3ae8861f068042::t_51c662167b7f58 3-27
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "0a6ac1fe2a1a0e2e2767f8630be1314712b5329e",
+  "prompts": {},
+  "sessions": {
+    "s_3ae8861f068042": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "cafa9883-fca2-4dbc-b226-b1a4858a867f",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}

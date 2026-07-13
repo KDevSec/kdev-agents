@@ -1,0 +1,22 @@
+plugins/kdev-memory/hooks/pre-compact-check.py
+  s_7911c9068c7c15::t_b2d60b431621be 6,8-10,13-18
+  s_7911c9068c7c15::t_153d7af2a795dc 124-125,127-128,130,132-134,136-137,151-172,175,177-178,183,185-188
+plugins/kdev-memory/tests/test_dualread_readers.py
+  s_7911c9068c7c15::t_b23d5e01ef576f 414-486
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.4",
+  "base_commit_sha": "8f91d47df6f30c8f632fe398ebcef48206c2780a",
+  "prompts": {},
+  "sessions": {
+    "s_7911c9068c7c15": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "dae659e8-6a74-493c-aecd-8c1c67aece9a",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}

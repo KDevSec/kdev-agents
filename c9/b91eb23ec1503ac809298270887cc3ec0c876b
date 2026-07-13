@@ -1,0 +1,30 @@
+plugins/kdev-memory/tests/test_distill.py
+  s_3ae8861f068042::t_2a46ef20175a84 555-635
+plugins/kdev-memory/hooks/lib/distill.py
+  s_3ae8861f068042::t_a6f175e7711b11 134
+  s_3ae8861f068042::t_8d136f5ec2936f 157
+  s_3ae8861f068042::t_9039130ceea1c6 40
+  s_3ae8861f068042::t_b920171c94f4a6 361-366,377-385
+  s_3ae8861f068042::t_3c8611f86b3f4a 87-103
+  s_3ae8861f068042::t_0db3580a41915b 465
+plugins/kdev-memory/CHANGELOG.md
+  s_3ae8861f068042::t_72b193cf8ff727 3-20
+plugins/kdev-memory/.claude-plugin/plugin.json
+  s_3ae8861f068042::t_aaffe685cc7699 4
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "c9b91eb23ec1503ac809298270887cc3ec0c876b",
+  "prompts": {},
+  "sessions": {
+    "s_3ae8861f068042": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "cafa9883-fca2-4dbc-b226-b1a4858a867f",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}

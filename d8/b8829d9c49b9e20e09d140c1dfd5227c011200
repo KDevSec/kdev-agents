@@ -1,0 +1,52 @@
+plugins/kdev-memory/skills/kdev-memory/references/六类记录-schema.md
+  s_7911c9068c7c15::t_ec965e20d5e5f1 142,144-150
+  s_7911c9068c7c15::t_e8a138cbfd2c63 263
+plugins/kdev-memory/skills/kdev-memory/SKILL.md
+  s_7911c9068c7c15::t_476d9a4c3ee0c9 3
+  s_7911c9068c7c15::t_f4d17a6ee8a7bc 543-545
+  s_7911c9068c7c15::t_f9f4d2d2fe0d19 207
+  s_7911c9068c7c15::t_29e25751ab1998 158-159
+  s_7911c9068c7c15::t_9bdef83cee0227 64,66,69-73,76
+  s_7911c9068c7c15::t_5b6716106046aa 334
+  s_7911c9068c7c15::t_5dcc5f58027769 354
+  s_7911c9068c7c15::t_bf59bb1733cfb8 466
+  s_7911c9068c7c15::t_3b672dc7b104ab 449
+  s_7911c9068c7c15::t_20d44c6bad1763 291
+  s_7911c9068c7c15::t_43e512337c7325 172
+plugins/kdev-memory/skills/kdev-memory/references/切档与归档.md
+  s_7911c9068c7c15::t_d0daaa8493b489 20
+  s_7911c9068c7c15::t_7b08f6d9235715 93
+  s_7911c9068c7c15::t_9d4b64ef91b149 30
+  s_7911c9068c7c15::t_2053e56eb5e6a5 3-4
+  s_7911c9068c7c15::t_e76f99be74ab7a 54,58-60,65,67,72,74
+  s_7911c9068c7c15::t_bd208382f4c051 46
+plugins/kdev-memory/skills/kdev-memory/references/markdown-切片导出.md
+  s_7911c9068c7c15::t_0ba2bab0fd700a 16
+  s_7911c9068c7c15::t_a7164796e11adc 29
+  s_7911c9068c7c15::t_922d1b9ac10db5 10,12,14
+  s_7911c9068c7c15::t_c0e843e013639e 7
+  s_7911c9068c7c15::t_d307c456b16d9f 52
+  s_7911c9068c7c15::t_16e0e1f7d53233 108,114-115
+  s_7911c9068c7c15::t_035b64cc7dc8ac 167
+plugins/kdev-memory/skills/kdev-memory/references/自动化机制-hooks.md
+  s_7911c9068c7c15::t_9823d54c863172 117,119
+  s_7911c9068c7c15::t_3fa1e47a0a0a97 46
+docs/superpowers/specs/2026-06-13-P-C2-JSONL操作层+token优化-design.md
+  s_7911c9068c7c15::t_82219bf907fadc 16-33
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.13",
+  "base_commit_sha": "d8b8829d9c49b9e20e09d140c1dfd5227c011200",
+  "prompts": {},
+  "sessions": {
+    "s_7911c9068c7c15": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "dae659e8-6a74-493c-aecd-8c1c67aece9a",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}

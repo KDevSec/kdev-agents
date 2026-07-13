@@ -1,0 +1,22 @@
+plugins/kdev-memory/hooks/run-python-hook.cmd
+  s_7911c9068c7c15::t_883b56b73ebd33 3-8
+  s_7911c9068c7c15::t_d4ca6c8fcf060e 12,20-23
+plugins/kdev-memory/.gitattributes
+  s_7911c9068c7c15::t_a4240692863395 1-2
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.4",
+  "base_commit_sha": "9cfc7a5b642c380f377ffaa4f1c8e2b357db8776",
+  "prompts": {},
+  "sessions": {
+    "s_7911c9068c7c15": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "dae659e8-6a74-493c-aecd-8c1c67aece9a",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}

@@ -1,0 +1,27 @@
+plugins/kdev-hud/commands/kdev-hud-setup.md
+  s_22525fa85bc62d::t_f47cf5a58b4a01 1-37
+plugins/kdev-hud/.claude-plugin/plugin.json
+  s_22525fa85bc62d::t_f082f171c4800f 7
+  s_22525fa85bc62d::t_6e70b49927b722 4
+plugins/kdev-hud/README.md
+  s_22525fa85bc62d::t_47d336159d16a6 19-43
+  s_22525fa85bc62d::t_6e451ba4355390 69-80
+plugins/kdev-hud/CHANGELOG.md
+  s_22525fa85bc62d::t_8e5e7fd3b791f6 3-8
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.8",
+  "base_commit_sha": "28927cdba52da0d5a9ceb8cda83b9fdbb5f0ab24",
+  "prompts": {},
+  "sessions": {
+    "s_22525fa85bc62d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "cfb5df2e-492b-4de8-b078-5b523b8b5ac4",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}

@@ -1,0 +1,41 @@
+docs/framework/踩坑索引.md
+  s_b18e7754019887::t_5e2943bf2331d4 1-200
+docs/meta/方法论沉淀-实战反思.md
+  s_b18e7754019887::t_5052b3e7175c01 1-97
+docs/README.md
+  s_479f5c2e5c44db::t_26a80e82f3e860 17-21
+docs/framework/架构决策日志-ADR.md
+  s_6ddf3d2390d6cb::t_098363a64a411c 1-254
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.12",
+  "base_commit_sha": "108d503cb3e0b6166243e42cc58bb34f34547d16",
+  "prompts": {},
+  "sessions": {
+    "s_479f5c2e5c44db": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "6c28b44e-7d79-468a-a2a9-0788f246f6c2",
+        "model": "unknown"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    },
+    "s_6ddf3d2390d6cb": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "agent-aa10dc7fe5acec1ff",
+        "model": "unknown"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    },
+    "s_b18e7754019887": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ae121d62-ad52-4ae7-9a8a-c930272dd1c8",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}

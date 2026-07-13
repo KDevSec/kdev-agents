@@ -1,0 +1,21 @@
+docs/skills/kdev-memory/roadmap.md
+  s_2bbd0647749aa8::t_bd8dfc2f4b103f 177
+  s_2bbd0647749aa8::t_a5044366d4e9d5 15
+  s_2bbd0647749aa8::t_3fcff4fc6c65b7 61-106
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.13",
+  "base_commit_sha": "6cd05d0a6486fab3ace095847aa5c8c347998a99",
+  "prompts": {},
+  "sessions": {
+    "s_2bbd0647749aa8": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "34cdde45-c6a0-4304-9779-54a49f3c777f",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}

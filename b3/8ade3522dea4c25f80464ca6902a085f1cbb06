@@ -1,0 +1,40 @@
+plugins/kdev-memory/hooks/stop-check.py
+  s_ae90d47443e528::t_34681f25abff6c 137-141
+  s_ae90d47443e528::t_7ef6226ba4860a 38
+plugins/kdev-memory/hooks/post-write-check.py
+  s_ae90d47443e528::t_69fe092d8ed4a2 26,30-34
+plugins/kdev-memory/hooks/kdev-sync-push.py
+  s_ae90d47443e528::t_62257c45caa79f 9,14-17
+plugins/kdev-memory/hooks/session-end-check.py
+  s_ae90d47443e528::t_8e0c604c66a760 22
+  s_ae90d47443e528::t_c99261b34d4e4f 92-96
+plugins/kdev-memory/hooks/kdev-sync-bootstrap.py
+  s_ae90d47443e528::t_67d9a052d45bed 9,14-17
+plugins/kdev-memory/hooks/pre-compact-check.py
+  s_ae90d47443e528::t_a800186bdf5d2a 87-91
+  s_ae90d47443e528::t_bad60b9e3d22c5 38
+plugins/kdev-memory/hooks/user-prompt-trigger.py
+  s_ae90d47443e528::t_f9779388d664f4 24,31-36
+plugins/kdev-memory/hooks/session-start-brief.py
+  s_ae90d47443e528::t_75a89bab92ca37 32
+  s_ae90d47443e528::t_d57d30ad6cbc08 513-519
+plugins/kdev-memory/hooks/commit-tracker.py
+  s_ae90d47443e528::t_ce1db486da76bb 27
+  s_ae90d47443e528::t_27bd8c25dcca44 86-90
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "b38ade3522dea4c25f80464ca6902a085f1cbb06",
+  "prompts": {},
+  "sessions": {
+    "s_ae90d47443e528": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "43b4bc16-57c1-42c9-bf7f-9477870bd82d",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}

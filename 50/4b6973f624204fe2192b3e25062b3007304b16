@@ -1,0 +1,43 @@
+plugins/kdev-memory/hooks/lib/fallback_step.py
+  s_3ae8861f068042::t_1340a88e4b34ac 15
+  s_3ae8861f068042::t_657bd18dd5cfc3 114-117
+  s_3ae8861f068042::t_e32c0fc719c358 73-82
+  s_3ae8861f068042::t_8c2f8f033b2491 60
+plugins/kdev-memory/tests/test_precompact_fallback.py
+  s_3ae8861f068042::t_d18ff23ec70d89 1-69
+plugins/kdev-memory/tests/test_fallback_step.py
+  s_3ae8861f068042::t_1a55c844f2375e 95-120
+plugins/kdev-memory/tests/test_daily_render.py
+  s_3ae8861f068042::t_fdca35c9293878 111-127
+docs/superpowers/specs/2026-07-07-兜底记录+三层防线-design.md
+  s_3ae8861f068042::t_3df041abd70765 118
+  s_3ae8861f068042::t_5785fbc98add01 3
+plugins/kdev-memory/.claude-plugin/plugin.json
+  s_3ae8861f068042::t_f9421495a258a7 4
+plugins/kdev-memory/hooks/pre-compact-check.py
+  s_3ae8861f068042::t_72a7aadc28991c 40,42
+  s_3ae8861f068042::t_8619a5082646b3 111,113-114,133-136,138,140-146,148-150
+plugins/kdev-memory/hooks/lib/daily_render.py
+  s_3ae8861f068042::t_a0cf54ea5e52b4 68-71,75-76,82-87
+  s_3ae8861f068042::t_1ec3802ee3d230 21
+plugins/kdev-memory/tests/test_dualread_readers.py
+  s_3ae8861f068042::t_3008740ebb6216 478-479,487-488
+plugins/kdev-memory/CHANGELOG.md
+  s_3ae8861f068042::t_c7747a0327863d 3-29
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "504b6973f624204fe2192b3e25062b3007304b16",
+  "prompts": {},
+  "sessions": {
+    "s_3ae8861f068042": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "cafa9883-fca2-4dbc-b226-b1a4858a867f",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}

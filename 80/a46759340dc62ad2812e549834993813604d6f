@@ -1,0 +1,23 @@
+plugins/kdev-memory/tests/test_tier_a_scope.py
+  s_7911c9068c7c15::t_8be296efdbfa56 33-46,51-68
+plugins/kdev-memory/hooks/lib/archive_hint.py
+  s_7911c9068c7c15::t_67f2f1b3e78747 100-106
+  s_7911c9068c7c15::t_e4caeaf1d774a8 6
+  s_7911c9068c7c15::t_76457fca6691af 55-60
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.13",
+  "base_commit_sha": "80a46759340dc62ad2812e549834993813604d6f",
+  "prompts": {},
+  "sessions": {
+    "s_7911c9068c7c15": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "dae659e8-6a74-493c-aecd-8c1c67aece9a",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}

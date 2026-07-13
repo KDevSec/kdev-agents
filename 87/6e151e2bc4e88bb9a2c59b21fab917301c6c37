@@ -1,0 +1,58 @@
+plugins/kdev-memory/hooks/lib/step_log.py
+  s_3ae8861f068042::t_9b866e98ac29e9 77,86-109
+  s_3ae8861f068042::t_1d8f16fedaad83 110-111
+plugins/kdev-memory/hooks/session-end-check.py
+  s_3ae8861f068042::t_437e9bdf6a3078 23,25
+  s_3ae8861f068042::t_001bc643d5ad3e 112-113,115-117,132-139
+  s_3ae8861f068042::t_4a85078eb2d241 142-147,151-153,155-159
+  s_3ae8861f068042::t_62031d371c9420 140
+plugins/kdev-memory/tests/test_fallback_step.py
+  s_3ae8861f068042::t_0051eb24822a81 1-94
+plugins/kdev-memory/tests/test_step_completeness.py
+  s_3ae8861f068042::t_97cd95cd052cde 549-554
+plugins/kdev-memory/.claude-plugin/plugin.json
+  s_3ae8861f068042::t_ff32184da71365 4
+plugins/kdev-memory/tests/test_distill.py
+  s_3ae8861f068042::t_fb24a09daade76 636-656
+plugins/kdev-memory/tests/test_session_end_mtime.py
+  s_3ae8861f068042::t_ed80a37bdb76d6 94-150
+plugins/kdev-memory/tests/test_status_schema.py
+  s_3ae8861f068042::t_fc990a8b0a33d9 64-86
+plugins/kdev-memory/tests/test_brief_verbosity.py
+  s_3ae8861f068042::t_9b62978c393759 81-97
+plugins/kdev-memory/hooks/lib/status_schema.py
+  s_3ae8861f068042::t_7b55a0c93db6b5 25
+  s_3ae8861f068042::t_ae266263e151d5 40-43,45-55
+plugins/kdev-memory/CHANGELOG.md
+  s_3ae8861f068042::t_e87aae4ea4ea6d 3-28
+plugins/kdev-memory/hooks/lib/fallback_step.py
+  s_3ae8861f068042::t_502757b02cad33 1-70,72-105
+  s_3ae8861f068042::t_a428d854dd39b8 71
+plugins/kdev-memory/hooks/lib/step_completeness.py
+  s_3ae8861f068042::t_b74f92dd988219 72
+  s_3ae8861f068042::t_caba46a8413bef 151-153
+plugins/kdev-memory/hooks/session-start-brief.py
+  s_3ae8861f068042::t_4d3895d57dd903 322-339
+  s_3ae8861f068042::t_c8c4f7758ae59f 366
+  s_3ae8861f068042::t_3334338ab8a455 376,381-382
+  s_3ae8861f068042::t_ba9b6959107af5 579-580
+plugins/kdev-memory/hooks/lib/distill.py
+  s_3ae8861f068042::t_8c683059e4d201 250-251
+  s_3ae8861f068042::t_269918624dd9fb 38
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "876e151e2bc4e88bb9a2c59b21fab917301c6c37",
+  "prompts": {},
+  "sessions": {
+    "s_3ae8861f068042": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "cafa9883-fca2-4dbc-b226-b1a4858a867f",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}

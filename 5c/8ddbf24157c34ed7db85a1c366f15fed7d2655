@@ -1,0 +1,43 @@
+plugins/kdev-team/staff.yml
+  s_514813c2541bfb::t_bb95f7ff35f00c 47
+plugins/kdev-team/skills/kdev-flow-driver/references/node-agent-routing.md
+  s_514813c2541bfb::t_18c2837034bffd 139-140
+plugins/kdev-team/tests/test_staff.py
+  s_514813c2541bfb::t_581b97314a6803 78-83
+  s_514813c2541bfb::t_b60f211628aaeb 73
+plugins/kdev-team/agents/test-engineer-api.md
+  s_514813c2541bfb::t_7a8ca537946146 1-43
+plugins/kdev-team/orchestration/test-engineer.exec.node-table.yml
+  s_514813c2541bfb::t_03df2d51946979 4
+  s_514813c2541bfb::t_065ee9d3fd86a9 11-12
+plugins/kdev-team/.claude-plugin/plugin.json
+  s_514813c2541bfb::t_5b7292704718a3 4
+plugins/kdev-team/tests/test_test_engineer_wiring.py
+  s_514813c2541bfb::t_f0404d3fae4d47 38-42
+plugins/kdev-team/tests/test_test_engineer_orchestration.py
+  s_514813c2541bfb::t_0ff7691982206d 26
+  s_514813c2541bfb::t_ab292f1c4831c4 30-56
+plugins/kdev-team/agents/test-engineer-orchestrator.md
+  s_514813c2541bfb::t_32ae6c24aba1f7 25
+  s_514813c2541bfb::t_6391a6b6d18941 36
+plugins/kdev-team/CHANGELOG.md
+  s_514813c2541bfb::t_f9559fe90177e9 3-11
+plugins/kdev-team/tests/test_agents.py
+  s_514813c2541bfb::t_1389276b9744e1 117
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.8",
+  "base_commit_sha": "5c8ddbf24157c34ed7db85a1c366f15fed7d2655",
+  "prompts": {},
+  "sessions": {
+    "s_514813c2541bfb": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "975d7c0d-2bec-4835-bad1-4b662472c24e",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}

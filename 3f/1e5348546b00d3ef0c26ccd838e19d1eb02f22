@@ -1,0 +1,26 @@
+plugins/kdev-memory/agents/kdev-step-recorder.md
+  s_7911c9068c7c15::t_9fcda2cbd80f3f 36
+  s_7911c9068c7c15::t_76ade33dc9931e 209,211,213
+  s_7911c9068c7c15::t_03c67dd13367ab 115,120,126,130
+  s_7911c9068c7c15::t_1d4f2003e9cb23 143-167,170-173,175-180,182,184-185,188
+  s_7911c9068c7c15::t_eebca53695d04c 1,3,7-9
+  s_7911c9068c7c15::t_8d9703d621f62e 231-232
+plugins/kdev-memory/tests/test_step_recorder_e2e.py
+  s_7911c9068c7c15::t_c76d42bccfd07d 2,5-7,19-20,35-37,41-61,64-65,69-71,74,78,80-83,85-93,95-118,125-141
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.13",
+  "base_commit_sha": "3f1e5348546b00d3ef0c26ccd838e19d1eb02f22",
+  "prompts": {},
+  "sessions": {
+    "s_7911c9068c7c15": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "dae659e8-6a74-493c-aecd-8c1c67aece9a",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}

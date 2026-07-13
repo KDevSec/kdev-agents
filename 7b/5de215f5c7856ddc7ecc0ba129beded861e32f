@@ -1,0 +1,23 @@
+plugins/kdev-memory/hooks/lib/kdev_sync.py
+  s_e2b8fb7df6e9d8::t_a83153644ffe3c 12
+plugins/kdev-memory/CHANGELOG.md
+  s_e2b8fb7df6e9d8::t_f1dd4e79b04271 3-10
+plugins/kdev-memory/tests/test_kdev_sync_noninteractive.py
+  s_e2b8fb7df6e9d8::t_ae76771bd7ee5e 1-88
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.13",
+  "base_commit_sha": "7b5de215f5c7856ddc7ecc0ba129beded861e32f",
+  "prompts": {},
+  "sessions": {
+    "s_e2b8fb7df6e9d8": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "2adf6927-1e8c-4808-9bb0-3fdbc58abddd",
+        "model": "deepseek-v4-pro"
+      },
+      "human_author": "liyong <ly1989abc@126.com>"
+    }
+  }
+}

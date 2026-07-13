@@ -1,0 +1,21 @@
+docs/分享/superpowers技术分享.md
+  s_54085f20b36e9a::t_af50e253eaf4cf 1-339
+docs/分享/frontend-design技术分享.md
+  s_54085f20b36e9a::t_df9a38e987c195 1-191
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "957b93ecb12cb9b0f25fe00c80ba83ccc22472b2",
+  "prompts": {},
+  "sessions": {
+    "s_54085f20b36e9a": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "03f0d70b-1bed-4b9a-ab4b-672b40a8635e",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}

@@ -1,0 +1,21 @@
+plugins/kdev-memory/.claude-plugin/plugin.json
+  s_0d3c07cfe95666::t_00c9204a68e469 4
+docs/skills/kdev-memory/dev-notes/kdev-memory上下文消耗诊断-2026-07-10.md
+  s_0d3c07cfe95666::t_5a4d93c4a01782 142
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.11",
+  "base_commit_sha": "551dae2c27f8c20568c24e1ed0124d43ebd7e905",
+  "prompts": {},
+  "sessions": {
+    "s_0d3c07cfe95666": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "85a05d44-9776-4541-93fa-0cf8d2acd2b3",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}

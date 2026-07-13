@@ -1,0 +1,19 @@
+plugins/kdev-memory/tests/test_coexist_defer.py
+  s_ae90d47443e528::t_055476bb1ad0fa 1-372
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "28e9ca90cb076fad764e282e3e229e265829d6b9",
+  "prompts": {},
+  "sessions": {
+    "s_ae90d47443e528": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "43b4bc16-57c1-42c9-bf7f-9477870bd82d",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}

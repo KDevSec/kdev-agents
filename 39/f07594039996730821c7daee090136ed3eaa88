@@ -1,0 +1,30 @@
+plugins/kdev-hud/tests/test_main_entrypoint.py
+  s_22525fa85bc62d::t_baa29773e7d1cf 1-39
+plugins/kdev-hud/tests/test_setup_cli.py
+  s_22525fa85bc62d::t_e1cc0e0ac60aef 1-67
+plugins/kdev-hud/kdev_hud/setup.py
+  s_22525fa85bc62d::t_4aa49df59a1ead 1-115
+plugins/kdev-hud/kdev_hud/cli.py
+  s_22525fa85bc62d::t_3bd2279573643b 84-107,119-127
+  s_22525fa85bc62d::t_8bb3bf7bc452b0 1,5,14
+plugins/kdev-hud/tests/test_setup.py
+  s_22525fa85bc62d::t_fcc849a76e2b6a 1-167
+plugins/kdev-hud/kdev_hud/__main__.py
+  s_22525fa85bc62d::t_aaa04b7d3bfa88 2-7
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.8",
+  "base_commit_sha": "39f07594039996730821c7daee090136ed3eaa88",
+  "prompts": {},
+  "sessions": {
+    "s_22525fa85bc62d": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "cfb5df2e-492b-4de8-b078-5b523b8b5ac4",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}

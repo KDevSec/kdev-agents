@@ -1,0 +1,19 @@
+docs/superpowers/specs/2026-07-07-兜底记录+三层防线-design.md
+  s_3ae8861f068042::t_3eba5504f6fe1a 1-126
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.10",
+  "base_commit_sha": "7cdf5f72052c21aba2b75cdbf618bdad76fde58d",
+  "prompts": {},
+  "sessions": {
+    "s_3ae8861f068042": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "cafa9883-fca2-4dbc-b226-b1a4858a867f",
+        "model": "unknown"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}

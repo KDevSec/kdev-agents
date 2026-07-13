@@ -1,0 +1,27 @@
+docs/superpowers/specs/2026-06-18-kdev单插件化+去第三方+bootstrap安装-design.md
+  s_7babc6caee3d38::t_c06b5945c49b73 14-26,31-33,36
+  s_7babc6caee3d38::t_30c3ddff9995bc 28
+  s_7babc6caee3d38::t_0ecd0521d77236 27,29-30
+  s_7babc6caee3d38::t_2950c92ab955da 1-13,34-35,37-63,66-212
+  s_7babc6caee3d38::t_2bf487c35584a4 64-65
+docs/superpowers/plans/2026-06-18-ieidev迁移-P0-仓库骨架+引擎内核port.md
+  s_7babc6caee3d38::t_b53456095a6ea9 1-192
+docs/superpowers/specs/2026-06-18-CQO监督员-design.md
+  s_7babc6caee3d38::t_31c2a2cb304581 1-278
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.5.9",
+  "base_commit_sha": "7d9872f1029daddd97f8c87f0b13b633dc3d866f",
+  "prompts": {},
+  "sessions": {
+    "s_7babc6caee3d38": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "ccc49fd4-0e9b-4101-8102-20e3c84bc25f",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
