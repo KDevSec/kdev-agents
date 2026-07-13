@@ -1,0 +1,62 @@
+.claude-plugin/marketplace.json
+  s_315574ffebf919::t_4f5dbd7795ca7b 23-27
+  s_c8923f1f2fdbf5::t_fb8e361ad0e01c 22
+plugins/kdev-zentao-sync/.claude-plugin/plugin.json
+  s_315574ffebf919::t_56bae29a155089 1-10
+plugins/kdev-zentao-sync/README.md
+  s_315574ffebf919::t_f7c9067fab4c96 1-30
+plugins/kdev-zentao-sync/skills/kdev-zentao-sync/.gitignore
+  s_315574ffebf919::t_e9a6edfca2eb38 1-5
+plugins/kdev-zentao-sync/skills/kdev-zentao-sync/SKILL.md
+  s_315574ffebf919::t_e2ab7bfde33b2e 1-133
+plugins/kdev-zentao-sync/skills/kdev-zentao-sync/scripts/bug_ops.py
+  s_315574ffebf919::t_21146e1b0275db 1-188
+plugins/kdev-zentao-sync/skills/kdev-zentao-sync/scripts/capability_probe.py
+  s_315574ffebf919::t_249a4ee877fcc0 1-85
+plugins/kdev-zentao-sync/skills/kdev-zentao-sync/scripts/case_md_parser.py
+  s_315574ffebf919::t_1c8331e9a25161 1-91
+plugins/kdev-zentao-sync/skills/kdev-zentao-sync/scripts/mapper.py
+  s_315574ffebf919::t_e73050d7530b0c 1-129
+plugins/kdev-zentao-sync/skills/kdev-zentao-sync/scripts/pytest.ini
+  s_315574ffebf919::t_24fc1463d49c73 1-4
+plugins/kdev-zentao-sync/skills/kdev-zentao-sync/scripts/sync.py
+  s_315574ffebf919::t_4fa66bfdfb36a0 1-404
+plugins/kdev-zentao-sync/skills/kdev-zentao-sync/scripts/tests/fixtures/sample_cases.md
+  s_315574ffebf919::t_b041706bb1a8d5 1-48
+plugins/kdev-zentao-sync/skills/kdev-zentao-sync/scripts/tests/test_bug_ops.py
+  s_315574ffebf919::t_0becc7a1e07996 1-171
+plugins/kdev-zentao-sync/skills/kdev-zentao-sync/scripts/tests/test_case_md_parser.py
+  s_315574ffebf919::t_9a854da4167e45 1-31
+plugins/kdev-zentao-sync/skills/kdev-zentao-sync/scripts/tests/test_mapper.py
+  s_315574ffebf919::t_32e9bc83e147ee 1-139
+plugins/kdev-zentao-sync/skills/kdev-zentao-sync/scripts/tests/test_sync.py
+  s_315574ffebf919::t_3c80be3ff51ef9 1-630
+plugins/kdev-zentao-sync/skills/kdev-zentao-sync/scripts/tests/test_zentao_client.py
+  s_315574ffebf919::t_89eaed79dd1e65 1-153
+plugins/kdev-zentao-sync/skills/kdev-zentao-sync/scripts/zentao_client.py
+  s_315574ffebf919::t_2ead63f6899a5f 1-112
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.12",
+  "base_commit_sha": "643fc33627cfa95fbbfdcd959d663c4823225a61",
+  "prompts": {},
+  "sessions": {
+    "s_315574ffebf919": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "a4fbf740-5572-4479-b8e3-a7bf7448659f",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "doudoudou-dou <82752251@qq.com>"
+    },
+    "s_c8923f1f2fdbf5": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "23598973-6e45-4426-9c1e-a1cc84a15175",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "doudoudou-dou <82752251@qq.com>"
+    }
+  }
+}
