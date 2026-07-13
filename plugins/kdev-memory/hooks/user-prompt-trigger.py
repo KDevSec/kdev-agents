@@ -58,8 +58,9 @@ def main() -> int:
         from transcript_source import stash_current_transcript
         _d = json.loads(raw) if raw.strip() else {}
         _tp = _d.get("transcript_path", "") if isinstance(_d, dict) else ""
+        _sid = str(_d.get("session_id") or "") if isinstance(_d, dict) else ""
         if _tp:
-            stash_current_transcript(Path(".kdev/memory/state"), _tp)
+            stash_current_transcript(Path(".kdev/memory/state"), _tp, session_id=_sid)
     except Exception:
         pass
 

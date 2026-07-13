@@ -66,7 +66,10 @@ def _read_source() -> Tuple[str, str]:
         from transcript_source import stash_current_transcript
         tp = data.get("transcript_path", "")
         if tp:
-            stash_current_transcript(Path(".kdev/memory/state"), tp)
+            # 槽 key 用 hook input 的 session_id（与 recorder 侧 CLAUDE_CODE_SESSION_ID 同源），
+            # 不从 transcript 文件名 stem 反推——resume/compact 后二者未必相等
+            sid = "" if session_id == "unknown" else session_id
+            stash_current_transcript(Path(".kdev/memory/state"), tp, session_id=sid)
     except Exception:
         pass
     return source, session_id

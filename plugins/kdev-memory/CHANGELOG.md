@@ -1,5 +1,20 @@
 # kdev-memory CHANGELOG
 
+## [0.24.0] - 2026-07-13
+
+**他评溯源分槽根治 —— 修 0.23.0 `resolve_marker_verified` 的设计缺陷**。0.23.0 用「commit sha 当锚 + 内容校验 + 多命中取最新 mtime 恢复」绕开 `.current-transcript` 单槽竞争；下游 ieidev forward-port（0.9.1）后揪出 4 个问题，对照 kdev 实现逐条复核**全部成立**，且第 1 条在 kdev 侧更严重。全程 TDD，631 passed（+12 新）。
+
+### 修了什么
+
+- **分槽根治（取代内容反推当主路径）**：hook 按会话写独占槽 `.current-transcript.<session_id>`；recorder（subagent）的 `CLAUDE_CODE_SESSION_ID` 继承父会话、与 hook input 的 `session_id` 同源 → 直接认领自己那一槽，**零 dispatch 契约改造**。并发会话再多也覆盖不了别人的槽。legacy 单槽继续写供向后兼容。槽带 TTL GC，不在 `state/` 无限堆积。
+- **sha 锚不可单独采信（问题1）**：kdev-memory **自己的** `<kdev-memory-brief>` SessionStart 注入会把 `当前状态.md` frontmatter 里的 commit sha 写进**每一个**新会话 transcript 的第 5 行；加上 Claude Code 系统提示的 gitStatus `Recent commits`——锚不是"可能被污染"，是"默认被污染"（实测 `e41d003` 命中本 repo 4 个会话）。内容 fallback 路径现要求**写操作强判据**：会话须含针对 `files_touched` 的 Edit/Write/NotebookEdit `tool_use`（开发会话必有，讨论/评审/排查会话没有）。
+- **多命中不再猜（问题2+3）**：0.23.0 的 `recovered-ambiguous` 取最新 mtime——但"事后谈论某 commit"必然晚于"产出它"，最新 mtime **系统性地**选中错的那个（实测选中的正是一个一行代码没提交的排查会话）；更糟的是它把猜测标成 `recovered=True` 而 recorder 被要求信任该标志 → **复制了它本要消灭的静默错评，还多盖一个"已恢复到正确会话"的权威戳**。现在多命中一律 `degraded=True, ambiguous=True`，显式降级为自评，绝不猜。
+- **扫描有界 + 空指针可恢复（问题4）**：内容 fallback 扫描加 `SCAN_MAX_BYTES` (16M) + `SCAN_MAX_AGE_S` (7d) 双界（本 repo projects 目录实测 67 文件 / 131M、最坏全扫 1.42s）；`projects_dir` 缺省不再只从"候选 transcript 父目录"推（候选为空时直接不扫 → 而"指针丢了"恰是最该恢复的场景），改为按 cwd 推导 `~/.claude/projects/<slug>`。
+
+### 兼容性
+
+`resolve_marker_verified(state_dir, anchors, projects_dir=None, session_id=None, files_touched=None)` 参数向后兼容；返回值新增 `ambiguous` / `candidates` / `source`。`resolve_marker` 新增可选 `session_id` + 返回 `source`。zero-commit step 路径不变。
+
 ## [0.23.0] - 2026-07-12
 
 **他评溯源抗并发（`.current-transcript` 单槽竞争修复）+ 模板自洽性加固**——修 G 20260708-215209 的 2026-07-12 复现根因：`.current-transcript` 是每 repo 单槽全局指针、无会话隔离，同 repo **并发多会话**时互相覆盖，导致 recorder 他评溯源读到并发的另一会话（且 `switched=False`、内容有效可读 → 老越界守卫拦不住、静默错评）。改为**内容校验 + 自动恢复**，而非改 dispatch 契约。全程 TDD，619 passed（+6 新）。

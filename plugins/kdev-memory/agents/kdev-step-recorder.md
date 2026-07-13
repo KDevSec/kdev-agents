@@ -134,17 +134,19 @@ Capture `MINTED:` (e.g. `Step 20260613-101432-abcdev`) and `TARGET:` (the 执行
 
 主会话 dispatch 时**不再喂事实 YAML**，你自己从真 transcript 抽：
 
-1. 取范围（**用 `resolve_marker_verified`，把本次 `commit_shas` 当锚传进去**——别用裸 `resolve_marker`/`get_transcript_marker`）：
-   `python3 -c "import sys,json; sys.path.insert(0,'plugins/kdev-memory/hooks/lib'); import transcript_source as tsrc; from pathlib import Path; print(json.dumps(tsrc.resolve_marker_verified(Path('.kdev/memory/state'), ['<sha1>','<sha2>'])))"`
-   → `{transcript_path, since_offset, switched, verified, recovered, degraded, note}`。
-   - **为什么加锚校验**：`.current-transcript` 是**每 repo 单槽全局指针**，同 repo **并发多会话**时会被互相覆盖（G 20260708-215209 的 2026-07-12 复现根因：他评读到并发的另一会话，且 `switched=False`、内容有效可读 → 老的越界守卫拦不住、静默错评）。`resolve_marker_verified` 用你手里的 `commit_shas` 验证解出的 transcript **确实含本次 commit**；不含 → 自动扫 projects 目录**恢复**到真正含这些 sha 的会话（`recovered=True, since_offset=0`）。
-   - `verified=True`（含锚）或 `recovered=True`（已恢复）→ 正常用 `transcript_path` 抽事实；`recovered=True` 时在成功回报里加一行 `ℹ️ transcript 指针曾指向并发/错误会话，已按 commit 锚恢复到正确会话`。
-   - `commit_shas=[]`（zero-commit step）→ 无锚可校验，`resolve_marker_verified` 退回裸 `resolve_marker`（`verified=False`），按老流程走。
+1. 取范围（**用 `resolve_marker_verified`，把本次 `commit_shas` 当锚 + `files_touched` 当写证据一起传进去**——别用裸 `resolve_marker`/`get_transcript_marker`）：
+   `python3 -c "import sys,json; sys.path.insert(0,'plugins/kdev-memory/hooks/lib'); import transcript_source as tsrc; from pathlib import Path; print(json.dumps(tsrc.resolve_marker_verified(Path('.kdev/memory/state'), ['<sha1>','<sha2>'], files_touched=['<path1>','<path2>'])))"`
+   → `{transcript_path, since_offset, switched, verified, recovered, degraded, ambiguous, candidates, source, note}`。
+   - **主路径（`source=session-slot`）**：0.24.0 起 hook 按会话写**独占槽** `.current-transcript.<session_id>`，你（subagent）的 `CLAUDE_CODE_SESSION_ID` 环境变量继承自父会话、与之同源 → `resolve_marker_verified` 直接解出**你自己那一槽**，并发会话再多也覆盖不了它。此时 `verified=True`、不做任何内容扫描，正常抽事实。
+   - **fallback（老 state / 无独占槽）**才走内容校验：用 `commit_shas` + `files_touched` 找"真正产出本次 commit 的会话"。⚠️ **光有 sha 不算数**——`<kdev-memory-brief>` 注入和 Claude Code 的 gitStatus `Recent commits` 会把 sha 灌进**每一个**新会话的 transcript（实测一个 sha 命中 4 个会话）；必须同时有对 `files_touched` 的 Edit/Write tool_use（开发会话必有，讨论/评审/排查会话没有）。
+     - 恰好 1 个会话满足 → `recovered=True, since_offset=0`，正常抽事实，回报里加一行 `ℹ️ transcript 指针曾指向并发/错误会话，已按 commit 锚 + 写操作证据恢复到开发会话`。
+     - **多个会话满足（`ambiguous=True`）→ `degraded=True`，不猜**。（0.23.0 曾取最新 mtime 猜一个还标 `recovered=True`；但"事后谈论某 commit"必然晚于"产出它"，最新 mtime 系统性地选中错的那个，而 `recovered=True` 又给错评盖了权威戳 = 比原 bug 更糟。）按 5 走降级。
+   - `commit_shas=[]`（zero-commit step）→ 无锚可校验，退回裸 `resolve_marker`（`verified=False`），按老流程走。
 2. **用 Bash 调确定性抽取 helper**（⚠️ 不要用 Read 工具读 transcript——它有 25k 整文件 token 闸，offset/limit 也救不了大文件，直接拒）：
    `python3 plugins/kdev-memory/hooks/lib/transcript_extract.py "<transcript_path>" <since_offset>` → stdout JSON（`tools_invoked` / `tools_invoked_count` / `errors_hit` / `error_samples` / `files_touched` / `commit_shas` / `skills_invoked` / `subagents_dispatched` / `unreadable` / `out_of_range`）。这些直接填进 Step 的 `key_facts`（commit_shas 已锚定 git 真实输出，不会有 ghost SHA；空工具名已滤，tools_invoked_count 真实）。
 3. 需要他评所需的"绕路/返工原文"时，再 `sed -n 'A,Bp' "<transcript_path>" | jq -r '...'` 取具体几条（同样别用 Read 工具）。
 4. `subject`：Step 主题默认 `project`；若该段含用户对某 skill/plugin 的反馈，按 subject 三级推断（L1 显式名 / L2 取 `skills_invoked` 最近项 / L3 候选询问）裂解出 F-NNN（subject:plugin:X, verbatim 原话）——沿用现有 F-NNN 流程不变。
-5. **transcript 不可达时降级 + 显式标注（别静默）**：`resolve_marker_verified` 回 `degraded:true`（有 `commit_shas` 但无任何 transcript 含这些锚，如尚未落盘）/ `unreadable:true` / `transcript_path` 空 / `out_of_range:true`（越界读空）→ 据 dispatch summary + `git log` 写，since_offset 当 0，**不硬卡**；但**必须在成功回报里显式加一行 `⚠️ 他评降级为自评（<原因：degraded-无会话含commit锚/out_of_range/unreadable/空指针>），本条 model_eval 用主会话自评、未独立溯源`**——否则你无从判断这条是真他评还是主会话自说自话。
+5. **transcript 不可达时降级 + 显式标注（别静默）**：`resolve_marker_verified` 回 `degraded:true`（无任何会话同时满足 commit 锚 + 写证据，如 transcript 尚未落盘；或 `ambiguous:true` 多会话无法区分）/ `unreadable:true` / `transcript_path` 空 / `out_of_range:true`（越界读空）→ 据 dispatch summary + `git log` 写，since_offset 当 0，**不硬卡**；但**必须在成功回报里显式加一行 `⚠️ 他评降级为自评（<原因：degraded-无会话满足判据/degraded-ambiguous-多会话无法区分/out_of_range/unreadable/空指针>），本条 model_eval 用主会话自评、未独立溯源`**——否则你无从判断这条是真他评还是主会话自说自话。**宁可显式降级，也不要猜一个会话然后当他评落盘**。
 
 ### 2. Build JSON record，写 JSONL 主账（Phase B；本插件无 delegation）
 
