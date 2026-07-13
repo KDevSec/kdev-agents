@@ -1,0 +1,19 @@
+.gitignore
+  s_f1c2dcace7ab15::t_ff759c8d007f26 67-68
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.12",
+  "base_commit_sha": "996ad2e497c308c1fe0c96329947861e0ae17a24",
+  "prompts": {},
+  "sessions": {
+    "s_f1c2dcace7ab15": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "7c1b317e-b203-4f5c-86a2-299fba6b3765",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
