@@ -64,6 +64,8 @@ docs/framework/04-references/_repos/
 .claude/settings.local.json
 .claude/scheduled_tasks.lock
 .claude/*.lock
+# Claude Code 原生 worktree（整份仓库副本，绝不入库——防 `git add -A` 搭车）
+.claude/worktrees/
 sandbox/*
 
 # Git worktrees (本地隔离工作区，不跟踪)
