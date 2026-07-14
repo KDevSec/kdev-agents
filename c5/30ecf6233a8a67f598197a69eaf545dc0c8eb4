@@ -1,0 +1,21 @@
+.gitignore
+  s_0a500c2be0fe68::t_acea6d696d90e4 64-65
+.claude-plugin/marketplace.json
+  s_0a500c2be0fe68::t_87d51d90f5b99f 8-10,85
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "c530ecf6233a8a67f598197a69eaf545dc0c8eb4",
+  "prompts": {},
+  "sessions": {
+    "s_0a500c2be0fe68": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "b0286159-7c17-4bab-9b06-69686cc1978f",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
