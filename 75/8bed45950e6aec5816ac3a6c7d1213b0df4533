@@ -1,0 +1,22 @@
+.claude-plugin/marketplace.json
+  s_d737ba344d8a42::t_2f4271edaec4c9 13-17
+  s_d737ba344d8a42::t_e6c5ad858c00b6 12
+plugins/kdev-memory/CHANGELOG.md
+  s_d737ba344d8a42::t_2282c08641f917 3-12
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "758bed45950e6aec5816ac3a6c7d1213b0df4533",
+  "prompts": {},
+  "sessions": {
+    "s_d737ba344d8a42": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "42e98e66-f95b-45dd-b82a-017d75e2ce79",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
