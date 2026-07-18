@@ -61,6 +61,8 @@ docs/framework/04-references/_repos/
 # Claude Code 本地调试产物（仅忽略仓库根目录的 .kdev/；
 # 允许子目录里的 .kdev 作为测试 fixture 被跟踪，靠下面的 negation 放行）
 /.kdev/
+# ieidev 工程记忆——与 /.kdev/ 同口径，独立仓不进代码仓
+/.ieidev/
 .claude/settings.local.json
 .claude/scheduled_tasks.lock
 .claude/*.lock
