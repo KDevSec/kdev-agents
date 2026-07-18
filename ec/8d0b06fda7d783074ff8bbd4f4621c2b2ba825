@@ -1,0 +1,19 @@
+.gitignore
+  s_d737ba344d8a42::t_67b7e0a6c1c75a 64-65
+---
+{
+  "schema_version": "authorship/3.0.0",
+  "git_ai_version": "1.6.14",
+  "base_commit_sha": "ec8d0b06fda7d783074ff8bbd4f4621c2b2ba825",
+  "prompts": {},
+  "sessions": {
+    "s_d737ba344d8a42": {
+      "agent_id": {
+        "tool": "claude",
+        "id": "42e98e66-f95b-45dd-b82a-017d75e2ce79",
+        "model": "claude-opus-4-8"
+      },
+      "human_author": "ly <ly1989abc@126.com>"
+    }
+  }
+}
